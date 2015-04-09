@@ -10,13 +10,19 @@
         android:layout_width="fill_parent"
         android:layout_height="fill_parent">
 
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Synchronize"
-            android:id="@+id/syncButton"
-            android:layout_gravity="right"
-            android:onClick="onSynchronize" />
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content">
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Synchronize"
+                android:id="@+id/syncButton"
+                android:onClick="onSynchronize" />
+
+        </LinearLayout>
 
         <TextView
             android:layout_width="match_parent"
@@ -27,12 +33,45 @@
             android:textColor="@color/primary_text_default_material_light"
             android:typeface="monospace" />
 
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="Current location:"
+                android:id="@+id/currentLocationLabel" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:id="@+id/currentLocationView"
+                android:text="undefined"
+                android:singleLine="true"
+                android:paddingLeft="5dp" />
+
+            <Button
+                style="?android:attr/buttonStyleSmall"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="update"
+                android:id="@+id/updateLocationButton"
+                android:onClick="onUpdateLocation"
+                android:enabled="true"
+                android:clickable="true" />
+        </LinearLayout>
+
         <GridView
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:id="@+id/itemsGridView"
             android:layout_centerHorizontal="true"
-            android:numColumns="2"
+            android:numColumns="1"
             android:nestedScrollingEnabled="false" />
+
     </LinearLayout>
 </RelativeLayout>

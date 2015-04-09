@@ -5,6 +5,10 @@ import android.media.Image;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+
+
 public class Item {
     protected Integer id;
     protected String  title;
@@ -29,6 +33,10 @@ public class Item {
         } catch (JSONException e) {
             e.printStackTrace();
         }
+    }
+
+    public String toString() {
+        return getTitle() + ' ' + getHumanDistance();
     }
 
     public Integer getId() {
@@ -87,6 +95,18 @@ public class Item {
         this.distance = distance;
     }
 
+    public String getHumanDistance() {
+        int meters = Math.round(distance);
+        if (meters <= 999) {
+            return String.format("%dm", meters);
+        } else if (meters > 999 && meters <= 9999) {
+            return String.format("%.1fkm", meters/1000.0);
+        } else if (meters > 9999) {
+            return String.format("%dkm", Math.round(meters/1000.0));
+        }
+        return String.format("%dm", meters);
+    }
+
     public Image getPicture() {
         return picture;
     }
@@ -94,4 +114,12 @@ public class Item {
     public void setPicture(Image picture) {
         this.picture = picture;
     }
+
+//    public static double round(double value, int places) {
+//        if (places < 0) throw new IllegalArgumentException();
+//
+//        BigDecimal bd = new BigDecimal(value);
+//        bd = bd.setScale(places, RoundingMode.HALF_UP);
+//        return bd.doubleValue();
+//    }
 }

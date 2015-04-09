@@ -2,14 +2,18 @@ package org.give2peer.give2peer;
 
 import android.content.Context;
 import android.graphics.Color;
-import android.provider.CalendarContract;
-import android.support.annotation.NonNull;
+import android.location.Criteria;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
+import android.location.LocationProvider;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.GridView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -18,20 +22,23 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
 
 
 public class MainActivity extends ActionBarActivity {
 
+    protected LocationManager lm;
+    protected LocationProvider lp;
+    protected Location location;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        lm = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
+
+        // We never know, maybe there's an available location already
+        refreshLocationView();
 
         setContentView(R.layout.activity_main);
     }
@@ -58,27 +65,63 @@ public class MainActivity extends ActionBarActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    // LISTENERS ///////////////////////////////////////////////////////////////////////////////////
+
+
+
     // BUTTONS /////////////////////////////////////////////////////////////////////////////////////
 
     public void onSynchronize(View view) {
-        ArrayList<Item> items = new ArrayList<Item>();
-        Item item;
-        for (int i = 0 ; i < 42 ; i++) {
-            item = new Item();
-            item.setTitle("Item "+i);
-        }
+        // Find the items around me
+        ArrayList<Item> items = findItemsAroundMe();
 
-        GridView gridview = (GridView) findViewById(R.id.itemsGridView);
+        GridView itemsGridView = (GridView) findViewById(R.id.itemsGridView);
 
-        gridview.setBackgroundColor(Color.CYAN);
+        //itemsGridView.setBackgroundColor(Color.CYAN);
 
 
-        items = findItemsAroundMe();
+        itemsGridView.setAdapter(new ItemAdapter(this, R.layout.grid_item, R.id.titleTextView, items));
 
 
         toast("Synchronizing...");
-        dump(items.get(0).title);
+//        dump(items.get(0).title);
+
     }
+
+    public void onUpdateLocation(View view) {
+        // Disable the button
+        final View button = view; // accessed within inner class, so `final` is needed
+        button.setEnabled(false);
+        // Fetch the location asynchronously
+        LocationListener locationListener = new OneTimeLocationListener(lm, getLocationCriteria()) {
+            @Override
+            public void onLocationChanged(Location newLocation) {
+                super.onLocationChanged(newLocation);
+                location = newLocation;
+                refreshLocationView();
+                button.setEnabled(true);
+                toast("Successfully updated current location");
+            }
+        };
+    }
+
+
+    public void refreshLocationView() {
+
+        TextView currentLocationView = (TextView) findViewById(R.id.currentLocationView);
+        if (null != location) {
+            double latitude  = location.getLatitude();
+            double longitude = location.getLongitude();
+
+            currentLocationView.setText(String.format("%.5f/%.5f", latitude, longitude));
+        }
+
+    }
+
+
+
+
+
 
     // HELPERS /////////////////////////////////////////////////////////////////////////////////////
 
@@ -102,6 +145,22 @@ public class MainActivity extends ActionBarActivity {
     {
         return getString(R.string.dummyFindItemsResponse);
     }
+
+    // CONFIGURATION ///////////////////////////////////////////////////////////////////////////////
+
+    protected Criteria getLocationCriteria()
+    {
+        Criteria criteria = new Criteria();
+        criteria.setAltitudeRequired(false);
+        criteria.setBearingRequired(false);
+        criteria.setSpeedRequired(false);
+        criteria.setAccuracy(Criteria.ACCURACY_COARSE);
+
+        return criteria;
+    }
+
+    // ACTIONS /////////////////////////////////////////////////////////////////////////////////////
+
 
     protected ArrayList<Item> findItemsAroundMe()
     {
