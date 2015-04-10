@@ -13,7 +13,7 @@ import org.json.JSONObject;
 /**
  * Items are first-class citizens in this app.
  * They are fetched as JSON from the server.
- * They handle their image downloads through async tasks.
+ * They handle their own image downloads through async tasks.
  */
 public class Item {
     protected Integer id;
@@ -25,8 +25,9 @@ public class Item {
     protected Float   distance;
 
     protected Bitmap                thumbnail;
-    protected DownloadItemThumbTask downloadThumbTask;
+    protected String                thumbnailUrl;
     protected View                  thumbnailView;
+    protected DownloadItemThumbTask downloadThumbTask;
 
     protected Image   picture;
 
@@ -38,9 +39,10 @@ public class Item {
             setTitle(json.optString("title"));
             setDescription(json.optString("description"));
             setLocation(json.getString("location"));
-            setLatitude(new Float(json.getDouble("latitude")));
-            setLongitude(new Float(json.getDouble("longitude")));
-            setDistance(new Float(json.getString("distance")));
+            setLatitude((float)json.getDouble("latitude"));
+            setLongitude((float)json.getDouble("longitude"));
+            setDistance((float)json.getDouble("distance"));
+            setThumbnailUrl(json.optString("thumbnail"));
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -50,62 +52,14 @@ public class Item {
         return getTitle() + ' ' + getHumanDistance();
     }
 
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public String getLocation() {
-        return location;
-    }
-
-    public void setLocation(String location) {
-        this.location = location;
-    }
-
-    public Float getLatitude() {
-        return latitude;
-    }
-
-    public void setLatitude(Float latitude) {
-        this.latitude = latitude;
-    }
-
-    public Float getLongitude() {
-        return longitude;
-    }
-
-    public void setLongitude(Float longitude) {
-        this.longitude = longitude;
-    }
-
-    public Float getDistance() {
-        return distance;
-    }
-
-    public void setDistance(Float distance) {
-        this.distance = distance;
-    }
-
+    /**
+     * Returns a string describing the distance in human-readable format, like :
+     * - 42m
+     * - 4,2km
+     * - 42km
+     *
+     * This could be easily unit-tested. It isn't. But it could.
+     */
     public String getHumanDistance() {
         int meters = Math.round(distance);
         if (meters <= 999) {
@@ -118,6 +72,9 @@ public class Item {
         return String.format("%dm", meters);
     }
 
+    /**
+     * @return a concatenation of the distance and the title, for the thumbnail
+     */
     public String getThumbnailTitle() {
         String s = getHumanDistance();
         if (title.length() > 0) {
@@ -125,6 +82,65 @@ public class Item {
         }
         return s;
     }
+
+    /**
+     * Download the thumbnail in an async task.
+     */
+    public void downloadThumbnail() {
+        downloadThumbnail(null);
+    }
+
+    /**
+     * Download the thumbnail in an async task.
+     *
+     * @param viewToUpdate An optional ImageView to update with the thumbnail
+     */
+    public void downloadThumbnail(ImageView viewToUpdate) {
+        // Ignore subsequent calls to download if we already tried
+        if (null != downloadThumbTask) return;
+
+        // Download the thumbnail
+        if (thumbnailUrl.length() > 0) {
+            try {
+                Log.i("DownloadItemThumbTask", "Downloading from " + thumbnailUrl);
+                downloadThumbTask = new DownloadItemThumbTask(this, viewToUpdate);
+                downloadThumbTask.execute(thumbnailUrl);
+            } catch (Exception ex) {
+                Log.e("DownloadItemThumbTask", ex.getMessage());
+                ex.printStackTrace();
+            }
+        }
+    }
+
+    // ACCESSORS AND MUTATORS //////////////////////////////////////////////////////////////////////
+
+    public Integer getId() { return id; }
+
+    public void setId(Integer id) { this.id = id; }
+
+    public String getTitle() { return title; }
+
+    public void setTitle(String title) { this.title = title; }
+
+    public String getDescription() { return description; }
+
+    public void setDescription(String description) { this.description = description; }
+
+    public String getLocation() { return location; }
+
+    public void setLocation(String location) { this.location = location; }
+
+    public Float getLatitude() { return latitude; }
+
+    public void setLatitude(Float latitude) { this.latitude = latitude; }
+
+    public Float getLongitude() { return longitude; }
+
+    public void setLongitude(Float longitude) { this.longitude = longitude; }
+
+    public Float getDistance() { return distance; }
+
+    public void setDistance(Float distance) { this.distance = distance; }
 
     public Image getPicture() {
         return picture;
@@ -142,50 +158,16 @@ public class Item {
         return thumbnail;
     }
 
-    public void setThumbnail(Bitmap thumbnail) {
-        this.thumbnail = thumbnail;
-    }
+    public void setThumbnail(Bitmap thumbnail) { this.thumbnail = thumbnail; }
 
-    public void downloadThumbnail() {
-        downloadThumbnail(null);
-    }
-    public void downloadThumbnail(ImageView viewToUpdate) {
-        if (null != downloadThumbTask) return;
+    public String getThumbnailUrl() { return thumbnailUrl; }
 
-        // We also need their images
-        // fixme
-        String imageUrl = "http://www.gamasutra.com/db_area/images/news/2014/Sep/226054/android_logo.jpg";
-        if (getDistance() > 3000) {
-            imageUrl = "http://www.51osos.com/wp-content/uploads/2011/12/linux.jpg";
-        }
-        // Get an Image
-        try {
-            Log.e("DownloadItemThumbTask", "Starting download of " + imageUrl.substring(11));
-            downloadThumbTask = new DownloadItemThumbTask(this, viewToUpdate);
-            downloadThumbTask.execute(imageUrl);
-        } catch (Exception ex) {
-            Log.e("DownloadItemThumbTask", ex.getMessage());
-            ex.printStackTrace();
-        }
-    }
+    public void setThumbnailUrl(String thumbnailUrl) { this.thumbnailUrl = thumbnailUrl; }
 
-    public boolean hasThumbnailView() {
-        return null != thumbnailView;
-    }
+    public boolean hasThumbnailView() { return null != thumbnailView; }
 
-    public View getThumbnailView() {
-        return thumbnailView;
-    }
+    public View getThumbnailView() { return thumbnailView; }
 
-    public void setThumbnailView(View thumbnailView) {
-        this.thumbnailView = thumbnailView;
-    }
+    public void setThumbnailView(View thumbnailView) { this.thumbnailView = thumbnailView; }
 
-    //    public static double round(double value, int places) {
-//        if (places < 0) throw new IllegalArgumentException();
-//
-//        BigDecimal bd = new BigDecimal(value);
-//        bd = bd.setScale(places, RoundingMode.HALF_UP);
-//        return bd.doubleValue();
-//    }
 }
