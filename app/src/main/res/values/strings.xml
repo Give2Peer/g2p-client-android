@@ -8,12 +8,12 @@
 [
    {
        \"id\": 529,
-       \"title\": \"Plum maiores\",
+       \"title\": \"Chaise\",
        \"location\": \"43.59528538094, 1.4899757103897\",
        \"latitude\": 43.59528538094,
        \"longitude\": 1.4899757103897,
-       \"distance\": \"2494.63965368956\",
-       \"description\": \"Consequuntur rem quod ab omnis aut nesciunt quaerat. Dolorem ea rerum enim.\",
+       \"distance\": \"249.63965368956\",
+       \"description\": \"Une simple chaise en plastique.\",
        \"tags\": [
 
        ],
@@ -32,12 +32,12 @@
    },
    {
        \"id\": 76,
-       \"title\": \"LimeGreen libero\",
+       \"title\": \"Briquet BIC\",
        \"location\": \"43.548083594727, 1.4953072156219\",
        \"latitude\": 43.548083594727,
        \"longitude\": 1.4953072156219,
-       \"distance\": \"4194.49735510112\",
-       \"description\": \"Eum dolore saepe repellendus autem accusantium inventore. Explicabo dolore corporis quam atque. Doloribus reiciendis culpa aut.\",
+       \"distance\": \"2494.49735510112\",
+       \"description\": \"Il est déchargé.\",
        \"tags\": [
 
        ],

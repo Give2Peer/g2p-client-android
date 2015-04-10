@@ -1,12 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent" android:layout_height="fill_parent">
 
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/itemImageView"
+        android:src="@drawable/briquet_bic_thumb"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="false"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="false" />
+
     <TextView
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:text="Nope"
-        android:id="@+id/titleTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/itemTitleTextView"
         android:layout_gravity="center"
-        android:background="#ffe2ffd2" />
-</LinearLayout>
+        android:layout_alignParentTop="true"
+        android:elegantTextHeight="false"
+        android:textSize="12sp"
+        android:textIsSelectable="true"
+        android:background="#afffffff"
+        android:padding="3dp"
+        android:singleLine="true" />
+
+</RelativeLayout>

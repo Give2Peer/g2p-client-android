@@ -9,6 +9,7 @@ import android.location.LocationManager;
 import android.location.LocationProvider;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -35,8 +36,8 @@ public class MainActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        // Let's grab the location manager
         lm = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
-
         // We never know, maybe there's an available location already
         refreshLocationView();
 
@@ -69,29 +70,35 @@ public class MainActivity extends ActionBarActivity {
 
 
 
-    // BUTTONS /////////////////////////////////////////////////////////////////////////////////////
+    // UI LISTENERS ////////////////////////////////////////////////////////////////////////////////
 
     public void onSynchronize(View view) {
         // Find the items around me
         ArrayList<Item> items = findItemsAroundMe();
 
+        // This is a hack for API v8 to get the column width in order to have square item thumbs
+        int nbColumns = 2; // getting this procedurally requires a higher API too
+        DisplayMetrics dm = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(dm);
+        int size = dm.widthPixels / nbColumns;
+
+        // Fill the gridView with our items
         GridView itemsGridView = (GridView) findViewById(R.id.itemsGridView);
+        itemsGridView.setAdapter(new ItemAdapter(this, R.layout.grid_item, size, items));
 
-        //itemsGridView.setBackgroundColor(Color.CYAN);
-
-
-        itemsGridView.setAdapter(new ItemAdapter(this, R.layout.grid_item, R.id.titleTextView, items));
-
-
-        toast("Synchronizing...");
+        // Warn the user
+        if (items.isEmpty()) {
+            toast("No items could be found.");
+        }
 //        dump(items.get(0).title);
 
     }
 
     public void onUpdateLocation(View view) {
-        // Disable the button
-        final View button = view; // accessed within inner class, so `final` is needed
+        // Disable the button, accessed within inner class, so `final` is needed
+        final View button = findViewById(R.id.updateLocationButton);
         button.setEnabled(false);
+
         // Fetch the location asynchronously
         LocationListener locationListener = new OneTimeLocationListener(lm, getLocationCriteria()) {
             @Override
@@ -106,6 +113,8 @@ public class MainActivity extends ActionBarActivity {
     }
 
 
+    // UI ACTIONS //////////////////////////////////////////////////////////////////////////////////
+
     public void refreshLocationView() {
 
         TextView currentLocationView = (TextView) findViewById(R.id.currentLocationView);
@@ -113,7 +122,7 @@ public class MainActivity extends ActionBarActivity {
             double latitude  = location.getLatitude();
             double longitude = location.getLongitude();
 
-            currentLocationView.setText(String.format("%.5f/%.5f", latitude, longitude));
+            currentLocationView.setText(String.format("%.4f/%.4f", latitude, longitude));
         }
 
     }
@@ -160,7 +169,6 @@ public class MainActivity extends ActionBarActivity {
     }
 
     // ACTIONS /////////////////////////////////////////////////////////////////////////////////////
-
 
     protected ArrayList<Item> findItemsAroundMe()
     {

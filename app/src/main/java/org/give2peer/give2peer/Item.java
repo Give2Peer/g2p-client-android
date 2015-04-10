@@ -107,6 +107,14 @@ public class Item {
         return String.format("%dm", meters);
     }
 
+    public String getThumbnailTitle() {
+        String s = getHumanDistance();
+        if (!title.isEmpty()) {
+            s = s + "  " + title;
+        }
+        return s;
+    }
+
     public Image getPicture() {
         return picture;
     }
