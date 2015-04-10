@@ -76,6 +76,15 @@ public class MainActivity extends ActionBarActivity {
         // Find the items around me
         ArrayList<Item> items = findItemsAroundMe();
 
+//        // We also need their images
+//        String imageUrl = "http://www.gamasutra.com/db_area/images/news/2014/Sep/226054/android_logo.jpg";
+////        String imageUrl = "http://s20.postimg.org/4t9w2pdct/logo_android_png.png";
+//        // Get an Image
+//        try {
+//            AsyncTask<String, Void, Bitmap> execute = new DownloadItemThumbTask((ImageView) findViewById(R.id.imageView)).execute(imageUrl);
+//            // R.id.imageView  -> Here imageView is id of your ImageView
+//        } catch (Exception ex) {}
+
         // This is a hack for API v8 to get the column width in order to have square item thumbs
         int nbColumns = 2; // getting this procedurally requires a higher API too
         DisplayMetrics dm = new DisplayMetrics();

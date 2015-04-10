@@ -1,12 +1,13 @@
 package org.give2peer.give2peer;
 
+import android.graphics.Bitmap;
 import android.media.Image;
+import android.util.Log;
+import android.view.View;
+import android.widget.ImageView;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 
 
 public class Item {
@@ -17,7 +18,11 @@ public class Item {
     protected Float   latitude;
     protected Float   longitude;
     protected Float   distance;
+
+    protected Bitmap  thumbnail;
     protected Image   picture;
+
+    protected View    thumbnailView;
 
     public Item() {}
 
@@ -102,14 +107,14 @@ public class Item {
         } else if (meters > 999 && meters <= 9999) {
             return String.format("%.1fkm", meters/1000.0);
         } else if (meters > 9999) {
-            return String.format("%dkm", Math.round(meters/1000.0));
+            return String.format("%dkm", Math.round(meters / 1000.0));
         }
         return String.format("%dm", meters);
     }
 
     public String getThumbnailTitle() {
         String s = getHumanDistance();
-        if (!title.isEmpty()) {
+        if (title.length() > 0) {
             s = s + "  " + title;
         }
         return s;
@@ -123,7 +128,56 @@ public class Item {
         this.picture = picture;
     }
 
-//    public static double round(double value, int places) {
+    public boolean hasThumbnail() {
+        return null != thumbnail;
+    }
+
+    public Bitmap getThumbnail() {
+        return thumbnail;
+    }
+
+    public void setThumbnail(Bitmap thumbnail) {
+        this.thumbnail = thumbnail;
+    }
+
+    protected DownloadItemThumbTask downloadThumbTask;
+
+    public void downloadThumbnail() {
+        downloadThumbnail(null);
+    }
+    public void downloadThumbnail(ImageView viewToUpdate) {
+        if (null != downloadThumbTask) return;
+
+        // We also need their images
+        // fixme
+        String imageUrl = "http://www.gamasutra.com/db_area/images/news/2014/Sep/226054/android_logo.jpg";
+        if (getDistance() > 3000) {
+            imageUrl = "http://www.51osos.com/wp-content/uploads/2011/12/linux.jpg";
+        }
+        // Get an Image
+        try {
+            Log.e("DownloadItemThumbTask", "Starting download of " + imageUrl.substring(11));
+            downloadThumbTask = new DownloadItemThumbTask(this, viewToUpdate);
+            downloadThumbTask.execute(imageUrl);
+        } catch (Exception ex) {
+            Log.e("DownloadItemThumbTask", ex.getMessage());
+            ex.printStackTrace();
+        }
+    }
+
+    public boolean hasThumbnailView() {
+        return null != thumbnailView;
+    }
+
+    public View getThumbnailView() {
+        return thumbnailView;
+    }
+
+    public void setThumbnailView(View thumbnailView) {
+        this.thumbnailView = thumbnailView;
+    }
+
+    //    public static double round(double value, int places) {
 //        if (places < 0) throw new IllegalArgumentException();
 //
 //        BigDecimal bd = new BigDecimal(value);

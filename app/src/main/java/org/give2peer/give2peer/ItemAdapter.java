@@ -2,7 +2,8 @@ package org.give2peer.give2peer;
 
 import android.app.Activity;
 import android.content.Context;
-import android.util.DisplayMetrics;
+import android.graphics.Bitmap;
+import android.os.AsyncTask;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -33,29 +34,38 @@ public class ItemAdapter extends ArrayAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-//        GridView grid = (GridView)parent;
-//        int size = grid.getRequestedColumnWidth();
-
+        GridView grid = (GridView)parent;
+        Item item = objects.get(position);
         ItemHolder holder = null;
-        View row = convertView;
+        View row;
 
-        if (null == row) {
+        if (!item.hasThumbnailView()) {
             LayoutInflater inflater = ((Activity)context).getLayoutInflater();
             row = inflater.inflate(layoutResource, parent, false);
+            row.setLayoutParams(new GridView.LayoutParams(GridView.AUTO_FIT, size));
+
+            Log.i("ItemAdapter", "Row is null for position #"+position);
 
             holder = new ItemHolder();
-//        holder.imgIcon = (ImageView)row.findViewById(R.id.imgIcon);
+            holder.imgThumb = (ImageView)row.findViewById(R.id.itemImageView);
             holder.txtTitle = (TextView)row.findViewById(R.id.itemTitleTextView);
 
             row.setTag(holder);
         } else {
+            row = item.getThumbnailView();
             holder = (ItemHolder) row.getTag();
         }
 
-        Item item = objects.get(position);
         holder.txtTitle.setText(item.getThumbnailTitle());
+        if (item.hasThumbnail()) {
+            holder.imgThumb.setImageBitmap(item.getThumbnail());
+        } else {
+            item.downloadThumbnail(holder.imgThumb);
+        }
 
-        row.setLayoutParams(new GridView.LayoutParams(GridView.AUTO_FIT, size));
+        item.setThumbnailView(row);
+
+        Log.i("ItemAdapter", "Returned row for position #"+position);
 
         return row;
     }
