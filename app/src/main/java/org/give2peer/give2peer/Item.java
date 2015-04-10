@@ -10,6 +10,11 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 
+/**
+ * Items are first-class citizens in this app.
+ * They are fetched as JSON from the server.
+ * They handle their image downloads through async tasks.
+ */
 public class Item {
     protected Integer id;
     protected String  title;
@@ -19,10 +24,11 @@ public class Item {
     protected Float   longitude;
     protected Float   distance;
 
-    protected Bitmap  thumbnail;
-    protected Image   picture;
+    protected Bitmap                thumbnail;
+    protected DownloadItemThumbTask downloadThumbTask;
+    protected View                  thumbnailView;
 
-    protected View    thumbnailView;
+    protected Image   picture;
 
     public Item() {}
 
@@ -139,8 +145,6 @@ public class Item {
     public void setThumbnail(Bitmap thumbnail) {
         this.thumbnail = thumbnail;
     }
-
-    protected DownloadItemThumbTask downloadThumbTask;
 
     public void downloadThumbnail() {
         downloadThumbnail(null);
