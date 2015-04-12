@@ -6,22 +6,6 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context=".MainActivity">
 
-    <LinearLayout
-        android:orientation="horizontal"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:paddingLeft="@dimen/activity_horizontal_margin"
-        android:paddingRight="@dimen/activity_horizontal_margin">
-
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Synchronize"
-            android:id="@+id/syncButton"
-            android:onClick="onSynchronize" />
-
-    </LinearLayout>
-
     <TextView
         android:layout_width="match_parent"
         android:layout_height="219dp"
@@ -58,17 +42,28 @@
             style="?android:attr/buttonStyleSmall"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="update"
-            android:id="@+id/updateLocationButton"
-            android:onClick="onUpdateLocation"
+            android:text="Detect"
+            android:id="@+id/detectLocationButton"
+            android:onClick="onDetectLocation"
             android:enabled="true"
             android:clickable="true" />
     </LinearLayout>
 
-    <GridView
+    <LinearLayout
+        android:orientation="horizontal"
         android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:id="@+id/itemsGridView"
-        android:numColumns="2" />
+        android:layout_height="wrap_content"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin">
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Find around me"
+            android:id="@+id/listAroundMeButton"
+            android:onClick="onListAroundMe"
+            android:enabled="false" />
+
+    </LinearLayout>
 
 </LinearLayout>

@@ -56,8 +56,8 @@ public class MainActivity extends ActionBarActivity
         refreshLocationView();
 
         // TEST -- fixme: remove and async the queries
-        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
-        StrictMode.setThreadPolicy(policy);
+//        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+//        StrictMode.setThreadPolicy(policy);
 
         // Prepare the Item repository
         ir = app.getItemRepository();
@@ -95,38 +95,22 @@ public class MainActivity extends ActionBarActivity
 
     // UI LISTENERS ////////////////////////////////////////////////////////////////////////////////
 
-    public void onSynchronize(View view)
+    public void onListAroundMe(View view)
     {
-        // Find the items around me
-        //ArrayList<Item> items = findItemsAroundMe(0);
-
-//        // This is a hack for API v8 to get the column width in order to have square item thumbs
-//        int nbColumns = 2; // getting this procedurally requires a higher API too
-//        DisplayMetrics dm = new DisplayMetrics();
-//        getWindowManager().getDefaultDisplay().getMetrics(dm);
-//        int size = dm.widthPixels / nbColumns;
-
-//        // Fill the gridView with our items
-//        GridView itemsGridView = (GridView) findViewById(R.id.itemsGridView);
-//        itemsGridView.setAdapter(new ItemAdapter(this, R.layout.grid_item, size, items));
-
-        // Start the list around activity
+        // Start the "list around" activity
         Intent intent = new Intent(this, ListAroundActivity.class);
         intent.putExtra("page", 0);
         startActivity(intent);
-
-//        if (items.isEmpty()) {
-//            // Warn the user if we have no items to display
-//            toast("No items could be found.");
-//        } else {
-//        }
     }
 
-    public void onUpdateLocation(View view)
+    public void onDetectLocation(View view)
     {
-        // Disable the button, accessed within inner class, so `final` is needed
-        final View button = findViewById(R.id.updateLocationButton);
-        button.setEnabled(false);
+        // Disable some buttons, accessed within inner class, so `final` is needed
+        final View detectLocationButton = findViewById(R.id.detectLocationButton);
+        detectLocationButton.setEnabled(false);
+
+        final View listAroundMeButton = findViewById(R.id.listAroundMeButton);
+        listAroundMeButton.setEnabled(false);
 
         // Fetch the location asynchronously
         LocationListener locationListener = new OneTimeLocationListener(lm, getLocationCriteria()) {
@@ -136,8 +120,9 @@ public class MainActivity extends ActionBarActivity
                 location = newLocation;
                 app.setLocation(location);
                 refreshLocationView();
-                button.setEnabled(true);
-                toast("Successfully updated current location");
+                detectLocationButton.setEnabled(true);
+                listAroundMeButton.setEnabled(true);
+                toast("Successfully updated current location.");
             }
         };
     }
@@ -155,11 +140,6 @@ public class MainActivity extends ActionBarActivity
             currentLocationView.setText(String.format("%.4f/%.4f", latitude, longitude));
         }
     }
-
-
-
-
-
 
     // HELPERS /////////////////////////////////////////////////////////////////////////////////////
 
@@ -179,10 +159,10 @@ public class MainActivity extends ActionBarActivity
         dumpTextView.setText(text);
     }
 
-    protected String getDummyJson()
-    {
-        return getString(R.string.dummyFindItemsResponse);
-    }
+//    protected String getDummyJson()
+//    {
+//        return getString(R.string.dummyFindItemsResponse);
+//    }
 
 
     // CONFIGURATION ///////////////////////////////////////////////////////////////////////////////
@@ -200,33 +180,33 @@ public class MainActivity extends ActionBarActivity
 
     // ACTIONS /////////////////////////////////////////////////////////////////////////////////////
 
-    protected ArrayList<Item> findItemsAroundMe(int page)
-    {
-        ArrayList<Item> items = new ArrayList<>();
-
-        if (null != location) {
-            items = ir.findAroundPaginated(location.getLatitude(), location.getLongitude(), page);
-        }
-
-        return items;
-    }
-
-    protected ArrayList<Item> findItemsAroundMeDummy()
-    {
-        ArrayList<Item> items = new ArrayList<>();
-        // try parse the string to a JSON object
-        try {
-            JSONObject row;
-            JSONArray rows = new JSONArray(getDummyJson());
-            for (int i = 0 ; i < rows.length() ; i++) {
-                row = rows.getJSONObject(i);
-                items.add(new Item(row));
-            }
-        } catch (JSONException e) {
-            Log.e("JSON Parser", "Error parsing data : " + e.toString());
-        }
-
-        return items;
-    }
+//    protected ArrayList<Item> findItemsAroundMe(int page)
+//    {
+//        ArrayList<Item> items = new ArrayList<>();
+//
+//        if (null != location) {
+//            items = ir.findAroundPaginated(location.getLatitude(), location.getLongitude(), page);
+//        }
+//
+//        return items;
+//    }
+//
+//    protected ArrayList<Item> findItemsAroundMeDummy()
+//    {
+//        ArrayList<Item> items = new ArrayList<>();
+//        // try parse the string to a JSON object
+//        try {
+//            JSONObject row;
+//            JSONArray rows = new JSONArray(getDummyJson());
+//            for (int i = 0 ; i < rows.length() ; i++) {
+//                row = rows.getJSONObject(i);
+//                items.add(new Item(row));
+//            }
+//        } catch (JSONException e) {
+//            Log.e("JSON Parser", "Error parsing data : " + e.toString());
+//        }
+//
+//        return items;
+//    }
 }
 

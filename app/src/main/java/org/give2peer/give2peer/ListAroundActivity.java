@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.View;
 import android.widget.GridView;
 import android.widget.TextView;
@@ -17,7 +18,6 @@ import java.util.ArrayList;
 public class ListAroundActivity extends Activity
 {
     ItemRepository ir;
-
     Application app;
 
     @Override
@@ -37,46 +37,58 @@ public class ListAroundActivity extends Activity
         app = (Application) getApplication();
         ir = app.getItemRepository();
 
-        double latitude  = app.getLocation().getLatitude();
-        double longitude = app.getLocation().getLongitude();
-
-        // This is a hack for API v8 to get the column width in order to have square item thumbs
-        // This will probably cause headaches in landscape mode, but hey, one thing at a time
-        int nbColumns = 2; // getting this procedurally requires a higher API too
-        DisplayMetrics dm = new DisplayMetrics();
-        getWindowManager().getDefaultDisplay().getMetrics(dm);
-        int size = dm.widthPixels / nbColumns;
-
-        // Grab the contents asynchronously todo
-        ArrayList<Item> items = ir.findAroundPaginated(latitude, longitude, page);
-
-        // Fill the gridView with our items
-        GridView itemsGridView = (GridView) findViewById(R.id.itemsGridView);
-        itemsGridView.setAdapter(new ItemAdapter(this, R.layout.grid_item, size, items));
+        FindItemsTask fit = (FindItemsTask) new FindItemsTask(this, page).execute();
 
         // Display a "Please wait" message
-        toast("All done !");
+//        toast("All done !");
 
     }
 
-//    private class FindItemsTask extends AsyncTask<String, Void, String> {
-//        @Override
-//        protected String doInBackground(String... urls) {
-//            String response = "";
-//            try {
-//                items = findItemsAroundMe(0);
-//
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//            }
-//            return response;
-//        }
-//
-//        @Override
-//        protected void onPostExecute(String result) {
-//            textView.setText(result);
-//        }
-//    }
+    private class FindItemsTask extends AsyncTask<Void, Void, ArrayList<Item>> {
+
+        int page;
+        Context context;
+
+        public FindItemsTask(Context context, int page)
+        {
+            super();
+            this.page = page;
+            this.context = context;
+        }
+
+        @Override
+        protected ArrayList<Item> doInBackground(Void... nope) {
+            ArrayList<Item> items = new ArrayList<Item>();
+            try {
+                double latitude  = app.getLocation().getLatitude();
+                double longitude = app.getLocation().getLongitude();
+                items = ir.findAroundPaginated(latitude, longitude, page);
+            } catch (Exception e) {
+                Log.e(this.getClass().toString(), e.getMessage());
+                e.printStackTrace();
+            }
+            return items;
+        }
+
+        @Override
+        protected void onPostExecute(ArrayList<Item> result)
+        {
+            // This is a hack for API v8 to get the column width in order to have square item thumbs
+            // This will probably cause headaches in landscape mode, but hey, one thing at a time
+            int nbColumns = 2; // getting this procedurally requires a higher API too
+            DisplayMetrics dm = new DisplayMetrics();
+            getWindowManager().getDefaultDisplay().getMetrics(dm);
+            int size = dm.widthPixels / nbColumns;
+
+            // Remove the Loading...
+            TextView itemsLoadingTextView = (TextView) findViewById(R.id.itemsLoadingTextView);
+            itemsLoadingTextView.setVisibility(View.GONE);
+            // Fill the gridView with our items
+            GridView itemsGridView = (GridView) findViewById(R.id.itemsGridView);
+            itemsGridView.setAdapter(new ItemAdapter(context, R.layout.grid_item, size, result));
+            itemsGridView.setVisibility(View.VISIBLE);
+        }
+    }
 
 //
 //    @Override
