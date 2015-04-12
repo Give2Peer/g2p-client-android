@@ -40,10 +40,15 @@ public class MainActivity extends ActionBarActivity
 
     ItemRepository ir;
 
+    Application app;
+
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
+
+        // Grab the app
+        app = (Application) getApplication();
 
         // Let's grab the location manager
         lm = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
@@ -55,7 +60,7 @@ public class MainActivity extends ActionBarActivity
         StrictMode.setThreadPolicy(policy);
 
         // Prepare the Item repository
-        ir = ((Application) getApplication()).getItemRepository();
+        ir = app.getItemRepository();
 
         setContentView(R.layout.activity_main);
     }
@@ -93,27 +98,28 @@ public class MainActivity extends ActionBarActivity
     public void onSynchronize(View view)
     {
         // Find the items around me
-        ArrayList<Item> items = findItemsAroundMe(0);
+        //ArrayList<Item> items = findItemsAroundMe(0);
 
-        // This is a hack for API v8 to get the column width in order to have square item thumbs
-        int nbColumns = 2; // getting this procedurally requires a higher API too
-        DisplayMetrics dm = new DisplayMetrics();
-        getWindowManager().getDefaultDisplay().getMetrics(dm);
-        int size = dm.widthPixels / nbColumns;
+//        // This is a hack for API v8 to get the column width in order to have square item thumbs
+//        int nbColumns = 2; // getting this procedurally requires a higher API too
+//        DisplayMetrics dm = new DisplayMetrics();
+//        getWindowManager().getDefaultDisplay().getMetrics(dm);
+//        int size = dm.widthPixels / nbColumns;
 
-        // Fill the gridView with our items
-        GridView itemsGridView = (GridView) findViewById(R.id.itemsGridView);
-        itemsGridView.setAdapter(new ItemAdapter(this, R.layout.grid_item, size, items));
+//        // Fill the gridView with our items
+//        GridView itemsGridView = (GridView) findViewById(R.id.itemsGridView);
+//        itemsGridView.setAdapter(new ItemAdapter(this, R.layout.grid_item, size, items));
 
-        if (items.isEmpty()) {
-            // Warn the user if we have no items to display
-            toast("No items could be found.");
-        } else {
-            // Start the list around activity
-            Intent intent = new Intent(this, ListAroundActivity.class);
-            //intent.putExtra("username", username);
-            startActivity(intent);
-        }
+        // Start the list around activity
+        Intent intent = new Intent(this, ListAroundActivity.class);
+        intent.putExtra("page", 0);
+        startActivity(intent);
+
+//        if (items.isEmpty()) {
+//            // Warn the user if we have no items to display
+//            toast("No items could be found.");
+//        } else {
+//        }
     }
 
     public void onUpdateLocation(View view)
@@ -128,6 +134,7 @@ public class MainActivity extends ActionBarActivity
             public void onLocationChanged(Location newLocation) {
                 super.onLocationChanged(newLocation);
                 location = newLocation;
+                app.setLocation(location);
                 refreshLocationView();
                 button.setEnabled(true);
                 toast("Successfully updated current location");

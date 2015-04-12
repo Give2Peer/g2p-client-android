@@ -1,26 +1,83 @@
 package org.give2peer.give2peer;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
+import android.util.DisplayMetrics;
 import android.view.View;
+import android.widget.GridView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.ArrayList;
 
-public class ListAroundActivity extends ActionBarActivity
+
+public class ListAroundActivity extends Activity
 {
     ItemRepository ir;
+
+    Application app;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
 
-        toast("List Around onCreate");
-
         setContentView(R.layout.activity_list_around);
+
+        Intent in = getIntent();
+
+        int page = in.getIntExtra("page", 0);
+
+        toast("List Around onCreate with offset "+page);
+
+        // Grab the app
+        app = (Application) getApplication();
+        ir = app.getItemRepository();
+
+        double latitude  = app.getLocation().getLatitude();
+        double longitude = app.getLocation().getLongitude();
+
+        // This is a hack for API v8 to get the column width in order to have square item thumbs
+        // This will probably cause headaches in landscape mode, but hey, one thing at a time
+        int nbColumns = 2; // getting this procedurally requires a higher API too
+        DisplayMetrics dm = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(dm);
+        int size = dm.widthPixels / nbColumns;
+
+        // Grab the contents asynchronously todo
+        ArrayList<Item> items = ir.findAroundPaginated(latitude, longitude, page);
+
+        // Fill the gridView with our items
+        GridView itemsGridView = (GridView) findViewById(R.id.itemsGridView);
+        itemsGridView.setAdapter(new ItemAdapter(this, R.layout.grid_item, size, items));
+
+        // Display a "Please wait" message
+        toast("All done !");
+
     }
+
+//    private class FindItemsTask extends AsyncTask<String, Void, String> {
+//        @Override
+//        protected String doInBackground(String... urls) {
+//            String response = "";
+//            try {
+//                items = findItemsAroundMe(0);
+//
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
+//            return response;
+//        }
+//
+//        @Override
+//        protected void onPostExecute(String result) {
+//            textView.setText(result);
+//        }
+//    }
+
 //
 //    @Override
 //    public boolean onCreateOptionsMenu(Menu menu)
