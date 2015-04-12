@@ -1,4 +1,4 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
     android:layout_width="fill_parent"
@@ -6,14 +6,13 @@
     tools:context=".ListAroundActivity"
     android:weightSum="1">
 
-    <TextView
-        android:layout_width="match_parent"
+    <ProgressBar
+        android:id="@+id/itemsLoadingSpinner"
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/dumpTextView"
-        android:enabled="false"
-        android:visibility="gone"
-        android:textColor="@color/primary_text_default_material_light"
-        android:typeface="monospace" />
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true" />
 
     <GridView
         android:layout_width="fill_parent"
@@ -22,13 +21,4 @@
         android:numColumns="2"
         android:visibility="gone" />
 
-    <TextView
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="Loading..."
-        android:id="@+id/itemsLoadingTextView"
-        android:textStyle="bold"
-        android:layout_gravity="center" />
-
-</LinearLayout>
+</RelativeLayout>

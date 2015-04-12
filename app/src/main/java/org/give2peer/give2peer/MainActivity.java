@@ -97,10 +97,14 @@ public class MainActivity extends ActionBarActivity
 
     public void onListAroundMe(View view)
     {
-        // Start the "list around" activity
-        Intent intent = new Intent(this, ListAroundActivity.class);
-        intent.putExtra("page", 0);
-        startActivity(intent);
+        if (app.isOnline()) {
+            // Start the "list around" activity
+            Intent intent = new Intent(this, ListAroundActivity.class);
+            intent.putExtra("page", 0);
+            startActivity(intent);
+        } else {
+            toast("Internet is not available.");
+        }
     }
 
     public void onDetectLocation(View view)

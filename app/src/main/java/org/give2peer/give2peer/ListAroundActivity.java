@@ -24,24 +24,23 @@ public class ListAroundActivity extends Activity
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.activity_list_around);
 
+        // Extract some parameters from the intent
         Intent in = getIntent();
-
         int page = in.getIntExtra("page", 0);
-
-        toast("List Around onCreate with offset "+page);
 
         // Grab the app
         app = (Application) getApplication();
         ir = app.getItemRepository();
 
+        // Launch the Task
         FindItemsTask fit = (FindItemsTask) new FindItemsTask(this, page).execute();
 
         // Display a "Please wait" message
-//        toast("All done !");
+        toast("Connecting to server...\nPlease wait.");
 
+        //finish();
     }
 
     private class FindItemsTask extends AsyncTask<Void, Void, ArrayList<Item>> {
@@ -81,8 +80,8 @@ public class ListAroundActivity extends Activity
             int size = dm.widthPixels / nbColumns;
 
             // Remove the Loading...
-            TextView itemsLoadingTextView = (TextView) findViewById(R.id.itemsLoadingTextView);
-            itemsLoadingTextView.setVisibility(View.GONE);
+            View itemsLoadingSpinner = findViewById(R.id.itemsLoadingSpinner);
+            itemsLoadingSpinner.setVisibility(View.GONE);
             // Fill the gridView with our items
             GridView itemsGridView = (GridView) findViewById(R.id.itemsGridView);
             itemsGridView.setAdapter(new ItemAdapter(context, R.layout.grid_item, size, result));
@@ -129,17 +128,10 @@ public class ListAroundActivity extends Activity
     protected void toast(String message)
     {
         Context context = getApplicationContext();
-        int duration = Toast.LENGTH_SHORT;
+        int duration = Toast.LENGTH_LONG;
 
         Toast toast = Toast.makeText(context, message, duration);
         toast.show();
-    }
-
-    protected void dump(String text)
-    {
-        TextView dumpTextView = (TextView) findViewById(R.id.dumpTextView);
-        dumpTextView.setVisibility(View.VISIBLE);
-        dumpTextView.setText(text);
     }
 
     // CONFIGURATION ///////////////////////////////////////////////////////////////////////////////
