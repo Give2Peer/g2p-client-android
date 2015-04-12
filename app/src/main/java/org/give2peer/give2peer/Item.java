@@ -34,6 +34,10 @@ public class Item {
     public Item() {}
 
     public Item(JSONObject json) {
+        updateWithJSON(json);
+    }
+
+    public Item updateWithJSON(JSONObject json) {
         try {
             setId(json.getInt("id"));
             setTitle(json.optString("title"));
@@ -44,8 +48,11 @@ public class Item {
             setDistance((float)json.getDouble("distance"));
             setThumbnailUrl(json.optString("thumbnail"));
         } catch (JSONException e) {
+            Log.e("Item", e.getMessage());
             e.printStackTrace();
         }
+
+        return this;
     }
 
     public String toString() {

@@ -1,7 +1,6 @@
 package org.give2peer.give2peer;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
@@ -14,7 +13,6 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.widget.GridView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -25,15 +23,21 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
-
-public class MainActivity extends ActionBarActivity {
-
+/**
+ * Still not sure if this should be our main logic class.
+ * What happens when I change Activities ?
+ */
+public class MainActivity extends ActionBarActivity
+{
     protected LocationManager lm;
     protected LocationProvider lp;
     protected Location location;
 
+    ItemRepository ir;
+
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState)
+    {
         super.onCreate(savedInstanceState);
 
         // Let's grab the location manager
@@ -41,18 +45,26 @@ public class MainActivity extends ActionBarActivity {
         // We never know, maybe there's an available location already
         refreshLocationView();
 
+        // Prepare the Item repository
+        String username = "Goutte";
+        String password = "Goutte";
+        String serverUrl = "http://g2p.give2peer.org";
+        ir = new ItemRepository(serverUrl, username, password);
+
         setContentView(R.layout.activity_main);
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
+    public boolean onCreateOptionsMenu(Menu menu)
+    {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
+    public boolean onOptionsItemSelected(MenuItem item)
+    {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
@@ -72,18 +84,10 @@ public class MainActivity extends ActionBarActivity {
 
     // UI LISTENERS ////////////////////////////////////////////////////////////////////////////////
 
-    public void onSynchronize(View view) {
+    public void onSynchronize(View view)
+    {
         // Find the items around me
-        ArrayList<Item> items = findItemsAroundMe();
-
-//        // We also need their images
-//        String imageUrl = "http://www.gamasutra.com/db_area/images/news/2014/Sep/226054/android_logo.jpg";
-////        String imageUrl = "http://s20.postimg.org/4t9w2pdct/logo_android_png.png";
-//        // Get an Image
-//        try {
-//            AsyncTask<String, Void, Bitmap> execute = new DownloadItemThumbTask((ImageView) findViewById(R.id.imageView)).execute(imageUrl);
-//            // R.id.imageView  -> Here imageView is id of your ImageView
-//        } catch (Exception ex) {}
+        ArrayList<Item> items = findItemsAroundMe(0);
 
         // This is a hack for API v8 to get the column width in order to have square item thumbs
         int nbColumns = 2; // getting this procedurally requires a higher API too
@@ -103,7 +107,8 @@ public class MainActivity extends ActionBarActivity {
 
     }
 
-    public void onUpdateLocation(View view) {
+    public void onUpdateLocation(View view)
+    {
         // Disable the button, accessed within inner class, so `final` is needed
         final View button = findViewById(R.id.updateLocationButton);
         button.setEnabled(false);
@@ -124,8 +129,8 @@ public class MainActivity extends ActionBarActivity {
 
     // UI ACTIONS //////////////////////////////////////////////////////////////////////////////////
 
-    public void refreshLocationView() {
-
+    public void refreshLocationView()
+    {
         TextView currentLocationView = (TextView) findViewById(R.id.currentLocationView);
         if (null != location) {
             double latitude  = location.getLatitude();
@@ -133,7 +138,6 @@ public class MainActivity extends ActionBarActivity {
 
             currentLocationView.setText(String.format("%.4f/%.4f", latitude, longitude));
         }
-
     }
 
 
@@ -164,6 +168,7 @@ public class MainActivity extends ActionBarActivity {
         return getString(R.string.dummyFindItemsResponse);
     }
 
+
     // CONFIGURATION ///////////////////////////////////////////////////////////////////////////////
 
     protected Criteria getLocationCriteria()
@@ -179,7 +184,18 @@ public class MainActivity extends ActionBarActivity {
 
     // ACTIONS /////////////////////////////////////////////////////////////////////////////////////
 
-    protected ArrayList<Item> findItemsAroundMe()
+    protected ArrayList<Item> findItemsAroundMe(int page)
+    {
+        ArrayList<Item> items = new ArrayList<>();
+
+        if (null != location) {
+            items = ir.findAroundPaginated(location.getLatitude(), location.getLongitude(), page);
+        }
+
+        return items;
+    }
+
+    protected ArrayList<Item> findItemsAroundMeDummy()
     {
         ArrayList<Item> items = new ArrayList<>();
         // try parse the string to a JSON object
@@ -193,6 +209,7 @@ public class MainActivity extends ActionBarActivity {
         } catch (JSONException e) {
             Log.e("JSON Parser", "Error parsing data : " + e.toString());
         }
+
         return items;
     }
 }

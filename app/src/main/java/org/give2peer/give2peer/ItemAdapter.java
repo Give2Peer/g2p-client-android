@@ -44,8 +44,6 @@ public class ItemAdapter extends ArrayAdapter {
             row = inflater.inflate(layoutResource, parent, false);
             row.setLayoutParams(new GridView.LayoutParams(GridView.AUTO_FIT, size));
 
-            Log.i("ItemAdapter", "Row is null for position #"+position);
-
             holder = new ItemHolder();
             holder.imgThumb = (ImageView)row.findViewById(R.id.itemImageView);
             holder.txtTitle = (TextView)row.findViewById(R.id.itemTitleTextView);
@@ -64,8 +62,6 @@ public class ItemAdapter extends ArrayAdapter {
         }
 
         item.setThumbnailView(row);
-
-        Log.i("ItemAdapter", "Returned row for position #"+position);
 
         return row;
     }
