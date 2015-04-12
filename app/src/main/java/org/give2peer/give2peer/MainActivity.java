@@ -1,11 +1,13 @@
 package org.give2peer.give2peer;
 
 import android.content.Context;
+import android.content.Intent;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.location.LocationProvider;
+import android.os.StrictMode;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
@@ -26,6 +28,9 @@ import java.util.ArrayList;
 /**
  * Still not sure if this should be our main logic class.
  * What happens when I change Activities ?
+ *
+ * Callbacks : http://developer.android.com/training/basics/activity-lifecycle/starting.html
+ *
  */
 public class MainActivity extends ActionBarActivity
 {
@@ -45,11 +50,12 @@ public class MainActivity extends ActionBarActivity
         // We never know, maybe there's an available location already
         refreshLocationView();
 
+        // TEST -- fixme: remove and async the queries
+        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+        StrictMode.setThreadPolicy(policy);
+
         // Prepare the Item repository
-        String username = "Goutte";
-        String password = "Goutte";
-        String serverUrl = "http://g2p.give2peer.org";
-        ir = new ItemRepository(serverUrl, username, password);
+        ir = ((Application) getApplication()).getItemRepository();
 
         setContentView(R.layout.activity_main);
     }
@@ -99,12 +105,15 @@ public class MainActivity extends ActionBarActivity
         GridView itemsGridView = (GridView) findViewById(R.id.itemsGridView);
         itemsGridView.setAdapter(new ItemAdapter(this, R.layout.grid_item, size, items));
 
-        // Warn the user
         if (items.isEmpty()) {
+            // Warn the user if we have no items to display
             toast("No items could be found.");
+        } else {
+            // Start the list around activity
+            Intent intent = new Intent(this, ListAroundActivity.class);
+            //intent.putExtra("username", username);
+            startActivity(intent);
         }
-//        dump(items.get(0).title);
-
     }
 
     public void onUpdateLocation(View view)

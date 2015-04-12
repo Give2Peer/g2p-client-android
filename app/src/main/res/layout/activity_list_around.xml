@@ -1,0 +1,23 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    tools:context=".ListAroundActivity">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/dumpTextView"
+        android:enabled="false"
+        android:visibility="gone"
+        android:textColor="@color/primary_text_default_material_light"
+        android:typeface="monospace" />
+
+    <GridView
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:id="@+id/itemsGridView"
+        android:numColumns="2" />
+
+</LinearLayout>

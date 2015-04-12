@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -58,6 +59,8 @@ public class ItemRepository {
         credentials = new UsernamePasswordCredentials(username, password);
 
         client = new DefaultHttpClient();
+
+        items = new HashMap<Integer, Item>();
     }
 
     protected ArrayList<Item> findAroundPaginated(double latitude, double longitude, int page) {
@@ -124,7 +127,6 @@ public class ItemRepository {
             for (int i = 0 ; i < rows.length() ; i++) {
                 jsonObject = rows.getJSONObject(i);
                 item = new Item(jsonObject);
-                // todo potential bug here, TEST if two different Integer instances work
                 if (items.containsKey(item.getId())) {
                     item = items.get(item.getId());
                     item.updateWithJSON(jsonObject);

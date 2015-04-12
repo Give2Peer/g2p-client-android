@@ -15,7 +15,8 @@ import org.json.JSONObject;
  * They are fetched as JSON from the server.
  * They handle their own image downloads through async tasks.
  */
-public class Item {
+public class Item
+{
     protected Integer id;
     protected String  title;
     protected String  description;
