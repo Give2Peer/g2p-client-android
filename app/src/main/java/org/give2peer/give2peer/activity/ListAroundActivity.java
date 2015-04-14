@@ -20,9 +20,11 @@ import org.give2peer.give2peer.R;
 import java.util.ArrayList;
 
 
+/**
+ * This fullscreen activity lists items in a grid
+ */
 public class ListAroundActivity extends Activity
 {
-    ItemRepository ir;
     Application app;
 
     @Override
@@ -37,18 +39,17 @@ public class ListAroundActivity extends Activity
 
         // Grab the app
         app = (Application) getApplication();
-        ir = app.getItemRepository();
 
         // Launch the Task
         FindItemsTask fit = (FindItemsTask) new FindItemsTask(this, page).execute();
 
         // Display a "Please wait" message
-        toast("Connecting to server...\nPlease wait.");
-
-        //finish();
+        Toast.makeText(getApplicationContext(),
+                getString(R.string.toast_connecting_please_wait), Toast.LENGTH_LONG).show();
     }
 
-    private class FindItemsTask extends AsyncTask<Void, Void, ArrayList<Item>> {
+    private class FindItemsTask extends AsyncTask<Void, Void, ArrayList<Item>>
+    {
 
         int page;
         Context context;
@@ -61,12 +62,13 @@ public class ListAroundActivity extends Activity
         }
 
         @Override
-        protected ArrayList<Item> doInBackground(Void... nope) {
+        protected ArrayList<Item> doInBackground(Void... nope)
+        {
             ArrayList<Item> items = new ArrayList<Item>();
             try {
                 double latitude  = app.getLocation().getLatitude();
                 double longitude = app.getLocation().getLongitude();
-                items = ir.findAroundPaginated(latitude, longitude, page);
+                items = app.getItemRepository().findAroundPaginated(latitude, longitude, page);
             } catch (Exception e) {
                 Log.e(this.getClass().toString(), e.getMessage());
                 e.printStackTrace();
@@ -94,30 +96,6 @@ public class ListAroundActivity extends Activity
         }
     }
 
-//
-//    @Override
-//    public boolean onCreateOptionsMenu(Menu menu)
-//    {
-//        // Inflate the menu; this adds items to the action bar if it is present.
-//        getMenuInflater().inflate(R.menu.menu_main, menu);
-//        return true;
-//    }
-//
-//    @Override
-//    public boolean onOptionsItemSelected(MenuItem item)
-//    {
-//        // Handle action bar item clicks here. The action bar will
-//        // automatically handle clicks on the Home/Up button, so long
-//        // as you specify a parent activity in AndroidManifest.xml.
-//        int id = item.getItemId();
-//
-//        //noinspection SimplifiableIfStatement
-//        if (id == R.id.action_settings) {
-//            return true;
-//        }
-//
-//        return super.onOptionsItemSelected(item);
-//    }
 
     // LISTENERS ///////////////////////////////////////////////////////////////////////////////////
 
@@ -130,29 +108,11 @@ public class ListAroundActivity extends Activity
 
     // HELPERS /////////////////////////////////////////////////////////////////////////////////////
 
-    protected void toast(String message)
-    {
-        Context context = getApplicationContext();
-        int duration = Toast.LENGTH_LONG;
-
-        Toast toast = Toast.makeText(context, message, duration);
-        toast.show();
-    }
 
     // CONFIGURATION ///////////////////////////////////////////////////////////////////////////////
 
 
     // ACTIONS /////////////////////////////////////////////////////////////////////////////////////
 
-//    protected ArrayList<Item> findItemsAroundMe(int page)
-//    {
-//        ArrayList<Item> items = new ArrayList<>();
-//
-//        if (null != location) {
-//            items = ir.findAroundPaginated(location.getLatitude(), location.getLongitude(), page);
-//        }
-//
-//        return items;
-//    }
 }
 

@@ -15,7 +15,6 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
-//import org.apache.http.entity.mime;
 import org.give2peer.give2peer.Application;
 import org.give2peer.give2peer.ItemRepository;
 import org.give2peer.give2peer.OneTimeLocationListener;

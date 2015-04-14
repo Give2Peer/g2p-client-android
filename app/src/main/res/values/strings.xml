@@ -11,6 +11,8 @@
     <string name="new_item_send_button">Send</string>
     <string name="toast_no_camera_available">No camera could be found.\nAsk for support of gallery images!</string>
     <string name="toast_new_item_uploading">Uploading new item…</string>
-    <string name="toast_new_item_uploaded">Item '%s' was uploaded.\nBravo!</string>
+    <string name="toast_new_item_uploaded">Item \'%s\' was uploaded.\nBravo!</string>
     <string name="toast_new_item_file_error">An error occurred while creating the file to store the photograph.</string>
+    <string name="toast_connecting_please_wait">Connecting to server...\nPlease wait.</string>
+    <string name="toast_no_mapping_activity">Did not find any mapping activity to go to</string>
 </resources>
