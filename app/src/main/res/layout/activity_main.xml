@@ -64,6 +64,25 @@
             android:onClick="onListAroundMe"
             android:enabled="false" />
 
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Give"
+            android:id="@+id/giveItemButton"
+            android:onClick="onGiveItemButton" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Spot"
+            android:id="@+id/spotItemButton"
+            android:onClick="onSpotItemButton" />
+
     </LinearLayout>
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/captureImageView" />
 
 </LinearLayout>

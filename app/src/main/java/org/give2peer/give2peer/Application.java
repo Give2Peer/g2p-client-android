@@ -1,5 +1,6 @@
 package org.give2peer.give2peer;
 
+import android.content.pm.PackageManager;
 import android.location.Location;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -67,9 +68,13 @@ public class Application extends android.app.Application
     public boolean isOnline()
     {
         ConnectivityManager cm = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
-
         NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+
         return activeNetwork != null && activeNetwork.isConnectedOrConnecting();
+    }
+
+    public boolean hasCameraSupport() {
+        return getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA);
     }
 
 

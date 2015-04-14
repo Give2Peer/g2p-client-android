@@ -4,12 +4,16 @@ import android.util.Log;
 
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
 import org.apache.http.auth.AuthenticationException;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.auth.BasicScheme;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -20,6 +24,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -30,8 +35,8 @@ import java.util.Map;
  * - Keep fetched items up to date.
  * - Store items locally in a cache for offline use. (don't know how, yet)
  */
-public class ItemRepository {
-
+public class ItemRepository
+{
     /**
      * The server limits the number of items sent in the response.
      * This constant is defined by the server.
@@ -52,7 +57,8 @@ public class ItemRepository {
 
     protected HttpClient client;
 
-    ItemRepository(String serverUrl, String username, String password) {
+    ItemRepository(String serverUrl, String username, String password)
+    {
         this.serverUrl = serverUrl;
         this.username = username;
         this.password = password;
@@ -63,11 +69,13 @@ public class ItemRepository {
         items = new HashMap<Integer, Item>();
     }
 
-    protected ArrayList<Item> findAroundPaginated(double latitude, double longitude, int page) {
+    protected ArrayList<Item> findAroundPaginated(double latitude, double longitude, int page)
+    {
         return findAround(latitude, longitude, page * ITEMS_PER_PAGE);
     }
 
-    protected ArrayList<Item> findAround(double latitude, double longitude) {
+    protected ArrayList<Item> findAround(double latitude, double longitude)
+    {
         return findAround(latitude, longitude, 0);
     }
 
@@ -80,7 +88,8 @@ public class ItemRepository {
      * @param offset
      * @return
      */
-    protected ArrayList<Item> findAround(double latitude, double longitude, int offset) {
+    protected ArrayList<Item> findAround(double latitude, double longitude, int offset)
+    {
 
         String url = serverUrl + "/find/" + latitude + "/" + longitude + "/" + offset;
 
@@ -108,6 +117,37 @@ public class ItemRepository {
     }
 
 
+    protected void giveItem(Item item)
+    {
+        String url = serverUrl + "/give";
+
+        try {
+            HttpPost request = new HttpPost();
+            request.setURI(new URI(url));
+
+            BasicScheme scheme = new BasicScheme();
+            Header authorizationHeader = scheme.authenticate(credentials, request);
+            request.addHeader(authorizationHeader);
+
+            List<NameValuePair> pairs = new ArrayList<NameValuePair>();
+            pairs.add(new BasicNameValuePair("location", item.getLocation()));
+            pairs.add(new BasicNameValuePair("title", item.getTitle()));
+            request.setEntity(new UrlEncodedFormEntity(pairs));
+
+            HttpResponse response = client.execute(request);
+
+            Log.i("G2P", "Reponse Entity : "+response.getEntity().toString());
+            String json = EntityUtils.toString(response.getEntity(), "UTF-8");
+            Log.i("G2P", "Reponse JSON : "+json);
+//            itemsList = jsonToItems(json);
+
+        } catch (URISyntaxException|AuthenticationException|IOException e) {
+            Log.e("Item", e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    // UTILS ///////////////////////////////////////////////////////////////////////////////////////
 
     /**
      * Try to parse the `json` and build the items in it.
