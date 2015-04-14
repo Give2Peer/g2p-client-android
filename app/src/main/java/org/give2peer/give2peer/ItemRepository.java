@@ -3,6 +3,7 @@ package org.give2peer.give2peer;
 import android.util.Log;
 
 import org.apache.http.Header;
+import org.apache.http.HttpRequest;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.auth.AuthenticationException;
@@ -32,6 +33,7 @@ import java.util.Map;
  *
  * Responsibilities :
  * - Fetch items from server HTTP REST API.
+ *   It fetches them synchronously, so there's also a bunch of AsyncTasks that use these methods.
  * - Keep fetched items up to date.
  * - Store items locally in a cache for offline use. (don't know how, yet)
  */
@@ -69,12 +71,12 @@ public class ItemRepository
         items = new HashMap<Integer, Item>();
     }
 
-    protected ArrayList<Item> findAroundPaginated(double latitude, double longitude, int page)
+    public ArrayList<Item> findAroundPaginated(double latitude, double longitude, int page)
     {
         return findAround(latitude, longitude, page * ITEMS_PER_PAGE);
     }
 
-    protected ArrayList<Item> findAround(double latitude, double longitude)
+    public ArrayList<Item> findAround(double latitude, double longitude)
     {
         return findAround(latitude, longitude, 0);
     }
@@ -88,7 +90,7 @@ public class ItemRepository
      * @param offset
      * @return
      */
-    protected ArrayList<Item> findAround(double latitude, double longitude, int offset)
+    public ArrayList<Item> findAround(double latitude, double longitude, int offset)
     {
 
         String url = serverUrl + "/find/" + latitude + "/" + longitude + "/" + offset;
@@ -99,16 +101,14 @@ public class ItemRepository
             HttpGet request = new HttpGet();
             request.setURI(new URI(url));
 
-            BasicScheme scheme = new BasicScheme();
-            Header authorizationHeader = scheme.authenticate(credentials, request);
-            request.addHeader(authorizationHeader);
+            authenticate(request);
 
             HttpResponse response = client.execute(request);
 
             String json = EntityUtils.toString(response.getEntity(), "UTF-8");
             itemsList = jsonToItems(json);
 
-        } catch (URISyntaxException|AuthenticationException|IOException e) {
+        } catch (URISyntaxException|IOException e) {
             Log.e("Item", e.getMessage());
             e.printStackTrace();
         }
@@ -117,7 +117,7 @@ public class ItemRepository
     }
 
 
-    protected void giveItem(Item item)
+    public Item giveItem(Item item)
     {
         String url = serverUrl + "/give";
 
@@ -125,9 +125,7 @@ public class ItemRepository
             HttpPost request = new HttpPost();
             request.setURI(new URI(url));
 
-            BasicScheme scheme = new BasicScheme();
-            Header authorizationHeader = scheme.authenticate(credentials, request);
-            request.addHeader(authorizationHeader);
+            authenticate(request);
 
             List<NameValuePair> pairs = new ArrayList<NameValuePair>();
             pairs.add(new BasicNameValuePair("location", item.getLocation()));
@@ -136,18 +134,38 @@ public class ItemRepository
 
             HttpResponse response = client.execute(request);
 
-            Log.i("G2P", "Reponse Entity : "+response.getEntity().toString());
             String json = EntityUtils.toString(response.getEntity(), "UTF-8");
-            Log.i("G2P", "Reponse JSON : "+json);
-//            itemsList = jsonToItems(json);
-
-        } catch (URISyntaxException|AuthenticationException|IOException e) {
-            Log.e("Item", e.getMessage());
+            if (response.getStatusLine().getStatusCode() < 400) {
+                item.updateWithJSON(new JSONObject(json));
+            } else {
+                Log.e("G2P", "Give Item Error : "+json);
+            }
+        } catch (URISyntaxException|IOException|JSONException e) {
+            Log.e("G2P", e.getMessage());
             e.printStackTrace();
         }
+
+        return item;
     }
 
     // UTILS ///////////////////////////////////////////////////////////////////////////////////////
+
+    /**
+     *
+     * @param request The request to authenticate
+     */
+    protected void authenticate(HttpRequest request)
+    {
+        try {
+            BasicScheme scheme = new BasicScheme();
+            Header authorizationHeader = scheme.authenticate(credentials, request);
+            request.addHeader(authorizationHeader);
+        } catch (AuthenticationException e) {
+            Log.e("G2P", "Authentication failure !");
+            Log.e("G2P", e.getMessage());
+            e.printStackTrace();
+        }
+    }
 
     /**
      * Try to parse the `json` and build the items in it.

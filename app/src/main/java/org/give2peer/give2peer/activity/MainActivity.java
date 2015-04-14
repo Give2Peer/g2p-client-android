@@ -1,48 +1,26 @@
-package org.give2peer.give2peer;
+package org.give2peer.give2peer.activity;
 
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.location.LocationProvider;
-import android.net.Uri;
-import android.os.Environment;
-import android.os.StrictMode;
-import android.provider.MediaStore;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
-import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.GridView;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 //import org.apache.http.entity.mime;
+import org.give2peer.give2peer.Application;
+import org.give2peer.give2peer.ItemRepository;
+import org.give2peer.give2peer.OneTimeLocationListener;
+import org.give2peer.give2peer.R;
 
-import org.apache.http.HttpVersion;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.params.CoreProtocolPNames;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.File;
-import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Still not sure if this should be our main logic class.
@@ -59,7 +37,7 @@ public class MainActivity extends ActionBarActivity
 
     ItemRepository ir;
 
-    Application app;
+    protected Application app;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -75,8 +53,8 @@ public class MainActivity extends ActionBarActivity
         refreshLocationView();
 
         // TEST -- fixme: remove and async all queries
-        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
-        StrictMode.setThreadPolicy(policy);
+//        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+//        StrictMode.setThreadPolicy(policy);
 
         // Prepare the Item repository
         ir = app.getItemRepository();
@@ -161,7 +139,7 @@ public class MainActivity extends ActionBarActivity
     }
 
 
-    static final int REQUEST_IMAGE_CAPTURE = 1;
+
 
     /**
      *
@@ -170,48 +148,15 @@ public class MainActivity extends ActionBarActivity
     protected void snapshotNewItem(String action)
     {
         if (!app.hasCameraSupport()) {
-            toast("No camera could be found.");
+            toast(getString(R.string.toast_no_camera_available));
             return;
         }
 
-        // Will probably do that in another Activity anyway
+        // Start the "new item" activity
+        Intent intent = new Intent(this, NewItemActivity.class);
+        intent.putExtra("action", action);
+        startActivity(intent);
 
-        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        // Make sure we have an Activity that can capture images
-        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
-            // Create the File where the photo should go
-            File photoFile = null;
-            try {
-                photoFile = createImageFile();
-            } catch (IOException ex) {
-                String msg = "An error occurred while creating the file to store the photograph.";
-                Log.e("G2P", msg);
-                Log.e("G2P", ex.getMessage());
-                ex.printStackTrace();
-                toast(msg);
-            }
-            // Continue only if the File was successfully created
-            if (photoFile != null) {
-//                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(photoFile));
-                startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
-            }
-        }
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
-            Bundle extras = data.getExtras();
-            Bitmap imageBitmap = (Bitmap) extras.get("data");
-            ((ImageView)findViewById(R.id.captureImageView)).setImageBitmap(imageBitmap);
-
-            Location loc = app.getLocation();
-            Item item = new Item();
-            item.setLocation(String.format("%f/%f", loc.getLatitude(), loc.getLongitude()));
-            item.setTitle("TEST");
-
-            app.getItemRepository().giveItem(item);
-        }
     }
 
 //    protected void uploadImage()
@@ -259,28 +204,6 @@ public class MainActivity extends ActionBarActivity
 //        }
 //    }
 
-    String mCurrentPhotoPath;
-
-    private File createImageFile() throws IOException {
-        // Create an image file name
-        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        String imageFileName = "g2p_" + timeStamp + "_plop";
-        imageFileName = "g2p_fuck_plop";
-        File storageDir = Environment.getExternalStoragePublicDirectory(
-                Environment.DIRECTORY_PICTURES);
-        storageDir.mkdirs();
-        Log.i("G2P", storageDir.getPath());
-        Log.i("G2P", imageFileName);
-        File image = File.createTempFile(
-                imageFileName,  /* prefix */
-                ".jpg",         /* suffix */
-                storageDir      /* directory */
-        );
-
-        // Save a file: path for use with ACTION_VIEW intents
-        mCurrentPhotoPath = "file:" + image.getAbsolutePath();
-        return image;
-    }
 
 
     // UI ACTIONS //////////////////////////////////////////////////////////////////////////////////

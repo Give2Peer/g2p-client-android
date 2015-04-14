@@ -11,11 +11,12 @@ import android.os.Bundle;
  * that will start listening to updates by itself, and stop listening by itself when the
  * LocationManager finds a location.
  */
-public class OneTimeLocationListener implements LocationListener {
-
+public class OneTimeLocationListener implements LocationListener
+{
     protected LocationManager locationManager;
 
-    OneTimeLocationListener(LocationManager lm, Criteria criteria) {
+    public OneTimeLocationListener(LocationManager lm, Criteria criteria)
+    {
         locationManager = lm;
         locationManager.requestLocationUpdates(
                 locationManager.getBestProvider(criteria, true),
@@ -31,18 +32,11 @@ public class OneTimeLocationListener implements LocationListener {
     }
 
     @Override
-    public void onStatusChanged(String provider, int status, Bundle extras) {
-
-    }
+    public void onStatusChanged(String provider, int status, Bundle extras) {}
 
     @Override
-    public void onProviderEnabled(String provider) {
-
-    }
+    public void onProviderEnabled(String provider) {}
 
     @Override
-    public void onProviderDisabled(String provider) {
-
-    }
-
+    public void onProviderDisabled(String provider) {}
 }

@@ -1,4 +1,4 @@
-package org.give2peer.give2peer;
+package org.give2peer.give2peer.activity;
 
 import android.app.Activity;
 import android.content.Context;
@@ -9,8 +9,13 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
 import android.widget.GridView;
-import android.widget.TextView;
 import android.widget.Toast;
+
+import org.give2peer.give2peer.Application;
+import org.give2peer.give2peer.Item;
+import org.give2peer.give2peer.ItemAdapter;
+import org.give2peer.give2peer.ItemRepository;
+import org.give2peer.give2peer.R;
 
 import java.util.ArrayList;
 

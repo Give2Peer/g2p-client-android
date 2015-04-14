@@ -1,10 +1,13 @@
-package org.give2peer.give2peer;
+package org.give2peer.give2peer.task;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.util.Log;
 import android.widget.ImageView;
 import android.os.AsyncTask;
+
+import org.give2peer.give2peer.Item;
+
 import java.io.*;
 
 

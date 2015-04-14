@@ -6,6 +6,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 
+import org.give2peer.give2peer.task.DownloadItemThumbTask;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -46,7 +47,7 @@ public class Item
             setLocation(json.getString("location"));
             setLatitude((float)json.getDouble("latitude"));
             setLongitude((float)json.getDouble("longitude"));
-            setDistance((float)json.getDouble("distance"));
+            setDistance((float)json.optDouble("distance", 0));
             setThumbnailUrl(json.optString("thumbnail"));
         } catch (JSONException e) {
             Log.e("Item", e.getMessage());
