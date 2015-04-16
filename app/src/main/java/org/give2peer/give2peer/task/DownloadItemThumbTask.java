@@ -35,7 +35,7 @@ public class DownloadItemThumbTask extends AsyncTask<String, Void, Bitmap> {
 
     protected void onPostExecute(Bitmap thumb) {
         if (null != thumb) {
-            item.setThumbnail(thumb);
+            item.setThumbnailBitmap(thumb);
             thumbView.setImageBitmap(thumb);
         }
     }

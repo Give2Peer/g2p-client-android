@@ -77,7 +77,7 @@ public class ListAroundActivity extends Activity
         }
 
         @Override
-        protected void onPostExecute(ArrayList<Item> result)
+        protected void onPostExecute(ArrayList<Item> items)
         {
             // This is a hack for API v8 to get the column width in order to have square item thumbs
             // This will probably cause headaches in landscape mode, but hey, one thing at a time
@@ -91,7 +91,7 @@ public class ListAroundActivity extends Activity
             itemsLoadingSpinner.setVisibility(View.GONE);
             // Fill the gridView with our items
             GridView itemsGridView = (GridView) findViewById(R.id.itemsGridView);
-            itemsGridView.setAdapter(new ItemAdapter(context, R.layout.grid_item, size, result));
+            itemsGridView.setAdapter(new ItemAdapter(context, R.layout.grid_item, size, items));
             itemsGridView.setVisibility(View.VISIBLE);
         }
     }

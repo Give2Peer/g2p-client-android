@@ -1,8 +1,10 @@
 package org.give2peer.give2peer;
 
+import android.graphics.Bitmap;
 import android.util.Log;
 
 import org.apache.http.Header;
+import org.apache.http.HttpEntity;
 import org.apache.http.HttpRequest;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
@@ -12,6 +14,9 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.ContentType;
+import org.apache.http.entity.FileEntity;
+import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.impl.auth.BasicScheme;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
@@ -20,6 +25,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -70,6 +76,8 @@ public class ItemRepository
 
         items = new HashMap<Integer, Item>();
     }
+
+    // HTTP QUERIES ////////////////////////////////////////////////////////////////////////////////
 
     public ArrayList<Item> findAroundPaginated(double latitude, double longitude, int page)
     {
@@ -148,6 +156,40 @@ public class ItemRepository
         return item;
     }
 
+
+    public Item pictureItem(Item item, File picture)
+    {
+        String url = serverUrl + "/picture/" + item.getId().toString();
+        
+        try {
+            HttpPost request = new HttpPost();
+            request.setURI(new URI(url));
+
+            authenticate(request);
+
+            HttpEntity httpEntity = MultipartEntityBuilder
+                    .create()
+                    .addBinaryBody("picture", picture, ContentType.create("image/jpg"), picture.getName())
+                    .build();
+            request.setEntity(httpEntity);
+
+            HttpResponse response = client.execute(request);
+
+            String json = EntityUtils.toString(response.getEntity(), "UTF-8");
+            if (response.getStatusLine().getStatusCode() < 400) {
+                item.updateWithJSON(new JSONObject(json));
+            } else {
+                Log.e("G2P", "Picture Item Error : "+json);
+            }
+        } catch (URISyntaxException|IOException|JSONException e) {
+            Log.e("G2P", e.getMessage());
+            e.printStackTrace();
+        }
+
+        return item;
+    }
+
+
     // UTILS ///////////////////////////////////////////////////////////////////////////////////////
 
     /**
@@ -177,7 +219,6 @@ public class ItemRepository
     protected ArrayList<Item> jsonToItems(String json)
     {
         ArrayList<Item> itemsList = new ArrayList<Item>();
-        // try parse the string to a JSON object
         try {
             Item item;
             JSONObject jsonObject;

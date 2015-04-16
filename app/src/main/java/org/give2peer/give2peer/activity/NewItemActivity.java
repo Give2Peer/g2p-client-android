@@ -24,9 +24,12 @@ import org.give2peer.give2peer.R;
 import org.give2peer.give2peer.task.GiveItemTask;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 public class NewItemActivity extends ActionBarActivity
@@ -34,6 +37,8 @@ public class NewItemActivity extends ActionBarActivity
     static final int REQUEST_IMAGE_CAPTURE = 1;
 
     protected Application app;
+
+    protected List<File> pictureFiles;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,27 +48,37 @@ public class NewItemActivity extends ActionBarActivity
         // Grab the app
         app = (Application) getApplication();
 
+        // Initialize
+        pictureFiles = new ArrayList<>();
+
+        // Directly try to grab a new picture
+        addNewPicture();
+    }
+
+    protected void addNewPicture()
+    {
         // Create an new image capture intent
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         // Make sure we have an Activity that can capture images
         if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
-            // Create the File where the photo should go
-            File photoFile = null;
+            // Create the File where the picture should go
+            File pictureFile = null;
             try {
-                photoFile = createImageFile();
+                pictureFile = createImageFile();
             } catch (IOException ex) {
                 String msg = getString(R.string.toast_new_item_file_error);
-                Log.e("G2P", msg);
                 Log.e("G2P", ex.getMessage());
                 ex.printStackTrace();
                 toast(msg);
             }
             // Continue only if the File was successfully created
-            if (photoFile != null) {
-//                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(photoFile));
+            if (pictureFile != null) {
+                pictureFiles.add(pictureFile);
+//                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(pictureFile));
                 startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
             }
         } else {
+            // GTFO
             toast(getString(R.string.toast_no_camera_available));
             finish();
         }
@@ -75,9 +90,24 @@ public class NewItemActivity extends ActionBarActivity
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
             Bundle extras = data.getExtras();
             Bitmap imageBitmap = (Bitmap) extras.get("data");
-            ((ImageView)findViewById(R.id.newItemImageView)).setImageBitmap(imageBitmap);
 
-            // fixme: do something with the image, and also get the file path
+            if (null == imageBitmap) {
+                toast("MOTHERFUCKER WHY IS THE IMAGE NULL ?");
+            }
+
+            // Put the bitmap in the View to show the user
+            ((ImageView)findViewById(R.id.newItemImageView)).setImageBitmap(imageBitmap);
+            // Write the bitmap to file
+            File pictureFile = pictureFiles.get(pictureFiles.size()-1);
+            FileOutputStream fOut;
+            try {
+                fOut = new FileOutputStream(pictureFile);
+                imageBitmap.compress(Bitmap.CompressFormat.JPEG, 85, fOut);
+                fOut.flush();
+                fOut.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -97,7 +127,6 @@ public class NewItemActivity extends ActionBarActivity
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             return true;
         }
@@ -119,6 +148,7 @@ public class NewItemActivity extends ActionBarActivity
         Item item = new Item();
         item.setLocation(String.format("%f/%f", loc.getLatitude(), loc.getLongitude()));
         item.setTitle(titleInput.getText().toString());
+        item.setPictures(pictureFiles);
 
         GiveItemTask git = new GiveItemTask(app) {
             protected void onPostExecute(Item item) {
@@ -132,13 +162,11 @@ public class NewItemActivity extends ActionBarActivity
     }
 
 
-    String mCurrentPhotoPath;
 
     private File createImageFile() throws IOException
     {
-        // Create an image file name
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(new Date());
-        String imageFileName = "g2p_" + timeStamp + "_plop";
+        String imageFileName = "g2p_" + timeStamp + "_item";
         File dir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
         dir.mkdirs();
         File image = File.createTempFile(
@@ -148,7 +176,7 @@ public class NewItemActivity extends ActionBarActivity
         );
 
         // Save a file: path for use with ACTION_VIEW intents
-        mCurrentPhotoPath = "file:" + image.getAbsolutePath();
+        //String path = "file:" + image.getAbsolutePath();
         return image;
     }
 

@@ -3,10 +3,7 @@ package org.give2peer.give2peer;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.net.Uri;
-import android.os.AsyncTask;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,6 +18,7 @@ import java.util.List;
 
 /**
  * This adapter transforms items into their own thumbnail view.
+ * Each thumbnail can be clicked on. Right now, doing so opens a third-party mapping activity.
  */
 public class ItemAdapter extends ArrayAdapter
 {
@@ -56,8 +54,6 @@ public class ItemAdapter extends ArrayAdapter
             holder.txtTitle = (TextView)row.findViewById(R.id.itemTitleTextView);
             row.setTag(holder);
 
-            row.setEnabled(true);
-
             row.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -82,7 +78,7 @@ public class ItemAdapter extends ArrayAdapter
 
         holder.txtTitle.setText(item.getThumbnailTitle());
         if (item.hasThumbnail()) {
-            holder.imgThumb.setImageBitmap(item.getThumbnail());
+            holder.imgThumb.setImageBitmap(item.getThumbnailBitmap());
         } else {
             item.downloadThumbnail(holder.imgThumb);
         }
