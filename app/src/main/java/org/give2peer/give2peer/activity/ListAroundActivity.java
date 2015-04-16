@@ -40,12 +40,18 @@ public class ListAroundActivity extends Activity
         // Grab the app
         app = (Application) getApplication();
 
+        // Make sure we have a location
+        if (null == app.getLocation()) {
+            toast(getString(R.string.toast_please_set_up_location));
+            finish();
+            return;
+        }
+
         // Launch the Task
         FindItemsTask fit = (FindItemsTask) new FindItemsTask(this, page).execute();
 
         // Display a "Please wait" message
-        Toast.makeText(getApplicationContext(),
-                getString(R.string.toast_connecting_please_wait), Toast.LENGTH_LONG).show();
+        toast(getString(R.string.toast_connecting_please_wait), Toast.LENGTH_LONG);
     }
 
     private class FindItemsTask extends AsyncTask<Void, Void, ArrayList<Item>>
@@ -108,6 +114,13 @@ public class ListAroundActivity extends Activity
 
     // HELPERS /////////////////////////////////////////////////////////////////////////////////////
 
+    protected void toast(String message) { toast(message, Toast.LENGTH_SHORT); }
+    protected void toast(String message, int duration)
+    {
+        Context context = getApplicationContext();
+        Toast toast = Toast.makeText(context, message, duration);
+        toast.show();
+    }
 
     // CONFIGURATION ///////////////////////////////////////////////////////////////////////////////
 

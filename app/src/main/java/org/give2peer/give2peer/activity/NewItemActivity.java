@@ -48,6 +48,13 @@ public class NewItemActivity extends ActionBarActivity
         // Grab the app
         app = (Application) getApplication();
 
+        // Make sure we have a location
+        if (null == app.getLocation()) {
+            toast("Please set up a location first.");
+            finish();
+            return;
+        }
+
         // Initialize
         pictureFiles = new ArrayList<>();
 
@@ -70,6 +77,8 @@ public class NewItemActivity extends ActionBarActivity
                 Log.e("G2P", ex.getMessage());
                 ex.printStackTrace();
                 toast(msg);
+                finish();
+                return;
             }
             // Continue only if the File was successfully created
             if (pictureFile != null) {
@@ -92,7 +101,9 @@ public class NewItemActivity extends ActionBarActivity
             Bitmap imageBitmap = (Bitmap) extras.get("data");
 
             if (null == imageBitmap) {
-                toast("MOTHERFUCKER WHY IS THE IMAGE NULL ?");
+                toast("WHY IS THE IMAGE `NULL`?\nWHAT DID YOU DO!?");
+                finish();
+                return;
             }
 
             // Put the bitmap in the View to show the user
@@ -106,34 +117,17 @@ public class NewItemActivity extends ActionBarActivity
                 fOut.flush();
                 fOut.close();
             } catch (Exception e) {
+                Log.e("G2P", e.getMessage());
                 e.printStackTrace();
+                finish();
             }
+        } else if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_CANCELED) {
+            // If the user cancelled the capture of a picture, we GTFO
+            // It may be nice to allow a user to add a picture from a gallery instead of taking one
+            // see http://stackoverflow.com/questions/20021431/android-how-to-take-a-picture-from-camera-or-gallery
+            finish();
         }
     }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu)
-    {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_new_item, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item)
-    {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
-
 
     public void onSend(View view)
     {
@@ -145,6 +139,7 @@ public class NewItemActivity extends ActionBarActivity
         sendProgress.setVisibility(View.VISIBLE);
 
         Location loc = app.getLocation();
+
         Item item = new Item();
         item.setLocation(String.format("%f/%f", loc.getLatitude(), loc.getLongitude()));
         item.setTitle(titleInput.getText().toString());
@@ -180,11 +175,12 @@ public class NewItemActivity extends ActionBarActivity
         return image;
     }
 
-    protected void toast(String message)
+    // UTILS ///////////////////////////////////////////////////////////////////////////////////////
+
+    protected void toast(String message) { toast(message, Toast.LENGTH_SHORT); }
+    protected void toast(String message, int duration)
     {
         Context context = getApplicationContext();
-        int duration = Toast.LENGTH_SHORT;
-
         Toast toast = Toast.makeText(context, message, duration);
         toast.show();
     }

@@ -15,4 +15,5 @@
     <string name="toast_new_item_file_error">An error occurred while creating the file to store the photograph.</string>
     <string name="toast_connecting_please_wait">Connecting to server…\nPlease wait.</string>
     <string name="toast_no_mapping_activity">Did not find any mapping activity to go to</string>
+    <string name="toast_please_set_up_location">Please set up a location first.</string>
 </resources>

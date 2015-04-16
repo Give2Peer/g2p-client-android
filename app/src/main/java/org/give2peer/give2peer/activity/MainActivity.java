@@ -158,53 +158,6 @@ public class MainActivity extends ActionBarActivity
 
     }
 
-//    protected void uploadImage()
-//    {
-//        HttpClient client = new DefaultHttpClient();
-//
-//        try
-//        {
-//
-//            HttpPost post = new HttpPost(URL);
-//
-//            MultipartEntityBuilder entityBuilder = MultipartEntityBuilder.create();
-//            entityBuilder.setMode(HttpMultipartMode.BROWSER_COMPATIBLE);
-//
-//            entityBuilder.addTextBody(USER_ID, userId);
-//            entityBuilder.addTextBody(NAME, name);
-//            entityBuilder.addTextBody(TYPE, type);
-//            entityBuilder.addTextBody(COMMENT, comment);
-//            entityBuilder.addTextBody(LATITUDE, String.valueOf(User.Latitude));
-//            entityBuilder.addTextBody(LONGITUDE, String.valueOf(User.Longitude));
-//
-//            if(file != null)
-//            {
-//                entityBuilder.addBinaryBody(IMAGE, file);
-//            }
-//
-//            HttpEntity entity = entityBuilder.build();
-//
-//            post.setEntity(entity);
-//
-//            HttpResponse response = client.execute(post);
-//
-//            HttpEntity httpEntity = response.getEntity();
-//
-//            result = EntityUtils.toString(httpEntity);
-//
-//            Log.v("result", result);
-//        }
-//        catch(Exception e)
-//        {
-//            e.printStackTrace();
-//        } finally
-//        {
-//            client.getConnectionManager().shutdown();
-//        }
-//    }
-
-
-
     // UI ACTIONS //////////////////////////////////////////////////////////////////////////////////
 
     public void refreshLocationView()
@@ -220,11 +173,10 @@ public class MainActivity extends ActionBarActivity
 
     // HELPERS /////////////////////////////////////////////////////////////////////////////////////
 
-    protected void toast(String message)
+    protected void toast(String message) { toast(message, Toast.LENGTH_SHORT); }
+    protected void toast(String message, int duration)
     {
         Context context = getApplicationContext();
-        int duration = Toast.LENGTH_SHORT;
-
         Toast toast = Toast.makeText(context, message, duration);
         toast.show();
     }

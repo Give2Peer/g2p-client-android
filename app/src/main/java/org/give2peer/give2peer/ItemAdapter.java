@@ -47,6 +47,8 @@ public class ItemAdapter extends ArrayAdapter
         if (!item.hasThumbnailView()) {
             LayoutInflater inflater = ((Activity)context).getLayoutInflater();
             row = inflater.inflate(layoutResource, parent, false);
+            // we need min SDK to 16 in order to use that
+            //int size = grid.getRequestedColumnWidth();
             row.setLayoutParams(new GridView.LayoutParams(GridView.AUTO_FIT, size));
 
             holder = new ItemHolder();
