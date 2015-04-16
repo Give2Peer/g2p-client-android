@@ -35,7 +35,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * This manages the collections of Items.
+ * This manages the collections of Items. It doubles as a REST service.
  *
  * Responsibilities :
  * - Fetch items from server HTTP REST API.
@@ -43,7 +43,7 @@ import java.util.Map;
  * - Keep fetched items up to date.
  * - Store items locally in a cache for offline use. (don't know how, yet)
  */
-public class ItemRepository
+public class RestService
 {
     /**
      * The server limits the number of items sent in the response.
@@ -65,7 +65,7 @@ public class ItemRepository
 
     protected HttpClient client;
 
-    ItemRepository(String serverUrl, String username, String password)
+    RestService(String serverUrl, String username, String password)
     {
         this.serverUrl = serverUrl;
         this.username = username;
@@ -100,7 +100,6 @@ public class ItemRepository
      */
     public ArrayList<Item> findAround(double latitude, double longitude, int offset)
     {
-
         String url = serverUrl + "/find/" + latitude + "/" + longitude + "/" + offset;
 
         ArrayList<Item> itemsList = new ArrayList<Item>();

@@ -16,7 +16,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import org.give2peer.give2peer.Application;
-import org.give2peer.give2peer.ItemRepository;
+import org.give2peer.give2peer.RestService;
 import org.give2peer.give2peer.OneTimeLocationListener;
 import org.give2peer.give2peer.R;
 
@@ -34,7 +34,7 @@ public class MainActivity extends ActionBarActivity
     protected LocationProvider lp;
     protected Location location;
 
-    ItemRepository ir;
+    RestService ir;
 
     protected Application app;
 
@@ -56,7 +56,7 @@ public class MainActivity extends ActionBarActivity
 //        StrictMode.setThreadPolicy(policy);
 
         // Prepare the Item repository
-        ir = app.getItemRepository();
+        ir = app.getRestService();
 
         setContentView(R.layout.activity_main);
     }

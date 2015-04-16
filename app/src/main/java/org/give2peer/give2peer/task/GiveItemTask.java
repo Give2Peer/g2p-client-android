@@ -1,11 +1,9 @@
 package org.give2peer.give2peer.task;
 
 import android.os.AsyncTask;
-import android.util.Log;
 
 import org.give2peer.give2peer.Application;
 import org.give2peer.give2peer.Item;
-import org.json.JSONObject;
 
 import java.io.File;
 
@@ -25,12 +23,12 @@ public class GiveItemTask extends AsyncTask<Item, Void, Item> {
     protected Item doInBackground(Item... items)
     {
         Item item = items[0];
-        item = app.getItemRepository().giveItem(item);
+        item = app.getRestService().giveItem(item);
 //        Item freshItem = app.getRestService().giveItem(item.getLocation(), item.getTitle());
 
         // And then upload the picture
         File picture = item.getPictures().get(0);
-        item = app.getItemRepository().pictureItem(item, picture);
+        item = app.getRestService().pictureItem(item, picture);
 
 //        TypedFile typedFile = new TypedFile("multipart/form-data", picture);
         //String result = app.getRestService().postPicture(item.getId(), typedFile);

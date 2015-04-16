@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.location.Location;
+import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v7.app.ActionBarActivity;
@@ -83,7 +84,7 @@ public class NewItemActivity extends ActionBarActivity
             // Continue only if the File was successfully created
             if (pictureFile != null) {
                 pictureFiles.add(pictureFile);
-//                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(pictureFile));
+                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(pictureFile));
                 startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
             }
         } else {
@@ -97,8 +98,16 @@ public class NewItemActivity extends ActionBarActivity
     protected void onActivityResult(int requestCode, int resultCode, Intent data)
     {
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
-            Bundle extras = data.getExtras();
-            Bitmap imageBitmap = (Bitmap) extras.get("data");
+
+            File pictureFile = pictureFiles.get(pictureFiles.size()-1);
+
+            Bitmap imageBitmap;
+            if (null != data) {
+                Bundle extras = data.getExtras();
+                imageBitmap = (Bitmap) extras.get("data");
+            } else {
+                imageBitmap = app.getBitmapFromPath(pictureFile.getPath());
+            }
 
             if (null == imageBitmap) {
                 toast("WHY IS THE IMAGE `NULL`?\nWHAT DID YOU DO!?");
@@ -108,8 +117,8 @@ public class NewItemActivity extends ActionBarActivity
 
             // Put the bitmap in the View to show the user
             ((ImageView)findViewById(R.id.newItemImageView)).setImageBitmap(imageBitmap);
+
             // Write the bitmap to file
-            File pictureFile = pictureFiles.get(pictureFiles.size()-1);
             FileOutputStream fOut;
             try {
                 fOut = new FileOutputStream(pictureFile);
@@ -161,8 +170,8 @@ public class NewItemActivity extends ActionBarActivity
     private File createImageFile() throws IOException
     {
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(new Date());
-        String imageFileName = "g2p_" + timeStamp + "_item";
-        File dir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
+        String imageFileName = "g2p_" + timeStamp + "_";
+        File dir = Environment.getExternalStorageDirectory();
         dir.mkdirs();
         File image = File.createTempFile(
                 imageFileName,  /* prefix */

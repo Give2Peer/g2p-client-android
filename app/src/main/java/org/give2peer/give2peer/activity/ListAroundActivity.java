@@ -14,7 +14,6 @@ import android.widget.Toast;
 import org.give2peer.give2peer.Application;
 import org.give2peer.give2peer.Item;
 import org.give2peer.give2peer.ItemAdapter;
-import org.give2peer.give2peer.ItemRepository;
 import org.give2peer.give2peer.R;
 
 import java.util.ArrayList;
@@ -74,7 +73,7 @@ public class ListAroundActivity extends Activity
             try {
                 double latitude  = app.getLocation().getLatitude();
                 double longitude = app.getLocation().getLongitude();
-                items = app.getItemRepository().findAroundPaginated(latitude, longitude, page);
+                items = app.getRestService().findAroundPaginated(latitude, longitude, page);
             } catch (Exception e) {
                 Log.e(this.getClass().toString(), e.getMessage());
                 e.printStackTrace();

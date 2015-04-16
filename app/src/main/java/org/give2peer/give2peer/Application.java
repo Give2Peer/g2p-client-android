@@ -1,9 +1,17 @@
 package org.give2peer.give2peer;
 
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.location.Location;
+import android.media.ExifInterface;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.util.Log;
+
+import java.io.File;
+import java.io.FileInputStream;
 
 
 /**
@@ -26,7 +34,7 @@ public class Application extends android.app.Application
     String username = "Goutte";
     String password = "Goutte";
 
-    protected ItemRepository itemRepository;
+    protected RestService restService;
 
     public Application getInstance() { return singleton; }
 
@@ -38,7 +46,7 @@ public class Application extends android.app.Application
         super.onCreate();
         singleton = this;
 
-        itemRepository = new ItemRepository(serverUrl, username, password);
+        restService = new RestService(serverUrl, username, password);
     }
 
     // UTILS ///////////////////////////////////////////////////////////////////////////////////////
@@ -62,7 +70,57 @@ public class Application extends android.app.Application
         return getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA);
     }
 
-    public ItemRepository getItemRepository() { return itemRepository; }
+
+    /**
+     * Corrects the orientation of a Bitmap. Orientation, depending of the device,
+     * is not correctly set in the EXIF data of the taken image when it is saved
+     * into disk.
+     *
+     * Explanation:
+     * 	Camera orientation is not working ok (as is when capturing an image) because
+     *  OEMs do not adhere to the standard. So, each company does this following their
+     *  own way.
+     *
+     * @param path	path to the file
+     * @return
+     */
+    public Bitmap getBitmapFromPath(String path) {
+        Bitmap bitmap = null;
+
+        try {
+            File f = new File(path);
+            ExifInterface exif = new ExifInterface(f.getPath());
+            int orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
+
+            int rotate = 0;
+            switch(orientation) {
+                case ExifInterface.ORIENTATION_ROTATE_270:
+                    rotate += 90;
+                case ExifInterface.ORIENTATION_ROTATE_180:
+                    rotate += 90;
+                case ExifInterface.ORIENTATION_ROTATE_90:
+                    rotate += 90;
+            }
+
+            Matrix mat = new Matrix();
+            mat.postRotate(rotate);
+            BitmapFactory.Options options = new BitmapFactory.Options();
+            options.inSampleSize = 2;
+
+            Bitmap bmp = BitmapFactory.decodeStream(new FileInputStream(f), null, options);
+            bitmap = Bitmap.createBitmap(bmp, 0, 0, bmp.getWidth(), bmp.getHeight(), mat, true);
+
+        } catch (OutOfMemoryError e) {
+            Log.e("G2P", "getBitmapFromPath() [OutOfMemory!]: " + e.getMessage(), e);
+        } catch (Throwable e) {
+            Log.e("G2P","getBitmapFromPath(): " + e.getMessage(), e);
+        }
+
+        return bitmap;
+    }
+
+
+    public RestService getRestService() { return restService; }
 
     public boolean hasLocation() { return null != location; }
 
