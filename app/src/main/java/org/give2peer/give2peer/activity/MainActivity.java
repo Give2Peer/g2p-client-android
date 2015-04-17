@@ -154,6 +154,8 @@ public class MainActivity extends ActionBarActivity
 
     // UI ACTIONS //////////////////////////////////////////////////////////////////////////////////
 
+
+
     public void refreshActionsView()
     {
         boolean enabled = null != app.getLocation();
@@ -165,12 +167,17 @@ public class MainActivity extends ActionBarActivity
     public void refreshLocationView()
     {
         Location location = app.getLocation();
+        TextView title = ((TextView)findViewById(R.id.currentLocationTitle));
         if (null != location) {
             double latitude  = location.getLatitude();
             double longitude = location.getLongitude();
 
+            title.setText(getString(R.string.title_current_location));
+
             ((EditText) findViewById(R.id.latitudeEditText )).setText(String.valueOf(latitude ));
             ((EditText) findViewById(R.id.longitudeEditText)).setText(String.valueOf(longitude));
+        } else {
+            title.setText(getString(R.string.title_set_up_location));
         }
     }
 

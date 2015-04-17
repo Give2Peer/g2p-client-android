@@ -16,4 +16,7 @@
     <string name="toast_connecting_please_wait">Connecting to server…\nPlease wait.</string>
     <string name="toast_no_mapping_activity">Did not find any mapping activity to go to</string>
     <string name="toast_please_set_up_location">Please set up a location first.</string>
+
+    <string name="title_current_location">Current location</string>
+    <string name="title_set_up_location">Set up a location</string>
 </resources>
