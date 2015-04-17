@@ -1,9 +1,16 @@
+# Here we list the files we want to exclude from version control
+
+# Android
 .gradle
 gradle
-
 /.idea
 /.idea/workspace.xml
 /.idea/libraries
 /local.properties
-.DS_Store
 /build
+
+# Mac?
+.DS_Store
+
+# KDE
+.directory

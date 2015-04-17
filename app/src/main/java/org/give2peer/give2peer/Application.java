@@ -1,5 +1,7 @@
 package org.give2peer.give2peer;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -30,6 +32,8 @@ public class Application extends android.app.Application
 
     protected Location location;
 
+    private static String PREFERENCES_NAME = "org.give2peer.preferences";
+
     String serverUrl = "http://g2p.give2peer.org";
     String username = "Goutte";
     String password = "Goutte";
@@ -46,7 +50,38 @@ public class Application extends android.app.Application
         super.onCreate();
         singleton = this;
 
+        loadLocation();
+
         restService = new RestService(serverUrl, username, password);
+    }
+
+    // PREFERENCES /////////////////////////////////////////////////////////////////////////////////
+
+    protected void saveLocation()
+    {
+        if (null == location) return;
+        SharedPreferences sharedPref = getApplicationContext().getSharedPreferences(
+                PREFERENCES_NAME, Context.MODE_PRIVATE
+        );
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putFloat("latitude",  (float) location.getLatitude());
+        editor.putFloat("longitude", (float) location.getLongitude());
+        editor.apply();
+    }
+
+    protected void loadLocation()
+    {
+        SharedPreferences sharedPref = getApplicationContext().getSharedPreferences(
+                PREFERENCES_NAME, Context.MODE_PRIVATE
+        );
+
+        double lat = (double) sharedPref.getFloat("latitude",  666);
+        double lng = (double) sharedPref.getFloat("longitude", 666);
+        if (lat == 666 || lng == 666) return;
+
+        location = new Location("g2p");
+        location.setLatitude(lat);
+        location.setLongitude(lng);
     }
 
     // UTILS ///////////////////////////////////////////////////////////////////////////////////////
@@ -126,7 +161,10 @@ public class Application extends android.app.Application
 
     public Location getLocation() { return location; }
 
-    public void setLocation(Location location) { this.location = location; }
+    public void setLocation(Location location) {
+        this.location = location;
+        saveLocation();
+    }
 
     /**
      * This is a great hack !

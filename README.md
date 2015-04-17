@@ -52,6 +52,7 @@ ROADMAP
 -------
 
 - Locally cache item thumbnail images.
+- Register automatically and store credentials
 
 
 

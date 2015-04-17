@@ -3,8 +3,8 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context=".MainActivity">
+    tools:context=".MainActivity"
+    android:padding="16dp">
 
     <TextView
         android:layout_width="match_parent"
@@ -15,46 +15,101 @@
         android:textColor="@color/primary_text_default_material_light"
         android:typeface="monospace" />
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Current location"
+        android:id="@+id/currentLocationTitle"
+        style="@android:style/TextAppearance.DeviceDefault.Widget.ActionBar.Title"
+        android:layout_marginBottom="16dp" />
+
+    <RadioGroup
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent">
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent">
+
+            <RadioButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="address"
+                android:id="@+id/addressRadioButton"
+                android:checked="false"
+                android:layout_marginRight="8dp" />
+
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textPostalAddress"
+                android:ems="10"
+                android:id="@+id/postalAddressEditText" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:measureWithLargestChild="false"
+            android:weightSum="1">
+
+            <RadioButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="gps"
+                android:id="@+id/gpsRadioButton"
+                android:checked="false"
+                android:layout_marginRight="36dp" />
+
+            <EditText
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:inputType="numberDecimal"
+                android:id="@+id/latitudeEditText"
+                android:ems="4"
+                android:maxLength="9"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="32dp"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="/"
+                android:id="@+id/latLngDelimitorTextView" />
+
+            <EditText
+                android:layout_width="96dp"
+                android:layout_height="wrap_content"
+                android:inputType="numberDecimal"
+                android:ems="4"
+                android:id="@+id/longitudeEditText"
+                android:maxLength="9"/>
+
+            <ImageButton
+                style="?android:attr/buttonStyleSmall"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Detect"
+                android:id="@+id/detectLocationButton"
+                android:onClick="onDetectLocation"
+                android:enabled="true"
+                android:clickable="true"
+                android:src="@drawable/detect_location"
+                android:baselineAlignBottom="false"
+                android:layout_marginLeft="3dp"/>
+
+        </LinearLayout>
+
+    </RadioGroup>
+
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:paddingLeft="@dimen/activity_horizontal_margin"
-        android:paddingRight="@dimen/activity_horizontal_margin">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:text="Current location:"
-            android:id="@+id/currentLocationLabel" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            android:id="@+id/currentLocationView"
-            android:text="undefined"
-            android:singleLine="true"
-            android:paddingLeft="5dp" />
-
-        <Button
-            style="?android:attr/buttonStyleSmall"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Detect"
-            android:id="@+id/detectLocationButton"
-            android:onClick="onDetectLocation"
-            android:enabled="true"
-            android:clickable="true" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:orientation="horizontal"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:paddingLeft="@dimen/activity_horizontal_margin"
-        android:paddingRight="@dimen/activity_horizontal_margin">
+        android:paddingRight="@dimen/activity_horizontal_margin"
+        android:layout_marginTop="16dp">
 
         <Button
             android:layout_width="wrap_content"
@@ -69,14 +124,16 @@
             android:layout_height="wrap_content"
             android:text="Give"
             android:id="@+id/giveItemButton"
-            android:onClick="onGiveItemButton" />
+            android:onClick="onGiveItemButton"
+            android:enabled="false"/>
 
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Spot"
             android:id="@+id/spotItemButton"
-            android:onClick="onSpotItemButton" />
+            android:onClick="onSpotItemButton"
+            android:enabled="false"/>
 
     </LinearLayout>
 

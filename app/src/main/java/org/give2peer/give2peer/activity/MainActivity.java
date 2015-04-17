@@ -12,11 +12,11 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import org.give2peer.give2peer.Application;
-import org.give2peer.give2peer.RestService;
 import org.give2peer.give2peer.OneTimeLocationListener;
 import org.give2peer.give2peer.R;
 
@@ -32,9 +32,6 @@ public class MainActivity extends ActionBarActivity
 {
     protected LocationManager lm;
     protected LocationProvider lp;
-    protected Location location;
-
-    RestService ir;
 
     protected Application app;
 
@@ -42,23 +39,21 @@ public class MainActivity extends ActionBarActivity
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
 
         // Grab the app
         app = (Application) getApplication();
 
         // Let's grab the location manager
         lm = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
+
         // We never know, maybe there's an available location already
         refreshLocationView();
+        refreshActionsView();
 
         // TEST -- fixme: remove and async all queries
 //        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
 //        StrictMode.setThreadPolicy(policy);
-
-        // Prepare the Item repository
-        ir = app.getRestService();
-
-        setContentView(R.layout.activity_main);
     }
 
     @Override
@@ -117,11 +112,10 @@ public class MainActivity extends ActionBarActivity
             @Override
             public void onLocationChanged(Location newLocation) {
                 super.onLocationChanged(newLocation);
-                location = newLocation;
-                app.setLocation(location);
+                app.setLocation(newLocation);
                 refreshLocationView();
+                refreshActionsView();
                 detectLocationButton.setEnabled(true);
-                listAroundMeButton.setEnabled(true);
                 toast("Successfully updated current location.");
             }
         };
@@ -160,14 +154,23 @@ public class MainActivity extends ActionBarActivity
 
     // UI ACTIONS //////////////////////////////////////////////////////////////////////////////////
 
+    public void refreshActionsView()
+    {
+        boolean enabled = null != app.getLocation();
+        findViewById(R.id.listAroundMeButton).setEnabled(enabled);
+        findViewById(R.id.giveItemButton).setEnabled(enabled);
+        findViewById(R.id.spotItemButton).setEnabled(enabled);
+    }
+
     public void refreshLocationView()
     {
-        TextView currentLocationView = (TextView) findViewById(R.id.currentLocationView);
+        Location location = app.getLocation();
         if (null != location) {
             double latitude  = location.getLatitude();
             double longitude = location.getLongitude();
 
-            currentLocationView.setText(String.format("%.4f/%.4f", latitude, longitude));
+            ((EditText) findViewById(R.id.latitudeEditText )).setText(String.valueOf(latitude ));
+            ((EditText) findViewById(R.id.longitudeEditText)).setText(String.valueOf(longitude));
         }
     }
 
@@ -196,6 +199,9 @@ public class MainActivity extends ActionBarActivity
 
     // CONFIGURATION ///////////////////////////////////////////////////////////////////////////////
 
+    /**
+     * @return a criteria tailored to our needs.
+     */
     protected Criteria getLocationCriteria()
     {
         Criteria criteria = new Criteria();
