@@ -10,7 +10,9 @@ import android.location.Location;
 import android.media.ExifInterface;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.preference.PreferenceManager;
 import android.util.Log;
+import android.widget.Toast;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -32,11 +34,16 @@ public class Application extends android.app.Application
 
     protected Location location;
 
-    private static String PREFERENCES_NAME = "org.give2peer.preferences";
-
-    String serverUrl = "http://g2p.give2peer.org";
+    private static String DEFAULT_SERVER_URI = "http://g2p.give2peer.org";
     String username = "Goutte";
     String password = "Goutte";
+
+    /**
+     *
+     */
+    //protected String currentServer = DEFAULT_SERVER_URI;
+
+    //protected ServerConfiguration currentServerConfiguration;
 
     protected RestService restService;
 
@@ -52,30 +59,36 @@ public class Application extends android.app.Application
 
         loadLocation();
 
-        restService = new RestService(serverUrl, username, password);
+        String serverUri = getPrefs().getString("server_uri", DEFAULT_SERVER_URI);
+
+        restService = new RestService(serverUri, username, password);
     }
 
     // PREFERENCES /////////////////////////////////////////////////////////////////////////////////
 
+//    protected ServerConfiguration getCurrentServerConfiguration()
+//    {
+//        if (null != currentServerConfiguration) return currentServerConfiguration;
+//
+//        // Build one from settings
+//
+//    }
+
     protected void saveLocation()
     {
         if (null == location) return;
-        SharedPreferences sharedPref = getApplicationContext().getSharedPreferences(
-                PREFERENCES_NAME, Context.MODE_PRIVATE
-        );
+        SharedPreferences sharedPref = getPrefs();
         SharedPreferences.Editor editor = sharedPref.edit();
-        editor.putFloat("latitude",  (float) location.getLatitude());
+        editor.putFloat("latitude", (float) location.getLatitude());
         editor.putFloat("longitude", (float) location.getLongitude());
         editor.apply();
     }
 
     protected void loadLocation()
     {
-        SharedPreferences sharedPref = getApplicationContext().getSharedPreferences(
-                PREFERENCES_NAME, Context.MODE_PRIVATE
-        );
+        SharedPreferences sharedPref = getPrefs();
 
-        double lat = (double) sharedPref.getFloat("latitude",  666);
+        double lat = (double) sharedPref.getFloat("latitude", 666);
         double lng = (double) sharedPref.getFloat("longitude", 666);
         if (lat == 666 || lng == 666) return;
 
@@ -85,6 +98,11 @@ public class Application extends android.app.Application
     }
 
     // UTILS ///////////////////////////////////////////////////////////////////////////////////////
+
+    public SharedPreferences getPrefs()
+    {
+        return PreferenceManager.getDefaultSharedPreferences(this);
+    }
 
     /**
      * @return whether internet is available or not.
@@ -119,7 +137,8 @@ public class Application extends android.app.Application
      * @param path	path to the file
      * @return
      */
-    public Bitmap getBitmapFromPath(String path) {
+    public Bitmap getBitmapFromPath(String path)
+    {
         Bitmap bitmap = null;
 
         try {
@@ -161,9 +180,20 @@ public class Application extends android.app.Application
 
     public Location getLocation() { return location; }
 
-    public void setLocation(Location location) {
+    public void setLocation(Location location)
+    {
         this.location = location;
         saveLocation();
+    }
+
+    // HELPERS /////////////////////////////////////////////////////////////////////////////////////
+
+    public void toast(String message) { toast(message, Toast.LENGTH_SHORT); }
+    public void toast(String message, int duration)
+    {
+        Context context = getApplicationContext();
+        Toast toast = Toast.makeText(context, message, duration);
+        toast.show();
     }
 
     /**

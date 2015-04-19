@@ -15,12 +15,17 @@ import org.give2peer.give2peer.Application;
 import org.give2peer.give2peer.Item;
 import org.give2peer.give2peer.ItemAdapter;
 import org.give2peer.give2peer.R;
+import org.give2peer.give2peer.task.FindItemsTask;
 
 import java.util.ArrayList;
 
 
 /**
- * This fullscreen activity lists items in a grid
+ * This fullscreen activity lists items in a grid, from closest to furthest.
+ * It lists at most 32 items. (as server API returns at most 32 items)
+ *
+ * Ideas:
+ *   - list more items when we get to the bottom
  */
 public class ListAroundActivity extends Activity
 {
@@ -30,7 +35,6 @@ public class ListAroundActivity extends Activity
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_list_around);
 
         // Extract some parameters from the intent
         Intent in = getIntent();
@@ -41,66 +45,19 @@ public class ListAroundActivity extends Activity
 
         // Make sure we have a location
         if (null == app.getLocation()) {
-            toast(getString(R.string.toast_please_set_up_location));
+            app.toast(getString(R.string.toast_please_set_up_location));
             finish();
             return;
         }
 
+        setContentView(R.layout.activity_list_around);
+
         // Launch the Task
-        FindItemsTask fit = (FindItemsTask) new FindItemsTask(this, page).execute();
+        FindItemsTask fit = (FindItemsTask) new FindItemsTask(app, this, page).execute();
 
         // Display a "Please wait" message
-        toast(getString(R.string.toast_connecting_please_wait), Toast.LENGTH_LONG);
+        app.toast(getString(R.string.toast_connecting_please_wait), Toast.LENGTH_LONG);
     }
-
-    private class FindItemsTask extends AsyncTask<Void, Void, ArrayList<Item>>
-    {
-
-        int page;
-        Context context;
-
-        public FindItemsTask(Context context, int page)
-        {
-            super();
-            this.page = page;
-            this.context = context;
-        }
-
-        @Override
-        protected ArrayList<Item> doInBackground(Void... nope)
-        {
-            ArrayList<Item> items = new ArrayList<Item>();
-            try {
-                double latitude  = app.getLocation().getLatitude();
-                double longitude = app.getLocation().getLongitude();
-                items = app.getRestService().findAroundPaginated(latitude, longitude, page);
-            } catch (Exception e) {
-                Log.e(this.getClass().toString(), e.getMessage());
-                e.printStackTrace();
-            }
-            return items;
-        }
-
-        @Override
-        protected void onPostExecute(ArrayList<Item> items)
-        {
-            // This is a hack for API v8 to get the column width in order to have square item thumbs
-            // This will probably cause headaches in landscape mode, but hey, one thing at a time
-            int nbColumns = 2; // getting this procedurally requires a higher API too
-            DisplayMetrics dm = new DisplayMetrics();
-            getWindowManager().getDefaultDisplay().getMetrics(dm);
-            int size = dm.widthPixels / nbColumns;
-
-            // Remove the Loading...
-            View itemsLoadingSpinner = findViewById(R.id.itemsLoadingSpinner);
-            itemsLoadingSpinner.setVisibility(View.GONE);
-            // Fill the gridView with our items
-            GridView itemsGridView = (GridView) findViewById(R.id.itemsGridView);
-            itemsGridView.setAdapter(new ItemAdapter(context, R.layout.grid_item, size, items));
-            itemsGridView.setVisibility(View.VISIBLE);
-        }
-    }
-
 
     // LISTENERS ///////////////////////////////////////////////////////////////////////////////////
 
@@ -113,13 +70,6 @@ public class ListAroundActivity extends Activity
 
     // HELPERS /////////////////////////////////////////////////////////////////////////////////////
 
-    protected void toast(String message) { toast(message, Toast.LENGTH_SHORT); }
-    protected void toast(String message, int duration)
-    {
-        Context context = getApplicationContext();
-        Toast toast = Toast.makeText(context, message, duration);
-        toast.show();
-    }
 
     // CONFIGURATION ///////////////////////////////////////////////////////////////////////////////
 

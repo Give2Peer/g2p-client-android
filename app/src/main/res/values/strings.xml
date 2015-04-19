@@ -4,11 +4,14 @@
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
 
+    <string name="title_activity_settings">Give2Peer - Settings</string>
     <string name="title_activity_new_item">Give2Peer - New Item</string>
+
     <string name="label_title">Title</string>
 
     <string name="new_item_image_description">The picture of the item you just took.</string>
     <string name="new_item_send_button">Send</string>
+
     <string name="toast_no_camera_available">No camera could be found.\nAsk for support of gallery images!</string>
     <string name="toast_new_item_uploading">Uploading new item…</string>
     <string name="toast_new_item_uploaded">Item \'%s\' was uploaded.\nWell done!</string>

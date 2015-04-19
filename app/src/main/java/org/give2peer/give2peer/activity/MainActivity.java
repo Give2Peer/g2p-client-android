@@ -19,11 +19,11 @@ import android.widget.Toast;
 import org.give2peer.give2peer.Application;
 import org.give2peer.give2peer.OneTimeLocationListener;
 import org.give2peer.give2peer.R;
+import org.give2peer.give2peer.fragment.SettingsFragment;
 
 
 /**
- * Still not sure if this should be our main logic class.
- * What happens when I change Activities ?
+ * This is the landing activity when a user starts the app.
  *
  * Callbacks : http://developer.android.com/training/basics/activity-lifecycle/starting.html
  *
@@ -51,9 +51,9 @@ public class MainActivity extends ActionBarActivity
         refreshLocationView();
         refreshActionsView();
 
-        // TEST -- fixme: remove and async all queries
-//        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
-//        StrictMode.setThreadPolicy(policy);
+        // Useful, to run a query on the UI thread, for debugging ONLY of course
+        //StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+        //StrictMode.setThreadPolicy(policy);
     }
 
     @Override
@@ -72,8 +72,9 @@ public class MainActivity extends ActionBarActivity
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            Intent intent = new Intent(this, SettingsActivity.class);
+            startActivity(intent);
             return true;
         }
 
@@ -104,9 +105,6 @@ public class MainActivity extends ActionBarActivity
         final View detectLocationButton = findViewById(R.id.detectLocationButton);
         detectLocationButton.setEnabled(false);
 
-        final View listAroundMeButton = findViewById(R.id.listAroundMeButton);
-        listAroundMeButton.setEnabled(false);
-
         // Fetch the location asynchronously
         LocationListener locationListener = new OneTimeLocationListener(lm, getLocationCriteria()) {
             @Override
@@ -132,29 +130,7 @@ public class MainActivity extends ActionBarActivity
     }
 
 
-
-
-    /**
-     *
-     * @param action Must be either "give" or "spot".
-     */
-    protected void snapshotNewItem(String action)
-    {
-        if (!app.hasCameraSupport()) {
-            toast(getString(R.string.toast_no_camera_available));
-            return;
-        }
-
-        // Start the "new item" activity
-        Intent intent = new Intent(this, NewItemActivity.class);
-        intent.putExtra("action", action);
-        startActivity(intent);
-
-    }
-
     // UI ACTIONS //////////////////////////////////////////////////////////////////////////////////
-
-
 
     public void refreshActionsView()
     {
@@ -181,6 +157,7 @@ public class MainActivity extends ActionBarActivity
         }
     }
 
+
     // HELPERS /////////////////////////////////////////////////////////////////////////////////////
 
     protected void toast(String message) { toast(message, Toast.LENGTH_SHORT); }
@@ -197,11 +174,6 @@ public class MainActivity extends ActionBarActivity
         dumpTextView.setVisibility(View.VISIBLE);
         dumpTextView.setText(text);
     }
-
-//    protected String getDummyJson()
-//    {
-//        return getString(R.string.dummyFindItemsResponse);
-//    }
 
 
     // CONFIGURATION ///////////////////////////////////////////////////////////////////////////////
@@ -220,35 +192,24 @@ public class MainActivity extends ActionBarActivity
         return criteria;
     }
 
+
     // ACTIONS /////////////////////////////////////////////////////////////////////////////////////
 
-//    protected ArrayList<Item> findItemsAroundMe(int page)
-//    {
-//        ArrayList<Item> items = new ArrayList<>();
-//
-//        if (null != location) {
-//            items = ir.findAroundPaginated(location.getLatitude(), location.getLongitude(), page);
-//        }
-//
-//        return items;
-//    }
-//
-//    protected ArrayList<Item> findItemsAroundMeDummy()
-//    {
-//        ArrayList<Item> items = new ArrayList<>();
-//        // try parse the string to a JSON object
-//        try {
-//            JSONObject row;
-//            JSONArray rows = new JSONArray(getDummyJson());
-//            for (int i = 0 ; i < rows.length() ; i++) {
-//                row = rows.getJSONObject(i);
-//                items.add(new Item(row));
-//            }
-//        } catch (JSONException e) {
-//            Log.e("JSON Parser", "Error parsing data : " + e.toString());
-//        }
-//
-//        return items;
-//    }
+    /**
+     *
+     * @param action Must be either "give" or "spot".
+     */
+    protected void snapshotNewItem(String action)
+    {
+        if (!app.hasCameraSupport()) {
+            toast(getString(R.string.toast_no_camera_available));
+            return;
+        }
+
+        // Start the "new item" activity
+        Intent intent = new Intent(this, NewItemActivity.class);
+        intent.putExtra("action", action);
+        startActivity(intent);
+    }
 }
 

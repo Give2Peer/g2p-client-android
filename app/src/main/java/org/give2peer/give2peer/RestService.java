@@ -80,11 +80,13 @@ public class RestService
     // HTTP QUERIES ////////////////////////////////////////////////////////////////////////////////
 
     public ArrayList<Item> findAroundPaginated(double latitude, double longitude, int page)
+            throws IOException, URISyntaxException
     {
         return findAround(latitude, longitude, page * ITEMS_PER_PAGE);
     }
 
     public ArrayList<Item> findAround(double latitude, double longitude)
+            throws IOException, URISyntaxException
     {
         return findAround(latitude, longitude, 0);
     }
@@ -99,26 +101,21 @@ public class RestService
      * @return
      */
     public ArrayList<Item> findAround(double latitude, double longitude, int offset)
+            throws URISyntaxException, IOException
     {
         String url = serverUrl + "/find/" + latitude + "/" + longitude + "/" + offset;
 
         ArrayList<Item> itemsList = new ArrayList<Item>();
 
-        try {
-            HttpGet request = new HttpGet();
-            request.setURI(new URI(url));
+        HttpGet request = new HttpGet();
+        request.setURI(new URI(url));
 
-            authenticate(request);
+        authenticate(request);
 
-            HttpResponse response = client.execute(request);
+        HttpResponse response = client.execute(request);
 
-            String json = EntityUtils.toString(response.getEntity(), "UTF-8");
-            itemsList = jsonToItems(json);
-
-        } catch (URISyntaxException|IOException e) {
-            Log.e("Item", e.getMessage());
-            e.printStackTrace();
-        }
+        String json = EntityUtils.toString(response.getEntity(), "UTF-8");
+        itemsList = jsonToItems(json);
 
         return itemsList;
     }
@@ -225,6 +222,7 @@ public class RestService
             for (int i = 0 ; i < rows.length() ; i++) {
                 jsonObject = rows.getJSONObject(i);
                 item = new Item(jsonObject);
+                // todo: move this memoization to upper function, it should not be here.
                 if (items.containsKey(item.getId())) {
                     item = items.get(item.getId());
                     item.updateWithJSON(jsonObject);
