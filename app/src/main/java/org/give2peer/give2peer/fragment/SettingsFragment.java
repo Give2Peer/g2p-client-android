@@ -59,8 +59,8 @@ public class SettingsFragment extends PreferenceFragment {
         // Android actually needs it now too, it seems, to instantiate stuff internally
         addPreferencesFromResource(R.xml.preferences);
 
-
-
+        // Build the server's input listeners once, as there's no need to build them many times.
+        // Besides, they need to be hard-referenced, or the garbage collector will eat them.
         updateSummaryListener = new Preference.OnPreferenceChangeListener() {
             @Override
             public boolean onPreferenceChange(Preference preference, Object newValue) {
@@ -112,11 +112,11 @@ public class SettingsFragment extends PreferenceFragment {
 
             servers.put(server.getId(), server);
 
-            Log.i("G2P", "Creating prefs screen for " + server.getName());
+            //Log.i("G2P", "Creating prefs screen for " + server.getName());
 
             PreferenceScreen screen = pm.createPreferenceScreen(context);
             screen.setTitle(server.getName());
-            screen.setIcon(R.drawable.ic_chevron_right_black_36dp);
+            screen.setIcon(R.drawable.ic_edit_black_36dp);
 
             UpdateScreenListener updateScreenListener = new UpdateScreenListener(screen);
             updateScreenListeners.add(updateScreenListener);

@@ -78,11 +78,13 @@ public class ServerChooserFragment extends PreferenceFragment {
             {
                 if (preference == serversListChooser) {
                     Server server = Server.findById(Server.class, Long.valueOf((String) newValue));
+                    // Update the summary of the chooser
+                    serversListChooser.setSummary(server.getName());
                     // This will also reload our rest service, internally
                     app.setServerConfiguration(server);
                 }
 
-                return false;
+                return true;
             }
         });
     }
