@@ -56,14 +56,10 @@ public class SettingsFragment extends PreferenceFragment {
 
         // Load the preferences from an XML resource
         // We'll need that later when we'll have static preferences
+        // Android actually needs it now too, it seems, to instantiate stuff internally
         addPreferencesFromResource(R.xml.preferences);
 
-        // List the server configurations
-        Iterator<Server> serversIterator = Server.findAll(Server.class);
 
-        Context context = (Context) getActivity();
-
-        PreferenceManager pm = getPreferenceManager();
 
         updateSummaryListener = new Preference.OnPreferenceChangeListener() {
             @Override
@@ -84,10 +80,27 @@ public class SettingsFragment extends PreferenceFragment {
             }
         };
 
+        refreshView();
+    }
+
+    public void refreshView() {
+
         // We can only do this using a Reflection hack I don't like. Too bad. And, also, WTF?
         // pm.inflateFromResource((Context) getActivity(), R.xml.server_editor, null)
 
         // Therefore, we're going to procedurally create everything
+
+        // List the server configurations
+        Iterator<Server> serversIterator = Server.findAll(Server.class);
+
+        // Prepare some variables
+        Context context = (Context) getActivity();
+        PreferenceManager pm = getPreferenceManager();
+
+        // Freshen the screen
+        getPreferenceScreen().removeAll();
+
+        // Create the Server category
         PreferenceCategory cat = new PreferenceCategory(context);
         cat.setTitle("Servers");
 
@@ -144,6 +157,22 @@ public class SettingsFragment extends PreferenceFragment {
             cat.addPreference(screen);
         }
 
+        // Add server button
+        Preference addServer = new Preference(context);
+        addServer.setTitle("Add a server");
+        addServer.setIcon(R.drawable.ic_add_circle_outline_black_36dp);
+
+        addServer.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                Server newServer = (new Server()).loadDummy();
+                newServer.save();
+                refreshView();
+                return true;
+            }
+        });
+
+        cat.addPreference(addServer);
     }
 
     @Override

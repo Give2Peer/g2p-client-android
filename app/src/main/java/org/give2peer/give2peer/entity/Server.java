@@ -31,6 +31,16 @@ public class Server extends SugarRecord<Server>
         return this;
     }
 
+    public Server loadDummy()
+    {
+        url      = "http://yourserver";
+        name     = "Unnamed";
+        username = "";
+        password = "";
+
+        return this;
+    }
+
     public String getUrl()                   { return url; }
 
     public void setUrl(String url)           { this.url = url; }
