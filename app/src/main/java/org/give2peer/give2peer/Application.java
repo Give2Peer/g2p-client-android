@@ -16,7 +16,7 @@ import android.widget.Toast;
 
 import com.orm.SugarApp;
 
-import org.give2peer.give2peer.entity.ServerConfiguration;
+import org.give2peer.give2peer.entity.Server;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -39,7 +39,7 @@ public class Application extends SugarApp
 
     protected Location location;
 
-    protected ServerConfiguration currentServer;
+    protected Server currentServer;
 
     protected RestService restService;
 
@@ -74,22 +74,22 @@ public class Application extends SugarApp
 
     // SERVERS /////////////////////////////////////////////////////////////////////////////////////
 
-    public void setServerConfiguration(ServerConfiguration config)
+    public void setServerConfiguration(Server config)
     {
         currentServer = config;
         restService = new RestService(currentServer);
     }
 
-    public ServerConfiguration guessServerConfiguration()
+    public Server guessServerConfiguration()
     {
-        ServerConfiguration serverConfiguration = null;
+        Server serverConfiguration = null;
 
         // Grab the locally-stored servers in our yummy SQLite database
-        List<ServerConfiguration> servers = ServerConfiguration.listAll(ServerConfiguration.class);
+        List<Server> servers = Server.listAll(Server.class);
 
         // Add a default server to the database if there are no servers at all
         if (0 == servers.size()) {
-            ServerConfiguration defaultServer = new ServerConfiguration();
+            Server defaultServer = new Server();
             defaultServer.loadDefaults().save();
             servers.add(defaultServer);
         }
@@ -101,7 +101,7 @@ public class Application extends SugarApp
         if (null != currentServerIdString) {
             int currentServerId = Integer.valueOf(currentServerIdString);
             for (int i=0; i<servers.size(); i++) {
-                ServerConfiguration config = servers.get(i);
+                Server config = servers.get(i);
                 if (config.getId() == currentServerId) {
                     serverConfiguration = config;
                     break;

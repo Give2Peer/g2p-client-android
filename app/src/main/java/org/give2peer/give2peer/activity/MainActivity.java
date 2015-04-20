@@ -56,8 +56,6 @@ public class MainActivity extends ActionBarActivity
                 .replace(R.id.serverChooserFragment, new ServerChooserFragment())
                 .commit();
 
-
-
         // Useful, to run a query on the UI thread, for debugging ONLY of course
         //StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         //StrictMode.setThreadPolicy(policy);

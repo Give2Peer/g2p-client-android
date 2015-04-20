@@ -19,7 +19,7 @@ import org.apache.http.impl.auth.BasicScheme;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
-import org.give2peer.give2peer.entity.ServerConfiguration;
+import org.give2peer.give2peer.entity.Server;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -64,7 +64,7 @@ public class RestService
 
     protected HttpClient client;
 
-    RestService(ServerConfiguration config)
+    RestService(Server config)
     {
         serverUrl = config.getUrl();
         username = config.getUsername();

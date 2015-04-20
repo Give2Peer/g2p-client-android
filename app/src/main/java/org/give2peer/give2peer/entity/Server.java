@@ -7,7 +7,7 @@ import com.orm.SugarRecord;
  * This is a persistable entity.
  *
  */
-public class ServerConfiguration extends SugarRecord<ServerConfiguration>
+public class Server extends SugarRecord<Server>
 {
     String url      = "";
     String name     = "";
@@ -17,11 +17,11 @@ public class ServerConfiguration extends SugarRecord<ServerConfiguration>
     /**
      * This loads the default configuration that is automatically added to the app on first launch.
      *
-     * Note: putting these in a class extending ServerConfiguration is a bad idea: the ORM chokes.
+     * Note: putting these in a class extending Server is a bad idea: the ORM chokes.
      *
      * TODO: either automatic registration somewhere, or a proper Anon account
      */
-    public ServerConfiguration loadDefaults()
+    public Server loadDefaults()
     {
         url      = "http://g2p.give2peer.org";
         name     = "Give2Peer Demo";

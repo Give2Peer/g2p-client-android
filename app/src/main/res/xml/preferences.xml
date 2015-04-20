@@ -1,9 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-    <EditTextPreference
-        android:key="server_uri"
-        android:title="Server"
-        android:summary="The URI of the server to connect to"
-        android:defaultValue="http://g2p.give2peer.org"
-    />
+    <!-- All of it is generated procedurally -->
 </PreferenceScreen>
