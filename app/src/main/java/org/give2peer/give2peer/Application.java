@@ -14,8 +14,13 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.orm.SugarApp;
+
+import org.give2peer.give2peer.entity.ServerConfiguration;
+
 import java.io.File;
 import java.io.FileInputStream;
+import java.util.List;
 
 
 /**
@@ -28,22 +33,13 @@ import java.io.FileInputStream;
  * Application app = (Application) getApplication();
  * ```
  */
-public class Application extends android.app.Application
+public class Application extends SugarApp
 {
     private static Application singleton;
 
     protected Location location;
 
-    private static String DEFAULT_SERVER_URI = "http://g2p.give2peer.org";
-    String username = "Goutte";
-    String password = "Goutte";
-
-    /**
-     *
-     */
-    //protected String currentServer = DEFAULT_SERVER_URI;
-
-    //protected ServerConfiguration currentServerConfiguration;
+    protected ServerConfiguration currentServer;
 
     protected RestService restService;
 
@@ -57,29 +53,78 @@ public class Application extends android.app.Application
         super.onCreate();
         singleton = this;
 
+        // Load the Location from preferences
         loadLocation();
 
-        String serverUri = getPrefs().getString("server_uri", DEFAULT_SERVER_URI);
+        // Increment the tally of launches and fire appropriate methods, like `onFirstTime()`
+        incrementLaunchesTally();
 
-        restService = new RestService(serverUri, username, password);
+        // Figure out the configured (or default) server configuration, and load it.
+        // This also loads the REST service with the found configuration.
+        setServerConfiguration(guessServerConfiguration());
     }
 
-    // PREFERENCES /////////////////////////////////////////////////////////////////////////////////
+    /**
+     * Mah, we'll use that again later, tutorials and such.
+     */
+    protected void onFirstTime()
+    {
+        // nothing is cool
+    }
 
-//    protected ServerConfiguration getCurrentServerConfiguration()
-//    {
-//        if (null != currentServerConfiguration) return currentServerConfiguration;
-//
-//        // Build one from settings
-//
-//    }
+    // SERVERS /////////////////////////////////////////////////////////////////////////////////////
+
+    public void setServerConfiguration(ServerConfiguration config)
+    {
+        currentServer = config;
+        restService = new RestService(currentServer);
+    }
+
+    public ServerConfiguration guessServerConfiguration()
+    {
+        ServerConfiguration serverConfiguration = null;
+
+        // Grab the locally-stored servers in our yummy SQLite database
+        List<ServerConfiguration> servers = ServerConfiguration.listAll(ServerConfiguration.class);
+
+        // Add a default server to the database if there are no servers at all
+        if (0 == servers.size()) {
+            ServerConfiguration defaultServer = new ServerConfiguration();
+            defaultServer.loadDefaults().save();
+            servers.add(defaultServer);
+        }
+
+        // Yes, our server chooser saves the ids as strings. If you know how to save ints...
+        String currentServerIdString = getPrefs().getString("current_server_id", null);
+
+        // Loop through our server configs to find the one with our id, it's cheaper than findById()
+        if (null != currentServerIdString) {
+            int currentServerId = Integer.valueOf(currentServerIdString);
+            for (int i=0; i<servers.size(); i++) {
+                ServerConfiguration config = servers.get(i);
+                if (config.getId() == currentServerId) {
+                    serverConfiguration = config;
+                    break;
+                }
+            }
+        }
+
+        // It's either the first time and we have not picked a server yet, or we deleted it.
+        if (null == serverConfiguration) {
+            serverConfiguration = servers.get(0); // the first one, the only one, the default G2P
+        }
+
+        return serverConfiguration;
+    }
+
+    // LOCATION ////////////////////////////////////////////////////////////////////////////////////
 
     protected void saveLocation()
     {
         if (null == location) return;
         SharedPreferences sharedPref = getPrefs();
         SharedPreferences.Editor editor = sharedPref.edit();
-        editor.putFloat("latitude", (float) location.getLatitude());
+        editor.putFloat("latitude",  (float) location.getLatitude());
         editor.putFloat("longitude", (float) location.getLongitude());
         editor.apply();
     }
@@ -88,7 +133,7 @@ public class Application extends android.app.Application
     {
         SharedPreferences sharedPref = getPrefs();
 
-        double lat = (double) sharedPref.getFloat("latitude", 666);
+        double lat = (double) sharedPref.getFloat("latitude",  666);
         double lng = (double) sharedPref.getFloat("longitude", 666);
         if (lat == 666 || lng == 666) return;
 
@@ -176,6 +221,11 @@ public class Application extends android.app.Application
 
     public RestService getRestService() { return restService; }
 
+
+
+
+    // LOCATION ////////////////////////////////////////////////////////////////////////////////////
+
     public boolean hasLocation() { return null != location; }
 
     public Location getLocation() { return location; }
@@ -184,6 +234,22 @@ public class Application extends android.app.Application
     {
         this.location = location;
         saveLocation();
+    }
+
+
+    // STATS ///////////////////////////////////////////////////////////////////////////////////////
+
+    protected void incrementLaunchesTally()
+    {
+        int count = getPrefs().getInt("launches_tally", 0) + 1;
+        switch (count)
+        {
+            case 1:
+                onFirstTime();
+                break;
+            default:
+        }
+        getPrefs().edit().putInt("launches_tally", count).apply();
     }
 
     // HELPERS /////////////////////////////////////////////////////////////////////////////////////

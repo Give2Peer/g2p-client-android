@@ -19,7 +19,7 @@ import android.widget.Toast;
 import org.give2peer.give2peer.Application;
 import org.give2peer.give2peer.OneTimeLocationListener;
 import org.give2peer.give2peer.R;
-import org.give2peer.give2peer.fragment.SettingsFragment;
+import org.give2peer.give2peer.fragment.ServerChooserFragment;
 
 
 /**
@@ -50,6 +50,13 @@ public class MainActivity extends ActionBarActivity
         // We never know, maybe there's an available location already
         refreshLocationView();
         refreshActionsView();
+
+        // Display the server chooser fragment
+        getFragmentManager().beginTransaction()
+                .replace(R.id.serverChooserFragment, new ServerChooserFragment())
+                .commit();
+
+
 
         // Useful, to run a query on the UI thread, for debugging ONLY of course
         //StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();

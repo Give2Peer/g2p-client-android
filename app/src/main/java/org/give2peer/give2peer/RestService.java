@@ -1,6 +1,5 @@
 package org.give2peer.give2peer;
 
-import android.graphics.Bitmap;
 import android.util.Log;
 
 import org.apache.http.Header;
@@ -15,12 +14,12 @@ import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.ContentType;
-import org.apache.http.entity.FileEntity;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.impl.auth.BasicScheme;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
+import org.give2peer.give2peer.entity.ServerConfiguration;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -65,11 +64,11 @@ public class RestService
 
     protected HttpClient client;
 
-    RestService(String serverUrl, String username, String password)
+    RestService(ServerConfiguration config)
     {
-        this.serverUrl = serverUrl;
-        this.username = username;
-        this.password = password;
+        serverUrl = config.getUrl();
+        username = config.getUsername();
+        password = config.getPassword();
         credentials = new UsernamePasswordCredentials(username, password);
 
         client = new DefaultHttpClient();
