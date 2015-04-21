@@ -59,6 +59,11 @@ public class ServerChooserFragment extends PreferenceFragment {
             Log.i("G2P", "Setting first found server as current server.");
             serversListChooser.setValueIndex(0);
         }
+        // Okay, but... the app remembers the current server too, this is badly structured code
+        if (Integer.valueOf(serversListChooser.getValue()) >= serversCount) {
+            Log.i("G2P", "Setting first found server as current server.");
+            serversListChooser.setValueIndex(0);
+        }
 
         // Set the name of the server as description
         int currentServerId = Integer.valueOf(serversListChooser.getValue());

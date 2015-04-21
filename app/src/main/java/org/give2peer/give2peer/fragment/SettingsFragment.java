@@ -14,6 +14,7 @@ import android.util.Log;
 import org.give2peer.give2peer.Application;
 import org.give2peer.give2peer.R;
 import org.give2peer.give2peer.entity.Server;
+import org.give2peer.give2peer.listener.OnForgetServerClickListener;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -31,7 +32,7 @@ public class SettingsFragment extends PreferenceFragment {
     protected Preference.OnPreferenceChangeListener updateObfuscatedSummaryListener;
     protected List<UpdateScreenListener> updateScreenListeners = new ArrayList<>();
 
-    protected HashMap<Long, Server> servers = new HashMap<>();
+    public HashMap<Long, Server> servers = new HashMap<>();
 
     private class UpdateScreenListener implements Preference.OnPreferenceChangeListener
     {
@@ -105,6 +106,8 @@ public class SettingsFragment extends PreferenceFragment {
         cat.setTitle("Servers");
 
         // The category MUST be added to the root node BEFORE we add screens to it
+        // (something about injected deps like PreferenceManager, probably)
+        // This code can possibly be improved by much, remember.
         getPreferenceScreen().addPreference(cat);
 
         for (;serversIterator.hasNext();) {
@@ -113,6 +116,8 @@ public class SettingsFragment extends PreferenceFragment {
             servers.put(server.getId(), server);
 
             //Log.i("G2P", "Creating prefs screen for " + server.getName());
+
+            // Create a screen for the server
 
             PreferenceScreen screen = pm.createPreferenceScreen(context);
             screen.setTitle(server.getName());
@@ -153,6 +158,15 @@ public class SettingsFragment extends PreferenceFragment {
             password.setText(server.getPassword());
             password.setOnPreferenceChangeListener(updateObfuscatedSummaryListener);
             screen.addPreference(password);
+
+            // Forget this server
+            Preference delServer = new Preference(context);
+            delServer.setTitle("Forget this server");
+            delServer.setIcon(R.drawable.ic_gps_fixed_black_18dp);
+
+            delServer.setOnPreferenceClickListener(new OnForgetServerClickListener(this, server));
+
+            screen.addPreference(delServer);
 
             cat.addPreference(screen);
         }

@@ -51,14 +51,18 @@ public class MainActivity extends ActionBarActivity
         refreshLocationView();
         refreshActionsView();
 
-        // Display the server chooser fragment
-        getFragmentManager().beginTransaction()
-                .replace(R.id.serverChooserFragment, new ServerChooserFragment())
-                .commit();
+        refreshServerChooser();
 
         // Useful, to run a query on the UI thread, for debugging ONLY of course
         //StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         //StrictMode.setThreadPolicy(policy);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        refreshServerChooser();
     }
 
     @Override
@@ -160,6 +164,16 @@ public class MainActivity extends ActionBarActivity
         } else {
             title.setText(getString(R.string.title_set_up_location));
         }
+    }
+
+    public void refreshServerChooser()
+    {
+        // Ask the app to guess a server configuration
+        app.setServerConfiguration(app.guessServerConfiguration());
+        // Display the server chooser fragment
+        getFragmentManager().beginTransaction()
+                .replace(R.id.serverChooserFragment, new ServerChooserFragment())
+                .commit();
     }
 
 
