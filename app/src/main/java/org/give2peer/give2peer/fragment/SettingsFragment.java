@@ -1,10 +1,13 @@
 package org.give2peer.give2peer.fragment;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.EditTextPreference;
 import android.preference.Preference;
+import android.preference.Preference.OnPreferenceChangeListener;
 import android.preference.PreferenceCategory;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
@@ -13,9 +16,17 @@ import android.util.Log;
 
 import org.give2peer.give2peer.Application;
 import org.give2peer.give2peer.R;
+import org.give2peer.give2peer.RestService;
 import org.give2peer.give2peer.entity.Server;
 import org.give2peer.give2peer.listener.OnForgetServerClickListener;
+import org.give2peer.give2peer.listener.OnServerNameChangeListener;
+import org.give2peer.give2peer.listener.OnServerPasswordChangeListener;
+import org.give2peer.give2peer.listener.OnServerUrlChangeListener;
+import org.give2peer.give2peer.listener.OnServerUsernameChangeListener;
+import org.give2peer.give2peer.listener.OnTestServerClickListener;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -27,29 +38,17 @@ import java.util.List;
  */
 public class SettingsFragment extends PreferenceFragment {
 
-    // These three holders are simply to ensure that the garbage collector will not destroy them
-    protected Preference.OnPreferenceChangeListener updateSummaryListener;
-    protected Preference.OnPreferenceChangeListener updateObfuscatedSummaryListener;
-    protected List<UpdateScreenListener> updateScreenListeners = new ArrayList<>();
+    // These list holders are simply to ensure that the garbage collector will not eat our listeners
+    protected List<OnPreferenceChangeListener> updateServerNameListeners = new ArrayList<>();
+    protected List<OnPreferenceChangeListener> updateServerUrlListeners = new ArrayList<>();
+    protected List<OnPreferenceChangeListener> updateServerUsernameListeners = new ArrayList<>();
+    protected List<OnPreferenceChangeListener> updateServerPasswordListeners = new ArrayList<>();
 
+    /**
+     * A (not really) internal collection of servers, rebuilt from database on each view refresh,
+     * which is on creation of the fragment and adding of a server. (and maybe deletion)
+     */
     public HashMap<Long, Server> servers = new HashMap<>();
-
-    private class UpdateScreenListener implements Preference.OnPreferenceChangeListener
-    {
-        PreferenceScreen screen;
-        UpdateScreenListener(PreferenceScreen screen)
-        {
-            this.screen = screen;
-        }
-        @Override
-        public boolean onPreferenceChange(Preference preference, Object newValue)
-        {
-            preference.setSummary((String)newValue);
-            screen.setTitle((String)newValue);
-
-            return true;
-        }
-    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -59,27 +58,6 @@ public class SettingsFragment extends PreferenceFragment {
         // We'll need that later when we'll have static preferences
         // Android actually needs it now too, it seems, to instantiate stuff internally
         addPreferencesFromResource(R.xml.preferences);
-
-        // Build the server's input listeners once, as there's no need to build them many times.
-        // Besides, they need to be hard-referenced, or the garbage collector will eat them.
-        updateSummaryListener = new Preference.OnPreferenceChangeListener() {
-            @Override
-            public boolean onPreferenceChange(Preference preference, Object newValue) {
-                preference.setSummary((String)newValue);
-
-                return true;
-            }
-        };
-
-        updateObfuscatedSummaryListener = new Preference.OnPreferenceChangeListener() {
-            @Override
-            public boolean onPreferenceChange(Preference preference, Object newValue) {
-                preference.setSummary(new String(new char[((String)newValue).length()])
-                          .replace("\0", "*"));
-
-                return true;
-            }
-        };
 
         refreshView();
     }
@@ -95,6 +73,7 @@ public class SettingsFragment extends PreferenceFragment {
         Iterator<Server> serversIterator = Server.findAll(Server.class);
 
         // Prepare some variables
+        final Application app = (Application) getActivity().getApplication();
         Context context = (Context) getActivity();
         PreferenceManager pm = getPreferenceManager();
 
@@ -123,15 +102,23 @@ public class SettingsFragment extends PreferenceFragment {
             screen.setTitle(server.getName());
             screen.setIcon(R.drawable.ic_edit_black_36dp);
 
-            UpdateScreenListener updateScreenListener = new UpdateScreenListener(screen);
-            updateScreenListeners.add(updateScreenListener);
+            // Our change listeners, that will update the database and the UI
+            OnPreferenceChangeListener nameListener     = new OnServerNameChangeListener(server, screen);
+            OnPreferenceChangeListener urlListener      = new OnServerUrlChangeListener(server);
+            OnPreferenceChangeListener usernameListener = new OnServerUsernameChangeListener(server);
+            OnPreferenceChangeListener passwordListener = new OnServerPasswordChangeListener(server);
+            // We hard-reference them so that the garbage collector does not destroy them
+            updateServerNameListeners.add(nameListener);
+            updateServerUrlListeners.add(urlListener);
+            updateServerUsernameListeners.add(usernameListener);
+            updateServerPasswordListeners.add(passwordListener);
 
             EditTextPreference name = new EditTextPreference(context);
             name.setTitle("Name");
             name.setKey(String.format("server_%d_name", server.getId()));
             name.setSummary(server.getName());
             name.setText(server.getName());
-            name.setOnPreferenceChangeListener(updateScreenListener);
+            name.setOnPreferenceChangeListener(nameListener);
             screen.addPreference(name);
 
             EditTextPreference uri = new EditTextPreference(context);
@@ -139,7 +126,7 @@ public class SettingsFragment extends PreferenceFragment {
             uri.setKey(String.format("server_%d_uri", server.getId()));
             uri.setSummary(server.getUrl());
             uri.setText(server.getUrl());
-            uri.setOnPreferenceChangeListener(updateSummaryListener);
+            uri.setOnPreferenceChangeListener(urlListener);
             screen.addPreference(uri);
 
             EditTextPreference username = new EditTextPreference(context);
@@ -147,7 +134,7 @@ public class SettingsFragment extends PreferenceFragment {
             username.setKey(String.format("server_%d_username", server.getId()));
             username.setSummary(server.getUsername());
             username.setText(server.getUsername());
-            username.setOnPreferenceChangeListener(updateSummaryListener);
+            username.setOnPreferenceChangeListener(usernameListener);
             screen.addPreference(username);
 
             EditTextPreference password = new EditTextPreference(context);
@@ -156,7 +143,7 @@ public class SettingsFragment extends PreferenceFragment {
             password.setSummary(new String(new char[server.getPassword().length()])
                     .replace("\0", "*"));
             password.setText(server.getPassword());
-            password.setOnPreferenceChangeListener(updateObfuscatedSummaryListener);
+            password.setOnPreferenceChangeListener(passwordListener);
             screen.addPreference(password);
 
             // Forget this server
@@ -167,7 +154,11 @@ public class SettingsFragment extends PreferenceFragment {
             screen.addPreference(delServer);
 
             // Test this server configuration
-
+            Preference testServer = new Preference(context);
+            testServer.setTitle("Test the server");
+            testServer.setIcon(R.drawable.ic_add_circle_outline_black_36dp);
+            testServer.setOnPreferenceClickListener(new OnTestServerClickListener(this, server));
+            screen.addPreference(testServer);
 
             cat.addPreference(screen);
         }
@@ -176,7 +167,6 @@ public class SettingsFragment extends PreferenceFragment {
         Preference addServer = new Preference(context);
         addServer.setTitle("Add a server");
         addServer.setIcon(R.drawable.ic_add_circle_outline_black_36dp);
-
         addServer.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
@@ -190,29 +180,29 @@ public class SettingsFragment extends PreferenceFragment {
         cat.addPreference(addServer);
     }
 
-    @Override
-    public void onPause() {
-        super.onPause();
-
-        Log.i("G2P", "Updating server configuration...");
-
-        Application app = (Application) getActivity().getApplication();
-        SharedPreferences prefs = app.getPrefs();
-
-        for (Server server : servers.values()) {
-            Long id = server.getId();
-            server.setName(prefs.getString(String.format("server_%d_name", id),
-                    server.getName()));
-            server.setUrl(prefs.getString(String.format("server_%d_uri", id),
-                    server.getUrl()));
-            server.setUsername(prefs.getString(String.format("server_%d_username", id),
-                    server.getUsername()));
-            server.setPassword(prefs.getString(String.format("server_%d_password", id),
-                    server.getPassword()));
-
-            server.save();
-        }
-
-    }
+//    @Override
+//    public void onPause() {
+//        super.onPause();
+//
+//        Log.i("G2P", "Updating server configuration...");
+//
+//        Application app = (Application) getActivity().getApplication();
+//        SharedPreferences prefs = app.getPrefs();
+//
+//        for (Server server : servers.values()) {
+//            Long id = server.getId();
+//            server.setName(prefs.getString(String.format("server_%d_name", id),
+//                    server.getName()));
+//            server.setUrl(prefs.getString(String.format("server_%d_uri", id),
+//                    server.getUrl()));
+//            server.setUsername(prefs.getString(String.format("server_%d_username", id),
+//                    server.getUsername()));
+//            server.setPassword(prefs.getString(String.format("server_%d_password", id),
+//                    server.getPassword()));
+//
+//            server.save();
+//        }
+//
+//    }
 
 }

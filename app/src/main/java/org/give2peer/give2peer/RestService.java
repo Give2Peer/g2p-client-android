@@ -34,13 +34,14 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * This manages the collections of Items. It doubles as a REST service.
+ * This is our REST client service.
+ * This also manages the collections of Items, but should not.
  *
  * Responsibilities :
  * - Fetch items from server HTTP REST API.
  *   It fetches them synchronously, so there's also a bunch of AsyncTasks that use these methods.
- * - Keep fetched items up to date.
- * - Store items locally in a cache for offline use. (don't know how, yet)
+ * - Keep fetched items up to date. (meh, no.)
+ * - Store items locally in a cache for offline use. (don't know how, yet, and ... nope, anyway)
  */
 public class RestService
 {
@@ -60,11 +61,15 @@ public class RestService
     protected String password;
     protected UsernamePasswordCredentials credentials;
 
-    protected Map<Integer, Item> items;
-
     protected HttpClient client;
 
-    RestService(Server config)
+    /**
+     * This is a very old var.
+     * It has no purpose here anymore, I think.
+     */
+    protected Map<Integer, Item> items;
+
+    public RestService(Server config)
     {
         serverUrl = config.getUrl();
         username = config.getUsername();
@@ -102,21 +107,10 @@ public class RestService
     public ArrayList<Item> findAround(double latitude, double longitude, int offset)
             throws URISyntaxException, IOException
     {
-        String url = serverUrl + "/find/" + latitude + "/" + longitude + "/" + offset;
+        String route = "/find/" + latitude + "/" + longitude + "/" + offset;
+        String json = getJson(route);
 
-        ArrayList<Item> itemsList = new ArrayList<Item>();
-
-        HttpGet request = new HttpGet();
-        request.setURI(new URI(url));
-
-        authenticate(request);
-
-        HttpResponse response = client.execute(request);
-
-        String json = EntityUtils.toString(response.getEntity(), "UTF-8");
-        itemsList = jsonToItems(json);
-
-        return itemsList;
+        return jsonToItems(json);
     }
 
 
@@ -182,6 +176,33 @@ public class RestService
         }
 
         return item;
+    }
+
+    public boolean testServer() throws IOException, URISyntaxException {
+        Log.i("G2P", "PING START");
+
+        String json = getJson("/ping");
+
+        Log.i("G2P", "PING: "+json);
+
+        return json.equals("\"pong\"");
+    }
+
+    /**
+     * @param route must start with `/`.
+     * @return the raw server response body, which happens to be a JSON string
+     */
+    public String getJson(String route) throws URISyntaxException, IOException {
+        String url = serverUrl + route;
+
+        HttpGet request = new HttpGet();
+        request.setURI(new URI(url));
+
+        authenticate(request);
+
+        HttpResponse response = client.execute(request);
+
+        return EntityUtils.toString(response.getEntity(), "UTF-8");
     }
 
 

@@ -135,7 +135,7 @@ public class Application extends SugarApp
 
         double lat = (double) sharedPref.getFloat("latitude",  666);
         double lng = (double) sharedPref.getFloat("longitude", 666);
-        if (lat == 666 || lng == 666) return;
+        if (lat == 666 || lng == 666) return; // ahem...
 
         location = new Location("g2p");
         location.setLatitude(lat);
