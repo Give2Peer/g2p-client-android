@@ -7,34 +7,32 @@ import android.preference.Preference;
 import android.util.Log;
 
 import org.give2peer.give2peer.activity.SettingsActivity;
+import org.give2peer.give2peer.entity.BaseEntity;
 import org.give2peer.give2peer.entity.Server;
 import org.give2peer.give2peer.fragment.SettingsFragment;
 
-public class OnForgetServerClickListener implements Preference.OnPreferenceClickListener {
+public class OnForgetEntityClickListener implements Preference.OnPreferenceClickListener {
     SettingsFragment fragment;
-    Server server;
-    public OnForgetServerClickListener(SettingsFragment fragment, Server server)
+    BaseEntity entity;
+    public OnForgetEntityClickListener(SettingsFragment fragment, BaseEntity entity)
     {
         this.fragment = fragment;
-        this.server = server;
+        this.entity = entity;
     }
     @Override
     public boolean onPreferenceClick(Preference preference)
     {
-        if (! fragment.servers.containsValue(server)) {
-            Log.e("G2P", "NOPE NOPE NOPE NOPE THIS MUST NOT HAPPEN!");
-        }
-
         // Confirmation alert
         AlertDialog.Builder builder = new AlertDialog.Builder(fragment.getActivity());
-        builder.setMessage("Are you sure you want to forget this server?")
+        builder.setMessage("Are you sure?")
                 .setCancelable(true)
                 .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         // Remove the server from the preference list
-                        fragment.servers.remove(server.getId());
-                        // Delete the server persisted entity
-                        server.delete();
+                        //fragment.servers.remove(server.getId());
+
+                        // Delete the persisted entity
+                        entity.delete();
 
                         // Quit the activity
                         fragment.getActivity().finish();

@@ -5,9 +5,10 @@ import com.orm.SugarRecord;
 
 /**
  * This is a persistable entity.
- *
+ * Possible names :
+ * - ServerConfiguration (bit long)
  */
-public class Server extends SugarRecord<Server>
+public class Server extends BaseEntity
 {
     String url      = "";
     String name     = "";
@@ -19,7 +20,7 @@ public class Server extends SugarRecord<Server>
      *
      * Note: putting these in a class extending Server is a bad idea: the ORM chokes.
      *
-     * TODO: either automatic registration somewhere, or a proper Anon account
+     * TODO@beta: either automatic registration somewhere, or a proper Anon account.
      */
     public Server loadDefaults()
     {
@@ -41,19 +42,19 @@ public class Server extends SugarRecord<Server>
         return this;
     }
 
-    public String getUrl()                   { return url; }
+    public String getUrl()                   { return url;               }
 
-    public void setUrl(String url)           { this.url = url; }
+    public void setUrl(String url)           { this.url = url;           }
 
-    public String getName()                  { return name; }
+    public String getName()                  { return name;              }
 
-    public void setName(String name)         { this.name = name; }
+    public void setName(String name)         { this.name = name;         }
 
-    public String getUsername()              { return username; }
+    public String getUsername()              { return username;          }
 
     public void setUsername(String username) { this.username = username; }
 
-    public String getPassword()              { return password; }
+    public String getPassword()              { return password;          }
 
     public void setPassword(String password) { this.password = password; }
 }
