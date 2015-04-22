@@ -1,7 +1,7 @@
 Give2Peer
 =========
 
-This is the source of the Android client application Give2Peer.
+This is the source of the Android client application [Give2Peer](http://give2peer.org).
 
 
 Goal
@@ -14,7 +14,7 @@ surplus).
 The user interface should be oriented towards speed. Adding a new item should not take more than a
 handful of seconds.
 
-The client should be able to connect to multiple servers. This will allow big organizations to
+The client is be able to connect to multiple servers. This will allow big organizations to
 staffsource internal item transfers.
 
 
@@ -32,16 +32,19 @@ If you know Android (or want to learn), you can help in a number of ways :
 - Refactor this learner's code into a beautiful codebase.
 - Suggest good third-party libraries to DRY the code.
 - Give advice on how to give the emulator a default `geo fix`.
-- Set up or give advice for a feature suite. _(I don't know which one to choose)_
+- Set up or give advice for a feature suite.
+  _(I don't know [which one](https://android-arsenal.com/) to choose)_
 - Report issues and submit ideas.
-- Save a coin (if you have some) for when we'll ask for donations.
+- Save a coin (if you have some) for future donations.
 - And, of course, spread the word!
 
 
 Disclaimer
 ----------
 
-This is my first project with Android and Java. Please advise when you see terrible code.
+This is my first project with Android and Java.
+There's horrible code everywhere.
+Please counsel.
 
 
 
@@ -55,13 +58,13 @@ ROADMAP
 - Register automatically and store credentials
 
 
-
 1.0.0-rc1
 ---------
 
 - List 32 items around my position, and launch maps and navigation.
 - Detect my position using the GPS.
 - Add a new Item with a location, a picture, and an optional title.
+- List, add, edit and forget servers.
 
 
 
@@ -76,6 +79,8 @@ Apache HttpComponents
 
 File upload requires `org.apache.httpcomponents:httpmime:4.3`
 and `org.apache.httpcomponents:httpclient-android:4.3.5`.
+
+There are duplication shenanigans with the `httpclient`, it may not even be needed.
 
 
 RetroFit

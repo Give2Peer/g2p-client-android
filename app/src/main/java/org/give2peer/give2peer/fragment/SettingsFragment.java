@@ -162,11 +162,12 @@ public class SettingsFragment extends PreferenceFragment {
             // Forget this server
             Preference delServer = new Preference(context);
             delServer.setTitle("Forget this server");
-            delServer.setIcon(R.drawable.ic_gps_fixed_black_18dp);
-
+            delServer.setIcon(R.drawable.ic_remove_circle_outline_black_36dp);
             delServer.setOnPreferenceClickListener(new OnForgetServerClickListener(this, server));
-
             screen.addPreference(delServer);
+
+            // Test this server configuration
+
 
             cat.addPreference(screen);
         }
