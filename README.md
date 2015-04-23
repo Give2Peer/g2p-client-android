@@ -14,8 +14,9 @@ surplus).
 The user interface should be oriented towards speed. Adding a new item should not take more than a
 handful of seconds.
 
-The client is be able to connect to multiple servers. This will allow big organizations to
-staffsource internal item transfers and disgorge email inboxes.
+The client is be able to connect to multiple servers.
+This will allow big organizations to staffsource internal item transfers and disgorge email inboxes
+by setting up their own private server.
 
 
 License
@@ -35,7 +36,6 @@ If you know Android (or want to learn), you can help in a number of ways :
 - Set up or give advice for a feature suite.
   _(I don't know [which one](https://android-arsenal.com/tag/98?sort=rating) to choose)_
 - Report issues and submit ideas.
-- Save a coin (if you have some) for future donations.
 - And, of course, spread the word!
 
 
@@ -45,7 +45,7 @@ Donate
 _"If it's free, you're the product."_
 
 Hosting a server costs money. We can pay for a couple years from our own pocket, but eventually the
-service must be able to pay for its own running costs.
+service must be able to pay for its own running costs, or it will shut down.
 
 You'll be the product for a while, as the server will measure your total usage for a year or two
 and show you (exactly!) how much you should give to keep it afloat for another year.
@@ -58,6 +58,8 @@ This will be an experiment in algorithms towards fiduciary self-sustenance.
 New features and maintenance will be provided by the
 [FLOSS](http://en.wikipedia.org/wiki/Free_and_open-source_software#FLOSS) community
 (aka: everybody), with the possible use of [bounties](https://www.bountysource.com).
+
+Besides, all the code being open-source, anyone knowledgeable can host their own server.
 
 _"If it's free, you took care of it."_
 
@@ -88,11 +90,24 @@ CHANGELOG
 -----------
 
 - List 32 items around my position, and launch maps and navigation.
-- Detect my location using the GPS.
 - Add a new Item with a location, a picture, and an optional title.
+- Detect my location using the GPS.
 - List, add, edit and forget servers.
 - List, add, edit and forget locations.
 
+
+TESTS AND SPECS
+===============
+
+We are big believers in behavior-driven development. Yet this app has no test-suite whatsoever, right now.
+
+Android's documentation uses [Espresso](http://developer.android.com/training/testing/ui-testing/espresso-testing.html).
+
+[JBehave](http://jbehave.org/) and Robotium stand out.
+([Truth](http://google.github.io/truth/) looks fine, too)
+Calabash introduces Ruby code and I don't understand how it works.
+
+Any PR setting up a skeleton feature suite (in Gherkin) is welcome.
 
 
 LIBS

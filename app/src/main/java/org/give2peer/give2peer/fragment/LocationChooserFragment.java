@@ -67,11 +67,9 @@ public class LocationChooserFragment extends PreferenceFragment {
 
         // Add the GPS-given location
         if (app.hasLocation()) {
-            android.location.Location l = app.getLocation();
-//            entries[0] = String.format("From GPS: %.3f/%.3f", l.getLatitude(), l.getLongitude());
             entries[0] = String.format("From GPS %s", app.getHumanLastLocatedDate());
         } else {
-            entries[0] = "No known location";
+            entries[0] = "GPS location unknown";
         }
         entryValues[0] = "0";
 
@@ -102,7 +100,11 @@ public class LocationChooserFragment extends PreferenceFragment {
         // Set the name of the currently chosen location as summary
         int currentLocationId = Integer.valueOf(chooser.getValue());
         if (0 == currentLocationId) {
-            chooser.setSummary(String.format("From GPS %s", app.getHumanLastLocatedDate()));
+            if (app.hasLocation()) {
+                chooser.setSummary(String.format("From GPS %s", app.getHumanLastLocatedDate()));
+            } else {
+                chooser.setSummary("GPS location unknown");
+            }
         } else {
             for (int i=0; i<locationsCount; i++) {
                 Location location = locations.get(i);
@@ -143,7 +145,6 @@ public class LocationChooserFragment extends PreferenceFragment {
 
 
         // Detect Location button
-
         detector.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
