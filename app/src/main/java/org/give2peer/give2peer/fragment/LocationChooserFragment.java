@@ -150,7 +150,7 @@ public class LocationChooserFragment extends PreferenceFragment {
             public boolean onPreferenceClick(Preference preference) {
 
                 detector.setEnabled(false);
-                detector.setIcon(R.drawable.ic_gps_fixed_grey600_36dp); // use styles instead !
+                detector.setIcon(R.drawable.ic_my_location_grey600_36dp); // use styles instead !
 
                 // Fetch the location asynchronously
                 LocationListener locationListener =
@@ -159,7 +159,7 @@ public class LocationChooserFragment extends PreferenceFragment {
                     public void onLocationChanged(android.location.Location newLocation) {
                         super.onLocationChanged(newLocation);
                         detector.setEnabled(true);
-                        detector.setIcon(R.drawable.ic_gps_fixed_black_36dp); // use styles instead
+                        detector.setIcon(R.drawable.ic_my_location_black_36dp); // use styles -_-
 
                         app.setLocation(newLocation);
 

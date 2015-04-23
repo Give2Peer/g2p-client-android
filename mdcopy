@@ -25,7 +25,7 @@ iconDir = '~/.material-design-icons'
 import fnmatch, os, shutil, subprocess, sys
 
 # Sanitize the configuration
-resDir  = os.path.abspath(os.path.expanduser(iconDir))
+resDir  = os.path.abspath(os.path.expanduser(resDir))
 iconDir = os.path.abspath(os.path.expanduser(iconDir))
 
 # Get the file name from a path name
