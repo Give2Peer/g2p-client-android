@@ -18,9 +18,11 @@ import android.widget.Toast;
 import com.orm.SugarApp;
 
 import org.give2peer.give2peer.entity.Server;
+import org.ocpsoft.prettytime.PrettyTime;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.util.Date;
 import java.util.List;
 
 
@@ -127,6 +129,7 @@ public class Application extends SugarApp
         SharedPreferences.Editor editor = sharedPref.edit();
         editor.putFloat("latitude",  (float) location.getLatitude());
         editor.putFloat("longitude", (float) location.getLongitude());
+        editor.putLong("last_located_date", (new Date()).getTime());
         editor.apply();
     }
 
@@ -151,6 +154,25 @@ public class Application extends SugarApp
     {
         this.location = location;
         saveLocation();
+    }
+
+    public Date getLastLocatedDate()
+    {
+        SharedPreferences sharedPref = getPrefs();
+        long time = sharedPref.getLong("last_located_date", 0);
+
+        if (0 == time) return null;
+        else           return new Date(time);
+    }
+
+    public String getHumanLastLocatedDate()
+    {
+        Date then = getLastLocatedDate();
+        if (null == then) return "";
+
+        PrettyTime p = new PrettyTime();
+
+        return p.format(then);
     }
 
     // CONFIGURATION ///////////////////////////////////////////////////////////////////////////////
