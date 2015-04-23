@@ -5,4 +5,9 @@
         android:title="Select a location"
         android:icon="@drawable/ic_expand_more_black_36dp"
         />
+    <Preference
+        android:key="detect_location"
+        android:title="Detect current location"
+        android:icon="@drawable/ic_gps_fixed_black_36dp"
+        />
 </PreferenceScreen>

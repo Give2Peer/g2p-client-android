@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- This is not used anymore :( It does not work with Preferences as-is -->
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:state_enabled="false" android:drawable="@drawable/ic_gps_fixed_grey600_18dp" />
-    <item android:state_pressed="true"  android:drawable="@drawable/ic_gps_fixed_grey600_18dp" />
-    <item android:drawable="@drawable/ic_gps_fixed_black_18dp" />
+    <item android:state_enabled="false" android:icon="@drawable/ic_gps_fixed_grey600_36dp" />
+    <item android:state_pressed="true"  android:icon="@drawable/ic_gps_fixed_grey600_36dp" />
+    <item android:icon="@drawable/ic_gps_fixed_black_36dp" />
 </selector>

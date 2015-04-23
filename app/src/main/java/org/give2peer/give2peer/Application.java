@@ -6,6 +6,7 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
+import android.location.Criteria;
 import android.location.Location;
 import android.media.ExifInterface;
 import android.net.ConnectivityManager;
@@ -134,12 +135,38 @@ public class Application extends SugarApp
         SharedPreferences sharedPref = getPrefs();
 
         double lat = (double) sharedPref.getFloat("latitude",  666);
-        double lng = (double) sharedPref.getFloat("longitude", 666);
-        if (lat == 666 || lng == 666) return; // ahem...
+        double lng = (double) sharedPref.getFloat("longitude", 999);
+        if (lat == 666 || lng == 999) return; // ahem...
 
         location = new Location("g2p");
         location.setLatitude(lat);
         location.setLongitude(lng);
+    }
+
+    public boolean hasLocation() { return null != location; }
+
+    public Location getLocation() { return location; }
+
+    public void setLocation(Location location)
+    {
+        this.location = location;
+        saveLocation();
+    }
+
+    // CONFIGURATION ///////////////////////////////////////////////////////////////////////////////
+
+    /**
+     * @return a criteria tailored to our needs.
+     */
+    public Criteria getLocationCriteria()
+    {
+        Criteria criteria = new Criteria();
+        criteria.setAltitudeRequired(false);
+        criteria.setBearingRequired(false);
+        criteria.setSpeedRequired(false);
+        criteria.setAccuracy(Criteria.ACCURACY_COARSE);
+
+        return criteria;
     }
 
     // UTILS ///////////////////////////////////////////////////////////////////////////////////////
@@ -220,21 +247,6 @@ public class Application extends SugarApp
 
 
     public RestService getRestService() { return restService; }
-
-
-
-
-    // LOCATION ////////////////////////////////////////////////////////////////////////////////////
-
-    public boolean hasLocation() { return null != location; }
-
-    public Location getLocation() { return location; }
-
-    public void setLocation(Location location)
-    {
-        this.location = location;
-        saveLocation();
-    }
 
 
     // STATS ///////////////////////////////////////////////////////////////////////////////////////

@@ -1,14 +1,20 @@
 package org.give2peer.give2peer.fragment;
 
+import android.content.Context;
 import android.content.Intent;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.util.Log;
+import android.view.View;
 
 import org.give2peer.give2peer.Application;
+import org.give2peer.give2peer.OneTimeLocationListener;
 import org.give2peer.give2peer.R;
+import org.give2peer.give2peer.activity.MainActivity;
 import org.give2peer.give2peer.activity.SettingsActivity;
 import org.give2peer.give2peer.entity.Location;
 
@@ -32,12 +38,21 @@ public class LocationChooserFragment extends PreferenceFragment {
     @Override
     public void onResume() {
         super.onResume();
+        refreshView();
+    }
 
+    public void refreshView() {
+
+        // Some services we're going to need
         final Application app = (Application) getActivity().getApplication();
+        final LocationManager lm = (LocationManager) getActivity()
+                .getSystemService(Context.LOCATION_SERVICE);
 
-        // Grab the View we're going to edit
+        // Grab the Views we're going to edit
         final ListPreference chooser = (ListPreference) getPreferenceManager()
                 .findPreference("current_location_id");
+        final Preference detector = (Preference) getPreferenceManager()
+                .findPreference("detect_location");
 
 
         // List the locations from the database
@@ -83,7 +98,7 @@ public class LocationChooserFragment extends PreferenceFragment {
             chooser.setValueIndex(0);
         }
 
-        // Set the name of the location as summary
+        // Set the name of the currently chosen location as summary
         int currentLocationId = Integer.valueOf(chooser.getValue());
         if (0 == currentLocationId) {
             chooser.setSummary("From GPS");
@@ -115,7 +130,7 @@ public class LocationChooserFragment extends PreferenceFragment {
                         // Update the summary of the chooser
                         chooser.setSummary(location.getName());
                     } catch (Exception e) {
-                        app.toast("That location cannot be chosen.");
+                        app.toast("That location cannot be chosen: "+e.getMessage());
                         return false;
                     }
                 }
@@ -124,5 +139,44 @@ public class LocationChooserFragment extends PreferenceFragment {
             }
         };
         chooser.setOnPreferenceChangeListener(notGarbageListener);
+
+
+        // Detect Location button
+
+        detector.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+
+                detector.setEnabled(false);
+                detector.setIcon(R.drawable.ic_gps_fixed_grey600_36dp); // use styles instead !
+
+                // Fetch the location asynchronously
+                LocationListener locationListener =
+                        new OneTimeLocationListener(lm, app.getLocationCriteria()) {
+                    @Override
+                    public void onLocationChanged(android.location.Location newLocation) {
+                        super.onLocationChanged(newLocation);
+                        detector.setEnabled(true);
+                        detector.setIcon(R.drawable.ic_gps_fixed_black_36dp); // use styles instead
+
+                        app.setLocation(newLocation);
+
+                        // hmmm... this is not cool. MainActivity business logic !
+                        if (getActivity() instanceof MainActivity) {
+                            MainActivity activity = (MainActivity) getActivity();
+                            activity.refreshActionsView();
+                        }
+
+                        app.toast("Successfully updated current location.");
+
+                        refreshView();
+                    }
+                };
+
+                return false;
+            }
+        });
     }
+
+
 }

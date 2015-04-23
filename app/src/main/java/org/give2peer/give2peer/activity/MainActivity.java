@@ -49,7 +49,7 @@ public class MainActivity extends ActionBarActivity
         lm = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
 
         // We never know, maybe there's an available location already
-        refreshLocationView();
+        //refreshLocationView();
         refreshActionsView();
 
         refreshServerChooser();
@@ -110,25 +110,7 @@ public class MainActivity extends ActionBarActivity
         }
     }
 
-    public void onDetectLocation(View view)
-    {
-        // Disable some buttons, accessed within inner class, so `final` is needed
-        final View detectLocationButton = findViewById(R.id.detectLocationButton);
-        detectLocationButton.setEnabled(false);
 
-        // Fetch the location asynchronously
-        LocationListener locationListener = new OneTimeLocationListener(lm, getLocationCriteria()) {
-            @Override
-            public void onLocationChanged(Location newLocation) {
-                super.onLocationChanged(newLocation);
-                app.setLocation(newLocation);
-                refreshLocationView();
-                refreshActionsView();
-                detectLocationButton.setEnabled(true);
-                toast("Successfully updated current location.");
-            }
-        };
-    }
 
     public void onGiveItemButton(View view)
     {
@@ -151,22 +133,22 @@ public class MainActivity extends ActionBarActivity
         findViewById(R.id.spotItemButton).setEnabled(enabled);
     }
 
-    public void refreshLocationView()
-    {
-        Location location = app.getLocation();
-        TextView title = ((TextView)findViewById(R.id.currentLocationTitle));
-        if (null != location) {
-            double latitude  = location.getLatitude();
-            double longitude = location.getLongitude();
-
-            title.setText(getString(R.string.title_current_location));
-
-            ((EditText) findViewById(R.id.latitudeEditText )).setText(String.valueOf(latitude ));
-            ((EditText) findViewById(R.id.longitudeEditText)).setText(String.valueOf(longitude));
-        } else {
-            title.setText(getString(R.string.title_set_up_location));
-        }
-    }
+//    public void refreshLocationView()
+//    {
+//        Location location = app.getLocation();
+//        TextView title = ((TextView)findViewById(R.id.currentLocationTitle));
+//        if (null != location) {
+//            double latitude  = location.getLatitude();
+//            double longitude = location.getLongitude();
+//
+//            title.setText(getString(R.string.title_current_location));
+//
+//            ((EditText) findViewById(R.id.latitudeEditText )).setText(String.valueOf(latitude ));
+//            ((EditText) findViewById(R.id.longitudeEditText)).setText(String.valueOf(longitude));
+//        } else {
+//            title.setText(getString(R.string.title_set_up_location));
+//        }
+//    }
 
     public void refreshServerChooser()
     {
@@ -207,21 +189,7 @@ public class MainActivity extends ActionBarActivity
     }
 
 
-    // CONFIGURATION ///////////////////////////////////////////////////////////////////////////////
 
-    /**
-     * @return a criteria tailored to our needs.
-     */
-    protected Criteria getLocationCriteria()
-    {
-        Criteria criteria = new Criteria();
-        criteria.setAltitudeRequired(false);
-        criteria.setBearingRequired(false);
-        criteria.setSpeedRequired(false);
-        criteria.setAccuracy(Criteria.ACCURACY_COARSE);
-
-        return criteria;
-    }
 
 
     // ACTIONS /////////////////////////////////////////////////////////////////////////////////////
