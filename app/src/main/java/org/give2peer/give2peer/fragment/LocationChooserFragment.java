@@ -9,7 +9,6 @@ import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.util.Log;
-import android.view.View;
 
 import org.give2peer.give2peer.Application;
 import org.give2peer.give2peer.OneTimeLocationListener;
@@ -66,8 +65,8 @@ public class LocationChooserFragment extends PreferenceFragment {
         CharSequence[] entryValues = new CharSequence[locationsCount+numChoicesBef+numChoicesAft];
 
         // Add the GPS-given location
-        if (app.hasLocation()) {
-            entries[0] = String.format("From GPS %s", app.getHumanLastLocatedDate());
+        if (app.hasGeoLocation()) {
+            entries[0] = String.format("From GPS %s", app.getPrettyDurationSinceLastLocatedDate());
         } else {
             entries[0] = "GPS location unknown";
         }
@@ -100,8 +99,8 @@ public class LocationChooserFragment extends PreferenceFragment {
         // Set the name of the currently chosen location as summary
         int currentLocationId = Integer.valueOf(chooser.getValue());
         if (0 == currentLocationId) {
-            if (app.hasLocation()) {
-                chooser.setSummary(String.format("From GPS %s", app.getHumanLastLocatedDate()));
+            if (app.hasGeoLocation()) {
+                chooser.setSummary(String.format("From GPS %s", app.getPrettyDurationSinceLastLocatedDate()));
             } else {
                 chooser.setSummary("GPS location unknown");
             }
@@ -122,7 +121,7 @@ public class LocationChooserFragment extends PreferenceFragment {
                 Long id = Long.valueOf((String) newValue);
 
                 if (0 == id) {         // We chose the GPS-detected location
-                    chooser.setSummary(String.format("From GPS %s", app.getHumanLastLocatedDate()));
+                    chooser.setSummary(String.format("From GPS %s", app.getPrettyDurationSinceLastLocatedDate()));
                 } else if (-1 == id) { // We choose to add a new location
                     Intent intent = new Intent(getActivity(), SettingsActivity.class);
                     startActivity(intent);
@@ -132,6 +131,9 @@ public class LocationChooserFragment extends PreferenceFragment {
                         Location location = Location.findById(Location.class, id);
                         // Update the summary of the chooser
                         chooser.setSummary(location.getName());
+
+
+
                     } catch (Exception e) {
                         app.toast("That location cannot be chosen: "+e.getMessage());
                         return false;
@@ -158,10 +160,15 @@ public class LocationChooserFragment extends PreferenceFragment {
                     @Override
                     public void onLocationChanged(android.location.Location newLocation) {
                         super.onLocationChanged(newLocation);
+                        // Disable the button
                         detector.setEnabled(true);
                         detector.setIcon(R.drawable.ic_my_location_black_36dp); // use styles -_-
 
-                        app.setLocation(newLocation);
+                        // Select the GPS location in the location chooser
+                        chooser.setValueIndex(0);
+
+                        // Set the location application-wise
+                        app.setGeoLocation(newLocation);
 
                         // hmmm... this is not cool. MainActivity business logic !
                         if (getActivity() instanceof MainActivity) {

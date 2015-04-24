@@ -36,8 +36,8 @@ public class FindItemsTask extends AsyncTask<Void, Void, ArrayList<Item>>
     {
         ArrayList<Item> items = new ArrayList<Item>();
         try {
-            double latitude  = app.getLocation().getLatitude();
-            double longitude = app.getLocation().getLongitude();
+            double latitude  = app.getGeoLocation().getLatitude();
+            double longitude = app.getGeoLocation().getLongitude();
             items = app.getRestService().findAroundPaginated(latitude, longitude, page);
         } catch (Exception e) {
             exception = e;

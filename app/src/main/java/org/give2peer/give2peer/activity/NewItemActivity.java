@@ -3,15 +3,12 @@ package org.give2peer.give2peer.activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.location.Location;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -22,6 +19,7 @@ import android.widget.Toast;
 import org.give2peer.give2peer.Application;
 import org.give2peer.give2peer.Item;
 import org.give2peer.give2peer.R;
+import org.give2peer.give2peer.entity.Location;
 import org.give2peer.give2peer.task.GiveItemTask;
 
 import java.io.File;
@@ -50,7 +48,7 @@ public class NewItemActivity extends ActionBarActivity
         app = (Application) getApplication();
 
         // Make sure we have a location
-        if (null == app.getLocation()) {
+        if (null == app.getGeoLocation()) {
             toast("Please set up a location first.");
             finish();
             return;
@@ -147,17 +145,22 @@ public class NewItemActivity extends ActionBarActivity
         sendButton.setEnabled(false);
         sendProgress.setVisibility(View.VISIBLE);
 
-        Location loc = app.getLocation();
+        Location location = app.getLocation();
 
         Item item = new Item();
-        item.setLocation(String.format("%f/%f", loc.getLatitude(), loc.getLongitude()));
+        item.setLocation(location.forItem());
         item.setTitle(titleInput.getText().toString());
         item.setPictures(pictureFiles);
 
         GiveItemTask git = new GiveItemTask(app) {
+            @Override
             protected void onPostExecute(Item item) {
-                finish();
-                toast(String.format(getString(R.string.toast_new_item_uploaded), item.getTitle()));
+                if (!hasException()) {
+                    finish();
+                    toast(String.format(getString(R.string.toast_new_item_uploaded), item.getTitle()));
+                } else {
+                    toast(String.format("Failure: %s", getException().getMessage()));
+                }
             }
         };
         git.execute(item);

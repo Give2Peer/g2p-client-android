@@ -2,9 +2,6 @@ package org.give2peer.give2peer.activity;
 
 import android.content.Context;
 import android.content.Intent;
-import android.location.Criteria;
-import android.location.Location;
-import android.location.LocationListener;
 import android.location.LocationManager;
 import android.location.LocationProvider;
 import android.support.v7.app.ActionBarActivity;
@@ -12,12 +9,10 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import org.give2peer.give2peer.Application;
-import org.give2peer.give2peer.OneTimeLocationListener;
 import org.give2peer.give2peer.R;
 import org.give2peer.give2peer.fragment.LocationChooserFragment;
 import org.give2peer.give2peer.fragment.ServerChooserFragment;
@@ -127,7 +122,7 @@ public class MainActivity extends ActionBarActivity
 
     public void refreshActionsView()
     {
-        boolean enabled = null != app.getLocation();
+        boolean enabled = null != app.getGeoLocation();
         findViewById(R.id.listAroundMeButton).setEnabled(enabled);
         findViewById(R.id.giveItemButton).setEnabled(enabled);
         findViewById(R.id.spotItemButton).setEnabled(enabled);
@@ -135,7 +130,7 @@ public class MainActivity extends ActionBarActivity
 
 //    public void refreshLocationView()
 //    {
-//        Location location = app.getLocation();
+//        Location location = app.getGeoLocation();
 //        TextView title = ((TextView)findViewById(R.id.currentLocationTitle));
 //        if (null != location) {
 //            double latitude  = location.getLatitude();

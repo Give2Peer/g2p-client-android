@@ -1,23 +1,13 @@
 package org.give2peer.give2peer.activity;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.util.DisplayMetrics;
-import android.util.Log;
-import android.view.View;
-import android.widget.GridView;
 import android.widget.Toast;
 
 import org.give2peer.give2peer.Application;
-import org.give2peer.give2peer.Item;
-import org.give2peer.give2peer.ItemAdapter;
 import org.give2peer.give2peer.R;
 import org.give2peer.give2peer.task.FindItemsTask;
-
-import java.util.ArrayList;
 
 
 /**
@@ -44,7 +34,7 @@ public class ListAroundActivity extends Activity
         app = (Application) getApplication();
 
         // Make sure we have a location
-        if (null == app.getLocation()) {
+        if (null == app.getGeoLocation()) {
             app.toast(getString(R.string.toast_please_set_up_location));
             finish();
             return;

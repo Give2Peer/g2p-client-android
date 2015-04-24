@@ -7,7 +7,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.location.Criteria;
-import android.location.Location;
 import android.media.ExifInterface;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -17,6 +16,7 @@ import android.widget.Toast;
 
 import com.orm.SugarApp;
 
+import org.give2peer.give2peer.entity.Location;
 import org.give2peer.give2peer.entity.Server;
 import org.ocpsoft.prettytime.PrettyTime;
 
@@ -40,7 +40,7 @@ public class Application extends SugarApp
 {
     private static Application singleton;
 
-    protected Location location;
+    protected android.location.Location location;
 
     protected Server currentServer;
 
@@ -57,7 +57,7 @@ public class Application extends SugarApp
         singleton = this;
 
         // Load the Location from preferences
-        loadLocation();
+        loadGeoLocation();
 
         // Increment the tally of launches and fire appropriate methods, like `onFirstTime()`
         incrementLaunchesTally();
@@ -120,9 +120,9 @@ public class Application extends SugarApp
         return serverConfiguration;
     }
 
-    // LOCATION ////////////////////////////////////////////////////////////////////////////////////
+    // GEO LOCATION ////////////////////////////////////////////////////////////////////////////////
 
-    protected void saveLocation()
+    protected void saveGeoLocation()
     {
         if (null == location) return;
         SharedPreferences sharedPref = getPrefs();
@@ -133,7 +133,7 @@ public class Application extends SugarApp
         editor.apply();
     }
 
-    protected void loadLocation()
+    protected void loadGeoLocation()
     {
         SharedPreferences sharedPref = getPrefs();
 
@@ -141,19 +141,19 @@ public class Application extends SugarApp
         double lng = (double) sharedPref.getFloat("longitude", 999);
         if (lat == 666 || lng == 999) return; // ahem...
 
-        location = new Location("g2p");
+        location = new android.location.Location("g2p");
         location.setLatitude(lat);
         location.setLongitude(lng);
     }
 
-    public boolean hasLocation() { return null != location; }
+    public boolean hasGeoLocation() { return null != location; }
 
-    public Location getLocation() { return location; }
+    public android.location.Location getGeoLocation() { return location; }
 
-    public void setLocation(Location location)
+    public void setGeoLocation(android.location.Location location)
     {
         this.location = location;
-        saveLocation();
+        saveGeoLocation();
     }
 
     public Date getLastLocatedDate()
@@ -165,7 +165,7 @@ public class Application extends SugarApp
         else           return new Date(time);
     }
 
-    public String getHumanLastLocatedDate()
+    public String getPrettyDurationSinceLastLocatedDate()
     {
         Date then = getLastLocatedDate();
         if (null == then) return "";
@@ -173,6 +173,26 @@ public class Application extends SugarApp
         PrettyTime p = new PrettyTime();
 
         return p.format(then);
+    }
+
+    // LOCATION ////////////////////////////////////////////////////////////////////////////////////
+
+    public Location getLocation()
+    {
+        Long id = Long.valueOf(getPrefs().getString("current_location_id", "0"));
+         if (0 == id) {
+             if (hasGeoLocation()) {
+                 android.location.Location geo = getGeoLocation();
+                 Location locFromGeo = new Location();
+                 locFromGeo.setLatitude(geo.getLatitude());
+                 locFromGeo.setLatitude(geo.getLongitude());
+                 return locFromGeo;
+             } else {
+                 return null;
+             }
+         } else {
+             return Location.findById(Location.class, id);
+         }
     }
 
     // CONFIGURATION ///////////////////////////////////////////////////////////////////////////////

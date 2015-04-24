@@ -33,6 +33,21 @@ public class Location extends BaseEntity
         return this;
     }
 
+    /**
+     * Privileges lat/lng as geocoder use is both expensive and throttled.
+     * @return the serialized location, ready for the Item REST API.
+     */
+    public String forItem()
+    {
+        if (latitude != LAT_LNG_EMPTY && longitude != LAT_LNG_EMPTY) {
+            return String.format("%f/%f", latitude, longitude);
+        }
+        if (postal.equals("")) {
+            return name;
+        }
+        return postal;
+    }
+
     public String getName() { return name;                                   } // ∞! = √o
 
     public void setName(String name) { this.name = name;                    }

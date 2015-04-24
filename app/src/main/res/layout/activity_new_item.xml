@@ -39,14 +39,19 @@
             android:maxLength="32"
             android:maxLines="1"
             android:inputType="text|textAutoComplete|textAutoCorrect"
-            android:layout_marginLeft="10dp" />
+            android:layout_marginStart="10dp" />
     </LinearLayout>
+
+    <fragment android:name="org.give2peer.give2peer.fragment.LocationChooserFragment"
+              android:id="@+id/newItemLocationChooserFragment"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content" />
 
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:gravity="right"
+        android:gravity="end"
         android:weightSum="1">
 
         <ProgressBar
@@ -62,7 +67,6 @@
             android:layout_height="wrap_content"
             android:text="@string/new_item_send_button"
             android:id="@+id/newItemSendButton"
-            android:nestedScrollingEnabled="false"
             android:onClick="onSend" />
     </LinearLayout>
 
