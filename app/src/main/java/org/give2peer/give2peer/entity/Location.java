@@ -40,10 +40,15 @@ public class Location extends BaseEntity
      */
     public String forItem()
     {
-        if (latitude != LAT_LNG_EMPTY && longitude != LAT_LNG_EMPTY) {
+        if (hasLatLng()) {
             return String.format("%f/%f", latitude, longitude);
         }
         return postal;
+    }
+
+    public boolean hasLatLng()
+    {
+        return latitude != LAT_LNG_EMPTY && longitude != LAT_LNG_EMPTY;
     }
 
     public String getName() { return name;                                   } // ∞! = √o

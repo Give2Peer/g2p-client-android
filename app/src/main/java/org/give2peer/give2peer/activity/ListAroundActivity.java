@@ -45,7 +45,7 @@ public class ListAroundActivity extends Activity
             finish();
             return;
         }
-        if (location.getPostal().isEmpty()) {
+        if (!location.hasLatLng() && location.getPostal().isEmpty()) {
             app.toast(getString(R.string.toast_invalid_location));
             finish();
             return;
