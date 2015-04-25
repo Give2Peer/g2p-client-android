@@ -26,8 +26,6 @@ import org.give2peer.give2peer.fragment.ServerChooserFragment;
  */
 public class MainActivity extends ActionBarActivity
 {
-    protected LocationManager lm;
-    protected LocationProvider lp;
 
     protected Application app;
 
@@ -40,13 +38,7 @@ public class MainActivity extends ActionBarActivity
         // Grab the app
         app = (Application) getApplication();
 
-        // Let's grab the location manager
-        lm = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
-
-        // We never know, maybe there's an available location already
-        //refreshLocationView();
-        //refreshActionsView();
-
+        // Load the chooser fragments
         refreshServerChooser();
         refreshLocationChooser();
 
@@ -60,6 +52,7 @@ public class MainActivity extends ActionBarActivity
         super.onResume();
 
         refreshServerChooser();
+        refreshLocationChooser();
     }
 
     @Override
@@ -78,7 +71,7 @@ public class MainActivity extends ActionBarActivity
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        if (id == R.id.action_settings) {
+        if (id == R.id.menu_action_settings) {
             Intent intent = new Intent(this, SettingsActivity.class);
             startActivity(intent);
             return true;
@@ -126,29 +119,12 @@ public class MainActivity extends ActionBarActivity
 
     // UI ACTIONS //////////////////////////////////////////////////////////////////////////////////
 
-    public void refreshActionsView()
-    {
-        boolean enabled = null != app.getLocation();
-        findViewById(R.id.listAroundMeButton).setEnabled(enabled);
-        findViewById(R.id.giveItemButton).setEnabled(enabled);
-        findViewById(R.id.spotItemButton).setEnabled(enabled);
-    }
-
-//    public void refreshLocationView()
+//    public void refreshActionsView()
 //    {
-//        Location location = app.getGeoLocation();
-//        TextView title = ((TextView)findViewById(R.id.currentLocationTitle));
-//        if (null != location) {
-//            double latitude  = location.getLatitude();
-//            double longitude = location.getLongitude();
-//
-//            title.setText(getString(R.string.title_current_location));
-//
-//            ((EditText) findViewById(R.id.latitudeEditText )).setText(String.valueOf(latitude ));
-//            ((EditText) findViewById(R.id.longitudeEditText)).setText(String.valueOf(longitude));
-//        } else {
-//            title.setText(getString(R.string.title_set_up_location));
-//        }
+//        boolean enabled = null != app.getLocation();
+//        findViewById(R.id.listAroundMeButton).setEnabled(enabled);
+//        findViewById(R.id.giveItemButton).setEnabled(enabled);
+//        findViewById(R.id.spotItemButton).setEnabled(enabled);
 //    }
 
     public void refreshServerChooser()

@@ -1,7 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Give2Peer</string>
 
-    <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
 
     <string name="title_activity_settings">Give2Peer - Settings</string>
@@ -12,16 +12,18 @@
     <string name="new_item_image_description">The picture of the item you just took.</string>
     <string name="new_item_send_button">Send</string>
 
-    <string name="toast_no_camera_available">No camera could be found.\nAsk for support of gallery images!</string>
     <string name="toast_new_item_uploading">Uploading new item…</string>
     <string name="toast_new_item_uploaded">Item \'%s\' was uploaded.\nWell done!</string>
     <string name="toast_new_item_file_error">An error occurred while creating the file to store the photograph.</string>
     <string name="toast_connecting_please_wait">Connecting to server…\nPlease wait.</string>
-    <string name="toast_no_mapping_activity">Did not find any mapping activity to go to</string>
-    <string name="toast_please_set_up_location">Please set up a location first.</string>
+    <string name="toast_no_camera_available">No camera could be found.\nAsk for support of gallery images!</string>
+    <string name="toast_no_mapping_activity">Could not find any mapping activity to go to.</string>
+    <string name="toast_no_internet_available">Internet is not available.</string>
+    <string name="toast_no_location_available">Select a location first.</string>
+    <string name="toast_invalid_location">Provided location is invalid.\nPlease set up a postal address.</string>
 
     <string name="title_current_location">Current location</string>
     <string name="title_set_up_location">Set up a location</string>
-    <string name="toast_no_location_available">Select a location first.</string>
-    <string name="toast_no_internet_available">Internet is not available.</string>
+
+    <string name="error_geocoding_failed">Could not locate \'%1$s\' at \'%2$s\'.</string>
 </resources>

@@ -6,7 +6,9 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
+import android.location.Address;
 import android.location.Criteria;
+import android.location.Geocoder;
 import android.media.ExifInterface;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -18,10 +20,12 @@ import com.orm.SugarApp;
 
 import org.give2peer.give2peer.entity.Location;
 import org.give2peer.give2peer.entity.Server;
+import org.give2peer.give2peer.exception.GeocodingException;
 import org.ocpsoft.prettytime.PrettyTime;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 
@@ -198,6 +202,29 @@ public class Application extends SugarApp
         } else {
             return Location.findById(Location.class, id);
         }
+    }
+
+    /**
+     * This MUST be called in async threads only.
+     */
+    public void geocodeLocationIfNeeded(Location location)
+            throws IOException, GeocodingException
+    {
+        Geocoder geocoder = new Geocoder(getApplicationContext());
+        List<Address> addresses = geocoder.getFromLocationName(location.getPostal(), 1);
+
+        if (addresses == null || addresses.size() == 0) {
+            throw new GeocodingException(getString(
+                    R.string.error_geocoding_failed,
+                    location.getName(),
+                    location.getPostal()
+            ));
+        }
+        Address address = addresses.get(0);
+        location.setLatitude(address.getLatitude());
+        location.setLongitude(address.getLongitude());
+        location.save();
+
     }
 
     // CONFIGURATION ///////////////////////////////////////////////////////////////////////////////

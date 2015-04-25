@@ -70,30 +70,31 @@ public class NewItemActivity extends ActionBarActivity
     {
         // Create an new image capture intent
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+
         // Make sure we have an Activity that can capture images
-        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
-            // Create the File where the picture should go
-            File pictureFile = null;
-            try {
-                pictureFile = createImageFile();
-            } catch (IOException ex) {
-                String msg = getString(R.string.toast_new_item_file_error);
-                Log.e("G2P", ex.getMessage());
-                ex.printStackTrace();
-                app.toast(msg);
-                finish();
-                return;
-            }
-            // Continue only if the File was successfully created
-            if (pictureFile != null) {
-                pictureFiles.add(pictureFile);
-                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(pictureFile));
-                startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
-            }
-        } else {
-            // GTFO
+        if (takePictureIntent.resolveActivity(getPackageManager()) == null) {
             app.toast(getString(R.string.toast_no_camera_available));
             finish();
+            return;
+        }
+
+        // Create the File where the picture should go
+        File pictureFile = null;
+        try {
+            pictureFile = createImageFile();
+        } catch (IOException ex) {
+            Log.e("G2P", ex.getMessage());
+            ex.printStackTrace();
+            app.toast(getString(R.string.toast_new_item_file_error));
+            finish();
+            return;
+        }
+
+        // Continue only if the File was successfully created
+        if (pictureFile != null) {
+            pictureFiles.add(pictureFile);
+            takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(pictureFile));
+            startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
         }
     }
 
@@ -134,8 +135,8 @@ public class NewItemActivity extends ActionBarActivity
                 finish();
             }
         } else if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_CANCELED) {
-            // If the user cancelled the capture of a picture, we GTFO
-            // It may be nice to allow a user to add a picture from a gallery instead of taking one
+            // If the user cancelled the capture of a picture, we GTFO.
+            // It may be nice to allow a user to add a picture from a gallery instead of taking one.
             // see http://stackoverflow.com/questions/20021431/android-how-to-take-a-picture-from-camera-or-gallery
             finish();
         }
@@ -162,7 +163,7 @@ public class NewItemActivity extends ActionBarActivity
             protected void onPostExecute(Item item) {
                 if (!hasException()) {
                     finish();
-                    app.toast(String.format(getString(R.string.toast_new_item_uploaded), item.getTitle()));
+                    app.toast(getString(R.string.toast_new_item_uploaded, item.getTitle()));
                 } else {
                     app.toast(String.format("Failure: %s", getException().getMessage()), Toast.LENGTH_LONG);
                     sendButton.setEnabled(true);
@@ -194,11 +195,4 @@ public class NewItemActivity extends ActionBarActivity
 
     // UTILS ///////////////////////////////////////////////////////////////////////////////////////
 
-//    protected void toast(String message) { toast(message, Toast.LENGTH_SHORT); }
-//    protected void toast(String message, int duration)
-//    {
-//        Context context = getApplicationContext();
-//        Toast toast = Toast.makeText(context, message, duration);
-//        toast.show();
-//    }
 }

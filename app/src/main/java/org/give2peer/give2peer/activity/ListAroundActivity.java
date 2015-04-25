@@ -7,6 +7,7 @@ import android.widget.Toast;
 
 import org.give2peer.give2peer.Application;
 import org.give2peer.give2peer.R;
+import org.give2peer.give2peer.entity.Location;
 import org.give2peer.give2peer.task.FindItemsTask;
 
 
@@ -30,14 +31,22 @@ public class ListAroundActivity extends Activity
         // Grab the app
         app = (Application) getApplication();
 
+        // Make sure we're online
         if (!app.isOnline()) {
             app.toast(getString(R.string.toast_no_internet_available));
             finish();
             return;
         }
 
-        if (!app.hasLocation()) {
+        // Grab the Location, and make sure we have one set
+        Location location = app.getLocation();
+        if (null == location) {
             app.toast(getString(R.string.toast_no_location_available));
+            finish();
+            return;
+        }
+        if (location.getPostal().isEmpty()) {
+            app.toast(getString(R.string.toast_invalid_location));
             finish();
             return;
         }

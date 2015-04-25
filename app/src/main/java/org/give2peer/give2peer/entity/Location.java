@@ -1,9 +1,10 @@
 package org.give2peer.give2peer.entity;
 
-import com.orm.SugarRecord;
-
 /**
  * The latitude and longitude are optional, and are always derived from the `postal` address.
+ *
+ * Android also provides a `Location` class, and an `Address` class (which is `Parcelable`!).
+ * This class may be refactored to use these.
  */
 public class Location extends BaseEntity
 {
