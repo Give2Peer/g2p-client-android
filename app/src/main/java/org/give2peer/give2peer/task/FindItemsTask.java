@@ -11,6 +11,7 @@ import org.give2peer.give2peer.Application;
 import org.give2peer.give2peer.Item;
 import org.give2peer.give2peer.ItemAdapter;
 import org.give2peer.give2peer.R;
+import org.give2peer.give2peer.entity.Location;
 
 import java.util.ArrayList;
 
@@ -36,8 +37,9 @@ public class FindItemsTask extends AsyncTask<Void, Void, ArrayList<Item>>
     {
         ArrayList<Item> items = new ArrayList<Item>();
         try {
-            double latitude  = app.getGeoLocation().getLatitude();
-            double longitude = app.getGeoLocation().getLongitude();
+            Location l = app.getLocation();
+            double latitude  = l.getLatitude();
+            double longitude = l.getLongitude();
             items = app.getRestService().findAroundPaginated(latitude, longitude, page);
         } catch (Exception e) {
             exception = e;
@@ -50,7 +52,7 @@ public class FindItemsTask extends AsyncTask<Void, Void, ArrayList<Item>>
     {
         // Our server URI is probably wrong, GTFO.
         if (null != exception) {
-            app.toast(exception.getMessage(), Toast.LENGTH_LONG);
+            app.toast(String.format("Failure: %s", exception.getMessage()), Toast.LENGTH_LONG);
             activity.finish();
             return;
         }

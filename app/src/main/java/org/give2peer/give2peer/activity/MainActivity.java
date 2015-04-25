@@ -45,7 +45,7 @@ public class MainActivity extends ActionBarActivity
 
         // We never know, maybe there's an available location already
         //refreshLocationView();
-        refreshActionsView();
+        //refreshActionsView();
 
         refreshServerChooser();
         refreshLocationChooser();
@@ -95,14 +95,10 @@ public class MainActivity extends ActionBarActivity
 
     public void onListAroundMe(View view)
     {
-        if (app.isOnline()) {
-            // Start the "list around" activity
-            Intent intent = new Intent(this, ListAroundActivity.class);
-            intent.putExtra("page", 0);
-            startActivity(intent);
-        } else {
-            toast("Internet is not available.");
-        }
+        // Start the "list around" activity
+        Intent intent = new Intent(this, ListAroundActivity.class);
+        intent.putExtra("page", 0);
+        startActivity(intent);
     }
 
 
@@ -117,12 +113,22 @@ public class MainActivity extends ActionBarActivity
         snapshotNewItem("spot");
     }
 
+    /**
+     * @param action MUST be either "give" or "spot".
+     */
+    protected void snapshotNewItem(String action)
+    {
+        // Start the "new item" activity
+        Intent intent = new Intent(this, NewItemActivity.class);
+        intent.putExtra("action", action);
+        startActivity(intent);
+    }
 
     // UI ACTIONS //////////////////////////////////////////////////////////////////////////////////
 
     public void refreshActionsView()
     {
-        boolean enabled = null != app.getGeoLocation();
+        boolean enabled = null != app.getLocation();
         findViewById(R.id.listAroundMeButton).setEnabled(enabled);
         findViewById(R.id.giveItemButton).setEnabled(enabled);
         findViewById(R.id.spotItemButton).setEnabled(enabled);
@@ -189,21 +195,6 @@ public class MainActivity extends ActionBarActivity
 
     // ACTIONS /////////////////////////////////////////////////////////////////////////////////////
 
-    /**
-     *
-     * @param action Must be either "give" or "spot".
-     */
-    protected void snapshotNewItem(String action)
-    {
-        if (!app.hasCameraSupport()) {
-            toast(getString(R.string.toast_no_camera_available));
-            return;
-        }
 
-        // Start the "new item" activity
-        Intent intent = new Intent(this, NewItemActivity.class);
-        intent.putExtra("action", action);
-        startActivity(intent);
-    }
 }
 

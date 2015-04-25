@@ -16,6 +16,7 @@ import org.give2peer.give2peer.task.FindItemsTask;
  *
  * Ideas:
  *   - list more items when we get to the bottom
+ *   - don't reload the items when the orientation changes
  */
 public class ListAroundActivity extends Activity
 {
@@ -26,23 +27,30 @@ public class ListAroundActivity extends Activity
     {
         super.onCreate(savedInstanceState);
 
-        // Extract some parameters from the intent
-        Intent in = getIntent();
-        int page = in.getIntExtra("page", 0);
-
         // Grab the app
         app = (Application) getApplication();
 
-        // Make sure we have a location
-        if (null == app.getGeoLocation()) {
-            app.toast(getString(R.string.toast_please_set_up_location));
+        if (!app.isOnline()) {
+            app.toast(getString(R.string.toast_no_internet_available));
             finish();
             return;
         }
 
+        if (!app.hasLocation()) {
+            app.toast(getString(R.string.toast_no_location_available));
+            finish();
+            return;
+        }
+
+        // Extract some parameters from the intent
+        Intent in = getIntent();
+        int page = in.getIntExtra("page", 0);
+
+
+        // Set the content from the layout
         setContentView(R.layout.activity_list_around);
 
-        // Launch the Task
+        // Launch the asynchronous Task
         FindItemsTask fit = (FindItemsTask) new FindItemsTask(app, this, page).execute();
 
         // Display a "Please wait" message

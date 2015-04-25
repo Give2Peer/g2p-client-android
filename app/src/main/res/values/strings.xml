@@ -22,4 +22,6 @@
 
     <string name="title_current_location">Current location</string>
     <string name="title_set_up_location">Set up a location</string>
+    <string name="toast_no_location_available">Select a location first.</string>
+    <string name="toast_no_internet_available">Internet is not available.</string>
 </resources>

@@ -9,34 +9,23 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 
+/**
+ * TODO: This should also mirror the error codes and provide localized messages when available.
+ */
 public class ErrorResponseException extends Exception
 {
-    private HttpResponse response;
-
-    public ErrorResponseException(HttpResponse response)
-    {
-        this.response = response;
-    }
-
-    public HttpResponse getResponse()
-    {
-        return response;
-    }
+    public ErrorResponseException(String detailMessage) { super(detailMessage); }
 
     @Override
     public String getMessage()
     {
-        String json = "";
-        try {
-            json = EntityUtils.toString(response.getEntity(), "UTF-8");
-        } catch (IOException e) {
-            return e.getMessage();
-        }
+        String json = super.getMessage();
 
         try {
             JSONObject jo = new JSONObject(json);
             return jo.getJSONObject("error").getString("message");
         } catch (JSONException e) {
+            Log.e("G2P", "Failed to parse JSON response: "+json);
             return "Could not parse response: " + e.getMessage();
         }
     }

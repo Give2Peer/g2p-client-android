@@ -47,9 +47,14 @@ public class NewItemActivity extends ActionBarActivity
         // Grab the app
         app = (Application) getApplication();
 
-        // Make sure we have a location
-        if (null == app.getGeoLocation()) {
-            toast("Please set up a location first.");
+        if (!app.hasCameraSupport()) {
+            app.toast(getString(R.string.toast_no_camera_available));
+            finish();
+            return;
+        }
+
+        if (!app.hasLocation()) {
+            app.toast(getString(R.string.toast_no_location_available));
             finish();
             return;
         }
@@ -75,7 +80,7 @@ public class NewItemActivity extends ActionBarActivity
                 String msg = getString(R.string.toast_new_item_file_error);
                 Log.e("G2P", ex.getMessage());
                 ex.printStackTrace();
-                toast(msg);
+                app.toast(msg);
                 finish();
                 return;
             }
@@ -87,7 +92,7 @@ public class NewItemActivity extends ActionBarActivity
             }
         } else {
             // GTFO
-            toast(getString(R.string.toast_no_camera_available));
+            app.toast(getString(R.string.toast_no_camera_available));
             finish();
         }
     }
@@ -108,7 +113,7 @@ public class NewItemActivity extends ActionBarActivity
             }
 
             if (null == imageBitmap) {
-                toast("WHY IS THE IMAGE `NULL`?\nWHAT DID YOU DO!?");
+                app.toast("WHY IS THE IMAGE `NULL`?\nWHAT DID YOU DO!?");
                 finish();
                 return;
             }
@@ -139,8 +144,8 @@ public class NewItemActivity extends ActionBarActivity
     public void onSend(View view)
     {
         EditText titleInput = (EditText) findViewById(R.id.newItemTitleEditText);
-        Button   sendButton = (Button)   findViewById(R.id.newItemSendButton);
-        ProgressBar sendProgress = (ProgressBar) findViewById(R.id.newItemProgressBar);
+        final Button      sendButton   = (Button)      findViewById(R.id.newItemSendButton);
+        final ProgressBar sendProgress = (ProgressBar) findViewById(R.id.newItemProgressBar);
 
         sendButton.setEnabled(false);
         sendProgress.setVisibility(View.VISIBLE);
@@ -157,15 +162,15 @@ public class NewItemActivity extends ActionBarActivity
             protected void onPostExecute(Item item) {
                 if (!hasException()) {
                     finish();
-                    toast(String.format(getString(R.string.toast_new_item_uploaded), item.getTitle()));
+                    app.toast(String.format(getString(R.string.toast_new_item_uploaded), item.getTitle()));
                 } else {
-                    toast(String.format("Failure: %s", getException().getMessage()));
+                    app.toast(String.format("Failure: %s", getException().getMessage()), Toast.LENGTH_LONG);
+                    sendButton.setEnabled(true);
+                    sendProgress.setVisibility(View.GONE);
                 }
             }
         };
         git.execute(item);
-
-        toast(getString(R.string.toast_new_item_uploading));
     }
 
 
@@ -189,11 +194,11 @@ public class NewItemActivity extends ActionBarActivity
 
     // UTILS ///////////////////////////////////////////////////////////////////////////////////////
 
-    protected void toast(String message) { toast(message, Toast.LENGTH_SHORT); }
-    protected void toast(String message, int duration)
-    {
-        Context context = getApplicationContext();
-        Toast toast = Toast.makeText(context, message, duration);
-        toast.show();
-    }
+//    protected void toast(String message) { toast(message, Toast.LENGTH_SHORT); }
+//    protected void toast(String message, int duration)
+//    {
+//        Context context = getApplicationContext();
+//        Toast toast = Toast.makeText(context, message, duration);
+//        toast.show();
+//    }
 }

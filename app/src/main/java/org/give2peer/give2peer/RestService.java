@@ -136,7 +136,7 @@ public class RestService
         if (response.getStatusLine().getStatusCode() < 400) {
             item.updateWithJSON(new JSONObject(json));
         } else {
-            throw new ErrorResponseException(response);
+            throw new ErrorResponseException(json);
         }
 
         return item;
@@ -175,13 +175,10 @@ public class RestService
         return item;
     }
 
-    public boolean testServer() throws IOException, URISyntaxException {
-        Log.i("G2P", "PING START");
-
+    public boolean testServer()
+            throws IOException, URISyntaxException
+    {
         String json = getJson("/ping");
-
-        Log.i("G2P", "PING: "+json);
-
         return json.equals("\"pong\"");
     }
 
@@ -189,7 +186,9 @@ public class RestService
      * @param route must start with `/`.
      * @return the raw server response body, which happens to be a JSON string
      */
-    public String getJson(String route) throws URISyntaxException, IOException {
+    public String getJson(String route)
+            throws URISyntaxException, IOException
+    {
         String url = serverUrl + route;
 
         HttpGet request = new HttpGet();

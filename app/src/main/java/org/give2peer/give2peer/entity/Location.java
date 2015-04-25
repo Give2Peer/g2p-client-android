@@ -42,9 +42,6 @@ public class Location extends BaseEntity
         if (latitude != LAT_LNG_EMPTY && longitude != LAT_LNG_EMPTY) {
             return String.format("%f/%f", latitude, longitude);
         }
-        if (postal.equals("")) {
-            return name;
-        }
         return postal;
     }
 

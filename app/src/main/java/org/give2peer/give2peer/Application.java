@@ -177,22 +177,27 @@ public class Application extends SugarApp
 
     // LOCATION ////////////////////////////////////////////////////////////////////////////////////
 
+    public boolean hasLocation()
+    {
+        return null != getLocation();
+    }
+
     public Location getLocation()
     {
         Long id = Long.valueOf(getPrefs().getString("current_location_id", "0"));
-         if (0 == id) {
-             if (hasGeoLocation()) {
-                 android.location.Location geo = getGeoLocation();
-                 Location locFromGeo = new Location();
-                 locFromGeo.setLatitude(geo.getLatitude());
-                 locFromGeo.setLatitude(geo.getLongitude());
-                 return locFromGeo;
-             } else {
-                 return null;
-             }
-         } else {
-             return Location.findById(Location.class, id);
-         }
+        if (0 == id) {
+            if (hasGeoLocation()) {
+                android.location.Location geo = getGeoLocation();
+                Location locFromGeo = new Location();
+                locFromGeo.setLatitude(geo.getLatitude());
+                locFromGeo.setLongitude(geo.getLongitude());
+                return locFromGeo;
+            } else {
+                return null;
+            }
+        } else {
+            return Location.findById(Location.class, id);
+        }
     }
 
     // CONFIGURATION ///////////////////////////////////////////////////////////////////////////////
@@ -234,7 +239,8 @@ public class Application extends SugarApp
      */
     public boolean hasCameraSupport()
     {
-        return getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA);
+        return getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA) ||
+               getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA_FRONT);
     }
 
 

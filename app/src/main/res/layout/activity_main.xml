@@ -43,7 +43,7 @@
             android:text="Find around me"
             android:id="@+id/listAroundMeButton"
             android:onClick="onListAroundMe"
-            android:enabled="false" />
+            android:enabled="true" />
 
         <Button
             android:layout_width="wrap_content"
@@ -51,7 +51,7 @@
             android:text="Give"
             android:id="@+id/giveItemButton"
             android:onClick="onGiveItemButton"
-            android:enabled="false"/>
+            android:enabled="true"/>
 
         <Button
             android:layout_width="wrap_content"
@@ -59,7 +59,7 @@
             android:text="Spot"
             android:id="@+id/spotItemButton"
             android:onClick="onSpotItemButton"
-            android:enabled="false"/>
+            android:enabled="true"/>
 
     </LinearLayout>
 

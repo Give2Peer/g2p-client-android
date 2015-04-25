@@ -131,9 +131,6 @@ public class LocationChooserFragment extends PreferenceFragment {
                         Location location = Location.findById(Location.class, id);
                         // Update the summary of the chooser
                         chooser.setSummary(location.getName());
-
-
-
                     } catch (Exception e) {
                         app.toast("That location cannot be chosen: "+e.getMessage());
                         return false;
@@ -171,10 +168,10 @@ public class LocationChooserFragment extends PreferenceFragment {
                         app.setGeoLocation(newLocation);
 
                         // hmmm... this is not cool. MainActivity business logic !
-                        if (getActivity() instanceof MainActivity) {
-                            MainActivity activity = (MainActivity) getActivity();
-                            activity.refreshActionsView();
-                        }
+//                        if (getActivity() instanceof MainActivity) {
+//                            MainActivity activity = (MainActivity) getActivity();
+//                            activity.refreshActionsView();
+//                        }
 
                         app.toast("Successfully updated current location.");
 
