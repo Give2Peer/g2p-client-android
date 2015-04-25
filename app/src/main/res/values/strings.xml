@@ -15,7 +15,6 @@
     <string name="toast_new_item_uploading">Uploading new item…</string>
     <string name="toast_new_item_uploaded">Item \'%s\' was uploaded.\nWell done!</string>
     <string name="toast_new_item_file_error">An error occurred while creating the file to store the photograph.</string>
-    <string name="toast_connecting_please_wait">Connecting to server…\nPlease wait.</string>
     <string name="toast_no_camera_available">No camera could be found.\nAsk for support of gallery images!</string>
     <string name="toast_no_mapping_activity">Could not find any mapping activity to go to.</string>
     <string name="toast_no_internet_available">Internet is not available.</string>
@@ -26,4 +25,5 @@
     <string name="title_set_up_location">Set up a location</string>
 
     <string name="error_geocoding_failed">Could not locate \'%1$s\' at \'%2$s\'.</string>
+    <string name="loader_list_items_please_wait">Collecting items around…\nThis may take a while.</string>
 </resources>

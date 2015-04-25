@@ -51,6 +51,9 @@ public class FindItemsTask extends AsyncTask<Void, Void, ArrayList<Item>>
     @Override
     protected void onPostExecute(ArrayList<Item> items)
     {
+        // Maybe our activity is dead ?
+        if (null == activity) return;
+
         // Our server URI is probably wrong, GTFO.
         if (null != exception) {
             app.toast(String.format("Failure: %s", exception.getMessage()), Toast.LENGTH_LONG);
@@ -67,7 +70,9 @@ public class FindItemsTask extends AsyncTask<Void, Void, ArrayList<Item>>
 
         // Remove the Loading...
         View itemsLoadingSpinner = activity.findViewById(R.id.itemsLoadingSpinner);
+        View itemsLoadingText    = activity.findViewById(R.id.itemsLoadingText);
         itemsLoadingSpinner.setVisibility(View.GONE);
+        itemsLoadingText   .setVisibility(View.GONE);
         // Fill the gridView with our items
         GridView itemsGridView = (GridView) activity.findViewById(R.id.itemsGridView);
         itemsGridView.setAdapter(new ItemAdapter(activity, R.layout.grid_item, size, items));

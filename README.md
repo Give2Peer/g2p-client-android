@@ -14,15 +14,9 @@ surplus).
 The user interface should be oriented towards speed. Adding a new item should not take more than a
 handful of seconds.
 
-The client is be able to connect to multiple servers.
+The client is able to connect to multiple servers.
 This will allow big organizations to staffsource internal item transfers and disgorge email inboxes
 by setting up their own private server.
-
-
-License
--------
-
-_Do whatever you want._ (unless you're a patent troll)
 
 
 Help
@@ -34,9 +28,9 @@ If you know Android (or want to learn), you can help in a number of ways :
 - Suggest good third-party libraries to DRY the code.
 - Give advice on how to give the emulator a default `geo fix`.
 - Set up or give advice for a feature suite.
-  _(I don't know [which one](https://android-arsenal.com/tag/98?sort=rating) to choose)_
+  _(We don't know [which one](https://android-arsenal.com/tag/98?sort=rating) to choose)_
 - Report issues and submit ideas.
-- And, of course, spread the word!
+- And, of course, use the app and spread the word!
 
 
 Donate
@@ -65,14 +59,6 @@ _"If it's free, you took care of it."_
 
 
 
-Disclaimer
-----------
-
-This is our first project with Android and Java.
-There's terrible code everywhere. EVERYWHERE.
-Please counsel.
-
-
 ROADMAP
 =======
 
@@ -81,6 +67,9 @@ ROADMAP
 
 - Locally cache item thumbnail images.
 - Register automatically when available.
+- Delete items submitted by self.
+- Propose deletion of items submitted by someone else.
+
 
 
 CHANGELOG
@@ -99,15 +88,16 @@ CHANGELOG
 TESTS AND SPECS
 ===============
 
-We are big believers in behavior-driven development. Yet this app has no test-suite whatsoever, right now.
+We are big believers in behavior-driven development, yet this app has no test-suite whatsoever, right now.
 
 Android's documentation uses [Espresso](http://developer.android.com/training/testing/ui-testing/espresso-testing.html).
 
 [JBehave](http://jbehave.org/) and Robotium stand out.
 ([Truth](http://google.github.io/truth/) looks fine, too)
-Calabash introduces Ruby code and I don't understand how it works.
+Calabash introduces Ruby code, and I don't understand how it works.
 
 Any PR setting up a skeleton feature suite (in Gherkin) is welcome.
+
 
 
 LIBS
@@ -134,8 +124,26 @@ We do not use that lib right now because the default adapters choked on our JSON
 A refactorization implementing support for this (or an even better REST lib) is welcome.
 
 
-THANKS
+
+OTHERS
 ======
+
+License
+-------
+
+_Do whatever you want._ (unless you're a patent troll)
+
+
+Disclaimer
+----------
+
+This is our first project with Android and Java.
+There's terrible code everywhere. EVERYWHERE.
+Please counsel.
+
+
+Thanks
+------
 
 - The community, without you there'd be nothing. You know who you are.
 - My roommate, for feeding me when I forget, and putting up with my code-related ramblings.

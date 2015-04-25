@@ -61,9 +61,6 @@ public class ListAroundActivity extends Activity
 
         // Launch the asynchronous Task
         FindItemsTask fit = (FindItemsTask) new FindItemsTask(app, this, page).execute();
-
-        // Display a "Please wait" message
-        app.toast(getString(R.string.toast_connecting_please_wait), Toast.LENGTH_LONG);
     }
 
     // LISTENERS ///////////////////////////////////////////////////////////////////////////////////

@@ -210,6 +210,9 @@ public class Application extends SugarApp
     public void geocodeLocationIfNeeded(Location location)
             throws IOException, GeocodingException
     {
+        // No need to geolocate locations from GPS
+        if (location.hasLatLng() && location.getPostal().isEmpty()) return;
+
         Geocoder geocoder = new Geocoder(getApplicationContext());
         List<Address> addresses = geocoder.getFromLocationName(location.getPostal(), 1);
 
