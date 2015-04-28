@@ -128,7 +128,7 @@ public class RestService
         List<NameValuePair> pairs = new ArrayList<NameValuePair>();
         pairs.add(new BasicNameValuePair("location", item.getLocation()));
         pairs.add(new BasicNameValuePair("title",    item.getTitle()));
-        request.setEntity(new UrlEncodedFormEntity(pairs));
+        request.setEntity(new UrlEncodedFormEntity(pairs, "UTF-8")); // deprecated in API level 22 !
 
         HttpResponse response = client.execute(request);
 
