@@ -47,7 +47,7 @@ and show you (exactly!) how much you should give to keep it afloat for another y
 Transparency is the key. If you know about good software suites / practices to that effect, we are
 interested.
 
-This will be an experiment in algorithms towards fiduciary self-sustenance.
+This will be yet another experiment in algorithms towards fiduciary self-sustenance.
 
 New features and maintenance will be provided by the
 [FLOSS](http://en.wikipedia.org/wiki/Free_and_open-source_software#FLOSS) community
@@ -55,7 +55,7 @@ New features and maintenance will be provided by the
 
 Besides, all the code being open-source, anyone knowledgeable can host their own server.
 
-_"If it's free, you took care of it."_
+_"Caring profits everyone."_
 
 
 
@@ -94,7 +94,7 @@ Android's documentation uses [Espresso](http://developer.android.com/training/te
 
 [JBehave](http://jbehave.org/) and Robotium stand out.
 ([Truth](http://google.github.io/truth/) looks fine, too)
-Calabash introduces Ruby code, and I don't understand how it works.
+Calabash introduces Ruby code, and we don't understand how it works.
 
 Any PR setting up a skeleton feature suite (in Gherkin) is welcome.
 
