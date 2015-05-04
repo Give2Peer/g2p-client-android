@@ -205,7 +205,7 @@ public class Application extends SugarApp
     }
 
     /**
-     * This MUST be called in async threads only.
+     * This MUST be called in async threads only, as it is a long operation.
      */
     public void geocodeLocationIfNeeded(Location location)
             throws IOException, GeocodingException
@@ -227,7 +227,6 @@ public class Application extends SugarApp
         location.setLatitude(address.getLatitude());
         location.setLongitude(address.getLongitude());
         location.save();
-
     }
 
     // CONFIGURATION ///////////////////////////////////////////////////////////////////////////////

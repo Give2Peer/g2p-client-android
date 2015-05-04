@@ -22,6 +22,7 @@ import java.util.List;
 /**
  * This will list all the locations stored in our local database, plus a dynamic location provided
  * by the GPS.
+ * It also provides a button to refresh the location provided by the GPS.
  */
 public class LocationChooserFragment extends PreferenceFragment {
     @Override

@@ -26,8 +26,9 @@ ROADMAP
 2.0.0
 -----
 
-- Action points.
-- Experience points.
+- [ ] Action points.
+- [ ] Experience points.
+- [ ] Propose deletion of items submitted by someone else.
 
 
 1.0.0
@@ -35,18 +36,16 @@ ROADMAP
 
 A version for the beta community.
 
-- Add a new Item offline, upload later.
-- Feature suite in Gherkin.
+- [ ] Add a new Item offline, upload later.
+- [ ] Feature suite in Gherkin.
 
 
 0.2.0
 -----
 
-- Locally cache item thumbnail images.
-- Register automatically when available.
-- Delete items submitted by self.
-- Propose deletion of items submitted by someone else.
-
+- [ ] Locally cache item thumbnail images.
+- [ ] Register automatically when available.
+- [ ] Delete items submitted by self.
 
 
 CHANGELOG
@@ -55,11 +54,11 @@ CHANGELOG
 0.1.0
 -----
 
-- List 32 items around my position, and launch maps and navigation.
-- Add a new Item with a location, a picture, and an optional title.
-- Detect my location using the GPS or WiFi.
-- List, add, edit and forget servers.
-- List, add, edit and forget locations.
+- [x] List 32 items around my position, and launch maps and navigation.
+- [x] Add a new Item with a location, a picture, and an optional title.
+- [x] Detect my location using the GPS or WiFi.
+- [x] List, add, edit and forget servers.
+- [x] List, add, edit and forget locations.
 
 
 TESTS AND SPECS
