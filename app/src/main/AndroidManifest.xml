@@ -36,7 +36,9 @@
         </activity>
         <activity
             android:name=".activity.NewItemActivity"
-            android:label="@string/title_activity_new_item">
+            android:label="@string/title_activity_new_item"
+            android:windowSoftInputMode="adjustPan|stateHidden"
+            >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".activity.MainActivity" />
