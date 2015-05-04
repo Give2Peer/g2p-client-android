@@ -24,11 +24,11 @@ import java.util.List;
  * by the GPS.
  * It also provides a button to refresh the location provided by the GPS.
  */
-public class LocationChooserFragment extends PreferenceFragment {
+public class LocationChooserFragment extends PreferenceFragment
+{
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         // Load the preferences from an XML resource
         addPreferencesFromResource(R.xml.location_chooser);
     }
@@ -168,12 +168,6 @@ public class LocationChooserFragment extends PreferenceFragment {
                         // Set the location application-wise
                         app.setGeoLocation(newLocation);
 
-                        // hmmm... this is not cool. MainActivity business logic !
-//                        if (getActivity() instanceof MainActivity) {
-//                            MainActivity activity = (MainActivity) getActivity();
-//                            activity.refreshActionsView();
-//                        }
-
                         app.toast("Successfully updated current location.");
 
                         refreshView();
@@ -184,6 +178,5 @@ public class LocationChooserFragment extends PreferenceFragment {
             }
         });
     }
-
 
 }

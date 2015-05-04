@@ -31,8 +31,10 @@ android {
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    // NO IDEA WHAT THIS IS
+    // BACKWARDS COMPATIBILITY
     compile 'com.android.support:appcompat-v7:22.0.0'
+    // GOOGLE API CLIENT
+    //compile 'com.google.android.gms:play-services:7.3.0'
     // HTTP
     compile 'org.apache.httpcomponents:httpmime:4.3'
 //    compile('org.apache.httpcomponents:httpmime:4.3') {

@@ -27,5 +27,5 @@
     <string name="error_geocoding_failed">Could not locate \'%1$s\' at \'%2$s\'.</string>
     <string name="loader_list_items_please_wait">Collecting items around…\nThis may take a while.</string>
 
-    <string name="main_activity_top_message">Welcome ! With this app, you can give an item you possess, spot an item that was lost or thrown away, and find items around a location.\n This is a beta version, if you experience a bug or a crash, please report it on our github issue tracker.</string>
+    <string name="main_activity_top_message">Welcome ! With this app, you can give an item you possess, spot an item that was lost or thrown away, and find items around a location.\nThis is a beta version, if you experience a bug or a crash, please report it on our github issue tracker.</string>
 </resources>

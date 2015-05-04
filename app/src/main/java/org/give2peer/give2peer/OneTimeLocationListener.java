@@ -10,6 +10,9 @@ import android.os.Bundle;
  * To minimize battery usage, and because we don't need regular updates, here's a LocationListener
  * that will start listening to updates by itself, and stop listening by itself when the
  * LocationManager finds a location.
+ *
+ * This is deprecated, see http://developer.android.com/training/location/index.html
+ *
  */
 public class OneTimeLocationListener implements LocationListener
 {
@@ -20,8 +23,8 @@ public class OneTimeLocationListener implements LocationListener
         locationManager = lm;
         locationManager.requestLocationUpdates(
                 locationManager.getBestProvider(criteria, true),
-                2000,
                 1000,
+                0,
                 this
         );
     }
