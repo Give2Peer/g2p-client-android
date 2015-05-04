@@ -33,7 +33,6 @@ public class OnForgetEntityClickListener implements Preference.OnPreferenceClick
 
                         // Delete the persisted entity
                         entity.delete();
-
                         // Quit the activity
                         fragment.getActivity().finish();
                         // And show the root of settings
@@ -43,7 +42,7 @@ public class OnForgetEntityClickListener implements Preference.OnPreferenceClick
                 })
                 .setNegativeButton("No", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                        // nothing is cool
+                        dialog.dismiss();
                     }
                 });
         AlertDialog alert = builder.create();

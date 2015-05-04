@@ -1,6 +1,8 @@
 package org.give2peer.give2peer.fragment;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -8,10 +10,10 @@ import android.os.Bundle;
 import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
+import android.provider.Settings;
 import android.util.Log;
 
 import org.give2peer.give2peer.Application;
-import org.give2peer.give2peer.OneTimeLocationListener;
 import org.give2peer.give2peer.R;
 import org.give2peer.give2peer.activity.MainActivity;
 import org.give2peer.give2peer.activity.SettingsActivity;
@@ -148,17 +150,52 @@ public class LocationChooserFragment extends PreferenceFragment
         detector.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
-
+                // Disable the button
                 detector.setEnabled(false);
                 detector.setIcon(R.drawable.ic_my_location_grey600_36dp); // use styles instead !
 
-                // Fetch the location asynchronously
-                LocationListener locationListener =
-                        new OneTimeLocationListener(lm, app.getLocationCriteria()) {
+                if (! lm.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+                    final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                    builder.setMessage("Your GPS seems to be disabled, do you want to enable it?")
+                            .setCancelable(false)
+                            .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    // Move to the settings
+                                    Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                                    startActivity(intent);
+                                }
+                            })
+                            .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    // Enable the button
+                                    detector.setEnabled(true);
+                                    detector.setIcon(R.drawable.ic_my_location_black_36dp); // use styles -_-
+                                    // Dismiss the dialog
+                                    dialog.dismiss();
+                                }
+                            });
+
+                    final AlertDialog alert = builder.create();
+                    alert.show();
+                    return false;
+                }
+
+                /**
+                 * To minimize battery usage, and because we don't need regular updates, here's a
+                 * LocationListener that will stop listening by itself when the LocationManager
+                 * finds a location.
+                 *
+                 * This is deprecated, see http://developer.android.com/training/location/index.html
+                 */
+                LocationListener locationListener = new LocationListener() {
                     @Override
                     public void onLocationChanged(android.location.Location newLocation) {
-                        super.onLocationChanged(newLocation);
-                        // Disable the button
+                        // Remove this listener
+                        lm.removeUpdates(this);
+
+                        // Enable the button
                         detector.setEnabled(true);
                         detector.setIcon(R.drawable.ic_my_location_black_36dp); // use styles -_-
 
@@ -172,7 +209,28 @@ public class LocationChooserFragment extends PreferenceFragment
 
                         refreshView();
                     }
+
+                    @Override
+                    public void onStatusChanged(String provider, int status, Bundle extras) {}
+
+                    @Override
+                    public void onProviderEnabled(String provider) {}
+
+                    @Override
+                    public void onProviderDisabled(String provider) {}
+//                    @Override
+//                    public void onProviderDisabled(String provider) {
+//                        Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+//                        startActivity(intent);
+//                    }
                 };
+                // Fetch the location asynchronously using the above listener
+                lm.requestLocationUpdates(
+                    lm.getBestProvider(app.getLocationCriteria(), true),
+                    1000,
+                    0,
+                    locationListener
+                );
 
                 return false;
             }
