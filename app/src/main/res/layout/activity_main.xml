@@ -45,7 +45,7 @@
         android:drawableStart="@drawable/ic_room_black_36dp"
         android:onClick="onListAroundMe"
         android:enabled="true"
-        android:layout_marginTop="3dp"/>
+        android:layout_marginTop="5dp"/>
 
     <TextView
         android:layout_width="match_parent"
@@ -63,7 +63,7 @@
         android:drawableStart="@drawable/ic_loyalty_black_36dp"
         android:onClick="onGiveItem"
         android:enabled="true"
-        android:layout_marginTop="3dp"/>
+        android:layout_marginTop="5dp"/>
 
     <TextView
         android:layout_width="match_parent"
@@ -81,7 +81,7 @@
         android:drawableStart="@drawable/ic_visibility_black_36dp"
         android:onClick="onSpotItem"
         android:enabled="true"
-        android:layout_marginTop="3dp"/>
+        android:layout_marginTop="5dp"/>
 
     <TextView
         android:layout_width="match_parent"
@@ -99,6 +99,6 @@
         android:drawableStart="@drawable/ic_room_black_36dp"
         android:onClick="onReportBug"
         android:enabled="true"
-        android:layout_marginTop="3dp"/>
+        android:layout_marginTop="5dp"/>
 
 </LinearLayout>
