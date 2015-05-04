@@ -19,51 +19,28 @@ This will allow big organizations to staffsource internal item transfers and dis
 by setting up their own private server.
 
 
-Help
-----
-
-If you know Android (or want to learn), you can help in a number of ways :
-
-- Refactor this learner's code into a beautiful codebase.
-- Suggest good third-party libraries to DRY the code.
-- Give advice on how to give the emulator a default `geo fix`.
-- Set up or give advice for a feature suite.
-  _(We don't know [which one](https://android-arsenal.com/tag/98?sort=rating) to choose)_
-- Report issues and submit ideas.
-- And, of course, use the app and spread the word!
-
-
-Donate
-------
-
-_"If it's free, you're the product."_
-
-Hosting a server costs money. We can pay for a couple years from our own pocket, but eventually the
-service must be able to pay for its own running costs, or it will shut down.
-
-You'll be the product for a while, as the server will measure your total usage for a year or two
-and show you (exactly!) how much you should give to keep it afloat for another year.
-
-Transparency is the key. If you know about good software suites / practices to that effect, we are
-interested.
-
-This will be yet another experiment in algorithms towards fiduciary self-sustenance.
-
-New features and maintenance will be provided by the
-[FLOSS](http://en.wikipedia.org/wiki/Free_and_open-source_software#FLOSS) community
-(aka: everybody), with the possible use of [bounties](https://www.bountysource.com).
-
-Besides, all the code being open-source, anyone knowledgeable can host their own server.
-
-_"Caring profits everyone."_
-
-
 
 ROADMAP
 =======
 
-1.0.0-beta
-----------
+2.0.0
+-----
+
+- Action points.
+- Experience points.
+
+
+1.0.0
+-----
+
+A version for the beta community.
+
+- Add a new Item offline, upload later.
+- Feature suite in Gherkin.
+
+
+0.2.0
+-----
 
 - Locally cache item thumbnail images.
 - Register automatically when available.
@@ -75,12 +52,12 @@ ROADMAP
 CHANGELOG
 =========
 
-1.0.0-alpha
------------
+0.1.0
+-----
 
 - List 32 items around my position, and launch maps and navigation.
 - Add a new Item with a location, a picture, and an optional title.
-- Detect my location using the GPS.
+- Detect my location using the GPS or WiFi.
 - List, add, edit and forget servers.
 - List, add, edit and forget locations.
 
@@ -96,7 +73,7 @@ Android's documentation uses [Espresso](http://developer.android.com/training/te
 ([Truth](http://google.github.io/truth/) looks fine, too)
 Calabash introduces Ruby code, and we don't understand how it works.
 
-Any PR setting up a skeleton feature suite (in Gherkin) is welcome.
+Any PR setting up a skeleton feature suite (in Gherkin) is more than welcome.
 
 
 
@@ -128,6 +105,44 @@ A refactorization implementing support for this (or an even better REST lib) is 
 OTHERS
 ======
 
+
+Help
+----
+
+If you know Android (or want to learn), you can help in a number of ways :
+
+- Refactor this learner's code into a beautiful codebase.
+- Suggest good third-party libraries to DRY the code.
+- Give advice on how to give the emulator a default `geo fix`.
+- Set up or give advice for a feature suite.
+  _(We don't know [which one](https://android-arsenal.com/tag/98?sort=rating) to choose)_
+- Report issues and submit ideas.
+- And, of course, use the app and spread the word!
+
+
+Donate
+------
+
+_"If it's free, you're the product."_
+
+Hosting a server costs money. We can pay for a couple years from our own pocket, but eventually the
+service must be able to pay for its own running costs, or it will shut down.
+
+You'll be the product for a while, as the server will measure your total usage for a year or two
+and show you (exactly!) how much you should give to keep it afloat for another year.
+
+Transparency is the key. If you know about good software suites / practices to that effect, we are
+interested.
+
+This will be yet another experiment in algorithms towards self-sustenance.
+
+New features and maintenance will be provided by the
+[FLOSS](http://en.wikipedia.org/wiki/Free_and_open-source_software#FLOSS) community
+(aka: everybody), with the possible use of [bounties](https://www.bountysource.com).
+
+Besides, all the code being open-source, anyone knowledgeable can host their own server.
+
+
 License
 -------
 
@@ -146,8 +161,8 @@ Thanks
 ------
 
 - The community, without you there'd be nothing. You know who you are.
-- My roommate, for feeding me when I forget, and putting up with my code-related ramblings.
-- His brother, for picking the name _give2peer_, and his general enthusiasm and advice.
+- Ilane, for feeding us and putting up with our code-related ramblings.
+- Misha, for picking the name _give2peer_, and his general enthusiasm and advice.
 - Willou, for his mumbled advice.
 - The ioth, because they can read between the books.
-- My family, for their unwavering support.
+- Our families, for their unwavering support.

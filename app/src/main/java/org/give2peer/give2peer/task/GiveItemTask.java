@@ -11,11 +11,6 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 
-//import retrofit.Callback;
-//import retrofit.RetrofitError;
-//import retrofit.client.Response;
-//import retrofit.mime.TypedFile;
-
 
 public class GiveItemTask extends AsyncTask<Item, Void, Item> {
     Application app;
