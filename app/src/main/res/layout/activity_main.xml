@@ -40,25 +40,65 @@
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Find around"
+        android:text="Find"
         android:id="@+id/listAroundMeButton"
+        android:drawableStart="@drawable/ic_room_black_36dp"
         android:onClick="onListAroundMe"
-        android:enabled="true" />
+        android:enabled="true"
+        android:layout_marginTop="3dp"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Browse items close to the provided location."
+        android:id="@+id/findTextHelper"
+        android:paddingRight="3dp"
+        android:paddingLeft="3dp"/>
 
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Give"
         android:id="@+id/giveItemButton"
-        android:onClick="onGiveItemButton"
-        android:enabled="true"/>
+        android:drawableStart="@drawable/ic_loyalty_black_36dp"
+        android:onClick="onGiveItem"
+        android:enabled="true"
+        android:layout_marginTop="3dp"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="When you want to give something for free."
+        android:id="@+id/giveTextHelper"
+        android:paddingLeft="3dp"
+        android:paddingRight="3dp"/>
 
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Spot"
         android:id="@+id/spotItemButton"
-        android:onClick="onSpotItemButton"
-        android:enabled="true"/>
+        android:drawableStart="@drawable/ic_visibility_black_36dp"
+        android:onClick="onSpotItem"
+        android:enabled="true"
+        android:layout_marginTop="3dp"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="When you see something lost or waiting to be recycled."
+        android:id="@+id/spotTextHelper"
+        android:paddingLeft="3dp"
+        android:paddingRight="3dp"/>
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="REPORT A BUG"
+        android:id="@+id/reportBugButton"
+        android:drawableStart="@drawable/ic_room_black_36dp"
+        android:onClick="onReportBug"
+        android:enabled="true"
+        android:layout_marginTop="3dp"/>
 
 </LinearLayout>

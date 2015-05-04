@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.location.LocationManager;
 import android.location.LocationProvider;
+import android.net.Uri;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -94,14 +95,12 @@ public class MainActivity extends ActionBarActivity
         startActivity(intent);
     }
 
-
-
-    public void onGiveItemButton(View view)
+    public void onGiveItem(View view)
     {
         snapshotNewItem("give");
     }
 
-    public void onSpotItemButton(View view)
+    public void onSpotItem(View view)
     {
         snapshotNewItem("spot");
     }
@@ -115,6 +114,14 @@ public class MainActivity extends ActionBarActivity
         Intent intent = new Intent(this, NewItemActivity.class);
         intent.putExtra("action", action);
         startActivity(intent);
+    }
+
+    public void onReportBug(View view)
+    {
+        String url = "http://www.give2peer.org";
+        Intent i = new Intent(Intent.ACTION_VIEW);
+        i.setData(Uri.parse(url));
+        startActivity(i);
     }
 
     // UI ACTIONS //////////////////////////////////////////////////////////////////////////////////
