@@ -11,7 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/main_activity_top_message"
-        android:id="@+id/textView"
+        android:id="@+id/welcomeTextView"
         />
 
     <TextView
@@ -40,17 +40,17 @@
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Find"
+        android:text="@string/button_find"
         android:id="@+id/listAroundMeButton"
         android:drawableStart="@drawable/ic_room_black_36dp"
         android:onClick="onListAroundMe"
         android:enabled="true"
-        android:layout_marginTop="5dp"/>
+        android:layout_marginTop="15dp"/>
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Browse items close to the provided location."
+        android:text="@string/button_find_label"
         android:id="@+id/findTextHelper"
         android:paddingRight="3dp"
         android:paddingLeft="3dp"/>
@@ -58,7 +58,7 @@
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Give"
+        android:text="@string/button_give"
         android:id="@+id/giveItemButton"
         android:drawableStart="@drawable/ic_loyalty_black_36dp"
         android:onClick="onGiveItem"
@@ -68,7 +68,7 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="When you want to give something for free."
+        android:text="@string/button_give_label"
         android:id="@+id/giveTextHelper"
         android:paddingLeft="3dp"
         android:paddingRight="3dp"/>
@@ -76,7 +76,7 @@
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Spot"
+        android:text="@string/button_spot"
         android:id="@+id/spotItemButton"
         android:drawableStart="@drawable/ic_visibility_black_36dp"
         android:onClick="onSpotItem"
@@ -86,7 +86,7 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="When you see something lost or waiting to be recycled."
+        android:text="@string/button_spot_label"
         android:id="@+id/spotTextHelper"
         android:paddingLeft="3dp"
         android:paddingRight="3dp"/>
@@ -94,9 +94,9 @@
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="REPORT A BUG"
+        android:text="@string/button_bug"
         android:id="@+id/reportBugButton"
-        android:drawableStart="@drawable/ic_room_black_36dp"
+        android:drawableStart="@drawable/ic_bug_report_black_36dp"
         android:onClick="onReportBug"
         android:enabled="true"
         android:layout_marginTop="5dp"/>

@@ -29,7 +29,8 @@ import java.util.List;
 public class LocationChooserFragment extends PreferenceFragment
 {
     @Override
-    public void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState)
+    {
         super.onCreate(savedInstanceState);
         // Load the preferences from an XML resource
         addPreferencesFromResource(R.xml.location_chooser);
@@ -38,12 +39,15 @@ public class LocationChooserFragment extends PreferenceFragment
     protected Preference.OnPreferenceChangeListener notGarbageListener;
 
     @Override
-    public void onResume() {
+    public void onResume()
+    {
         super.onResume();
         refreshView();
     }
 
-    public void refreshView() {
+    public void refreshView()
+    {
+        if (null == getActivity()) return;
 
         // Some services we're going to need
         final Application app = (Application) getActivity().getApplication();
@@ -218,11 +222,6 @@ public class LocationChooserFragment extends PreferenceFragment
 
                     @Override
                     public void onProviderDisabled(String provider) {}
-//                    @Override
-//                    public void onProviderDisabled(String provider) {
-//                        Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-//                        startActivity(intent);
-//                    }
                 };
                 // Fetch the location asynchronously using the above listener
                 lm.requestLocationUpdates(
