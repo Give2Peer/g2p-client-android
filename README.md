@@ -40,7 +40,7 @@ A version for the beta community.
 - [ ] Feature suite in Gherkin.
 
 
-0.2.0
+0.3.0
 -----
 
 - [ ] Locally cache item thumbnail images.
@@ -50,6 +50,13 @@ A version for the beta community.
 
 CHANGELOG
 =========
+
+0.2.0
+-----
+
+- [x] Set up a feature suite
+- [x] Add a Report Bug button
+
 
 0.1.0
 -----
@@ -64,16 +71,16 @@ CHANGELOG
 TESTS AND SPECS
 ===============
 
-We are big believers in behavior-driven development, yet this app has no test-suite whatsoever, right now.
+We are big believers in behavior-driven development.
 
-Android's documentation uses [Espresso](http://developer.android.com/training/testing/ui-testing/espresso-testing.html).
+We use [Cucumber] and [Robotium] to set up a [Gherkin]-based feature suite than spans multiple
+activities and tests application flows.
 
-[JBehave](http://jbehave.org/) and Robotium stand out.
-([Truth](http://google.github.io/truth/) looks fine, too)
-Calabash introduces Ruby code, and we don't understand how it works.
+Simply run `app/src/androidTest/java/org/give2peer/give2peer/test/MainTest.java` in Android Studio.
 
-Any PR setting up a skeleton feature suite (in Gherkin) is more than welcome.
-
+[Cucumber]: https://cucumber.io
+[Robotium]: https://robotium.org
+[Gherkin]:  https://github.com/cucumber/cucumber/wiki/Gherkin
 
 
 LIBS

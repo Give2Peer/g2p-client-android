@@ -118,7 +118,7 @@ public class MainActivity extends ActionBarActivity
 
     public void onReportBug(View view)
     {
-        String url = "http://www.give2peer.org";
+        String url = "https://github.com/Give2Peer/g2p-client-android/issues";
         Intent i = new Intent(Intent.ACTION_VIEW);
         i.setData(Uri.parse(url));
         startActivity(i);
