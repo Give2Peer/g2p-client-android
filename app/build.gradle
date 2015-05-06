@@ -11,6 +11,8 @@ android {
         targetSdkVersion 21
         versionCode 1
         versionName "1.0"
+
+        testInstrumentationRunner "cucumber.api.android.CucumberInstrumentation"
     }
     buildTypes {
         release {
@@ -25,29 +27,41 @@ android {
     packagingOptions {
         exclude 'META-INF/DEPENDENCIES'
         exclude 'META-INF/NOTICE'
+        exclude 'META-INF/NOTICE.txt'
         exclude 'META-INF/LICENSE'
+        exclude 'META-INF/LICENSE.txt'
+        exclude 'LICENSE.txt'
     }
 }
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     // BACKWARDS COMPATIBILITY
-    compile 'com.android.support:appcompat-v7:22.0.0'
-    // GOOGLE API CLIENT
+    compile 'com.android.support:appcompat-v7:22.1.1'
+    // GOOGLE API CLIENT (new geolocation goes through this, but we failed to implement it)
     //compile 'com.google.android.gms:play-services:7.3.0'
     // HTTP
     compile 'org.apache.httpcomponents:httpmime:4.3'
-//    compile('org.apache.httpcomponents:httpmime:4.3') {
-//        exclude module: 'org.apache.httpcomponents:httpclient'
-//    }
     compile 'org.apache.httpcomponents:httpclient-android:4.3.5'
     // ORM
     compile 'com.github.satyan:sugar:1.3'
     // SWEET SUGAR
     compile 'org.ocpsoft.prettytime:prettytime:3.2.7.Final'
-    // FONT ICONS
+    // FONT ICONS (clever, in case images become not enough)
     // http://zavoloklom.github.io/material-design-iconic-font/icons.html
     //compile 'com.malinskiy:materialicons:1.0.1'
-    // UNUSED
+    // LEGACY
     //compile 'com.squareup.retrofit:retrofit:1.6.0'
+
+    // TESTS AND FEATURES
+    androidTestCompile 'info.cukes:cucumber-core:1.2.2'
+    androidTestCompile 'info.cukes:cucumber-java:1.2.2'
+    androidTestCompile 'info.cukes:cucumber-android:1.2.2@jar'
+    androidTestCompile 'com.jayway.android.robotium:robotium-solo:5.2.1'
+    // SOME OTHER TEST LIBS we don't need right now (but might later on)
+    //androidTestCompile 'junit:junit:4.12'
+    //androidTestCompile 'info.cukes:cucumber-junit:1.2.2'
+    //androidTestCompile 'info.cukes:gherkin:2.12.2'
+    // TRUTH looks nice, but we have enough assertions for our uses
+    //androidTestCompile 'com.google.truth:truth:0.26'
 }

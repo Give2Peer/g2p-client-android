@@ -27,6 +27,7 @@ public class ItemAdapter extends ArrayAdapter
     private final Context context;
     protected int size;
 
+    @SuppressWarnings("unchecked")
     public ItemAdapter(Context context, int resource, int size, List<Item> objects)
     {
         super(context, resource, objects);

@@ -23,6 +23,8 @@ public class ListAroundActivity extends Activity
 {
     Application app;
 
+    public FindItemsTask fit;
+
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -60,7 +62,7 @@ public class ListAroundActivity extends Activity
         setContentView(R.layout.activity_list_around);
 
         // Launch the asynchronous Task
-        FindItemsTask fit = (FindItemsTask) new FindItemsTask(app, this, page).execute();
+        fit = (FindItemsTask) new FindItemsTask(app, this, page).execute();
     }
 
     // LISTENERS ///////////////////////////////////////////////////////////////////////////////////
