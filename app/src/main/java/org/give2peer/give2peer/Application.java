@@ -42,6 +42,8 @@ import java.util.List;
  */
 public class Application extends SugarApp
 {
+    public static String REPORT_BUG_URL = "https://github.com/Give2Peer/g2p-client-android/issues";
+
     private static Application singleton;
 
     protected android.location.Location location;

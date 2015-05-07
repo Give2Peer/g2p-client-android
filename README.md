@@ -38,6 +38,7 @@ A version for the beta community.
 
 - [ ] Add a new Item offline, upload later.
 - [ ] Require `https` servers.
+- [ ] Design an app icon.
 
 
 0.3.0

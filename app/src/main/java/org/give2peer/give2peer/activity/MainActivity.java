@@ -118,21 +118,12 @@ public class MainActivity extends ActionBarActivity
 
     public void onReportBug(View view)
     {
-        String url = "https://github.com/Give2Peer/g2p-client-android/issues";
         Intent i = new Intent(Intent.ACTION_VIEW);
-        i.setData(Uri.parse(url));
+        i.setData(Uri.parse(Application.REPORT_BUG_URL));
         startActivity(i);
     }
 
     // UI ACTIONS //////////////////////////////////////////////////////////////////////////////////
-
-//    public void refreshActionsView()
-//    {
-//        boolean enabled = null != app.getLocation();
-//        findViewById(R.id.listAroundMeButton).setEnabled(enabled);
-//        findViewById(R.id.giveItemButton).setEnabled(enabled);
-//        findViewById(R.id.spotItemButton).setEnabled(enabled);
-//    }
 
     public void refreshServerChooser()
     {
@@ -142,11 +133,6 @@ public class MainActivity extends ActionBarActivity
         ServerChooserFragment scf = (ServerChooserFragment) getFragmentManager()
                 .findFragmentById(R.id.serverChooserFragment);
         scf.refreshView();
-
-        // Display the server chooser fragment
-//        getFragmentManager().beginTransaction()
-//                .replace(R.id.serverChooserFragment, new ServerChooserFragment())
-//                .commit();
     }
 
     public void refreshLocationChooser()
@@ -154,22 +140,10 @@ public class MainActivity extends ActionBarActivity
         LocationChooserFragment lcf = (LocationChooserFragment) getFragmentManager()
                 .findFragmentById(R.id.locationChooserFragment);
         lcf.refreshView();
-//        // Display the location chooser fragment
-//        getFragmentManager().beginTransaction()
-//                .replace(R.id.locationChooserFragment, new LocationChooserFragment())
-//                .commit();
     }
 
 
     // HELPERS /////////////////////////////////////////////////////////////////////////////////////
-
-    protected void toast(String message) { toast(message, Toast.LENGTH_SHORT); }
-    protected void toast(String message, int duration)
-    {
-        Context context = getApplicationContext();
-        Toast toast = Toast.makeText(context, message, duration);
-        toast.show();
-    }
 
     protected void dump(String text)
     {
