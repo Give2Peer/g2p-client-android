@@ -30,6 +30,10 @@ public class ServerChooserFragment extends PreferenceFragment {
     @Override
     public void onResume() {
         super.onResume();
+        refreshView();
+    }
+
+    public void refreshView() {
 
         final Application app = (Application) getActivity().getApplication();
 

@@ -30,18 +30,18 @@
             android:typeface="monospace"
             />
 
-        <LinearLayout
-            android:id="@+id/serverChooserFragment"
-            android:orientation="vertical"
-            android:layout_width="fill_parent"
+        <fragment
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:name="org.give2peer.give2peer.fragment.ServerChooserFragment"
+            android:id="@+id/serverChooserFragment"
             />
 
-        <LinearLayout
-            android:id="@+id/locationChooserFragment"
-            android:orientation="vertical"
-            android:layout_width="fill_parent"
+        <fragment
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:name="org.give2peer.give2peer.fragment.LocationChooserFragment"
+            android:id="@+id/locationChooserFragment"
             />
 
         <Button

@@ -138,20 +138,26 @@ public class MainActivity extends ActionBarActivity
     {
         // Ask the app to guess a server configuration
         app.setServerConfiguration(app.guessServerConfiguration());
+
+        ServerChooserFragment scf = (ServerChooserFragment) getFragmentManager()
+                .findFragmentById(R.id.serverChooserFragment);
+        scf.refreshView();
+
         // Display the server chooser fragment
-        getFragmentManager().beginTransaction()
-                .replace(R.id.serverChooserFragment, new ServerChooserFragment())
-                .commit();
+//        getFragmentManager().beginTransaction()
+//                .replace(R.id.serverChooserFragment, new ServerChooserFragment())
+//                .commit();
     }
 
     public void refreshLocationChooser()
     {
-        // Ask the app to guess a server configuration
-        //app.setServerConfiguration(app.guessServerConfiguration());
-        // Display the server chooser fragment
-        getFragmentManager().beginTransaction()
-                .replace(R.id.locationChooserFragment, new LocationChooserFragment())
-                .commit();
+        LocationChooserFragment lcf = (LocationChooserFragment) getFragmentManager()
+                .findFragmentById(R.id.locationChooserFragment);
+        lcf.refreshView();
+//        // Display the location chooser fragment
+//        getFragmentManager().beginTransaction()
+//                .replace(R.id.locationChooserFragment, new LocationChooserFragment())
+//                .commit();
     }
 
 
