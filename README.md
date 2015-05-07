@@ -37,7 +37,7 @@ ROADMAP
 A version for the beta community.
 
 - [ ] Add a new Item offline, upload later.
-- [ ] Feature suite in Gherkin.
+- [ ] Require `https` servers.
 
 
 0.3.0
@@ -54,7 +54,7 @@ CHANGELOG
 0.2.0
 -----
 
-- [x] Set up a feature suite
+- [x] Set up a feature suite in Gherkin
 - [x] Add a Report Bug button
 
 

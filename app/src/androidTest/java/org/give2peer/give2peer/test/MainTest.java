@@ -54,6 +54,7 @@ public class MainTest extends ActivityInstrumentationTestCase2<MainActivity>
     public void iStartTheActivity(String activityClassName) {
         Log.i("G2P", "RUN STEP 1");
         // todo: start provided activity
+
         // Sanity checks
         assertNotNull("Robotium's Solo is set up.", solo);
         assertNotNull("Instrumentation has been injected", getInstrumentation());
