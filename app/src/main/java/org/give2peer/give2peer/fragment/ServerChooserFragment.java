@@ -14,27 +14,29 @@ import org.give2peer.give2peer.entity.Server;
 
 import java.util.List;
 
-public class ServerChooserFragment extends PreferenceFragment {
+public class ServerChooserFragment extends PreferenceFragment
+{
 
     // Makes sure GC does not eat our listener
     protected Preference.OnPreferenceChangeListener notGarbageListener;
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState)
+    {
         super.onCreate(savedInstanceState);
-
-        // Load the preferences from an XML resource
+        // Load the preferences layout from an XML resource
         addPreferencesFromResource(R.xml.server_chooser);
     }
 
     @Override
-    public void onResume() {
+    public void onResume()
+    {
         super.onResume();
         refreshView();
     }
 
-    public void refreshView() {
-
+    public void refreshView()
+    {
         final Application app = (Application) getActivity().getApplication();
 
         // Grab the View we're going to edit
@@ -45,7 +47,7 @@ public class ServerChooserFragment extends PreferenceFragment {
         final List<Server> servers = Server.listAll(Server.class);
         int serversCount = servers.size();
 
-        Log.i("G2P", String.format("Found %d server configuration(s).", serversCount));
+        //Log.i("G2P", String.format("Found %d server configuration(s).", serversCount));
 
         if (serversCount == 0) {
             serversListChooser.setEnabled(false);

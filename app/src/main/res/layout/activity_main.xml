@@ -37,9 +37,10 @@
             android:id="@+id/serverChooserFragment"
             />
 
+        <!-- This is interesting: half the fragment is hidden if we set the height to another value -->
         <fragment
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="121dp"
             android:name="org.give2peer.give2peer.fragment.LocationChooserFragment"
             android:id="@+id/locationChooserFragment"
             />
