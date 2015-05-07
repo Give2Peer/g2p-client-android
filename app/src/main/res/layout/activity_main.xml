@@ -1,104 +1,128 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:orientation="vertical"
+    android:layout_height="match_parent"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
     tools:context=".MainActivity"
-    android:padding="16dp"
-    android:weightSum="1">
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/main_activity_top_message"
-        android:id="@+id/welcomeTextView"
-        />
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="219dp"
-        android:id="@+id/dumpTextView"
-        android:enabled="false"
-        android:visibility="gone"
-        android:textColor="@color/primary_text_default_material_light"
-        android:typeface="monospace" />
+    >
 
     <LinearLayout
-        android:id="@+id/serverChooserFragment"
         android:orientation="vertical"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        />
-
-    <LinearLayout
-        android:id="@+id/locationChooserFragment"
-        android:orientation="vertical"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        />
-
-    <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/button_find"
-        android:id="@+id/findItemsButton"
-        android:drawableStart="@drawable/ic_room_black_36dp"
-        android:onClick="onListAroundMe"
-        android:enabled="true"
-        android:layout_marginTop="15dp"/>
+        android:padding="16dp"
+        >
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/button_find_label"
-        android:id="@+id/findTextHelper"
-        android:paddingRight="3dp"
-        android:paddingLeft="3dp"/>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/main_activity_top_message"
+            android:id="@+id/welcomeTextView"
+            />
 
-    <Button
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/button_give"
-        android:id="@+id/giveItemButton"
-        android:drawableStart="@drawable/ic_loyalty_black_36dp"
-        android:onClick="onGiveItem"
-        android:enabled="true"
-        android:layout_marginTop="5dp"/>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="219dp"
+            android:id="@+id/dumpTextView"
+            android:enabled="false"
+            android:visibility="gone"
+            android:textColor="@color/primary_text_default_material_light"
+            android:typeface="monospace"
+            />
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/button_give_label"
-        android:id="@+id/giveTextHelper"
-        android:paddingLeft="3dp"
-        android:paddingRight="3dp"/>
+        <LinearLayout
+            android:id="@+id/serverChooserFragment"
+            android:orientation="vertical"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            />
 
-    <Button
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/button_spot"
-        android:id="@+id/spotItemButton"
-        android:drawableStart="@drawable/ic_visibility_black_36dp"
-        android:onClick="onSpotItem"
-        android:enabled="true"
-        android:layout_marginTop="5dp"/>
+        <LinearLayout
+            android:id="@+id/locationChooserFragment"
+            android:orientation="vertical"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            />
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/button_spot_label"
-        android:id="@+id/spotTextHelper"
-        android:paddingLeft="3dp"
-        android:paddingRight="3dp"/>
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/button_find"
+            android:id="@+id/findItemsButton"
+            android:drawableStart="@drawable/ic_room_black_36dp"
+            android:onClick="onListAroundMe"
+            android:enabled="true"
+            android:layout_marginTop="15dp"
+            />
 
-    <Button
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/button_bug"
-        android:id="@+id/reportBugButton"
-        android:drawableStart="@drawable/ic_bug_report_black_36dp"
-        android:onClick="onReportBug"
-        android:enabled="true"
-        android:layout_marginTop="5dp"/>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/button_find_label"
+            android:id="@+id/findTextHelper"
+            android:paddingRight="3dp"
+            android:paddingLeft="3dp"
+            />
 
-</LinearLayout>
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/button_give"
+            android:id="@+id/giveItemButton"
+            android:drawableStart="@drawable/ic_loyalty_black_36dp"
+            android:onClick="onGiveItem"
+            android:enabled="true"
+            android:layout_marginTop="5dp"
+            />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/button_give_label"
+            android:id="@+id/giveTextHelper"
+            android:paddingLeft="3dp"
+            android:paddingRight="3dp"
+            />
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/button_spot"
+            android:id="@+id/spotItemButton"
+            android:drawableStart="@drawable/ic_visibility_black_36dp"
+            android:onClick="onSpotItem"
+            android:enabled="true"
+            android:layout_marginTop="5dp"
+            />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/button_spot_label"
+            android:id="@+id/spotTextHelper"
+            android:paddingLeft="3dp"
+            android:paddingRight="3dp"
+            />
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/button_bug"
+            android:id="@+id/reportBugButton"
+            android:drawableStart="@drawable/ic_bug_report_black_36dp"
+            android:onClick="onReportBug"
+            android:enabled="true"
+            android:layout_marginTop="5dp"
+            />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/button_bug_label"
+            android:id="@+id/bugTextHelper"
+            android:paddingLeft="3dp"
+            android:paddingRight="3dp"
+            />
+
+    </LinearLayout>
+</ScrollView>

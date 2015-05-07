@@ -12,6 +12,8 @@ IMPORTANT: Change resDir to the appropriate `/res/` folder path.
 USAGE: ./mdcopy <icon> [<new name>]
 
 CREDITS: https://github.com/janclarin/copy-material-icons
+
+ICONS BROWSER: http://google.github.io/material-design-icons/
 """
 
 # CHANGE THIS PATH TO YOUR RES FOLDER
