@@ -23,15 +23,17 @@ by setting up their own private server.
 ROADMAP
 =======
 
-2.0.0
+1.0.0
 -----
+
+A version for everybody.
 
 - [ ] Action points.
 - [ ] Experience points.
 - [ ] Propose deletion of items submitted by someone else.
 
 
-1.0.0
+0.4.0
 -----
 
 A version for the beta community.
