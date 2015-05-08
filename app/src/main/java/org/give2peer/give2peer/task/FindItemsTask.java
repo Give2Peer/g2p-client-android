@@ -73,6 +73,7 @@ public class FindItemsTask extends AsyncTask<Void, Void, ArrayList<Item>>
         View itemsLoadingText    = activity.findViewById(R.id.itemsLoadingText);
         itemsLoadingSpinner.setVisibility(View.GONE);
         itemsLoadingText   .setVisibility(View.GONE);
+
         // Fill the gridView with our items
         GridView itemsGridView = (GridView) activity.findViewById(R.id.itemsGridView);
         itemsGridView.setAdapter(new ItemAdapter(activity, R.layout.grid_item, size, items));

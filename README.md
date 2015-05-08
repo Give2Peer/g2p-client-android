@@ -23,6 +23,12 @@ by setting up their own private server.
 ROADMAP
 =======
 
+2.0.0
+-----
+
+A version with exhaustive hardware support.
+
+
 1.0.0
 -----
 
@@ -31,6 +37,7 @@ A version for everybody.
 - [ ] Action points.
 - [ ] Experience points.
 - [ ] Propose deletion of items submitted by someone else.
+- [ ] View items on a map.
 
 
 0.4.0
@@ -47,8 +54,10 @@ A version for the beta community.
 -----
 
 - [ ] Locally cache item thumbnail images.
+- [ ] Registration activity.
 - [ ] Register automatically when available.
 - [ ] Delete items submitted by self.
+
 
 
 CHANGELOG
@@ -71,6 +80,7 @@ CHANGELOG
 - [x] List, add, edit and forget locations.
 
 
+
 TESTS AND SPECS
 ===============
 
@@ -81,9 +91,17 @@ activities and tests application flows.
 
 Simply run `app/src/androidTest/java/org/give2peer/give2peer/test/MainTest.java` in Android Studio.
 
+The current feature suite is not as exhaustive as she should be.
+Robotium simply cannot control another activity without some serious and delicate apk re-signing, or
+[clever mocking](https://github.com/bryanl/FakeCamera). We are looking into ways of automatizing the
+setup and update of the preferences configuration (the android intent chooser), with gradle or
+anything else.
+
+
 [Cucumber]: https://cucumber.io
 [Robotium]: https://robotium.org
 [Gherkin]:  https://github.com/cucumber/cucumber/wiki/Gherkin
+
 
 
 LIBS
@@ -137,7 +155,7 @@ _"If it's free, you're the product."_
 Hosting a server costs money. We can pay for a couple years from our own pocket, but eventually the
 service must be able to pay for its own running costs, or it will shut down.
 
-You'll be the product for a while, as the server will measure your total usage for a year or two
+You'll be the product for a while, as the server will measure your total usage for a year or ten
 and show you (exactly!) how much you should give to keep it afloat for another year.
 
 Transparency is the key. If you know about good software suites / practices to that effect, we are

@@ -107,6 +107,11 @@ public class MainTest extends ActivityInstrumentationTestCase2<MainActivity>
         assertEquals(howMany, v.getCount());
     }
 
+    /**
+     * Examples:
+     * "new item"    => NewItem
+     * "list around" => ListAround
+     */
     protected String camelize(String stringWithSpaces) {
         String[] strings = stringWithSpaces.trim().split(" +");
         String camel = "";

@@ -21,13 +21,13 @@ public class DownloadItemThumbTask extends AsyncTask<String, Void, Bitmap> {
     }
 
     protected Bitmap doInBackground(String... urls) {
-        String urlDisplay = urls[0];
+        String thumbUrl = urls[0];
         Bitmap thumb = null;
         try {
-            InputStream in = new java.net.URL(urlDisplay).openStream();
+            InputStream in = new java.net.URL(thumbUrl).openStream();
             thumb = BitmapFactory.decodeStream(in);
         } catch (Exception e) {
-            Log.e("Error", e.getMessage());
+            Log.e("G2P", e.getMessage());
             e.printStackTrace();
         }
         return thumb;
