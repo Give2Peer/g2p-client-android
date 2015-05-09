@@ -16,7 +16,8 @@
         android:layout_alignParentEnd="false"
         android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="false" />
+        android:layout_alignParentStart="false"
+        />
 
     <TextView
         android:layout_width="wrap_content"
@@ -24,11 +25,11 @@
         android:id="@+id/itemTitleTextView"
         android:layout_gravity="center"
         android:layout_alignParentTop="true"
-        android:elegantTextHeight="false"
-        android:textSize="12sp"
+        android:textSize="14sp"
         android:textIsSelectable="true"
         android:background="#afffffff"
         android:padding="3dp"
-        android:singleLine="true" />
+        android:singleLine="true"
+        />
 
 </RelativeLayout>

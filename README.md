@@ -66,8 +66,8 @@ CHANGELOG
 0.2.0
 -----
 
-- [x] Set up a feature suite in Gherkin
-- [x] Add a Report Bug button
+- [x] Set up a feature suite in Gherkin.
+- [x] Add a Report Bug button.
 
 
 0.1.0
