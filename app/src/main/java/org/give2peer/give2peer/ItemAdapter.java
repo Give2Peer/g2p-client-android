@@ -21,6 +21,9 @@ import pl.polidea.webimageview.WebImageView;
 /**
  * This adapter transforms items into their own thumbnail view.
  * Each thumbnail can be clicked on. Right now, doing so opens a third-party mapping activity.
+ *
+ * The `WebImageView` handles the local caching of the thumbnails, so we do not have to worry about
+ * exceeding bandwidth usage. We hope there are no memory leaks in the lib we use.
  */
 public class ItemAdapter extends ArrayAdapter
 {
@@ -81,18 +84,12 @@ public class ItemAdapter extends ArrayAdapter
             holder = (ItemHolder) row.getTag();
         }
 
+        // Fill up the View with the item's data
         holder.txtTitle.setText(item.getThumbnailTitle());
-
         if (item.hasThumbnail()) {
-            // The WebImageView uses an internal cache
+            // The WebImageView uses internal LRU caches
             holder.imgThumb.setImageURL(item.getThumbnail());
         }
-
-//        if (item.hasThumbnailBitmap()) {
-//            holder.imgThumb.setImageBitmap(item.getThumbnailBitmap());
-//        } else {
-//            item.downloadThumbnail(holder.imgThumb);
-//        }
 
         item.setThumbnailView(row);
 

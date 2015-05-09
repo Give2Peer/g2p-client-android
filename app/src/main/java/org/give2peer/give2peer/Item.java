@@ -1,12 +1,9 @@
 package org.give2peer.give2peer;
 
-import android.graphics.Bitmap;
 import android.media.Image;
 import android.util.Log;
 import android.view.View;
-import android.widget.ImageView;
 
-import org.give2peer.give2peer.task.DownloadItemThumbTask;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -31,9 +28,7 @@ public class Item
     protected Float   distance;
 
     protected String                thumbnail;
-    protected Bitmap                thumbnailBitmap;
     protected View                  thumbnailView;
-    protected DownloadItemThumbTask downloadThumbTask;
 
     // not sure this is used ?
     protected Image   picture;
@@ -100,35 +95,6 @@ public class Item
         return s;
     }
 
-    /**
-     * Download the thumbnail in an async task.
-     */
-    public void downloadThumbnail() {
-        downloadThumbnail(null);
-    }
-
-    /**
-     * Download the thumbnail in an async task.
-     *
-     * @param viewToUpdate An optional ImageView to update with the thumbnail
-     */
-    public void downloadThumbnail(ImageView viewToUpdate) {
-        // Ignore subsequent calls to download if we already tried
-        if (null != downloadThumbTask) return;
-
-        // Download the thumbnail
-        if (thumbnail.length() > 0) {
-            try {
-                Log.i("DownloadItemThumbTask", "Downloading from " + thumbnail);
-                downloadThumbTask = new DownloadItemThumbTask(this, viewToUpdate);
-                downloadThumbTask.execute(thumbnail);
-            } catch (Exception ex) {
-                Log.e("DownloadItemThumbTask", ex.getMessage());
-                ex.printStackTrace();
-            }
-        }
-    }
-
     // ACCESSORS AND MUTATORS //////////////////////////////////////////////////////////////////////
 
     public Integer getId() { return id; }
@@ -168,12 +134,6 @@ public class Item
     }
 
     public boolean hasThumbnail() { return ! thumbnail.isEmpty(); }
-
-    public Bitmap getThumbnailBitmap() {
-        return thumbnailBitmap;
-    }
-
-    public void setThumbnailBitmap(Bitmap thumbnailBitmap) { this.thumbnailBitmap = thumbnailBitmap; }
 
     public String getThumbnail() { return thumbnail; }
 
