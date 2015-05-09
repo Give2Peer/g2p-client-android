@@ -167,9 +167,7 @@ public class Item
         this.picture = picture;
     }
 
-    public boolean hasThumbnail() {
-        return null != thumbnailBitmap;
-    }
+    public boolean hasThumbnail() { return ! thumbnail.isEmpty(); }
 
     public Bitmap getThumbnailBitmap() {
         return thumbnailBitmap;

@@ -53,9 +53,9 @@ A version for the beta community.
 0.3.0
 -----
 
-- [ ] Locally cache item thumbnail images.
+- [x] Locally cache item thumbnail images.
 - [ ] Registration activity.
-- [ ] Register automatically when available.
+- [ ] Register automatically when available. (?)
 - [ ] Delete items submitted by self.
 
 
@@ -92,7 +92,8 @@ activities and tests application flows.
 Simply run `app/src/androidTest/java/org/give2peer/give2peer/test/MainTest.java` in Android Studio.
 
 The current feature suite is not as exhaustive as she should be.
-Robotium simply cannot control another activity without some serious and delicate apk re-signing, or
+Robotium simply cannot control another activity without some serious and delicate apk re-signing
+(which [requires rooting](https://code.google.com/p/robotium/wiki/RobotiumForPreInstalledApps)), or
 [clever mocking](https://github.com/bryanl/FakeCamera). We are looking into ways of automatizing the
 setup and update of the preferences configuration (the android intent chooser), with gradle or
 anything else.
@@ -116,7 +117,7 @@ Apache HttpComponents
 File upload requires `org.apache.httpcomponents:httpmime:4.3`
 and `org.apache.httpcomponents:httpclient-android:4.3.5`.
 
-There are duplication shenanigans with the `httpclient`, it may not even be needed.
+There are duplication shenanigans with the `httpclient`.
 
 
 RetroFit
@@ -141,8 +142,8 @@ If you know Android (or want to learn), you can help in a number of ways :
 - Refactor this learner's code into a beautiful codebase.
 - Suggest good third-party libraries to DRY the code.
 - Give advice on how to give the emulator a default `geo fix`.
-- Set up or give advice for a feature suite.
-  _(We don't know [which one](https://android-arsenal.com/tag/98?sort=rating) to choose)_
+- Enrich and give advice for the feature suite.
+- Write a Usage Licence Agreement that users will have to accept on registration.
 - Report issues and submit ideas.
 - And, of course, use the app and spread the word!
 

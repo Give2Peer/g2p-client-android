@@ -15,6 +15,8 @@ import android.widget.Toast;
 
 import java.util.List;
 
+import pl.polidea.webimageview.WebImageView;
+
 
 /**
  * This adapter transforms items into their own thumbnail view.
@@ -53,7 +55,7 @@ public class ItemAdapter extends ArrayAdapter
             row.setLayoutParams(new GridView.LayoutParams(GridView.AUTO_FIT, size));
 
             holder = new ItemHolder();
-            holder.imgThumb = (ImageView)row.findViewById(R.id.itemImageView);
+            holder.imgThumb = (WebImageView)row.findViewById(R.id.itemImageView);
             holder.txtTitle = (TextView)row.findViewById(R.id.itemTitleTextView);
             row.setTag(holder);
 
@@ -80,11 +82,17 @@ public class ItemAdapter extends ArrayAdapter
         }
 
         holder.txtTitle.setText(item.getThumbnailTitle());
+
         if (item.hasThumbnail()) {
-            holder.imgThumb.setImageBitmap(item.getThumbnailBitmap());
-        } else {
-            item.downloadThumbnail(holder.imgThumb);
+            // The WebImageView uses an internal cache
+            holder.imgThumb.setImageURL(item.getThumbnail());
         }
+
+//        if (item.hasThumbnailBitmap()) {
+//            holder.imgThumb.setImageBitmap(item.getThumbnailBitmap());
+//        } else {
+//            item.downloadThumbnail(holder.imgThumb);
+//        }
 
         item.setThumbnailView(row);
 
@@ -93,8 +101,8 @@ public class ItemAdapter extends ArrayAdapter
 
     static class ItemHolder
     {
-        ImageView imgThumb;
-        TextView  txtTitle;
+        WebImageView imgThumb;
+        TextView     txtTitle;
     }
 
 }
