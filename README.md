@@ -92,11 +92,12 @@ activities and tests application flows.
 Simply run `app/src/androidTest/java/org/give2peer/give2peer/test/MainTest.java` in Android Studio.
 
 The current feature suite is not as exhaustive as she should be.
-Robotium simply cannot control another activity without some serious and delicate apk re-signing
+The mandatory usage of the Camera or Gallery picker when adding a new Item is tricky.
+Robotium simply cannot control another application without some serious and delicate apk re-signing
 (which [requires rooting](https://code.google.com/p/robotium/wiki/RobotiumForPreInstalledApps)), or
-[clever mocking](https://github.com/bryanl/FakeCamera). We are looking into ways of automatizing the
-setup and update of the preferences configuration (the android intent chooser), with gradle or
-anything else.
+[clever mocking](https://github.com/bryanl/FakeCamera).
+For the latter, we are looking into ways of automatizing the setup and update of the preferences
+configuration (the android intent chooser), with gradle or anything else. Feel free to chime in!
 
 
 [Cucumber]: https://cucumber.io
