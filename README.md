@@ -28,6 +28,8 @@ ROADMAP
 
 A version with exhaustive hardware support.
 
+- [ ] Design a prettier launcher icon.
+
 
 1.0.0
 -----
@@ -47,13 +49,14 @@ A version for the beta community.
 
 - [ ] Add a new Item offline, upload later.
 - [ ] Require `https` servers.
-- [ ] Design an app icon.
+
 
 
 0.3.0
 -----
 
 - [x] Locally cache item thumbnail images.
+- [x] Design a temporary basic launcher icon.
 - [ ] Registration activity.
 - [ ] Register automatically when available. (?)
 - [ ] Delete items submitted by self.

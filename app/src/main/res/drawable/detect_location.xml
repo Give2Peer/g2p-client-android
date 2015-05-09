@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- This is not used anymore :( It does not work with Preferences as-is -->
+<!-- This is a good way to grey out the button icons when pressed, though. -->
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:state_enabled="false" android:icon="@drawable/ic_my_location_grey600_36dp" />
     <item android:state_pressed="true"  android:icon="@drawable/ic_my_location_grey600_36dp" />
