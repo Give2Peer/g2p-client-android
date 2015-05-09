@@ -36,6 +36,7 @@ import java.util.List;
  * Besides, subsonic does it, and as a (blissfully ignorant) user, I really liked it.
  *
  * Servers
+ *   [edit] Default server
  *   [edit] Server Foo
  *   [edit] Server Bar
  *   [add]
@@ -44,8 +45,8 @@ import java.util.List;
  *   [edit] Office
  *   [edit] Somewhere else
  */
-public class SettingsFragment extends PreferenceFragment {
-
+public class SettingsFragment extends PreferenceFragment
+{
     // These list holders are simply to ensure that the garbage collector will not eat our listeners
     protected List<OnPreferenceChangeListener> notGarbageChangeListeners = new ArrayList<>();
     protected List<OnPreferenceClickListener>  notGarbageClickListeners  = new ArrayList<>();
@@ -55,16 +56,17 @@ public class SettingsFragment extends PreferenceFragment {
      * which is on creation of the fragment and adding of a server. (and maybe deletion)
      * I'm not sure why we have these anymore, as we're always refreshing the View.
      */
-    protected HashMap<Long, Server>   servers   = new HashMap<>();
+    //protected HashMap<Long, Server>   servers   = new HashMap<>();
 
     /**
      * A internal collection of locations, rebuilt from database on each view refresh,
      * I'm not sure why we have these anymore, as we're always refreshing the View.
      */
-    protected HashMap<Long, Location> locations = new HashMap<>();
+    //protected HashMap<Long, Location> locations = new HashMap<>();
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState)
+    {
         super.onCreate(savedInstanceState);
 
         // Load the preferences from an XML resource
@@ -75,8 +77,8 @@ public class SettingsFragment extends PreferenceFragment {
         refreshView();
     }
 
-    public void refreshView() {
-
+    public void refreshView()
+    {
         // We can only do this using a Reflection hack I don't like. Too bad. And, also, WTF?
         // pm.inflateFromResource((Context) getActivity(), R.xml.server_editor, null)
 
@@ -95,30 +97,28 @@ public class SettingsFragment extends PreferenceFragment {
         notGarbageClickListeners.clear();
 
         // Empty the memoization caches
-        servers.clear();
-        locations.clear();
+        //servers.clear();
+        //locations.clear();
 
 
         /// THE SERVERS ////////////////////////////////////////////////////////////////////////////
 
         // List the server configurations
-        Iterator<Server> serversIterator = Server.findAll(Server.class);
+        List<Server> serversList = Server.listAll(Server.class);
 
         // Create the Server category
         PreferenceCategory cat = new PreferenceCategory(context);
-        cat.setTitle("Servers");
+        cat.setTitle(app.getString(R.string.settings_category_servers));
 
         // The category MUST be added to the root node BEFORE we add screens to it
         // (something about injected deps like PreferenceManager, probably)
         // This code can possibly be improved by much, remember.
         getPreferenceScreen().addPreference(cat);
 
-        for (;serversIterator.hasNext();) {
-            Server server = serversIterator.next();
+        for (int i=0; i<serversList.size(); i++) {
+            Server server = serversList.get(i);
 
-            servers.put(server.getId(), server);
-
-            //Log.i("G2P", "Creating prefs screen for " + server.getName());
+            //servers.put(server.getId(), server);
 
             // Create a sub-screen for that server
             PreferenceScreen screen = pm.createPreferenceScreen(context);
@@ -139,7 +139,7 @@ public class SettingsFragment extends PreferenceFragment {
             notGarbageClickListeners.add(forgetListener);
 
             EditTextPreference name = new EditTextPreference(context);
-            name.setTitle("Name");
+            name.setTitle(app.getString(R.string.settings_server_name));
             name.setKey(String.format("server_%d_name", server.getId()));
             name.setSummary(server.getName());
             name.setText(server.getName());
@@ -147,7 +147,7 @@ public class SettingsFragment extends PreferenceFragment {
             screen.addPreference(name);
 
             EditTextPreference uri = new EditTextPreference(context);
-            uri.setTitle("Address");
+            uri.setTitle(app.getString(R.string.settings_server_address));
             uri.setKey(String.format("server_%d_uri", server.getId()));
             uri.setSummary(server.getUrl());
             uri.setText(server.getUrl());
@@ -155,7 +155,7 @@ public class SettingsFragment extends PreferenceFragment {
             screen.addPreference(uri);
 
             EditTextPreference username = new EditTextPreference(context);
-            username.setTitle("Username");
+            username.setTitle(app.getString(R.string.settings_server_username));
             username.setKey(String.format("server_%d_username", server.getId()));
             username.setSummary(server.getUsername());
             username.setText(server.getUsername());
@@ -163,7 +163,7 @@ public class SettingsFragment extends PreferenceFragment {
             screen.addPreference(username);
 
             EditTextPreference password = new EditTextPreference(context);
-            password.setTitle("Password");
+            password.setTitle(app.getString(R.string.settings_server_password));
             password.setKey(String.format("server_%d_password", server.getId()));
             password.setSummary(new String(new char[server.getPassword().length()])
                     .replace("\0", "*")); // hmmm. DRY this using a lib ?
@@ -171,16 +171,18 @@ public class SettingsFragment extends PreferenceFragment {
             password.setOnPreferenceChangeListener(passwordListener);
             screen.addPreference(password);
 
-            // Forget this server
-            Preference delServer = new Preference(context);
-            delServer.setTitle("Forget this server");
-            delServer.setIcon(R.drawable.ic_remove_circle_outline_black_36dp);
-            delServer.setOnPreferenceClickListener(forgetListener);
-            screen.addPreference(delServer);
+            // Forget this server, but, not unlike love, we can never forget the first one
+            if (i > 0) {
+                Preference delServer = new Preference(context);
+                delServer.setTitle(app.getString(R.string.settings_server_forget));
+                delServer.setIcon(R.drawable.ic_remove_circle_outline_black_36dp);
+                delServer.setOnPreferenceClickListener(forgetListener);
+                screen.addPreference(delServer);
+            }
 
             // Test this server configuration
             Preference testServer = new Preference(context);
-            testServer.setTitle("Test the server");
+            testServer.setTitle(app.getString(R.string.settings_server_test));
             testServer.setIcon(R.drawable.ic_signal_wifi_statusbar_not_connected_black_36dp);
             testServer.setOnPreferenceClickListener(new OnTestServerClickListener(this, server));
             screen.addPreference(testServer);
@@ -190,7 +192,7 @@ public class SettingsFragment extends PreferenceFragment {
 
         // Add server button
         Preference addServer = new Preference(context);
-        addServer.setTitle("Add a server");
+        addServer.setTitle(app.getString(R.string.settings_server_add));
         addServer.setIcon(R.drawable.ic_add_circle_outline_black_36dp);
         addServer.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
@@ -212,7 +214,7 @@ public class SettingsFragment extends PreferenceFragment {
 
         // Create the Server category
         PreferenceCategory locationsCategory = new PreferenceCategory(context);
-        locationsCategory.setTitle("Locations");
+        locationsCategory.setTitle(app.getString(R.string.settings_category_locations));
 
         // The category MUST be added to the root node BEFORE we add screens to it
         // (something about injected deps like PreferenceManager, probably)
@@ -222,7 +224,7 @@ public class SettingsFragment extends PreferenceFragment {
         for (;locationsIterator.hasNext();) {
             Location location = locationsIterator.next();
 
-            locations.put(location.getId(), location);
+            //locations.put(location.getId(), location);
 
             // Create a sub-screen for that location
 
@@ -240,7 +242,7 @@ public class SettingsFragment extends PreferenceFragment {
             notGarbageClickListeners.add(forgetListener);
 
             EditTextPreference name = new EditTextPreference(context);
-            name.setTitle("Name");
+            name.setTitle(app.getString(R.string.settings_location_name));
             name.setKey(String.format("location_%d_name", location.getId()));
             name.setSummary(location.getName());
             name.setText(location.getName());
@@ -248,7 +250,7 @@ public class SettingsFragment extends PreferenceFragment {
             screen.addPreference(name);
 
             EditTextPreference postal = new EditTextPreference(context);
-            postal.setTitle("Address");
+            postal.setTitle(app.getString(R.string.settings_location_address));
             postal.setKey(String.format("location_%d_postal", location.getId()));
             postal.setSummary(location.getPostal());
             postal.setText(location.getPostal());
@@ -257,7 +259,7 @@ public class SettingsFragment extends PreferenceFragment {
 
             // Forget this location
             Preference delLocation = new Preference(context);
-            delLocation.setTitle("Forget this location");
+            delLocation.setTitle(app.getString(R.string.settings_location_forget));
             delLocation.setIcon(R.drawable.ic_remove_circle_outline_black_36dp);
             delLocation.setOnPreferenceClickListener(forgetListener);
             screen.addPreference(delLocation);
@@ -267,7 +269,7 @@ public class SettingsFragment extends PreferenceFragment {
 
         // Add a location
         Preference addLocation = new Preference(context);
-        addLocation.setTitle("Add a location");
+        addLocation.setTitle(app.getString(R.string.settings_location_add));
         addLocation.setIcon(R.drawable.ic_add_circle_outline_black_36dp);
         addLocation.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
@@ -280,33 +282,5 @@ public class SettingsFragment extends PreferenceFragment {
         });
 
         locationsCategory.addPreference(addLocation);
-
-
     }
-
-//    @Override
-//    public void onPause() {
-//        super.onPause();
-//
-//        Log.i("G2P", "Updating server configuration...");
-//
-//        Application app = (Application) getActivity().getApplication();
-//        SharedPreferences prefs = app.getPrefs();
-//
-//        for (Server server : servers.values()) {
-//            Long id = server.getId();
-//            server.setName(prefs.getString(String.format("server_%d_name", id),
-//                    server.getName()));
-//            server.setUrl(prefs.getString(String.format("server_%d_uri", id),
-//                    server.getUrl()));
-//            server.setUsername(prefs.getString(String.format("server_%d_username", id),
-//                    server.getUsername()));
-//            server.setPassword(prefs.getString(String.format("server_%d_password", id),
-//                    server.getPassword()));
-//
-//            server.save();
-//        }
-//
-//    }
-
 }

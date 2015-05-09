@@ -27,7 +27,7 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:textAppearance="?android:attr/textAppearanceMedium"
-            android:text="@string/label_title"
+            android:text="@string/new_item_label_title"
             android:id="@+id/newItemTitleTextView"
             android:labelFor="@+id/newItemTitleEditText"
             android:gravity="center" />

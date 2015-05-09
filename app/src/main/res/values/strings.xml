@@ -7,7 +7,9 @@
     <string name="title_activity_settings">Give2Peer - Settings</string>
     <string name="title_activity_new_item">Give2Peer - New Item</string>
 
-    <string name="label_title">Title</string>
+    <string name="main_activity_top_message">Welcome! With this app, you can give an item you possess, spot an item that was lost or thrown away, and find items around a location.</string>
+
+    <string name="new_item_label_title">Title</string>
 
     <string name="new_item_image_description">The picture of the item you just took.</string>
     <string name="new_item_send_button">Send</string>
@@ -25,9 +27,8 @@
     <string name="title_set_up_location">Set up a location</string>
 
     <string name="error_geocoding_failed">Could not locate \'%1$s\' at \'%2$s\'.</string>
-    <string name="loader_list_items_please_wait">Collecting items around…\nThis may take a while.</string>
 
-    <string name="main_activity_top_message">Welcome! With this app, you can give an item you possess, spot an item that was lost or thrown away, and find items around a location.</string>
+    <string name="loader_list_items_please_wait">Collecting items around…\nThis may take a while.</string>
 
     <string name="button_find">Find</string>
     <string name="button_give">Give</string>
@@ -37,4 +38,18 @@
     <string name="button_give_label">When you want to give something for free.</string>
     <string name="button_spot_label">When you see something lost or waiting to be recycled.</string>
     <string name="button_bug_label">This is a beta version. If you experience a bug or a crash, please report it.</string>
+
+    <string name="settings_category_servers">Servers</string>
+    <string name="settings_server_name">Name</string>
+    <string name="settings_server_address">Address</string>
+    <string name="settings_server_username">Username</string>
+    <string name="settings_server_password">Password</string>
+    <string name="settings_server_forget">Forget this server</string>
+    <string name="settings_server_test">Test the server</string>
+    <string name="settings_server_add">Add a server</string>
+    <string name="settings_category_locations">Locations</string>
+    <string name="settings_location_name">Name</string>
+    <string name="settings_location_address">Address</string>
+    <string name="settings_location_forget">Forget this location</string>
+    <string name="settings_location_add">Add a location</string>
 </resources>
