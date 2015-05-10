@@ -87,6 +87,14 @@ public class MainActivity extends ActionBarActivity
 
     // UI LISTENERS ////////////////////////////////////////////////////////////////////////////////
 
+    public void onMapItems(View view)
+    {
+        // Start the "map items" activity
+        Intent intent = new Intent(this, MapItemsActivity.class);
+        //intent.putExtra("page", 0);
+        startActivity(intent);
+    }
+
     public void onListAroundMe(View view)
     {
         // Start the "list around" activity

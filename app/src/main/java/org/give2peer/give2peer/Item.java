@@ -4,6 +4,8 @@ import android.media.Image;
 import android.util.Log;
 import android.view.View;
 
+import com.google.android.gms.maps.model.LatLng;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -94,6 +96,12 @@ public class Item
         }
         return s;
     }
+
+    /**
+     * A convenience method to generate a `LatLng` object that some third-party applications
+     * (notably, Google Maps) use.
+     */
+    public LatLng getLatLng() { return new LatLng(getLatitude(), getLongitude()); }
 
     // ACCESSORS AND MUTATORS //////////////////////////////////////////////////////////////////////
 

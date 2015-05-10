@@ -6,6 +6,7 @@
 
     <string name="title_activity_settings">Give2Peer - Settings</string>
     <string name="title_activity_new_item">Give2Peer - New Item</string>
+    <string name="title_activity_map_items">Give2Peer - Map items</string>
 
     <string name="main_activity_top_message">Welcome! With this app, you can give an item you possess, spot an item that was lost or thrown away, and find items around a location.</string>
 
@@ -31,10 +32,12 @@
     <string name="loader_list_items_please_wait">Collecting items around…\nThis may take a while.</string>
 
     <string name="button_find">Find</string>
+    <string name="button_map">Find on map</string>
     <string name="button_give">Give</string>
     <string name="button_spot">Spot</string>
     <string name="button_bug">Report a bug</string>
-    <string name="button_find_label">Browse items close to the provided location.</string>
+    <string name="button_find_label">List items close to the provided location.</string>
+    <string name="button_map_label">Browse on a map for items close to the provided location.</string>
     <string name="button_give_label">When you want to give something for free.</string>
     <string name="button_spot_label">When you see something lost or waiting to be recycled.</string>
     <string name="button_bug_label">This is a beta version. If you experience a bug or a crash, please report it.</string>
@@ -52,4 +55,5 @@
     <string name="settings_location_address">Address</string>
     <string name="settings_location_forget">Forget this location</string>
     <string name="settings_location_add">Add a location</string>
+
 </resources>

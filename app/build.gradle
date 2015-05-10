@@ -38,8 +38,10 @@ dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     // BACKWARDS COMPATIBILITY
     compile 'com.android.support:appcompat-v7:22.1.1'
-    // GOOGLE API CLIENT (new geolocation goes through this, but we failed to implement it)
+    // GOOGLE API CLIENT (new geolocation also goes through this, but we're still using old-school)
     //compile 'com.google.android.gms:play-services:7.3.0'
+    // MAPS GOOGLE API (more targeted dependency than above)
+    compile 'com.google.android.gms:play-services-maps:7.3.0'
     // HTTP
     compile 'org.apache.httpcomponents:httpmime:4.3'
     compile 'org.apache.httpcomponents:httpclient-android:4.3.5'

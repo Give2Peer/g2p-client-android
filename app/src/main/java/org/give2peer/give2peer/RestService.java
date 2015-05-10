@@ -65,12 +65,6 @@ public class RestService
 
     protected HttpClient client;
 
-    /**
-     * This is a very old var.
-     * It has no purpose here anymore, I think.
-     */
-    protected Map<Integer, Item> items;
-
     public RestService(Server config)
     {
         serverUrl = config.getUrl();
@@ -79,8 +73,6 @@ public class RestService
         credentials = new UsernamePasswordCredentials(username, password);
 
         client = new DefaultHttpClient();
-
-        items = new HashMap<Integer, Item>();
     }
 
     // HTTP QUERIES ////////////////////////////////////////////////////////////////////////////////
@@ -117,7 +109,8 @@ public class RestService
 
 
     public Item giveItem(Item item)
-            throws URISyntaxException, IOException, JSONException, ErrorResponseException {
+            throws URISyntaxException, IOException, JSONException, ErrorResponseException
+    {
         String url = serverUrl + "/give";
 
         HttpPost request = new HttpPost();
@@ -175,30 +168,12 @@ public class RestService
         return item;
     }
 
+
     public boolean testServer()
             throws IOException, URISyntaxException
     {
         String json = getJson("/ping");
         return json.equals("\"pong\"");
-    }
-
-    /**
-     * @param route must start with `/`.
-     * @return the raw server response body, which happens to be a JSON string
-     */
-    public String getJson(String route)
-            throws URISyntaxException, IOException
-    {
-        String url = serverUrl + route;
-
-        HttpGet request = new HttpGet();
-        request.setURI(new URI(url));
-
-        authenticate(request);
-
-        HttpResponse response = client.execute(request);
-
-        return EntityUtils.toString(response.getEntity(), "UTF-8");
     }
 
 
@@ -221,9 +196,29 @@ public class RestService
         }
     }
 
+
+    /**
+     * @param route must start with `/`.
+     * @return the raw server response body, which happens to be a JSON string
+     */
+    public String getJson(String route)
+            throws URISyntaxException, IOException
+    {
+        String url = serverUrl + route;
+
+        HttpGet request = new HttpGet();
+        request.setURI(new URI(url));
+
+        authenticate(request);
+
+        HttpResponse response = client.execute(request);
+
+        return EntityUtils.toString(response.getEntity(), "UTF-8");
+    }
+
+
     /**
      * Try to parse the `json` and build the items in it.
-     * Updates the internal `Map` of `Item`s with the new data.
      *
      * @param json
      * @return
@@ -238,13 +233,6 @@ public class RestService
             for (int i = 0 ; i < rows.length() ; i++) {
                 jsonObject = rows.getJSONObject(i);
                 item = new Item(jsonObject);
-                // todo: move this memoization to upper function, it should not be here.
-                if (items.containsKey(item.getId())) {
-                    item = items.get(item.getId());
-                    item.updateWithJSON(jsonObject);
-                } else {
-                    items.put(item.getId(), item);
-                }
                 itemsList.add(item);
             }
         } catch (JSONException e) {

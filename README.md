@@ -39,7 +39,7 @@ A version for everybody.
 - [ ] Action points.
 - [ ] Experience points.
 - [ ] Propose deletion of items submitted by someone else.
-- [ ] View items on a map.
+
 
 
 0.4.0
@@ -58,6 +58,7 @@ A version for the beta community.
 
 - [x] Locally cache item thumbnail images.
 - [x] Design a temporary basic launcher icon.
+- [x] View items on a map.
 - [ ] Registration activity.
 - [ ] Register automatically when available. (?)
 - [ ] Delete items submitted by self.
@@ -147,6 +148,7 @@ If you know Android (or want to learn), you can help in a number of ways :
 - Refactor this learner's code into a beautiful codebase.
 - Suggest good third-party libraries to DRY the code.
 - Give advice on how to give the emulator a default `geo fix`.
+- Give advice on how to somehow publish the release `keystore` of an open-source project.
 - Enrich and give advice for the feature suite.
 - Write a Usage Licence Agreement that users will have to accept on registration.
 - Report issues and submit ideas.

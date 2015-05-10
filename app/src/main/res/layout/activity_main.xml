@@ -68,12 +68,32 @@
         <Button
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:text="@string/button_map"
+            android:id="@+id/mapItemsButton"
+            android:drawableStart="@drawable/ic_map_black_36dp"
+            android:onClick="onMapItems"
+            android:enabled="true"
+            android:layout_marginTop="15dp"
+            />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/button_map_label"
+            android:id="@+id/mapTextHelper"
+            android:paddingRight="3dp"
+            android:paddingLeft="3dp"
+            />
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:text="@string/button_give"
             android:id="@+id/giveItemButton"
             android:drawableStart="@drawable/ic_loyalty_black_36dp"
             android:onClick="onGiveItem"
             android:enabled="true"
-            android:layout_marginTop="5dp"
+            android:layout_marginTop="15dp"
             />
 
         <TextView
@@ -93,7 +113,7 @@
             android:drawableStart="@drawable/ic_visibility_black_36dp"
             android:onClick="onSpotItem"
             android:enabled="true"
-            android:layout_marginTop="5dp"
+            android:layout_marginTop="15dp"
             />
 
         <TextView
@@ -113,7 +133,7 @@
             android:drawableStart="@drawable/ic_bug_report_black_36dp"
             android:onClick="onReportBug"
             android:enabled="true"
-            android:layout_marginTop="5dp"
+            android:layout_marginTop="15dp"
             />
 
         <TextView
