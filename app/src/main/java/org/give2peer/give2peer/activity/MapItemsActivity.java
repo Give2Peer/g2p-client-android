@@ -63,17 +63,7 @@ public class MapItemsActivity extends Activity implements OnMapReadyCallback
     @Override
     public void onMapReady(final GoogleMap googleMap)
     {
-        Location l = app.getLocation();
-        try {
-            app.geocodeLocationIfNeeded(l);
-        } catch (IOException | GeocodingException e) {
-            e.printStackTrace();
-            app.toast(e.getMessage());
-            finish();
-        }
-        final double lat = l.getLatitude();
-        final double lng = l.getLongitude();
-        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(lat, lng), 1));
+        googleMap.moveCamera(CameraUpdateFactory.zoomTo(1));
 
         AsyncTask findAndLocate = new AsyncTask<Void, Void, ArrayList<Item>>() {
 
@@ -82,8 +72,12 @@ public class MapItemsActivity extends Activity implements OnMapReadyCallback
             @Override
             protected ArrayList<Item> doInBackground(Void... params)
             {
+                Location l = app.getLocation();
                 ArrayList<Item> items = new ArrayList<Item>();
                 try {
+                    app.geocodeLocationIfNeeded(l);
+                    final double lat = l.getLatitude();
+                    final double lng = l.getLongitude();
                     items = app.getRestService().findAround(lat, lng);
                 } catch (Exception e) {
                     exception = e;
