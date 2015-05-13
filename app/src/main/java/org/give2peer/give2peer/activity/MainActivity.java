@@ -77,6 +77,10 @@ public class MainActivity extends ActionBarActivity
             startActivity(intent);
             return true;
         }
+        if (id == R.id.menu_action_report_bug) {
+            reportBug();
+            return true;
+        }
 
         return super.onOptionsItemSelected(item);
     }
@@ -124,7 +128,7 @@ public class MainActivity extends ActionBarActivity
         startActivity(intent);
     }
 
-    public void onReportBug(View view)
+    public void reportBug()
     {
         Intent i = new Intent(Intent.ACTION_VIEW);
         i.setData(Uri.parse(Application.REPORT_BUG_URL));

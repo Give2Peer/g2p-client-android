@@ -36,6 +36,7 @@ import java.util.List;
  * Besides, subsonic does it, and as a (blissfully ignorant) user, I really liked it.
  *
  * Servers
+ *   [choice] Choose a server
  *   [edit] Default server
  *   [edit] Server Foo
  *   [edit] Server Bar
@@ -114,6 +115,7 @@ public class SettingsFragment extends PreferenceFragment
         // (something about injected deps like PreferenceManager, probably)
         // This code can possibly be improved by much, remember.
         getPreferenceScreen().addPreference(cat);
+
 
         for (int i=0; i<serversList.size(); i++) {
             Server server = serversList.get(i);

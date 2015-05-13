@@ -7,8 +7,16 @@
 
     <item
         android:id="@+id/menu_action_settings"
-        android:title="@string/action_settings"
+        android:title="@string/menu_action_settings"
         android:orderInCategory="100"
+        app:showAsAction="never"
+        />
+
+    <item
+        android:id="@+id/menu_action_report_bug"
+        android:title="@string/menu_action_report_bug"
+        android:icon="@drawable/ic_bug_report_black_36dp"
+        android:orderInCategory="200"
         app:showAsAction="never"
         />
 

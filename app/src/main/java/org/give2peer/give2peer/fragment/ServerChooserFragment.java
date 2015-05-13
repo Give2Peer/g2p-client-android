@@ -16,7 +16,6 @@ import java.util.List;
 
 public class ServerChooserFragment extends PreferenceFragment
 {
-
     // Makes sure GC does not eat our listener
     protected Preference.OnPreferenceChangeListener notGarbageListener;
 
@@ -98,7 +97,7 @@ public class ServerChooserFragment extends PreferenceFragment
             public boolean onPreferenceChange(Preference preference, Object newValue)
             {
                 long id = Long.valueOf((String) newValue);
-                if (-1 == id) { // "Add a new server" convenience choice: redirect to settings
+                if (-1 == id) { // "Add a new server" convenience choice that redirects to settings
                     Intent intent = new Intent(getActivity(), SettingsActivity.class);
                     startActivity(intent);
                     return false;

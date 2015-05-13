@@ -125,25 +125,5 @@
             android:paddingRight="3dp"
             />
 
-        <Button
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/button_bug"
-            android:id="@+id/reportBugButton"
-            android:drawableStart="@drawable/ic_bug_report_black_36dp"
-            android:onClick="onReportBug"
-            android:enabled="true"
-            android:layout_marginTop="15dp"
-            />
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/button_bug_label"
-            android:id="@+id/bugTextHelper"
-            android:paddingLeft="3dp"
-            android:paddingRight="3dp"
-            />
-
     </LinearLayout>
 </ScrollView>

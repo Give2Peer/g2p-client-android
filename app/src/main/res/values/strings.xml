@@ -2,7 +2,8 @@
 <resources>
     <string name="app_name">Give2Peer</string>
 
-    <string name="action_settings">Settings</string>
+    <string name="menu_action_settings">Settings</string>
+    <string name="menu_action_report_bug">Report Bug</string>
 
     <string name="title_activity_settings">Give2Peer - Settings</string>
     <string name="title_activity_new_item">Give2Peer - New Item</string>
@@ -35,12 +36,10 @@
     <string name="button_map">Find on map</string>
     <string name="button_give">Give</string>
     <string name="button_spot">Spot</string>
-    <string name="button_bug">Report a bug</string>
     <string name="button_find_label">List items close to the provided location.</string>
     <string name="button_map_label">Browse on a map for items close to the provided location.</string>
     <string name="button_give_label">When you want to give something for free.</string>
     <string name="button_spot_label">When you see something lost or waiting to be recycled.</string>
-    <string name="button_bug_label">This is a beta version. If you experience a bug or a crash, please report it.</string>
 
     <string name="settings_category_servers">Servers</string>
     <string name="settings_server_name">Name</string>
