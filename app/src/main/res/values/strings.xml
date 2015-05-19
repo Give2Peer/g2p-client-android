@@ -49,6 +49,7 @@
     <string name="settings_server_forget">Forget this server</string>
     <string name="settings_server_test">Test the server</string>
     <string name="settings_server_add">Add a server</string>
+    <string name="settings_server_choose">Choose a server</string>
     <string name="settings_category_locations">Locations</string>
     <string name="settings_location_name">Name</string>
     <string name="settings_location_address">Address</string>

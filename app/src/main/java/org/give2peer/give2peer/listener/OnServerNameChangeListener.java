@@ -7,7 +7,6 @@ import org.give2peer.give2peer.entity.Server;
 
 public class OnServerNameChangeListener extends OnServerAttributeChangeListener
 {
-    Server server;
     PreferenceScreen screen;
     public OnServerNameChangeListener(Server server, PreferenceScreen screen)
     {

@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-    <!--<PreferenceCategory android:title="Server"/>-->
     <ListPreference
         android:key="current_server_id"
-        android:title="Select a server"
+        android:title="@string/settings_server_choose"
         android:icon="@drawable/ic_expand_more_black_36dp"
         />
 </PreferenceScreen>

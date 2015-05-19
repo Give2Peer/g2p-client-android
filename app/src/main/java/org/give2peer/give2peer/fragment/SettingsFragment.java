@@ -3,6 +3,7 @@ package org.give2peer.give2peer.fragment;
 import android.content.Context;
 import android.os.Bundle;
 import android.preference.EditTextPreference;
+import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.Preference.OnPreferenceChangeListener;
 import android.preference.Preference.OnPreferenceClickListener;
@@ -10,6 +11,8 @@ import android.preference.PreferenceCategory;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
+import android.util.Log;
+import android.widget.ListAdapter;
 
 import org.give2peer.give2peer.Application;
 import org.give2peer.give2peer.R;
@@ -23,6 +26,7 @@ import org.give2peer.give2peer.listener.OnServerPasswordChangeListener;
 import org.give2peer.give2peer.listener.OnServerUrlChangeListener;
 import org.give2peer.give2peer.listener.OnServerUsernameChangeListener;
 import org.give2peer.give2peer.listener.OnTestServerClickListener;
+import org.give2peer.give2peer.preference.ServerChooserPreference;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -52,6 +56,11 @@ public class SettingsFragment extends PreferenceFragment
     protected List<OnPreferenceChangeListener> notGarbageChangeListeners = new ArrayList<>();
     protected List<OnPreferenceClickListener>  notGarbageClickListeners  = new ArrayList<>();
 
+    protected List<PreferenceScreen> serversEditScreens = new ArrayList<>();
+
+    // Probably makes sure that it is not garbage-collected either, because it too has listeners
+    protected ServerChooserPreference scp;
+
     /**
      * A internal collection of servers, rebuilt from database on each view refresh,
      * which is on creation of the fragment and adding of a server. (and maybe deletion)
@@ -71,7 +80,7 @@ public class SettingsFragment extends PreferenceFragment
         super.onCreate(savedInstanceState);
 
         // Load the preferences from an XML resource
-        // We'll need that later when we'll have static preferences
+        // We'll need that later when we'll have static preferences (if we ever do)
         // Android actually needs it now too, it seems, to instantiate stuff internally
         addPreferencesFromResource(R.xml.preferences);
 
@@ -79,6 +88,11 @@ public class SettingsFragment extends PreferenceFragment
     }
 
     public void refreshView()
+    {
+        refreshView(false);
+    }
+
+    public void refreshView(boolean openLastServer)
     {
         // We can only do this using a Reflection hack I don't like. Too bad. And, also, WTF?
         // pm.inflateFromResource((Context) getActivity(), R.xml.server_editor, null)
@@ -100,12 +114,11 @@ public class SettingsFragment extends PreferenceFragment
         // Empty the memoization caches
         //servers.clear();
         //locations.clear();
+        serversEditScreens.clear();
 
 
         /// THE SERVERS ////////////////////////////////////////////////////////////////////////////
 
-        // List the server configurations
-        List<Server> serversList = Server.listAll(Server.class);
 
         // Create the Server category
         PreferenceCategory cat = new PreferenceCategory(context);
@@ -116,16 +129,29 @@ public class SettingsFragment extends PreferenceFragment
         // This code can possibly be improved by much, remember.
         getPreferenceScreen().addPreference(cat);
 
+        // Select the server
+        ListPreference serverChooser = new ListPreference(context);
+        serverChooser.setTitle(app.getString(R.string.settings_server_choose));
+        serverChooser.setKey("current_server_id");
+        serverChooser.setIcon(R.drawable.ic_expand_more_black_36dp);
+        // The ServerChooserPreference fills the list with appropriate values
+        // It would probably be best to have ServerChooserPreference extend ListPreference
+        scp = new ServerChooserPreference(getActivity(), serverChooser, false);
+        cat.addPreference(serverChooser);
 
+        // List the server configurations
+        List<Server> serversList = Server.listAll(Server.class);
         for (int i=0; i<serversList.size(); i++) {
             Server server = serversList.get(i);
-
-            //servers.put(server.getId(), server);
 
             // Create a sub-screen for that server
             PreferenceScreen screen = pm.createPreferenceScreen(context);
             screen.setTitle(server.getName());
             screen.setIcon(R.drawable.ic_edit_black_36dp);
+            if (i == serversList.size()-1) screen.setKey("last_server_edit");
+
+            // Store it so that we may navigate to it procedurally when adding a new one
+            serversEditScreens.add(screen);
 
             // Our change or click listeners, that will update the database and the UI
             OnPreferenceChangeListener nameListener     = new OnServerNameChangeListener(server, screen);
@@ -201,7 +227,7 @@ public class SettingsFragment extends PreferenceFragment
             public boolean onPreferenceClick(Preference preference) {
                 Server newServer = (new Server()).loadDummy();
                 newServer.save();
-                refreshView();
+                refreshView(true);
                 return true;
             }
         });
@@ -284,5 +310,34 @@ public class SettingsFragment extends PreferenceFragment
         });
 
         locationsCategory.addPreference(addLocation);
+
+        // Open the appropriate preference screen
+        // This is harder than it seems, and probably harder than it should be.
+        // We cannot extend PreferenceScreen (it is declared final)
+        // We cannot call showDialog(), because it is private (whyyyyy?)
+        // We cannot use getDialog().show() because the dialog is not instantiated...
+        //serversEditScreens.get(serversEditScreens.size()-1).getDialog().show();
+        // We cannot call performClick() (but... but... why?)
+        //serversEditScreens.get(serversEditScreens.size()-1).performClick()
+        // Therefore, we're simulating a click
+//        if (openLastServer) {
+//            int pos = findPreference("last_server_edit").getOrder();
+//            Log.i("G2P", "Position of last server :"+pos);
+//
+//            ListAdapter listAdapter = getPreferenceScreen().getRootAdapter();
+////            EditTextPreference editPreference = (EditTextPreference) findPreference("set_password_preference");
+//
+//            Preference editPreference = findPreference("last_server_edit");
+//
+//            int itemsCount = listAdapter.getCount();
+//            for (int itemNumber = 0; itemNumber < itemsCount; itemNumber++) {
+//                if (listAdapter.getItem(itemNumber).equals(editPreference)) {
+//                    getPreferenceScreen().onItemClick(null, null, itemNumber, 0);
+//                    break;
+//                }
+//            }
+//
+//            //getPreferenceScreen().onItemClick(null, null, pos, 0);
+//        }
     }
 }

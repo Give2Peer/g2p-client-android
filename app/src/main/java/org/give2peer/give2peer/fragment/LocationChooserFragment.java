@@ -173,9 +173,6 @@ public class LocationChooserFragment extends PreferenceFragment
                             .setNegativeButton("No", new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
-                                    // Enable the button
-                                    detector.setEnabled(true);
-                                    detector.setIcon(R.drawable.ic_my_location_black_36dp); // use styles -_-
                                     // Dismiss the dialog
                                     dialog.dismiss();
                                 }
@@ -183,6 +180,11 @@ public class LocationChooserFragment extends PreferenceFragment
 
                     final AlertDialog alert = builder.create();
                     alert.show();
+
+                    // Enable the button
+                    detector.setEnabled(true);
+                    detector.setIcon(R.drawable.ic_my_location_black_36dp); // use styles -
+
                     return false;
                 }
 
