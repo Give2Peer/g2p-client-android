@@ -15,7 +15,9 @@ import org.give2peer.give2peer.entity.Location;
 
 import java.util.ArrayList;
 
-
+/**
+ * @Deprecated
+ */
 public class FindItemsTask extends AsyncTask<Void, Void, ArrayList<Item>>
 {
     int page;

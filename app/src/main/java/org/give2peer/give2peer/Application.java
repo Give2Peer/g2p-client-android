@@ -16,6 +16,7 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.google.android.gms.maps.model.LatLng;
 import com.orm.SugarApp;
 
 import org.give2peer.give2peer.entity.Location;
@@ -160,6 +161,11 @@ public class Application extends SugarApp
     {
         this.location = location;
         saveGeoLocation();
+    }
+
+    public LatLng getGeoLocationLatLng()
+    {
+        return new LatLng(location.getLatitude(), location.getLongitude());
     }
 
     public Date getLastLocatedDate()

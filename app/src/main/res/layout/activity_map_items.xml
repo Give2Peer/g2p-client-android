@@ -14,13 +14,29 @@
         android:layout_height="match_parent"
         />
 
+    <FrameLayout
+        android:id="@+id/mapItemsDrawFrame"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        >
+
+        <Button
+            android:id="@+id/mapItemsDrawButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/button_find"
+            android:onClick="onDrawButton"
+            />
+    </FrameLayout>
+
     <ProgressBar
         style="?android:attr/progressBarStyleLarge"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/mapItemsProgressBar"
         android:layout_centerVertical="true"
-        android:layout_centerHorizontal="true"/>
+        android:layout_centerHorizontal="true"
+        />
 
 
 </RelativeLayout>
