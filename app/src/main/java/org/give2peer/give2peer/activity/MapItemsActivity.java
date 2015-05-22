@@ -26,6 +26,8 @@ import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.Projection;
 
+import com.google.android.gms.maps.model.Circle;
+import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
@@ -61,6 +63,7 @@ public class MapItemsActivity extends Activity implements OnMapReadyCallback
 
     int lineColor = 0xFFFF3399;
     int fillColor = 0x33FF3399;
+    int fillAlpha = 0x55000000;
 
 
     @Override
@@ -158,13 +161,27 @@ public class MapItemsActivity extends Activity implements OnMapReadyCallback
                     exception = e;
                 }
 
-                // fixme: remove duplicates (comparing getId should probably work)
-                // will probably not work ---> it does NOT
                 //if (items.removeAll(displayedItems)) Log.w("G2P", "HEEEEEEY IT WORKS !");
+                // will probably not work ---> it does NOT
 
-                displayedItems.addAll(items);
+                // Remove duplicates (comparing getId)
+                // This task should probably be done by a ItemsCache or some such
+                ArrayList<Item> newItems = new ArrayList<Item>();
+                for (Item newItem : items) {
+                    boolean alreadyThere = false;
+                    for (Item oldItem: displayedItems) {
+                        if (newItem.getId() == oldItem.getId()) {
+                            alreadyThere = true;
+                            break;
+                        }
+                    }
+                    if (!alreadyThere) newItems.add(newItem);
+                }
 
-                return items;
+                // Add to the cache
+                displayedItems.addAll(newItems);
+
+                return newItems;
             }
 
             @Override
@@ -182,30 +199,44 @@ public class MapItemsActivity extends Activity implements OnMapReadyCallback
                     return;
                 }
 
-                // Collect the LatLngs to zoom and pan the camera ideally
-                LatLngBounds.Builder bc = new LatLngBounds.Builder();
-
                 int itemsCount = items.size();
 
-                for (int i=0; i<itemsCount; i++) {
-                    Item item = items.get(i);
+                if (itemsCount == 0) {
+                    // There were no items found
+                    app.toast("No items were found in this area.", Toast.LENGTH_LONG);
+                } else {
+                    // Collect the LatLngs to zoom and pan the camera ideally
+                    LatLngBounds.Builder bc = new LatLngBounds.Builder();
 
-                    bc.include(item.getLatLng());
+                    for (int i=0; i<itemsCount; i++) {
+                        Item item = items.get(i);
 
-                    Marker m = googleMap.addMarker(
-                            new MarkerOptions()
-                                    .position(item.getLatLng())
-                                    .title(item.getTitle())
-                                    .snippet(item.getHumanDistance())
-                    );
+                        bc.include(item.getLatLng());
 
-                    dropPinEffect(m, Math.round(i*222 + 222 * 0.618 * 0.618 * Math.random()));
+                        Marker m = googleMap.addMarker(
+                                new MarkerOptions()
+                                        .position(item.getLatLng())
+                                        .title(item.getTitle())
+                                        .snippet(item.getHumanDistance())
+                        );
 
-                    // We also map the markers to the items for the click callback
-                    markerItemHashMap.put(m, item);
+                        dropPinEffect(m, Math.round(i*222 + 222 * 0.618 * 0.618 * Math.random()));
+
+                        // We also map the markers to the items for the click callback
+                        markerItemHashMap.put(m, item);
+                    }
+
+                    // Pan and zoom the camera
+                    googleMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bc.build(), 55));
+
+                    // Hide the drawn region, and draw a circle instead
+                    // This is a cheap solution to the problem of performance, as users may draw BIG regions
+                    // Items are sorted by distance, so we are grabbing the last one
+                    double radius = items.get(itemsCount-1).getDistance();
+                    hideRegion();
+                    drawCircleOnMap(googleMap, where, radius);
                 }
 
-                googleMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bc.build(), 55));
 
 
                 // Hmmmm... This is pretty bad.
@@ -344,14 +375,15 @@ public class MapItemsActivity extends Activity implements OnMapReadyCallback
     
     Polygon  drawnPolygon;
     Polyline drawnPolyline;
+    Circle   drawnCircle;
 
     public void hideRegion()
     {
         if (drawnPolygon != null)  drawnPolygon.remove();
     }
 
-    public void drawPolygonOnMap(GoogleMap googleMap, Iterable<LatLng> polygonLatLngs) {
-
+    public void drawPolygonOnMap(GoogleMap googleMap, Iterable<LatLng> polygonLatLngs)
+    {
         if (drawnPolygon != null)  drawnPolygon.remove();
         if (drawnPolyline != null) drawnPolyline.remove();
 
@@ -364,17 +396,33 @@ public class MapItemsActivity extends Activity implements OnMapReadyCallback
         drawnPolygon = googleMap.addPolygon(options);
     }
 
-    public void drawPolylineOnMap(GoogleMap googleMap, Iterable<LatLng> lineLatLngs) {
-
+    public void drawPolylineOnMap(GoogleMap googleMap, Iterable<LatLng> lineLatLngs)
+    {
         if (drawnPolyline != null) drawnPolyline.remove();
 
         PolylineOptions options = new PolylineOptions();
         options.addAll(lineLatLngs);
-        options.color((lineColor & 0x00FFFFFF) + 0x77000000); // set alpha to 77
+        options.color((lineColor & 0x00FFFFFF) + fillAlpha);
         options.width(7);
 
         drawnPolyline = googleMap.addPolyline(options);
     }
+
+    public void drawCircleOnMap(GoogleMap googleMap, LatLng center, double radius)
+    {
+        if (drawnCircle != null) drawnCircle.remove();
+
+        CircleOptions options = new CircleOptions();
+        options.center(center);
+        options.radius(radius);
+        options.strokeColor(lineColor);
+        options.fillColor((lineColor & 0x00FFFFFF) + fillAlpha);
+        options.strokeWidth(7);
+
+        drawnCircle = googleMap.addCircle(options);
+    }
+
+
 
     protected LatLng getCentroidLatLng(List<LatLng> latLngs)
     {
