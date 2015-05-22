@@ -14,6 +14,7 @@
     <uses-feature android:name="android.hardware.camera.front" android:required="false" />
 
     <!-- todo: required=false, and disable the map if OpenGL ES 2 is unavailable -->
+    <!--       this is a very low-priority task as the map is a critical component -->
     <uses-feature android:glEsVersion="0x00020000"             android:required="true" />
 
     <application
@@ -30,7 +31,7 @@
             android:value="give2peer.db" />
         <meta-data
             android:name="VERSION"
-            android:value="7" />
+            android:value="7" /> <!-- Every time the database structure changes, increment this -->
         <meta-data
             android:name="QUERY_LOG"
             android:value="true" />
