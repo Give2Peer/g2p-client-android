@@ -7,7 +7,7 @@ android {
     defaultConfig {
 
         applicationId "org.give2peer.give2peer"
-        minSdkVersion 16
+        minSdkVersion 10
         targetSdkVersion 21
         versionCode 1
         versionName "1.0"
@@ -32,12 +32,21 @@ android {
         exclude 'META-INF/LICENSE.txt'
         exclude 'LICENSE.txt'
     }
+
+}
+
+repositories {
+    mavenCentral()
+    // for
+    //maven { url "http://nexus.antczak.org/content/repositories/thirdparty/" }
 }
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     // BACKWARDS COMPATIBILITY
     compile 'com.android.support:appcompat-v7:22.1.1'
+    compile 'com.github.machinarius:preferencefragment:0.1.1'
+    //compile 'com.android.support:support-v4-preferencefragment:1.0.0'
     // GOOGLE API CLIENT (new geolocation also goes through this, but we're still using old-school)
     //compile 'com.google.android.gms:play-services:7.3.0'
     // MAPS GOOGLE API (more targeted dependency than above)

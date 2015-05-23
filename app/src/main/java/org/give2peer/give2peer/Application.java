@@ -12,6 +12,7 @@ import android.location.Geocoder;
 import android.media.ExifInterface;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.Build;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.Toast;
@@ -251,6 +252,11 @@ public class Application extends SugarApp
         criteria.setAccuracy(Criteria.ACCURACY_FINE);
 
         return criteria;
+    }
+
+    public boolean canSetIcons()
+    {
+        return (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB);
     }
 
     // UTILS ///////////////////////////////////////////////////////////////////////////////////////

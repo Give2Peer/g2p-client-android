@@ -2,14 +2,22 @@ package org.give2peer.give2peer.activity;
 
 import android.app.Activity;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Point;
 import android.location.Location;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.SystemClock;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
+import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.BounceInterpolator;
@@ -26,6 +34,7 @@ import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.Projection;
 
+import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
@@ -46,7 +55,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 
-public class MapItemsActivity extends Activity implements OnMapReadyCallback
+public class MapItemsActivity extends ActionBarActivity implements OnMapReadyCallback
 {
     Application app;
 
@@ -86,10 +95,54 @@ public class MapItemsActivity extends Activity implements OnMapReadyCallback
             finish();
         }
 
-        MapFragment mapFragment = (MapFragment) getFragmentManager()
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.mapItemsFragment);
         mapFragment.getMapAsync(this);
 
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu)
+    {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item)
+    {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        if (id == R.id.menu_action_settings) {
+            Intent intent = new Intent(this, SettingsActivity.class);
+            startActivity(intent);
+            return true;
+        }
+        if (id == R.id.menu_action_add_item) {
+            Intent intent = new Intent(this, NewItemActivity.class);
+            startActivity(intent);
+            return true;
+        }
+        if (id == R.id.menu_action_report_bug) {
+            reportBug();
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+
+    //// ACTIONS ///////////////////////////////////////////////////////////////////////////////////
+
+    public void reportBug()
+    {
+        Intent i = new Intent(Intent.ACTION_VIEW);
+        i.setData(Uri.parse(Application.REPORT_BUG_URL));
+        startActivity(i);
     }
 
     protected boolean isFinding()
@@ -300,16 +353,24 @@ public class MapItemsActivity extends Activity implements OnMapReadyCallback
                         switch (eventAction) {
                             case MotionEvent.ACTION_MOVE: // the finger moves on the screen
                                 drawingCoordinates.add(latLng);
-                                drawPolylineOnMap(googleMap, drawingCoordinates);
+                                //drawPolylineOnMap(googleMap, drawingCoordinates);
+                                LatLng center = drawingCoordinates.get(0);
+                                float[] results = new float[3];
+                                android.location.Location.distanceBetween(
+                                        center.latitude, center.longitude,
+                                        latLng.latitude, latLng.longitude,
+                                        results);
+                                float distance = results[0];
+                                drawCircleOnMap(googleMap, center, distance);
                                 break;
 
                             case MotionEvent.ACTION_DOWN: // the finger touches the screen
                                 drawingCoordinates.add(latLng);
-                                drawPolylineOnMap(googleMap, drawingCoordinates);
+                                //drawPolylineOnMap(googleMap, drawingCoordinates);
                                 break;
 
                             case MotionEvent.ACTION_UP:   // the finger leaves the screen
-                                drawPolygonOnMap(googleMap, drawingCoordinates);
+                                //drawPolygonOnMap(googleMap, drawingCoordinates);
 
                                 isDrawing = false;
                                 LatLng centroid = getCentroidLatLng(drawingCoordinates);

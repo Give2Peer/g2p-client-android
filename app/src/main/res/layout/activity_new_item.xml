@@ -23,14 +23,14 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="13dp">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:text="@string/new_item_label_title"
-            android:id="@+id/newItemTitleTextView"
-            android:labelFor="@+id/newItemTitleEditText"
-            android:gravity="center" />
+        <!--<TextView-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="match_parent"-->
+            <!--android:textAppearance="?android:attr/textAppearanceMedium"-->
+            <!--android:text="@string/new_item_label_title"-->
+            <!--android:id="@+id/newItemTitleTextView"-->
+            <!--android:labelFor="@+id/newItemTitleEditText"-->
+            <!--android:gravity="center" />-->
 
         <EditText
             android:layout_width="match_parent"
@@ -39,14 +39,17 @@
             android:maxLength="32"
             android:maxLines="1"
             android:inputType="text|textAutoComplete|textAutoCorrect"
-            android:layout_marginStart="10dp" />
+            android:layout_marginStart="10dp"
+            android:hint="@string/new_item_label_title"
+            />
     </LinearLayout>
 
-    <fragment android:name="org.give2peer.give2peer.fragment.LocationChooserFragment"
-              android:id="@+id/newItemLocationChooserFragment"
-              android:layout_width="match_parent"
-              android:layout_height="wrap_content" />
+    <!--<fragment android:name="org.give2peer.give2peer.fragment.LocationChooserFragment"-->
+              <!--android:id="@+id/newItemLocationChooserFragment"-->
+              <!--android:layout_width="match_parent"-->
+              <!--android:layout_height="wrap_content" />-->
 
+    <!-- THE SUBMIT BUTTON AND THE SUBMISSION PROGRESSBAR -->
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="fill_parent"

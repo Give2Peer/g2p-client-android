@@ -55,5 +55,6 @@
     <string name="settings_location_address">Address</string>
     <string name="settings_location_forget">Forget this location</string>
     <string name="settings_location_add">Add a location</string>
+    <string name="menu_action_add_item">Add</string>
 
 </resources>

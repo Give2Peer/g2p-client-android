@@ -1,9 +1,14 @@
 package org.give2peer.give2peer.fragment;
 
+import android.annotation.TargetApi;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.ListPreference;
 import android.preference.Preference;
+//import android.preference.PreferenceFragment;
+//import android.support.v4.
+//import android.support.v4.app.FragmentManager;
 import android.preference.PreferenceFragment;
 import android.util.Log;
 

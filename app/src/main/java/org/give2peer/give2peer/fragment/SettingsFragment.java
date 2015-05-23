@@ -1,18 +1,25 @@
 package org.give2peer.give2peer.fragment;
 
+import android.annotation.TargetApi;
 import android.content.Context;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.EditTextPreference;
+//import android.preference.ListPreference;
 import android.preference.ListPreference;
-import android.preference.Preference;
 import android.preference.Preference.OnPreferenceChangeListener;
 import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.PreferenceCategory;
-import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
+
+import android.preference.Preference;
+//import android.support.v4.preference.PreferenceFragment;
+
 import android.util.Log;
 import android.widget.ListAdapter;
+
+import com.github.machinarius.preferencefragment.PreferenceFragment;
 
 import org.give2peer.give2peer.Application;
 import org.give2peer.give2peer.R;
@@ -34,6 +41,7 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
+ * THIS FILE IS BAD. BAD, BAD, BAD. Dirty hacks, inefficient code, bloat, it's got it all.
  * We are procedurally generating most of the settings, from our SQLite-persisted servers and
  * locations.
  * This is probably not the best way to do this, but it gives the app a nice feel.
@@ -49,6 +57,8 @@ import java.util.List;
  *   [edit] Home
  *   [edit] Office
  *   [edit] Somewhere else
+ *   [add]
+ *
  */
 public class SettingsFragment extends PreferenceFragment
 {
@@ -103,9 +113,11 @@ public class SettingsFragment extends PreferenceFragment
         final Application app = (Application) getActivity().getApplication();
         Context context = (Context) getActivity();
         PreferenceManager pm = getPreferenceManager();
+        boolean canSetIcons = app.canSetIcons();
 
         // Freshen the screen
         getPreferenceScreen().removeAll();
+        setPreferenceScreen(pm.createPreferenceScreen(context));
 
         // Remove all the (old) listeners, so that the GC can eat them
         notGarbageChangeListeners.clear();
@@ -123,6 +135,7 @@ public class SettingsFragment extends PreferenceFragment
         // Create the Server category
         PreferenceCategory cat = new PreferenceCategory(context);
         cat.setTitle(app.getString(R.string.settings_category_servers));
+        cat.setEnabled(true); // test
 
         // The category MUST be added to the root node BEFORE we add screens to it
         // (something about injected deps like PreferenceManager, probably)
@@ -133,7 +146,7 @@ public class SettingsFragment extends PreferenceFragment
         ListPreference serverChooser = new ListPreference(context);
         serverChooser.setTitle(app.getString(R.string.settings_server_choose));
         serverChooser.setKey("current_server_id");
-        serverChooser.setIcon(R.drawable.ic_expand_more_black_36dp);
+        if (canSetIcons) serverChooser.setIcon(R.drawable.ic_expand_more_black_36dp);
         // The ServerChooserPreference fills the list with appropriate values
         // It would probably be best to have ServerChooserPreference extend ListPreference
         scp = new ServerChooserPreference(getActivity(), serverChooser, false);
@@ -146,9 +159,23 @@ public class SettingsFragment extends PreferenceFragment
 
             // Create a sub-screen for that server
             PreferenceScreen screen = pm.createPreferenceScreen(context);
+
             screen.setTitle(server.getName());
-            screen.setIcon(R.drawable.ic_edit_black_36dp);
+            //screen.setWidgetLayoutResource(R.xml.preferences);
+            //screen.getDialog().getWindow().setBackgroundDrawableResource(android.R.color.white);
+            if (canSetIcons) screen.setIcon(R.drawable.ic_edit_black_36dp);
             if (i == serversList.size()-1) screen.setKey("last_server_edit");
+
+            // What a hack ! -- This is to make sure the background of second-level subscreens
+            // is white on API 10. Otherwise, it's black on black and we cannot see a thing.
+            screen.setOnPreferenceClickListener(new OnPreferenceClickListener() {
+                @Override
+                public boolean onPreferenceClick(Preference preference) {
+                    PreferenceScreen a = (PreferenceScreen) preference;
+                    a.getDialog().getWindow().setBackgroundDrawableResource(android.R.color.white);
+                    return false;
+                }
+            });
 
             // Store it so that we may navigate to it procedurally when adding a new one
             serversEditScreens.add(screen);
@@ -203,7 +230,7 @@ public class SettingsFragment extends PreferenceFragment
             if (i > 0) {
                 Preference delServer = new Preference(context);
                 delServer.setTitle(app.getString(R.string.settings_server_forget));
-                delServer.setIcon(R.drawable.ic_remove_circle_outline_black_36dp);
+                if (canSetIcons) delServer.setIcon(R.drawable.ic_remove_circle_outline_black_36dp);
                 delServer.setOnPreferenceClickListener(forgetListener);
                 screen.addPreference(delServer);
             }
@@ -211,7 +238,8 @@ public class SettingsFragment extends PreferenceFragment
             // Test this server configuration
             Preference testServer = new Preference(context);
             testServer.setTitle(app.getString(R.string.settings_server_test));
-            testServer.setIcon(R.drawable.ic_signal_wifi_statusbar_not_connected_black_36dp);
+            if (canSetIcons)
+                testServer.setIcon(R.drawable.ic_signal_wifi_statusbar_not_connected_black_36dp);
             testServer.setOnPreferenceClickListener(new OnTestServerClickListener(this, server));
             screen.addPreference(testServer);
 
@@ -221,7 +249,7 @@ public class SettingsFragment extends PreferenceFragment
         // Add server button
         Preference addServer = new Preference(context);
         addServer.setTitle(app.getString(R.string.settings_server_add));
-        addServer.setIcon(R.drawable.ic_add_circle_outline_black_36dp);
+        if (canSetIcons) addServer.setIcon(R.drawable.ic_add_circle_outline_black_36dp);
         addServer.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
@@ -258,7 +286,19 @@ public class SettingsFragment extends PreferenceFragment
 
             PreferenceScreen screen = pm.createPreferenceScreen(context);
             screen.setTitle(location.getName());
-            screen.setIcon(R.drawable.ic_edit_black_36dp);
+            if (canSetIcons) screen.setIcon(R.drawable.ic_edit_black_36dp);
+
+            // What a hack ! -- This is to make sure the background of second-level subscreens
+            // is white on API 10. Otherwise, it's black on black and we cannot see a thing.
+            screen.setOnPreferenceClickListener(new OnPreferenceClickListener() {
+                @Override
+                public boolean onPreferenceClick(Preference preference)
+                {
+                    PreferenceScreen a = (PreferenceScreen) preference;
+                    a.getDialog().getWindow().setBackgroundDrawableResource(android.R.color.white);
+                    return false;
+                }
+            });
 
             // Our change and click listeners, that will update the database and the UI
             OnPreferenceChangeListener nameListener   = new OnLocationNameChangeListener(location, screen);
@@ -288,7 +328,7 @@ public class SettingsFragment extends PreferenceFragment
             // Forget this location
             Preference delLocation = new Preference(context);
             delLocation.setTitle(app.getString(R.string.settings_location_forget));
-            delLocation.setIcon(R.drawable.ic_remove_circle_outline_black_36dp);
+            if (canSetIcons) delLocation.setIcon(R.drawable.ic_remove_circle_outline_black_36dp);
             delLocation.setOnPreferenceClickListener(forgetListener);
             screen.addPreference(delLocation);
 
@@ -298,7 +338,7 @@ public class SettingsFragment extends PreferenceFragment
         // Add a location
         Preference addLocation = new Preference(context);
         addLocation.setTitle(app.getString(R.string.settings_location_add));
-        addLocation.setIcon(R.drawable.ic_add_circle_outline_black_36dp);
+        if (canSetIcons) addLocation.setIcon(R.drawable.ic_add_circle_outline_black_36dp);
         addLocation.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
