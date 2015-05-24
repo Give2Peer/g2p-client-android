@@ -37,8 +37,6 @@ android {
 
 repositories {
     mavenCentral()
-    // for
-    //maven { url "http://nexus.antczak.org/content/repositories/thirdparty/" }
 }
 
 dependencies {
@@ -46,7 +44,6 @@ dependencies {
     // BACKWARDS COMPATIBILITY
     compile 'com.android.support:appcompat-v7:22.1.1'
     compile 'com.github.machinarius:preferencefragment:0.1.1'
-    //compile 'com.android.support:support-v4-preferencefragment:1.0.0'
     // GOOGLE API CLIENT (new geolocation also goes through this, but we're still using old-school)
     //compile 'com.google.android.gms:play-services:7.3.0'
     // MAPS GOOGLE API (more targeted dependency than above)

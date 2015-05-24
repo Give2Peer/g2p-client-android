@@ -1,19 +1,12 @@
 package org.give2peer.give2peer.activity;
 
-import android.app.Activity;
-
 import android.content.Intent;
-import android.graphics.Color;
 import android.graphics.Point;
-import android.location.Location;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.SystemClock;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.FragmentManager;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
@@ -30,7 +23,6 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.Projection;
 
@@ -195,8 +187,12 @@ public class MapItemsActivity extends ActionBarActivity implements OnMapReadyCal
     GoogleMap googleMap;
     AsyncTask finder;
 
-
     public AsyncTask executeFinderTask(final LatLng where)
+    {
+        return executeFinderTask(where, null);
+    }
+
+    public AsyncTask executeFinderTask(final LatLng where, final List<LatLng> container)
     {
         showLoader();
         finder = new AsyncTask<Void, Void, ArrayList<Item>>()
@@ -229,6 +225,17 @@ public class MapItemsActivity extends ActionBarActivity implements OnMapReadyCal
                         }
                     }
                     if (!alreadyThere) newItems.add(newItem);
+                }
+
+                // Remove items outside of container polygon (if specified)
+                items = newItems;
+                newItems = new ArrayList<Item>();
+                if (container != null) {
+                    for (Item item : items) {
+                        if (pointInPolygon(item.getLatLng(), container)) {
+                            newItems.add(item);
+                        }
+                    }
                 }
 
                 // Add to the cache
@@ -280,14 +287,14 @@ public class MapItemsActivity extends ActionBarActivity implements OnMapReadyCal
                     }
 
                     // Pan and zoom the camera
-                    googleMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bc.build(), 55));
+                    //googleMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bc.build(), 55));
 
                     // Hide the drawn region, and draw a circle instead
                     // This is a cheap solution to the problem of performance, as users may draw BIG regions
                     // Items are sorted by distance, so we are grabbing the last one
-                    double radius = items.get(itemsCount-1).getDistance();
-                    hideRegion();
-                    drawCircleOnMap(googleMap, where, radius);
+//                    double radius = items.get(itemsCount-1).getDistance();
+//                    hideRegion();
+//                    drawCircleOnMap(googleMap, where, radius);
                 }
 
 
@@ -353,31 +360,43 @@ public class MapItemsActivity extends ActionBarActivity implements OnMapReadyCal
                         switch (eventAction) {
                             case MotionEvent.ACTION_MOVE: // the finger moves on the screen
                                 drawingCoordinates.add(latLng);
-                                //drawPolylineOnMap(googleMap, drawingCoordinates);
-                                LatLng center = drawingCoordinates.get(0);
-                                float[] results = new float[3];
-                                android.location.Location.distanceBetween(
-                                        center.latitude, center.longitude,
-                                        latLng.latitude, latLng.longitude,
-                                        results);
-                                float distance = results[0];
-                                drawCircleOnMap(googleMap, center, distance);
+                                drawPolylineOnMap(googleMap, drawingCoordinates);
+
+//                                LatLng center = drawingCoordinates.get(0);
+//                                float[] results = new float[3];
+//                                android.location.Location.distanceBetween(
+//                                        center.latitude, center.longitude,
+//                                        latLng.latitude, latLng.longitude,
+//                                        results);
+//                                float distance = results[0];
+//                                drawCircleOnMap(googleMap, center, distance);
+
                                 break;
 
                             case MotionEvent.ACTION_DOWN: // the finger touches the screen
+                                drawingCoordinates.clear();
                                 drawingCoordinates.add(latLng);
-                                //drawPolylineOnMap(googleMap, drawingCoordinates);
+                                drawPolylineOnMap(googleMap, drawingCoordinates);
                                 break;
 
                             case MotionEvent.ACTION_UP:   // the finger leaves the screen
-                                //drawPolygonOnMap(googleMap, drawingCoordinates);
+                                drawPolygonOnMap(googleMap, drawingCoordinates);
 
                                 isDrawing = false;
-                                LatLng centroid = getCentroidLatLng(drawingCoordinates);
+
+                                LatLng centroid = getLatLngCentroid(drawingCoordinates);
                                 if (centroid != null) {
-                                    executeFinderTask(centroid);
+                                    // We need to make a copy of our drawn path, as we may clear it
+                                    // at any time (we're even clearing it right below)
+                                    List<LatLng> container = new ArrayList<LatLng>();
+                                    container.addAll(drawingCoordinates);
+                                    executeFinderTask(centroid, container);
                                 }
-                                drawingCoordinates.clear();
+
+                                // Zoom and pan the camera ideally around the drawn area
+                                googleMap.animateCamera(CameraUpdateFactory.newLatLngBounds(
+                                        getLatLngBounds(drawingCoordinates), 55
+                                ));
 
                                 break;
                         }
@@ -483,17 +502,81 @@ public class MapItemsActivity extends ActionBarActivity implements OnMapReadyCal
         drawnCircle = googleMap.addCircle(options);
     }
 
+    protected LatLngBounds getLatLngBounds(List<LatLng> latLngs)
+    {
+        LatLngBounds.Builder bc = new LatLngBounds.Builder();
+        for (LatLng latLng : latLngs) { bc.include(latLng); }
 
+        return bc.build();
+    }
 
-    protected LatLng getCentroidLatLng(List<LatLng> latLngs)
+    protected LatLng getLatLngCentroid(List<LatLng> latLngs)
     {
         if (latLngs.size() == 0) return null;
 
-        LatLngBounds.Builder bc = new LatLngBounds.Builder();
-        for (LatLng ll : latLngs) {
-            bc.include(ll);
+        return getLatLngBounds(latLngs).getCenter();
+    }
+
+    /**
+     * Ray casting alogrithm, see http://rosettacode.org/wiki/Ray-casting_algorithm
+     *
+     * @param point
+     * @param polygon The list of the vertices of the polygon, sequential and looping.
+     * @return whether the point is inside the polygon
+     */
+    public boolean pointInPolygon(LatLng point, List<LatLng> polygon) {
+        int crossings = 0;
+        int verticesCount = polygon.size();
+
+        // For each edge
+        for (int i = 0; i < verticesCount; i++) {
+            int j = (i + 1) % verticesCount;
+            LatLng a = polygon.get(i);
+            LatLng b = polygon.get(j);
+            if (rayCrossesSegment(point, a, b)) crossings++;
         }
 
-        return bc.build().getCenter();
+        // Odd number of crossings?
+        return crossings % 2 == 1;
+    }
+
+    /**
+     * Ray Casting algorithm checks, for each segment AB,
+     * Returns true if the point is
+     *   1) to the left of the segment and
+     *   2) not above nor below the segment.
+     *
+     * @param point
+     * @param a
+     * @param b
+     */
+    public boolean rayCrossesSegment(LatLng point, LatLng a, LatLng b) {
+        double px = point.longitude,
+               py = point.latitude,
+               ax = a.longitude,
+               ay = a.latitude,
+               bx = b.longitude,
+               by = b.latitude;
+        if (ay > by) {
+            ax = b.longitude;
+            ay = b.latitude;
+            bx = a.longitude;
+            by = a.latitude;
+        }
+        // Alter longitude to cater for 180 degree crossings
+        if (px < 0 || ax < 0 || bx < 0) { px += 360; ax += 360; bx += 360; }
+        // If the point has the same latitude as a or b, increase slightly py
+        if (py == ay || py == by) py += 0.00000001;
+        // If the point is above, below or to the right of the segment, it returns false
+        if ((py > by || py < ay) || (px > Math.max(ax, bx))) { return false; }
+        // If the point is not above, below or to the right and is to the left, return true
+        else if (px < Math.min(ax, bx))                      { return true;  }
+        // When the two above conditions are not met, compare the slopes of segment AB and AP
+        // to see if the point P is to the left of segment AB or not.
+        else {
+            double slopeAB = (ax != bx) ? ((by - ay) / (bx - ax)) : Double.POSITIVE_INFINITY;
+            double slopeAP = (ax != px) ? ((py - ay) / (px - ax)) : Double.POSITIVE_INFINITY;
+            return slopeAP >= slopeAB;
+        }
     }
 }
