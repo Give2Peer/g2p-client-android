@@ -17,6 +17,7 @@ import android.preference.Preference;
 //import android.support.v4.preference.PreferenceFragment;
 
 import android.util.Log;
+import android.view.Window;
 import android.widget.ListAdapter;
 
 import com.github.machinarius.preferencefragment.PreferenceFragment;
@@ -93,6 +94,12 @@ public class SettingsFragment extends PreferenceFragment
         // We'll need that later when we'll have static preferences (if we ever do)
         // Android actually needs it now too, it seems, to instantiate stuff internally
         addPreferencesFromResource(R.xml.preferences);
+    }
+
+    @Override
+    public void onResume()
+    {
+        super.onResume();
 
         refreshView();
     }
@@ -114,6 +121,8 @@ public class SettingsFragment extends PreferenceFragment
         Context context = (Context) getActivity();
         PreferenceManager pm = getPreferenceManager();
         boolean canSetIcons = app.canSetIcons();
+
+        //context.setTheme(R.style.Theme_AppCompat);
 
         // Freshen the screen
         getPreferenceScreen().removeAll();
@@ -159,23 +168,9 @@ public class SettingsFragment extends PreferenceFragment
 
             // Create a sub-screen for that server
             PreferenceScreen screen = pm.createPreferenceScreen(context);
-
             screen.setTitle(server.getName());
-            //screen.setWidgetLayoutResource(R.xml.preferences);
-            //screen.getDialog().getWindow().setBackgroundDrawableResource(android.R.color.white);
             if (canSetIcons) screen.setIcon(R.drawable.ic_edit_black_36dp);
             if (i == serversList.size()-1) screen.setKey("last_server_edit");
-
-            // What a hack ! -- This is to make sure the background of second-level subscreens
-            // is white on API 10. Otherwise, it's black on black and we cannot see a thing.
-            screen.setOnPreferenceClickListener(new OnPreferenceClickListener() {
-                @Override
-                public boolean onPreferenceClick(Preference preference) {
-                    PreferenceScreen a = (PreferenceScreen) preference;
-                    a.getDialog().getWindow().setBackgroundDrawableResource(android.R.color.white);
-                    return false;
-                }
-            });
 
             // Store it so that we may navigate to it procedurally when adding a new one
             serversEditScreens.add(screen);
@@ -288,18 +283,6 @@ public class SettingsFragment extends PreferenceFragment
             screen.setTitle(location.getName());
             if (canSetIcons) screen.setIcon(R.drawable.ic_edit_black_36dp);
 
-            // What a hack ! -- This is to make sure the background of second-level subscreens
-            // is white on API 10. Otherwise, it's black on black and we cannot see a thing.
-            screen.setOnPreferenceClickListener(new OnPreferenceClickListener() {
-                @Override
-                public boolean onPreferenceClick(Preference preference)
-                {
-                    PreferenceScreen a = (PreferenceScreen) preference;
-                    a.getDialog().getWindow().setBackgroundDrawableResource(android.R.color.white);
-                    return false;
-                }
-            });
-
             // Our change and click listeners, that will update the database and the UI
             OnPreferenceChangeListener nameListener   = new OnLocationNameChangeListener(location, screen);
             OnPreferenceChangeListener postalListener = new OnLocationPostalChangeListener(location);
@@ -379,5 +362,28 @@ public class SettingsFragment extends PreferenceFragment
 //
 //            //getPreferenceScreen().onItemClick(null, null, pos, 0);
 //        }
+    }
+
+
+    // Hack to set the bg color, 'cause of android bug. Nothing we can do about the title bg color?
+    // https://code.google.com/p/android/issues/detail?id=4611
+    // What a hack ! -- This is to make sure the background of second-level subscreens
+    // is of the appropriate color on API 10. Otherwise, we cannot see a thing.
+    @Override
+    public boolean onPreferenceTreeClick(PreferenceScreen preferenceScreen, Preference preference)
+    {
+        super.onPreferenceTreeClick(preferenceScreen, preference);
+        if (preference != null)
+            if (preference instanceof PreferenceScreen)
+                if (((PreferenceScreen) preference).getDialog() != null) {
+                    ((PreferenceScreen) preference).getDialog().getWindow().getDecorView()
+                            .setBackgroundColor(
+                                    getResources().getColor(R.color.background_material_dark)
+                            );
+                    // We also unset the title because it is useless AND its theme is buggy
+                    // Nope, nothing works. :( And setting the Title to null does not remove the bar
+                    //((PreferenceScreen) preference).getDialog().getWindow().requestFeature(Window.FEATURE_NO_TITLE);
+                }
+        return false;
     }
 }

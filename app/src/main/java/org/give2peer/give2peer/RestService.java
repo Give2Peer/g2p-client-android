@@ -52,7 +52,7 @@ public class RestService
      * The server limits the number of items sent in the response.
      * This constant is defined by the server.
      */
-    static int ITEMS_PER_PAGE = 32;
+    static int ITEMS_PER_PAGE = 128;
 
     static int UNAVAILABLE_USERNAME = 1;
     static int BANNED_FOR_ABUSE     = 2;
