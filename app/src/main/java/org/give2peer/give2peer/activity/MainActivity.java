@@ -82,7 +82,7 @@ public class MainActivity extends ActionBarActivity
 //            return true;
 //        }
 //        if (id == R.id.menu_action_report_bug) {
-//            reportBug();
+//            launchBugReport();
 //            return true;
 //        }
 //
@@ -132,7 +132,7 @@ public class MainActivity extends ActionBarActivity
         startActivity(intent);
     }
 
-//    public void reportBug()
+//    public void launchBugReport()
 //    {
 //        Intent i = new Intent(Intent.ACTION_VIEW);
 //        i.setData(Uri.parse(Application.REPORT_BUG_URL));

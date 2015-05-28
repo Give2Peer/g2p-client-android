@@ -75,21 +75,38 @@ public class MapItemsActivity extends ActionBarActivity implements OnMapReadyCal
 
         app = (Application) getApplication();
 
-        int availability = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(this);
+        GoogleApiAvailability gaa = GoogleApiAvailability.getInstance();
+        int availability = gaa.isGooglePlayServicesAvailable(this);
 
         // SUCCESS, SERVICE_MISSING, SERVICE_UPDATING, SERVICE_VERSION_UPDATE_REQUIRED,
         // SERVICE_DISABLED, SERVICE_INVALID
         // Read more: http://developer.android.com/google/play-services/setup.html
 
         if (availability != ConnectionResult.SUCCESS) {
-            app.toast("Google Play is unavailable or not up-to-date.");
-            GoogleApiAvailability.getInstance().getErrorDialog(this, availability, 0).show();
-            finish();
+            if (gaa.isUserResolvableError(availability)) {
+                app.toast("Google Play is unavailable or not up-to-date.");
+            } else {
+                app.toast("Google Play is unavailable or not up-to-date, and it is not resolvable.");
+            }
+            gaa.getErrorDialog(this, availability, 0).show();
+
+            //finish();
         }
 
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.mapItemsFragment);
-        mapFragment.getMapAsync(this);
+        // I never had a failure there, but better safe than sorry !
+        try {
+            SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
+                    .findFragmentById(R.id.mapItemsFragment);
+            mapFragment.getMapAsync(this);
+        } catch (Exception e) {
+            Log.e("G2P", "There was a problem loading the map fragment.");
+            Log.e("G2P", e.getMessage());
+            e.printStackTrace();
+
+            app.toast("Failed to load the map on this device. Sorry!");
+
+            // todo: show a help view, and/or the "report a bug" button.
+        }
 
     }
 
@@ -110,17 +127,15 @@ public class MapItemsActivity extends ActionBarActivity implements OnMapReadyCal
         int id = item.getItemId();
 
         if (id == R.id.menu_action_settings) {
-            Intent intent = new Intent(this, SettingsActivity.class);
-            startActivity(intent);
+            launchSettings();
             return true;
         }
         if (id == R.id.menu_action_add_item) {
-            Intent intent = new Intent(this, NewItemActivity.class);
-            startActivity(intent);
+            launchNewItem();
             return true;
         }
         if (id == R.id.menu_action_report_bug) {
-            reportBug();
+            launchBugReport();
             return true;
         }
 
@@ -130,11 +145,23 @@ public class MapItemsActivity extends ActionBarActivity implements OnMapReadyCal
 
     //// ACTIONS ///////////////////////////////////////////////////////////////////////////////////
 
-    public void reportBug()
+    public void launchBugReport()
     {
         Intent i = new Intent(Intent.ACTION_VIEW);
         i.setData(Uri.parse(Application.REPORT_BUG_URL));
         startActivity(i);
+    }
+
+    public void launchNewItem()
+    {
+        Intent intent = new Intent(this, NewItemActivity.class);
+        startActivity(intent);
+    }
+
+    public void launchSettings()
+    {
+        Intent intent = new Intent(this, SettingsActivity.class);
+        startActivity(intent);
     }
 
     protected boolean isFinding()
@@ -146,8 +173,7 @@ public class MapItemsActivity extends ActionBarActivity implements OnMapReadyCal
     {
         // 1. We are currently finding items, and this button is a CANCEL button.
         if (isFinding()) {
-            finder.cancel(true);
-            finder = null;
+            cancelFinderTask();
             hideLoader();
             hideRegion();
         }
@@ -184,6 +210,19 @@ public class MapItemsActivity extends ActionBarActivity implements OnMapReadyCal
         }
     }
 
+    protected void updateDrawButtonDelayed()
+    {
+        final Handler handler = new Handler();
+        handler.postDelayed(new Runnable()
+                            {
+                                @Override
+                                public void run()
+                                {
+                                    updateDrawButton();
+                                }
+                            }, 300);
+    }
+
     GoogleMap googleMap;
     AsyncTask finder;
 
@@ -194,7 +233,9 @@ public class MapItemsActivity extends ActionBarActivity implements OnMapReadyCal
 
     public AsyncTask executeFinderTask(final LatLng where, final List<LatLng> container)
     {
+        cancelFinderTask();
         showLoader();
+
         finder = new AsyncTask<Void, Void, ArrayList<Item>>()
         {
             Exception exception;
@@ -204,23 +245,20 @@ public class MapItemsActivity extends ActionBarActivity implements OnMapReadyCal
             {
                 ArrayList<Item> items = new ArrayList<Item>();
                 try {
-                    //app.geocodeLocationIfNeeded(l);
                     items = app.getRestService().findAround(where.latitude, where.longitude);
                 } catch (Exception e) {
                     exception = e;
                 }
 
-                //if (items.removeAll(displayedItems)) Log.w("G2P", "HEEEEEEY IT WORKS !");
-                // will probably not work ---> it does NOT
-
                 // Remove duplicates (comparing getId)
-                // This task should probably be done by a ItemsCache or some such
+                // This logic should probably reside in an ItemsCache or some such
                 ArrayList<Item> newItems = new ArrayList<Item>();
                 for (Item newItem : items) {
                     boolean alreadyThere = false;
                     for (Item oldItem: displayedItems) {
                         if (newItem.getId() == oldItem.getId()) {
                             alreadyThere = true;
+                            Log.d("G2P", "Item already fetched, and subsenquently ignored.");
                             break;
                         }
                     }
@@ -228,9 +266,9 @@ public class MapItemsActivity extends ActionBarActivity implements OnMapReadyCal
                 }
 
                 // Remove items outside of container polygon (if specified)
-                items = newItems;
-                newItems = new ArrayList<Item>();
                 if (container != null) {
+                    items = newItems;
+                    newItems = new ArrayList<Item>();
                     for (Item item : items) {
                         if (pointInPolygon(item.getLatLng(), container)) {
                             newItems.add(item);
@@ -252,11 +290,17 @@ public class MapItemsActivity extends ActionBarActivity implements OnMapReadyCal
                 // Hide the loader, whether there was an exception or not
                 hideLoader();
 
-                // Something went wrong with the request: warn the user and GTFO.
+                // Disable the Cancel button, it's too late to cancel now
+                findViewById(R.id.mapItemsDrawButton).setEnabled(false);
+
+                // Something went wrong with the request: probably no internet
                 if (null != exception) {
-                    app.toast(String.format("Failure: %s", exception.getMessage()), Toast.LENGTH_LONG);
-                    finish();
+                    exception.printStackTrace();
+                    findViewById(R.id.noInternetTextView).setVisibility(View.VISIBLE);
+                    updateDrawButtonDelayed();
                     return;
+                } else {
+                    findViewById(R.id.noInternetTextView).setVisibility(View.GONE);
                 }
 
                 int itemsCount = items.size();
@@ -280,7 +324,7 @@ public class MapItemsActivity extends ActionBarActivity implements OnMapReadyCal
                                         .snippet(item.getHumanDistance())
                         );
 
-                        dropPinEffect(m, Math.round(i*222 + 222 * 0.618 * 0.618 * Math.random()));
+                        dropPinEffect(m, Math.round(i * 222 + 222 * 0.618 * 0.618 * Math.random()));
 
                         // We also map the markers to the items for the click callback
                         markerItemHashMap.put(m, item);
@@ -304,16 +348,7 @@ public class MapItemsActivity extends ActionBarActivity implements OnMapReadyCal
                 // We could remove this hack by using a isFinished bool that we update ourselves
                 // but this solution also has non-trivial issues when running concurrent tasks.
                 // We can only implement it if we make sure that only one task may run at a time.
-                findViewById(R.id.mapItemsDrawButton).setEnabled(false);
-                final Handler handler = new Handler();
-                handler.postDelayed(new Runnable()
-                {
-                    @Override
-                    public void run()
-                    {
-                        updateDrawButton();
-                    }
-                }, 300);
+                updateDrawButtonDelayed();
             }
 
         }.execute();
@@ -321,6 +356,15 @@ public class MapItemsActivity extends ActionBarActivity implements OnMapReadyCal
         updateDrawButton();
 
         return finder;
+    }
+
+    /**
+     * Cancel the current subtask of finding items.
+     */
+    public void cancelFinderTask()
+    {
+        if (finder != null) finder.cancel(true);
+        finder = null;
     }
 
     @Override
@@ -387,7 +431,7 @@ public class MapItemsActivity extends ActionBarActivity implements OnMapReadyCal
                                 LatLng centroid = getLatLngCentroid(drawingCoordinates);
                                 if (centroid != null) {
                                     // We need to make a copy of our drawn path, as we may clear it
-                                    // at any time (we're even clearing it right below)
+                                    // at any time. (we're even clearing it right below)
                                     List<LatLng> container = new ArrayList<LatLng>();
                                     container.addAll(drawingCoordinates);
                                     executeFinderTask(centroid, container);
@@ -443,9 +487,10 @@ public class MapItemsActivity extends ActionBarActivity implements OnMapReadyCal
                 marker.setAnchor(0.5f, 1.0f + 14 * t);
 
                 if (t > 0.0) {
-                    // Post again 15ms later.
+                    // The animation continues, post again 15ms later
                     handler.postDelayed(this, 15);
                 } else {
+                    // The animation has ended
                     //marker.showInfoWindow();
                 }
             }

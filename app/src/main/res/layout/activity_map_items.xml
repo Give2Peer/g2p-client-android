@@ -27,7 +27,21 @@
             android:layout_height="wrap_content"
             android:text="@string/button_find"
             android:onClick="onDrawButton"
-            />
+            android:layout_gravity="left|bottom"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="Internet is unavailable.\nPlease connect and try again."
+            android:id="@+id/noInternetTextView"
+            android:layout_gravity="center_horizontal|top"
+            android:background="@color/background_material_light"
+            android:textColor="@color/primary_text_default_material_light"
+            android:padding="5dp"
+            android:textAlignment="center"
+            android:visibility="gone"/>
+
     </FrameLayout>
 
     <ProgressBar

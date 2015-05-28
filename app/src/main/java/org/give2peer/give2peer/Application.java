@@ -267,6 +267,8 @@ public class Application extends SugarApp
     }
 
     /**
+     * People say that this may return false negatives in some edge cases.
+     * It's best to also provide a way for the user to try to connect anyway.
      * @return whether internet is available or not.
      */
     public boolean isOnline()
