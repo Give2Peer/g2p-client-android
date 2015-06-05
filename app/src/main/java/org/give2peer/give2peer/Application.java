@@ -98,7 +98,7 @@ public class Application extends SugarApp
         // Grab the locally-stored servers in our yummy SQLite database
         List<Server> servers = Server.listAll(Server.class);
 
-        // Add a default server to the database if there are no servers at all
+        // Add the G2P default server to that database if there are no servers at all
         if (0 == servers.size()) {
             Server defaultServer = new Server();
             defaultServer.loadDefaults().save();
@@ -130,14 +130,22 @@ public class Application extends SugarApp
 
     // GEO LOCATION ////////////////////////////////////////////////////////////////////////////////
 
+    protected static String PREF_GEO_LAT = "geo_latitude";
+    protected static String PREF_GEO_LNG = "geo_longitude";
+    // Time in milliseconds since the last geo location update. Defaults to EPOCH.
+    protected static String PREF_GEO_TIME = "geo_last_located";
+    // Zero and negative values can be legit lat/lng, and `null` is not accepted,
+    // therefore this absurdly big number means no lat or lng.
+    protected static float  PREF_GEO_NONE = 666999;
+
     protected void saveGeoLocation()
     {
         if (null == location) return;
         SharedPreferences sharedPref = getPrefs();
         SharedPreferences.Editor editor = sharedPref.edit();
-        editor.putFloat("latitude",  (float) location.getLatitude());
-        editor.putFloat("longitude", (float) location.getLongitude());
-        editor.putLong("last_located_date", (new Date()).getTime());
+        editor.putFloat(PREF_GEO_LAT, (float) location.getLatitude());
+        editor.putFloat(PREF_GEO_LNG, (float) location.getLongitude());
+        editor.putLong(PREF_GEO_TIME, (new Date()).getTime());
         editor.apply();
     }
 
@@ -145,9 +153,9 @@ public class Application extends SugarApp
     {
         SharedPreferences sharedPref = getPrefs();
 
-        double lat = (double) sharedPref.getFloat("latitude",  666);
-        double lng = (double) sharedPref.getFloat("longitude", 999);
-        if (lat == 666 || lng == 999) return; // ahem...
+        double lat = (double) sharedPref.getFloat(PREF_GEO_LAT, PREF_GEO_NONE);
+        double lng = (double) sharedPref.getFloat(PREF_GEO_LNG, PREF_GEO_NONE);
+        if (lat == PREF_GEO_NONE || lng == PREF_GEO_NONE) return;
 
         location = new android.location.Location("g2p");
         location.setLatitude(lat);
@@ -172,7 +180,7 @@ public class Application extends SugarApp
     public Date getLastLocatedDate()
     {
         SharedPreferences sharedPref = getPrefs();
-        long time = sharedPref.getLong("last_located_date", 0);
+        long time = sharedPref.getLong(PREF_GEO_TIME, 0);
 
         if (0 == time) return null;
         else           return new Date(time);
@@ -183,9 +191,7 @@ public class Application extends SugarApp
         Date then = getLastLocatedDate();
         if (null == then) return "";
 
-        PrettyTime p = new PrettyTime();
-
-        return p.format(then);
+        return (new PrettyTime()).format(then);
     }
 
     // LOCATION ////////////////////////////////////////////////////////////////////////////////////
@@ -300,16 +306,19 @@ public class Application extends SugarApp
      *  own way.
      *
      * @param path	path to the file
-     * @return
      */
     public Bitmap getBitmapFromPath(String path)
     {
         Bitmap bitmap = null;
 
         try {
+
             File f = new File(path);
+            FileInputStream fis = new FileInputStream(f);
+
             ExifInterface exif = new ExifInterface(f.getPath());
-            int orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
+            int orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION,
+                                                   ExifInterface.ORIENTATION_NORMAL);
 
             int rotate = 0;
             switch(orientation) {
@@ -320,19 +329,24 @@ public class Application extends SugarApp
                 case ExifInterface.ORIENTATION_ROTATE_90:
                     rotate += 90;
             }
-
             Matrix mat = new Matrix();
             mat.postRotate(rotate);
-            BitmapFactory.Options options = new BitmapFactory.Options();
-            options.inSampleSize = 2;
 
-            Bitmap bmp = BitmapFactory.decodeStream(new FileInputStream(f), null, options);
+            BitmapFactory.Options options = new BitmapFactory.Options();
+            options.inSampleSize = 2; // halves the dimensions of the image
+
+            Log.d("G2P", "Before decodeStream");
+            Bitmap bmp = BitmapFactory.decodeStream(fis, null, options);
+            Log.d("G2P", "After decodeStream");
+            if (null == bmp) {
+                throw new Exception("Could not decode the bitmap stream.");
+            }
             bitmap = Bitmap.createBitmap(bmp, 0, 0, bmp.getWidth(), bmp.getHeight(), mat, true);
 
         } catch (OutOfMemoryError e) {
-            Log.e("G2P", "getBitmapFromPath() [OutOfMemory!]: " + e.getMessage(), e);
+            Log.e("G2P", "getBitmapFromPath('"+path+"') [OutOfMemory!]: " + e.getMessage(), e);
         } catch (Throwable e) {
-            Log.e("G2P","getBitmapFromPath(): " + e.getMessage(), e);
+            Log.e("G2P","getBitmapFromPath('"+path+"'): " + e.getMessage(), e);
         }
 
         return bitmap;

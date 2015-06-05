@@ -1,13 +1,15 @@
 package org.give2peer.give2peer.activity;
 
-import android.content.Context;
+import android.app.Activity;
 import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -31,13 +33,16 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-public class NewItemActivity extends ActionBarActivity
+public class NewItemActivity extends Activity
 {
     static final int REQUEST_IMAGE_CAPTURE = 1;
+    static final String BUNDLE_IMAGE_PATHS = "imagePaths";
 
     protected Application app;
 
-    protected List<File> pictureFiles;
+    protected List<File> imageFiles; // deprecated?
+    protected List<Uri> imageUris; // redundant with above, trying this
+    protected ArrayList<String> imagePaths; // redundant with above, trying this
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,24 +52,59 @@ public class NewItemActivity extends ActionBarActivity
         // Grab the app
         app = (Application) getApplication();
 
+        Log.d("G2P", "Starting new item activity.");
+
         if (!app.hasCameraSupport()) {
             app.toast(getString(R.string.toast_no_camera_available));
             finish();
             return;
         }
 
-        if (!app.hasLocation()) {
-            app.toast(getString(R.string.toast_no_location_available));
-            finish();
-            return;
+        // Initialize
+        imageFiles = new ArrayList<>();
+        imageUris = new ArrayList<>();
+
+        // On some devices, the Camera activity destroys this activity, so we need to restore the
+        // paths of the files we created.
+        if (null != savedInstanceState) {
+            imagePaths = savedInstanceState.getStringArrayList(BUNDLE_IMAGE_PATHS);
         }
 
-        // Initialize
-        pictureFiles = new ArrayList<>();
+        // This activity may have been destroyed by the Camera activity ; if it's the case,
+        // the imagePaths is not null, as we saved it.
+        if (null == imagePaths) {
+            // Only initialize if it has not been restored from bundle state.
+            imagePaths = new ArrayList<>();
+        }
 
-        // Directly try to grab a new picture
-        addNewPicture();
+        // Directly try to grab a new image if and only if there are no files paths stored
+        // Otherwise, it means that `onActivityResult` will be called.
+        if (imagePaths.size() == 0) {
+            addNewPicture();
+        }
+
     }
+
+    @Override
+    protected void onSaveInstanceState(@NonNull Bundle outState)
+    {
+        super.onSaveInstanceState(outState);
+        // On some devices, the Camera activity destroys this activity, so we need to save the
+        // paths of the files we created.
+        outState.putStringArrayList(BUNDLE_IMAGE_PATHS, imagePaths);
+    }
+
+    /**
+     * This is called AFTER onCreate, not good
+     */
+//    @Override
+//    protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState)
+//    {
+//        super.onRestoreInstanceState(savedInstanceState);
+//        // On some devices, the Camera activity destroys this activity, so we need to restore the
+//        // paths of the files we created.
+//        imagePaths = savedInstanceState.getStringArrayList(BUNDLE_IMAGE_PATHS);
+//    }
 
     protected void addNewPicture()
     {
@@ -79,9 +119,9 @@ public class NewItemActivity extends ActionBarActivity
         }
 
         // Create the File where the picture should go
-        File pictureFile = null;
+        File imageFile = null;
         try {
-            pictureFile = createImageFile();
+            imageFile = createImageFile();
         } catch (IOException ex) {
             Log.e("G2P", ex.getMessage());
             ex.printStackTrace();
@@ -90,31 +130,80 @@ public class NewItemActivity extends ActionBarActivity
             return;
         }
 
-        // Continue only if the File was successfully created
-        if (pictureFile != null) {
-            pictureFiles.add(pictureFile);
-            takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(pictureFile));
+        Uri imageUri = Uri.fromFile(imageFile);
+        // Try another approach
+//        Uri imageUri = getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+//                                                   new ContentValues());
+
+        if (null != imageFile) {
+            imagePaths.add(imageFile.getPath());
+            imageUris.add(imageUri);
+            imageFiles.add(imageFile);
+            takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
+            Log.d("G2P", "Starting Camera, EXTRA_OUTPUT="+imageUri+" ("+imageUri.getPath()+")");
             startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+        } else {
+            Log.e("G2P", "Created image file is NULL. This should NEVER happen.");
         }
+
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data)
+    protected void onActivityResult(int requestCode, int resultCode, Intent intent)
     {
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
 
-            File pictureFile = pictureFiles.get(pictureFiles.size()-1);
+//            File pictureFile = imageFiles.get(imageFiles.size()-1);
+//            Uri imageUri = imageUris.get(imageUris.size()-1);
 
-            Bitmap imageBitmap;
-            if (null != data) {
-                Bundle extras = data.getExtras();
+            if (imagePaths.size() == 0) {
+                Log.e("G2P", "No image paths are prepared to receive camera output. Cancelling...");
+                finish();
+            }
+
+            String imagePath = imagePaths.get(imagePaths.size()-1);
+            File pictureFile = new File(imagePath);
+
+            Bitmap imageBitmap = null;
+
+            if (null != intent) {
+                // Unsure if this ever happens as we're providing `MediaStore.EXTRA_OUTPUT`.
+                Log.d("G2P", "REQUEST_IMAGE_CAPTURE intent data is not null.");
+                Bundle extras = intent.getExtras();
                 imageBitmap = (Bitmap) extras.get("data");
             } else {
-                imageBitmap = app.getBitmapFromPath(pictureFile.getPath());
+                Log.d("G2P", "REQUEST_IMAGE_CAPTURE intent data is null.");
+
+                imageBitmap = app.getBitmapFromPath(imagePath);
+                //imageBitmap = app.getBitmapFromPath(imageUri.getPath());
+
+//                try {
+////                    imageBitmap = MediaStore.Images.Media.getBitmap(getContentResolver(),
+////                                                                    Uri.fromFile(pictureFile));
+//
+//                    // Image saved to a generated MediaStore.Images.Media.EXTERNAL_CONTENT_URI
+//                    String[] projection = {
+//                            MediaStore.MediaColumns._ID,
+//                            MediaStore.Images.ImageColumns.ORIENTATION,
+//                            MediaStore.Images.Media.DATA
+//                    };
+//                    Cursor c = getContentResolver().query(imageUri, projection, null, null, null);
+//                    c.moveToFirst(); // the cursor will be closed by the activity (someone said)
+//                    String photoFileName = c.getString(c.getColumnIndexOrThrow(MediaStore.Images.Media.DATA));
+//                    imageBitmap = BitmapFactory.decodeFile(photoFileName);
+//
+//                    Log.d("G2P", "Photo file name: "+photoFileName);
+//
+//                } catch (Exception e) {
+//                    e.printStackTrace();
+//                }
+
+
+
             }
 
             if (null == imageBitmap) {
-                app.toast("WHY IS THE IMAGE `NULL`?\nWHAT DID YOU DO!?");
+                Log.e("G2P", "Add new item : the image bitmap was `null` at : "+imagePath);
                 finish();
                 return;
             }
@@ -138,25 +227,29 @@ public class NewItemActivity extends ActionBarActivity
             // If the user cancelled the capture of a picture, we GTFO.
             // It may be nice to allow a user to add a picture from a gallery instead of taking one.
             // see http://stackoverflow.com/questions/20021431/android-how-to-take-a-picture-from-camera-or-gallery
+            Log.d("G2P", "User Cancelled the image capture.");
             finish();
         }
     }
 
     public void onSend(View view)
     {
-        EditText titleInput = (EditText) findViewById(R.id.newItemTitleEditText);
-        final Button      sendButton   = (Button)      findViewById(R.id.newItemSendButton);
-        final ProgressBar sendProgress = (ProgressBar) findViewById(R.id.newItemProgressBar);
+        disableSending();
 
-        sendButton.setEnabled(false);
-        sendProgress.setVisibility(View.VISIBLE);
+        // Collect inputs from the form
+        EditText titleInput = (EditText) findViewById(R.id.newItemTitleEditText);
 
         Location location = app.getLocation();
+        if (null == location) {
+            app.toast("No location selected.", Toast.LENGTH_LONG);
+            enableSending();
+            return;
+        }
 
         Item item = new Item();
         item.setLocation(location.forItem());
         item.setTitle(titleInput.getText().toString());
-        item.setPictures(pictureFiles);
+        item.setPictures(imageFiles);
 
         GiveItemTask git = new GiveItemTask(app) {
             @Override
@@ -166,12 +259,29 @@ public class NewItemActivity extends ActionBarActivity
                     app.toast(getString(R.string.toast_new_item_uploaded, item.getTitle()));
                 } else {
                     app.toast(String.format("Failure: %s", getException().getMessage()), Toast.LENGTH_LONG);
-                    sendButton.setEnabled(true);
-                    sendProgress.setVisibility(View.GONE);
+                    enableSending();
                 }
             }
         };
         git.execute(item);
+    }
+
+    protected void enableSending()
+    {
+        Button      sendButton   = (Button)      findViewById(R.id.newItemSendButton);
+        ProgressBar sendProgress = (ProgressBar) findViewById(R.id.newItemProgressBar);
+
+        sendButton.setEnabled(true);
+        sendProgress.setVisibility(View.GONE);
+    }
+
+    protected void disableSending()
+    {
+        Button      sendButton   = (Button)      findViewById(R.id.newItemSendButton);
+        ProgressBar sendProgress = (ProgressBar) findViewById(R.id.newItemProgressBar);
+
+        sendButton.setEnabled(false);
+        sendProgress.setVisibility(View.VISIBLE);
     }
 
 
