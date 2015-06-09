@@ -2,9 +2,7 @@ package org.give2peer.give2peer.activity;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.database.Cursor;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
@@ -40,20 +38,21 @@ public class NewItemActivity extends Activity
 
     protected Application app;
 
-    protected List<File> imageFiles; // deprecated?
-    protected List<Uri> imageUris; // redundant with above, trying this
-    protected ArrayList<String> imagePaths; // redundant with above, trying this
+    protected List<File> imageFiles; // stores the image Files
+    protected ArrayList<String> imagePaths; // stores the images Files paths, but is saved
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_item);
 
+        Log.d("G2P", "Starting new item activity.");
+
         // Grab the app
         app = (Application) getApplication();
 
-        Log.d("G2P", "Starting new item activity.");
-
+        // Check if there's a camera available
+        // todo: propose the gallery picker?
         if (!app.hasCameraSupport()) {
             app.toast(getString(R.string.toast_no_camera_available));
             finish();
@@ -62,7 +61,6 @@ public class NewItemActivity extends Activity
 
         // Initialize
         imageFiles = new ArrayList<>();
-        imageUris = new ArrayList<>();
 
         // On some devices, the Camera activity destroys this activity, so we need to restore the
         // paths of the files we created.
@@ -80,7 +78,14 @@ public class NewItemActivity extends Activity
         // Directly try to grab a new image if and only if there are no files paths stored
         // Otherwise, it means that `onActivityResult` will be called.
         if (imagePaths.size() == 0) {
-            addNewPicture();
+            try {
+                addNewPicture();
+            } catch (IOException ex) {
+                Log.e("G2P", "Failed to add a new picture.");
+                ex.printStackTrace();
+                app.toast(getString(R.string.toast_new_item_file_error), Toast.LENGTH_LONG);
+                finish();
+            }
         }
 
     }
@@ -94,73 +99,17 @@ public class NewItemActivity extends Activity
         outState.putStringArrayList(BUNDLE_IMAGE_PATHS, imagePaths);
     }
 
-    /**
-     * This is called AFTER onCreate, not good
-     */
-//    @Override
-//    protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState)
-//    {
-//        super.onRestoreInstanceState(savedInstanceState);
-//        // On some devices, the Camera activity destroys this activity, so we need to restore the
-//        // paths of the files we created.
-//        imagePaths = savedInstanceState.getStringArrayList(BUNDLE_IMAGE_PATHS);
-//    }
-
-    protected void addNewPicture()
-    {
-        // Create an new image capture intent
-        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-
-        // Make sure we have an Activity that can capture images
-        if (takePictureIntent.resolveActivity(getPackageManager()) == null) {
-            app.toast(getString(R.string.toast_no_camera_available));
-            finish();
-            return;
-        }
-
-        // Create the File where the picture should go
-        File imageFile = null;
-        try {
-            imageFile = createImageFile();
-        } catch (IOException ex) {
-            Log.e("G2P", ex.getMessage());
-            ex.printStackTrace();
-            app.toast(getString(R.string.toast_new_item_file_error));
-            finish();
-            return;
-        }
-
-        Uri imageUri = Uri.fromFile(imageFile);
-        // Try another approach
-//        Uri imageUri = getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-//                                                   new ContentValues());
-
-        if (null != imageFile) {
-            imagePaths.add(imageFile.getPath());
-            imageUris.add(imageUri);
-            imageFiles.add(imageFile);
-            takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
-            Log.d("G2P", "Starting Camera, EXTRA_OUTPUT="+imageUri+" ("+imageUri.getPath()+")");
-            startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
-        } else {
-            Log.e("G2P", "Created image file is NULL. This should NEVER happen.");
-        }
-
-    }
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent intent)
     {
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
-
-//            File pictureFile = imageFiles.get(imageFiles.size()-1);
-//            Uri imageUri = imageUris.get(imageUris.size()-1);
 
             if (imagePaths.size() == 0) {
                 Log.e("G2P", "No image paths are prepared to receive camera output. Cancelling...");
                 finish();
             }
 
+            // Right now there's only one image per item, but when there'll be multiple images...
             String imagePath = imagePaths.get(imagePaths.size()-1);
             File pictureFile = new File(imagePath);
 
@@ -173,33 +122,7 @@ public class NewItemActivity extends Activity
                 imageBitmap = (Bitmap) extras.get("data");
             } else {
                 Log.d("G2P", "REQUEST_IMAGE_CAPTURE intent data is null.");
-
                 imageBitmap = app.getBitmapFromPath(imagePath);
-                //imageBitmap = app.getBitmapFromPath(imageUri.getPath());
-
-//                try {
-////                    imageBitmap = MediaStore.Images.Media.getBitmap(getContentResolver(),
-////                                                                    Uri.fromFile(pictureFile));
-//
-//                    // Image saved to a generated MediaStore.Images.Media.EXTERNAL_CONTENT_URI
-//                    String[] projection = {
-//                            MediaStore.MediaColumns._ID,
-//                            MediaStore.Images.ImageColumns.ORIENTATION,
-//                            MediaStore.Images.Media.DATA
-//                    };
-//                    Cursor c = getContentResolver().query(imageUri, projection, null, null, null);
-//                    c.moveToFirst(); // the cursor will be closed by the activity (someone said)
-//                    String photoFileName = c.getString(c.getColumnIndexOrThrow(MediaStore.Images.Media.DATA));
-//                    imageBitmap = BitmapFactory.decodeFile(photoFileName);
-//
-//                    Log.d("G2P", "Photo file name: "+photoFileName);
-//
-//                } catch (Exception e) {
-//                    e.printStackTrace();
-//                }
-
-
-
             }
 
             if (null == imageBitmap) {
@@ -232,13 +155,49 @@ public class NewItemActivity extends Activity
         }
     }
 
-    public void onSend(View view)
+
+    //// ACTIONS ///////////////////////////////////////////////////////////////////////////////////
+
+    /**
+     * Launch the Camera activity to grab a picture, which will get back to `onActivityResult`.
+     */
+    protected void addNewPicture() throws IOException
     {
+        // Create an new image capture intent
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+
+        // Make sure we have an Activity that can capture images
+        if (takePictureIntent.resolveActivity(getPackageManager()) == null) {
+            app.toast(getString(R.string.toast_no_camera_available));
+            finish();
+            return;
+        }
+
+        // Create the File where the picture should go
+        File imageFile = imageFile = createImageFile();
+        Uri imageUri = Uri.fromFile(imageFile);
+
+        if (null != imageFile) {
+            imagePaths.add(imageFile.getPath());
+            imageFiles.add(imageFile);
+            takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
+            Log.d("G2P", "Starting Camera, EXTRA_OUTPUT="+imageUri+" ("+imageUri.getPath()+")");
+            startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+        } else {
+            // Unsure if this can even happen. If it happens, well... meh.
+            throw new IOException("Created image file is NULL. This should NEVER happen.");
+        }
+    }
+
+    public void send()
+    {
+        // Update the UI
         disableSending();
 
         // Collect inputs from the form
         EditText titleInput = (EditText) findViewById(R.id.newItemTitleEditText);
 
+        // Grab the Location
         Location location = app.getLocation();
         if (null == location) {
             app.toast("No location selected.", Toast.LENGTH_LONG);
@@ -258,12 +217,22 @@ public class NewItemActivity extends Activity
                     finish();
                     app.toast(getString(R.string.toast_new_item_uploaded, item.getTitle()));
                 } else {
-                    app.toast(String.format("Failure: %s", getException().getMessage()), Toast.LENGTH_LONG);
+                    Exception e = getException();
+                    app.toast(String.format("Failure: %s", e.getMessage()), Toast.LENGTH_LONG);
+                    e.printStackTrace();
                     enableSending();
                 }
             }
         };
         git.execute(item);
+    }
+
+
+    //// UI ////////////////////////////////////////////////////////////////////////////////////////
+
+    public void onSend(View view)
+    {
+        send();
     }
 
     protected void enableSending()
@@ -285,7 +254,15 @@ public class NewItemActivity extends Activity
     }
 
 
+    //// UTILS /////////////////////////////////////////////////////////////////////////////////////
 
+    /**
+     * Ok, this is trouble. We do NOT delete the image files after sending them. We should. Yup.
+     * todo: delete the image file after sending it.
+     *
+     * @return
+     * @throws IOException
+     */
     private File createImageFile() throws IOException
     {
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(new Date());
@@ -302,7 +279,5 @@ public class NewItemActivity extends Activity
         //String path = "file:" + image.getAbsolutePath();
         return image;
     }
-
-    // UTILS ///////////////////////////////////////////////////////////////////////////////////////
 
 }

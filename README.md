@@ -26,20 +26,20 @@ ROADMAP
 2.0.0
 -----
 
-A version with exhaustive hardware support.
+A version with a more limited hardware support, since API 21.
+This version will leverage the full power of Material design.
 
-- [ ] Design a prettier launcher icon.
+- [ ] Design a launcher icon.
 
 
 1.0.0
 -----
 
-A version for everybody.
+A version for everybody, working under API 10.
 
 - [ ] Action points.
 - [ ] Experience points.
 - [ ] Propose deletion of items submitted by someone else.
-
 
 
 0.4.0
@@ -52,13 +52,13 @@ A version for the beta community.
 - [ ] Add french translation.
 
 
-
 0.3.0
 -----
 
 - [x] Locally cache item thumbnail images.
 - [x] Design a temporary basic launcher icon.
 - [x] View items on a map.
+- [ ] Ann a new item using the "share" feature of the camera and gallery.
 - [ ] Registration activity.
 - [ ] Register automatically when available. (?)
 - [ ] Delete items submitted by self.
