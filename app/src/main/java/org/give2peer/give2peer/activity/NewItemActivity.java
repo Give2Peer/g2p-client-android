@@ -8,12 +8,16 @@ import android.os.Environment;
 import android.provider.MediaStore;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+//import android.support.v7.internal.widget.AdapterViewCompat;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import org.give2peer.give2peer.Application;
@@ -31,7 +35,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-public class NewItemActivity extends Activity
+import im.delight.android.keyvaluespinner.KeyValueSpinner;
+
+public class NewItemActivity extends Activity implements AdapterView.OnItemSelectedListener
 {
     static final int REQUEST_IMAGE_CAPTURE = 1;
     static final String BUNDLE_IMAGE_PATHS = "imagePaths";
@@ -58,6 +64,42 @@ public class NewItemActivity extends Activity
             finish();
             return;
         }
+
+        // Grab the locations from the database
+        final List<Location> locations = Location.listAll(Location.class);
+        int locationsCount = locations.size();
+
+        int numChoicesBef = 1; // GPS-detected location choice
+        int numChoicesAft = 1; // "Add location" convenience choice
+
+        CharSequence[] spinnerVals = new CharSequence[locationsCount+numChoicesBef+numChoicesAft];
+        CharSequence[] spinnerKeys = new CharSequence[locationsCount+numChoicesBef+numChoicesAft];
+
+        // Add the GPS-given location
+        if (app.hasGeoLocation()) {
+            spinnerVals[0] = String.format("From GPS (%s)", app.getPrettyDurationSinceLastLocatedDate());
+        } else {
+            spinnerVals[0] = "GPS location unknown";
+        }
+        spinnerKeys[0] = "0";
+
+        // Add the locations from the database as choices
+        for (int i=0; i<locationsCount; i++) {
+            Location location = locations.get(i);
+            spinnerVals[numChoicesBef+i] = location.getName();
+            spinnerKeys[numChoicesBef+i] = location.getId().toString();
+        }
+
+        // Add the convenience "Add location" choice
+        spinnerVals[locationsCount+numChoicesBef+numChoicesAft-1] = "Add a new location";
+        spinnerKeys[locationsCount+numChoicesBef+numChoicesAft-1] = "-1";
+
+        // Finally, fill the location spinner
+        KeyValueSpinner<CharSequence> spinner = (KeyValueSpinner<CharSequence>) findViewById(R.id.newItemLocationSpinner);
+        KeyValueSpinner.Adapter<CharSequence> adapter = KeyValueSpinner.Adapter.createFromArrays(this, spinnerKeys, spinnerVals, android.R.layout.simple_spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(adapter);
+        spinner.setOnItemSelectedListener(this);
 
         // Initialize
         imageFiles = new ArrayList<>();
@@ -87,6 +129,21 @@ public class NewItemActivity extends Activity
                 finish();
             }
         }
+
+    }
+
+    @Override
+    public void onItemSelected(AdapterView<?> parent, View view, int position, long id)
+    {
+        if (parent.getId() == R.id.newItemLocationSpinner) {
+            KeyValueSpinner.Pair pair = (KeyValueSpinner.Pair) parent.getItemAtPosition(position);
+            Log.d("G2P", "Selected: " + pair.getKey() + " -- " + pair.getValue());
+        }
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> parent)
+    {
 
     }
 
@@ -258,9 +315,9 @@ public class NewItemActivity extends Activity
 
     /**
      * Ok, this is trouble. We do NOT delete the image files after sending them. We should. Yup.
-     * todo: delete the image file after sending it.
+     * todo: delete the image file once it is sent.
      *
-     * @return
+     * @return the File that was created.
      * @throws IOException
      */
     private File createImageFile() throws IOException
@@ -279,5 +336,4 @@ public class NewItemActivity extends Activity
         //String path = "file:" + image.getAbsolutePath();
         return image;
     }
-
 }

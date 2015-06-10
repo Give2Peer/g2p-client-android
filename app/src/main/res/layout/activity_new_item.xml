@@ -32,17 +32,28 @@
             <!--android:labelFor="@+id/newItemTitleEditText"-->
             <!--android:gravity="center" />-->
 
+        <!-- The ellipsize attribute is to ensure that the hint shows on older devices -->
+        <!-- It's CSS madness all over again ! -->
         <EditText
+            android:id="@+id/newItemTitleEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/newItemTitleEditText"
+            android:layout_marginStart="10dp"
             android:maxLength="32"
             android:maxLines="1"
             android:inputType="text|textAutoComplete|textAutoCorrect"
-            android:layout_marginStart="10dp"
             android:hint="@string/new_item_label_title"
+            android:textColorHint="@android:color/darker_gray"
+            android:ellipsize="start"
             />
+
     </LinearLayout>
+
+    <im.delight.android.keyvaluespinner.KeyValueSpinner
+        android:id="@+id/newItemLocationSpinner"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        />
 
     <!--<fragment android:name="org.give2peer.give2peer.fragment.LocationChooserFragment"-->
               <!--android:id="@+id/newItemLocationChooserFragment"-->
