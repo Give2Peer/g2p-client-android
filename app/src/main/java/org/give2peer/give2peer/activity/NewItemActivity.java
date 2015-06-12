@@ -64,45 +64,6 @@ public class NewItemActivity extends Activity
             return;
         }
 
-        // This allowed preset locations. We now use ONLY the GPS location, for simplicity.
-        // Not deleted, because preset locations will be back (someday)
-//        // Grab the locations from the database
-//        final List<Location> locations = Location.listAll(Location.class);
-//        int locationsCount = locations.size();
-//
-//        int numChoicesBef = 1; // GPS-detected location choice
-//        int numChoicesAft = 1; // "Add location" convenience choice
-//
-//        CharSequence[] spinnerVals = new CharSequence[locationsCount+numChoicesBef+numChoicesAft];
-//        CharSequence[] spinnerKeys = new CharSequence[locationsCount+numChoicesBef+numChoicesAft];
-//
-//        // Add the GPS-given location
-//        if (app.hasGeoLocation()) {
-//            spinnerVals[0] = String.format("From GPS (%s)", app.getPrettyDurationSinceLastLocatedDate());
-//        } else {
-//            spinnerVals[0] = "GPS location unknown";
-//        }
-//        spinnerKeys[0] = "0";
-//
-//        // Add the locations from the database as choices
-//        for (int i=0; i<locationsCount; i++) {
-//            Location location = locations.get(i);
-//            spinnerVals[numChoicesBef+i] = location.getName();
-//            spinnerKeys[numChoicesBef+i] = location.getId().toString();
-//        }
-//
-//        // Add the convenience "Add location" choice
-//        spinnerVals[locationsCount+numChoicesBef+numChoicesAft-1] = "Add a new location";
-//        spinnerKeys[locationsCount+numChoicesBef+numChoicesAft-1] = "-1";
-//
-//        // Finally, fill the location spinner
-//        KeyValueSpinner<CharSequence> spinner = (KeyValueSpinner<CharSequence>) findViewById(R.id.newItemLocationSpinner);
-//        KeyValueSpinner.Adapter<CharSequence> adapter = KeyValueSpinner.Adapter.createFromArrays(this, spinnerKeys, spinnerVals, android.R.layout.simple_spinner_item);
-//        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-//        spinner.setAdapter(adapter);
-//        spinner.setOnItemSelectedListener(this);
-
-
         // On some devices, the Camera activity destroys this activity, so we need to restore the
         // paths of the files we created.
         if (null != savedInstanceState) {
@@ -130,21 +91,6 @@ public class NewItemActivity extends Activity
         }
 
     }
-
-//    @Override
-//    public void onItemSelected(AdapterView<?> parent, View view, int position, long id)
-//    {
-//        if (parent.getId() == R.id.newItemLocationSpinner) {
-//            KeyValueSpinner.Pair pair = (KeyValueSpinner.Pair) parent.getItemAtPosition(position);
-//            Log.d("G2P", "Selected: " + pair.getKey() + " -- " + pair.getValue());
-//        }
-//    }
-//
-//    @Override
-//    public void onNothingSelected(AdapterView<?> parent)
-//    {
-//
-//    }
 
     @Override
     protected void onSaveInstanceState(@NonNull Bundle outState)

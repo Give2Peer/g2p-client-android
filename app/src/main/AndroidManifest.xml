@@ -13,8 +13,7 @@
     <uses-feature android:name="android.hardware.camera"       android:required="false" />
     <uses-feature android:name="android.hardware.camera.front" android:required="false" />
 
-    <!-- todo: required=false, and disable the map if OpenGL ES 2 is unavailable -->
-    <!--       this is a very low-priority task as the map is a critical component -->
+    <!-- The map requires OpenGL ES 2 -->
     <uses-feature android:glEsVersion="0x00020000"             android:required="true" />
 
     <application
@@ -47,35 +46,34 @@
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
 
-        <!-- The launcher immediately shows the map items around the user's location -->
+        <!-- The launcher immediately shows the items around the user's location, on a map -->
         <activity
             android:name=".activity.MapItemsActivity"
             android:label="@string/app_name"
-            android:launchMode="singleTop" >
+            android:launchMode="singleTop"
+            >
             <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
+                <action   android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
 
         <!-- Displays a grid of items, from closest to furthest -->
-        <activity android:name=".activity.ListAroundActivity" >
+        <!-- Not used anymore, might be a good Map fallback when OpenGL 2.0 is unavailable ? -->
+        <activity android:name=".activity.ListAroundActivity">
         </activity>
 
         <!-- Uses a system intent to capture an image and provides a form to add a new item. -->
         <activity
             android:name=".activity.NewItemActivity"
-            android:label="@string/title_activity_new_item"
-            android:windowSoftInputMode="adjustPan|stateHidden" >
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".activity.MainActivity" />
+            android:windowSoftInputMode="adjustPan|stateHidden"
+            >
         </activity>
 
         <!-- App settings -->
         <activity
             android:name=".activity.SettingsActivity"
-            android:label="@string/title_activity_settings" >
+            >
         </activity>
 
     </application>

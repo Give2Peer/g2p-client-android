@@ -688,6 +688,8 @@ public class      MapItemsActivity
         return getLatLngBounds(latLngs).getCenter();
     }
 
+    //// MATH UTILS (SHOULD BE MOVED ELSEWHERE) ////////////////////////////////////////////////////
+
     /**
      * Ray casting alogrithm, see http://rosettacode.org/wiki/Ray-casting_algorithm
      *

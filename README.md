@@ -8,7 +8,7 @@ Goal
 ----
 
 Photograph and geotag lost items in public spaces (eg: a glove, a shoe, a 500€ bill), recyclable
-detritus (eg: planks of wood, broken mirrors), and just plain gifts (eg: baby apparatus, attic
+detritus (eg: planks of wood, broken mirrors), and just plain gifts (eg: child apparatus, attic
 surplus).
 
 The user interface should be oriented towards speed. Adding a new item should not take more than a
@@ -27,15 +27,18 @@ ROADMAP
 -----
 
 A version with a more limited hardware support, since API 21.
-This version will leverage the full power of Material design.
+This version leverages the full power of Material design, and provides tablet layouts as well as
+phone layouts.
 
 - [ ] Design a launcher icon.
+- [ ] Statistics
 
 
 1.0.0
 -----
 
 A version for everybody, working under API 10.
+This version (and all of 1.x.x) does not have a proper layout for tablets, and is ugly.
 
 - [ ] Action points.
 - [ ] Experience points.
@@ -57,8 +60,10 @@ A version for the beta community.
 
 - [x] Locally cache item thumbnail images.
 - [x] Design a temporary basic launcher icon.
-- [x] View items on a map.
-- [ ] Ann a new item using the "share" feature of the camera and gallery.
+- [x] Start application by displaying items around the user on a map.
+- [x] Improve automatic location detection using Google API.
+- [x] Refactor to support API 10 (and onwards).
+- [ ] Add a new item using the "share" feature of the camera and gallery.
 - [ ] Registration activity.
 - [ ] Register automatically when available. (?)
 - [ ] Delete items submitted by self.
@@ -133,6 +138,7 @@ https://github.com/delight-im/Android-KeyValueSpinner
 
 This is pretty useful, and should probably be part of Android's core, somehow.
 That lib is added as a JAR file. This is bad. It should be added through gradle.
+It is not used anymore, since the recent refactorization, but will probably be again in the future.
 
 
 RetroFit
@@ -152,14 +158,21 @@ OTHERS
 Help
 ----
 
-If you know Android (or want to learn), you can help in a number of ways :
+If you know Android and/or Java, we need some technical expertise :
 
 - Refactor this learner's code into a beautiful codebase.
 - Suggest good third-party libraries to DRY the code.
 - Give advice on how to give the emulator a default `geo fix`.
 - Give advice on how to somehow publish the release `keystore` of an open-source project.
 - Enrich and give advice for the feature suite.
+- Write good code guidelines for Android / Java.
+
+If not, you can still help in a number of ways :
+
 - Write a Usage Licence Agreement that users will have to accept on registration.
+- Write the text that will be shown in the Google Play store.
+- Translate the app into your language. (we'll release at first with english, french and spanish)
+- Design images, banners, logos, trophies, videos, everything.
 - Report issues and submit ideas.
 - And, of course, use the app and spread the word!
 
@@ -167,13 +180,15 @@ If you know Android (or want to learn), you can help in a number of ways :
 Donate
 ------
 
-_"If it's free, you're the product."_
+_"When it's free, you're the product."_
 
 Hosting a server costs money. We can pay for a couple years from our own pocket, but eventually the
 service must be able to pay for its own running costs, or it will shut down.
 
 You'll be the product for a while, as the server will measure your total usage for a year or ten
 and show you (exactly!) how much you should give to keep it afloat for another year.
+
+Of course, all these statistics will be published publicly.
 
 Transparency is the key. If you know about good software suites / practices to that effect, we are
 interested.
@@ -196,8 +211,8 @@ _Do whatever you want._ (unless you're a patent troll)
 Disclaimer
 ----------
 
-This is our first project with Android and Java.
-There's terrible code everywhere. EVERYWHERE.
+This is our very first project with Android and Java.
+There's terrible code everywhere. **EVERYWHERE.**
 Please counsel.
 
 
@@ -208,5 +223,7 @@ Thanks
 - Ilane, for feeding us and putting up with our code-related ramblings.
 - Misha, for picking the name _give2peer_, and his general enthusiasm and advice.
 - Willou, for his mumbled advice.
+- Kiouze, for his
 - The ioth, because they can read between the books.
+- Our other friends, for not killing us when we pester them about this.
 - Our families, for their unwavering support.
