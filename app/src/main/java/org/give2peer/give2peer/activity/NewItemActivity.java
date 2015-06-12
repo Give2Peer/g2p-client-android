@@ -37,15 +37,14 @@ import java.util.Locale;
 
 import im.delight.android.keyvaluespinner.KeyValueSpinner;
 
-public class NewItemActivity extends Activity implements AdapterView.OnItemSelectedListener
+public class NewItemActivity extends Activity
 {
     static final int REQUEST_IMAGE_CAPTURE = 1;
     static final String BUNDLE_IMAGE_PATHS = "imagePaths";
 
     protected Application app;
 
-    protected List<File> imageFiles; // stores the image Files
-    protected ArrayList<String> imagePaths; // stores the images Files paths, but is saved
+    protected ArrayList<String> imagePaths; // stores the images Files paths, and is saved
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,44 +64,44 @@ public class NewItemActivity extends Activity implements AdapterView.OnItemSelec
             return;
         }
 
-        // Grab the locations from the database
-        final List<Location> locations = Location.listAll(Location.class);
-        int locationsCount = locations.size();
+        // This allowed preset locations. We now use ONLY the GPS location, for simplicity.
+        // Not deleted, because preset locations will be back (someday)
+//        // Grab the locations from the database
+//        final List<Location> locations = Location.listAll(Location.class);
+//        int locationsCount = locations.size();
+//
+//        int numChoicesBef = 1; // GPS-detected location choice
+//        int numChoicesAft = 1; // "Add location" convenience choice
+//
+//        CharSequence[] spinnerVals = new CharSequence[locationsCount+numChoicesBef+numChoicesAft];
+//        CharSequence[] spinnerKeys = new CharSequence[locationsCount+numChoicesBef+numChoicesAft];
+//
+//        // Add the GPS-given location
+//        if (app.hasGeoLocation()) {
+//            spinnerVals[0] = String.format("From GPS (%s)", app.getPrettyDurationSinceLastLocatedDate());
+//        } else {
+//            spinnerVals[0] = "GPS location unknown";
+//        }
+//        spinnerKeys[0] = "0";
+//
+//        // Add the locations from the database as choices
+//        for (int i=0; i<locationsCount; i++) {
+//            Location location = locations.get(i);
+//            spinnerVals[numChoicesBef+i] = location.getName();
+//            spinnerKeys[numChoicesBef+i] = location.getId().toString();
+//        }
+//
+//        // Add the convenience "Add location" choice
+//        spinnerVals[locationsCount+numChoicesBef+numChoicesAft-1] = "Add a new location";
+//        spinnerKeys[locationsCount+numChoicesBef+numChoicesAft-1] = "-1";
+//
+//        // Finally, fill the location spinner
+//        KeyValueSpinner<CharSequence> spinner = (KeyValueSpinner<CharSequence>) findViewById(R.id.newItemLocationSpinner);
+//        KeyValueSpinner.Adapter<CharSequence> adapter = KeyValueSpinner.Adapter.createFromArrays(this, spinnerKeys, spinnerVals, android.R.layout.simple_spinner_item);
+//        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+//        spinner.setAdapter(adapter);
+//        spinner.setOnItemSelectedListener(this);
 
-        int numChoicesBef = 1; // GPS-detected location choice
-        int numChoicesAft = 1; // "Add location" convenience choice
-
-        CharSequence[] spinnerVals = new CharSequence[locationsCount+numChoicesBef+numChoicesAft];
-        CharSequence[] spinnerKeys = new CharSequence[locationsCount+numChoicesBef+numChoicesAft];
-
-        // Add the GPS-given location
-        if (app.hasGeoLocation()) {
-            spinnerVals[0] = String.format("From GPS (%s)", app.getPrettyDurationSinceLastLocatedDate());
-        } else {
-            spinnerVals[0] = "GPS location unknown";
-        }
-        spinnerKeys[0] = "0";
-
-        // Add the locations from the database as choices
-        for (int i=0; i<locationsCount; i++) {
-            Location location = locations.get(i);
-            spinnerVals[numChoicesBef+i] = location.getName();
-            spinnerKeys[numChoicesBef+i] = location.getId().toString();
-        }
-
-        // Add the convenience "Add location" choice
-        spinnerVals[locationsCount+numChoicesBef+numChoicesAft-1] = "Add a new location";
-        spinnerKeys[locationsCount+numChoicesBef+numChoicesAft-1] = "-1";
-
-        // Finally, fill the location spinner
-        KeyValueSpinner<CharSequence> spinner = (KeyValueSpinner<CharSequence>) findViewById(R.id.newItemLocationSpinner);
-        KeyValueSpinner.Adapter<CharSequence> adapter = KeyValueSpinner.Adapter.createFromArrays(this, spinnerKeys, spinnerVals, android.R.layout.simple_spinner_item);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinner.setAdapter(adapter);
-        spinner.setOnItemSelectedListener(this);
-
-        // Initialize
-        imageFiles = new ArrayList<>();
 
         // On some devices, the Camera activity destroys this activity, so we need to restore the
         // paths of the files we created.
@@ -132,20 +131,20 @@ public class NewItemActivity extends Activity implements AdapterView.OnItemSelec
 
     }
 
-    @Override
-    public void onItemSelected(AdapterView<?> parent, View view, int position, long id)
-    {
-        if (parent.getId() == R.id.newItemLocationSpinner) {
-            KeyValueSpinner.Pair pair = (KeyValueSpinner.Pair) parent.getItemAtPosition(position);
-            Log.d("G2P", "Selected: " + pair.getKey() + " -- " + pair.getValue());
-        }
-    }
-
-    @Override
-    public void onNothingSelected(AdapterView<?> parent)
-    {
-
-    }
+//    @Override
+//    public void onItemSelected(AdapterView<?> parent, View view, int position, long id)
+//    {
+//        if (parent.getId() == R.id.newItemLocationSpinner) {
+//            KeyValueSpinner.Pair pair = (KeyValueSpinner.Pair) parent.getItemAtPosition(position);
+//            Log.d("G2P", "Selected: " + pair.getKey() + " -- " + pair.getValue());
+//        }
+//    }
+//
+//    @Override
+//    public void onNothingSelected(AdapterView<?> parent)
+//    {
+//
+//    }
 
     @Override
     protected void onSaveInstanceState(@NonNull Bundle outState)
@@ -173,7 +172,7 @@ public class NewItemActivity extends Activity implements AdapterView.OnItemSelec
             Bitmap imageBitmap = null;
 
             if (null != intent) {
-                // Unsure if this ever happens as we're providing `MediaStore.EXTRA_OUTPUT`.
+                // Unsure if this ever happens as we're providing `MediaStore.EXTRA_OUTPUT` now.
                 Log.d("G2P", "REQUEST_IMAGE_CAPTURE intent data is not null.");
                 Bundle extras = intent.getExtras();
                 imageBitmap = (Bitmap) extras.get("data");
@@ -183,7 +182,14 @@ public class NewItemActivity extends Activity implements AdapterView.OnItemSelec
             }
 
             if (null == imageBitmap) {
-                Log.e("G2P", "Add new item : the image bitmap was `null` at : "+imagePath);
+                Log.e("G2P", "Add new item : the image bitmap was `null` at : " + imagePath);
+                finish();
+                return;
+            }
+
+            // Sometimes the camera sends back an empty bitmap, so we're trying this
+            if (imageBitmap.getHeight() == 0 || imageBitmap.getWidth() == 0) {
+                Log.e("G2P", "Add new item : the bitmap is empty !");
                 finish();
                 return;
             }
@@ -231,12 +237,11 @@ public class NewItemActivity extends Activity implements AdapterView.OnItemSelec
         }
 
         // Create the File where the picture should go
-        File imageFile = imageFile = createImageFile();
+        File imageFile = createImageFile();
         Uri imageUri = Uri.fromFile(imageFile);
 
         if (null != imageFile) {
             imagePaths.add(imageFile.getPath());
-            imageFiles.add(imageFile);
             takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
             Log.d("G2P", "Starting Camera, EXTRA_OUTPUT="+imageUri+" ("+imageUri.getPath()+")");
             startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
@@ -252,21 +257,40 @@ public class NewItemActivity extends Activity implements AdapterView.OnItemSelec
         disableSending();
 
         // Collect inputs from the form
-        EditText titleInput = (EditText) findViewById(R.id.newItemTitleEditText);
+        EditText titleInput    = (EditText) findViewById(R.id.newItemTitleEditText);
+        EditText locationInput = (EditText) findViewById(R.id.newItemLocationEditText);
 
-        // Grab the Location
-        Location location = app.getLocation();
-        if (null == location) {
-            app.toast("No location selected.", Toast.LENGTH_LONG);
-            enableSending();
-            return;
+        // Grab the Location, from input or GPS. It is MANDATORY.
+        String locationInputValue = locationInput.getText().toString();
+        if (locationInputValue.isEmpty()) {
+            android.location.Location location = app.getGeoLocation();
+            if (null != location) {
+                locationInputValue = String.format(
+                        "%f/%f",
+                        location.getLatitude(),
+                        location.getLongitude()
+                );
+            } else {
+                app.toast(getString(R.string.toast_no_location_available), Toast.LENGTH_LONG);
+                enableSending();
+                return;
+            }
         }
 
+        // Grab the image files from the paths
+        // Remember, maybe this activity was destroyed while taking a picture
+        List<File> imageFiles = new ArrayList<>();
+        for (String path : imagePaths) {
+            imageFiles.add(new File(path));
+        }
+
+        // Create a new Item with all that data
         Item item = new Item();
-        item.setLocation(location.forItem());
+        item.setLocation(locationInputValue);
         item.setTitle(titleInput.getText().toString());
         item.setPictures(imageFiles);
 
+        // Try to upload it, along with its image(s).
         GiveItemTask git = new GiveItemTask(app) {
             @Override
             protected void onPostExecute(Item item) {
@@ -275,7 +299,14 @@ public class NewItemActivity extends Activity implements AdapterView.OnItemSelec
                     app.toast(getString(R.string.toast_new_item_uploaded, item.getTitle()));
                 } else {
                     Exception e = getException();
-                    app.toast(String.format("Failure: %s", e.getMessage()), Toast.LENGTH_LONG);
+                    String toast;
+                    if (e instanceof IOException) {
+                        toast = getString(R.string.toast_no_internet_available);
+                    } else {
+                        toast = getString(R.string.toast_new_item_upload_failed);
+                    }
+                    app.toast(toast, Toast.LENGTH_LONG);
+                    Log.e("G2P", e.getMessage());
                     e.printStackTrace();
                     enableSending();
                 }
@@ -316,6 +347,7 @@ public class NewItemActivity extends Activity implements AdapterView.OnItemSelec
     /**
      * Ok, this is trouble. We do NOT delete the image files after sending them. We should. Yup.
      * todo: delete the image file once it is sent.
+     * Also, maybe move this utility method to the `Application`.
      *
      * @return the File that was created.
      * @throws IOException

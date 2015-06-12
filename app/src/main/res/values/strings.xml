@@ -12,7 +12,7 @@
     <string name="main_activity_top_message">Welcome! With this app, you can give an item you possess, spot an item that was lost or thrown away, and find items around a location.</string>
 
     <string name="new_item_label_title">Title</string>
-
+    <string name="new_item_label_location">Location</string>
     <string name="new_item_image_description">The picture of the item you just took.</string>
     <string name="new_item_send_button">Send</string>
 
@@ -22,7 +22,7 @@
     <string name="toast_no_camera_available">No camera could be found.\nAsk for support of gallery images!</string>
     <string name="toast_no_mapping_activity">Could not find any mapping activity to go to.</string>
     <string name="toast_no_internet_available">Internet is not available.</string>
-    <string name="toast_no_location_available">Select a location first.</string>
+    <string name="toast_no_location_available">You must provide a location.</string>
     <string name="toast_invalid_location">Provided location is invalid.\nPlease set up a postal address.</string>
 
     <string name="title_current_location">Current location</string>
@@ -56,5 +56,6 @@
     <string name="settings_location_forget">Forget this location</string>
     <string name="settings_location_add">Add a location</string>
     <string name="menu_action_add_item">Add</string>
+    <string name="toast_new_item_upload_failed">Failed to upload the item.</string>
 
 </resources>

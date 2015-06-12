@@ -1,12 +1,18 @@
 package org.give2peer.give2peer.activity;
 
+import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentSender;
 import android.graphics.Point;
+import android.location.Location;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.SystemClock;
+import android.support.annotation.NonNull;
+import android.support.v4.app.DialogFragment;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
@@ -21,6 +27,9 @@ import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
+import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -41,22 +50,27 @@ import com.google.android.gms.maps.model.PolylineOptions;
 import org.give2peer.give2peer.Application;
 import org.give2peer.give2peer.Item;
 import org.give2peer.give2peer.R;
+import org.give2peer.give2peer.listener.GoogleApiClientListener;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 
-public class MapItemsActivity extends ActionBarActivity implements OnMapReadyCallback
+public class      MapItemsActivity
+       extends    ActionBarActivity
+       implements OnMapReadyCallback, GoogleApiClientListener
 {
     Application app;
 
     // Allows us to find items from their respective markers during UI events
     HashMap<Marker, Item> markerItemHashMap = new HashMap<Marker, Item>();
 
-
     FrameLayout mapItemsDrawFrame;
     Boolean     isDrawing = false; // whether the user is drawing or not
+
+    GoogleMap googleMap;
+    GoogleApiClient googleLocator;
 
     ArrayList<LatLng> drawingCoordinates = new ArrayList<>();
 
@@ -108,6 +122,8 @@ public class MapItemsActivity extends ActionBarActivity implements OnMapReadyCal
             // todo: show a help view, and/or the "report a bug" button.
         }
 
+        Log.d("G2P", "Building Google API Client.");
+        googleLocator = app.buildGoogleLocator(this, this);
     }
 
     @Override
@@ -142,6 +158,112 @@ public class MapItemsActivity extends ActionBarActivity implements OnMapReadyCal
         return super.onOptionsItemSelected(item);
     }
 
+    //// GEO LOCATION //////////////////////////////////////////////////////////////////////////////
+
+    // Request code to use when launching the resolution activity
+    protected static final int REQUEST_RESOLVE_ERROR = 1001;
+    // Unique tag for the error dialog fragment
+    protected static final String DIALOG_ERROR = "dialog_error";
+    // Bool to track whether the app is already resolving an error
+    protected boolean isResolvingError = false;
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        if (!isResolvingError) {
+            googleLocator.connect();
+        }
+    }
+
+    @Override
+    protected void onStop() {
+        googleLocator.disconnect();
+        super.onStop();
+    }
+
+    @Override
+    public void onConnected(Bundle bundle)
+    {
+        Log.d("G2P", "Connection to Google Location API established.");
+        Location lastLocation = LocationServices.FusedLocationApi.getLastLocation(googleLocator);
+        if (lastLocation == null) {
+            Log.e("G2P", "Failed to retrieve the last known location.");
+        } else {
+            app.setGeoLocation(lastLocation);
+            if (isMapReady()) executeFinderTask(app.getGeoLocationLatLng());
+        }
+    }
+
+    @Override
+    public void onConnectionSuspended(int i)
+    {
+        Log.i("G2P", "Connection to Google API suspended.");
+        // I don't know what else to do here. Ideas ?
+    }
+
+    @Override
+    public void onConnectionFailed(ConnectionResult connectionResult)
+    {
+        Log.e("G2P", "Connection to Google API services failed.");
+        if (isResolvingError) {
+            // Already attempting to resolve an error.
+            return;
+        } else if (connectionResult.hasResolution()) {
+            try {
+                isResolvingError = true;
+                connectionResult.startResolutionForResult(this, REQUEST_RESOLVE_ERROR);
+            } catch (IntentSender.SendIntentException e) {
+                // There was an error with the resolution intent. Try again.
+                googleLocator.connect();
+            }
+        } else {
+            // Show dialog using GooglePlayServicesUtil.getErrorDialog()
+            showErrorDialog(connectionResult.getErrorCode());
+            isResolvingError = true;
+        }
+    }
+
+    // The rest of this code is all about building the error dialog
+
+    /* Creates a dialog for an error message */
+    private void showErrorDialog(int errorCode)
+    {
+        // Create a fragment for the error dialog
+        ErrorDialogFragment dialogFragment = new ErrorDialogFragment();
+        // Pass the error that should be displayed
+        Bundle args = new Bundle();
+        args.putInt(DIALOG_ERROR, errorCode);
+        dialogFragment.setArguments(args);
+        dialogFragment.show(getSupportFragmentManager(), DIALOG_ERROR);
+    }
+
+    /* Called from ErrorDialogFragment when the dialog is dismissed. */
+    public void onDialogDismissed()
+    {
+        isResolvingError = false;
+    }
+
+    /* A fragment to display an error dialog */
+    public static class ErrorDialogFragment extends DialogFragment
+    {
+        public ErrorDialogFragment() {}
+
+        @Override
+        @NonNull
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            // Get the error code and retrieve the appropriate dialog
+            int errorCode = this.getArguments().getInt(DIALOG_ERROR);
+            return GooglePlayServicesUtil.getErrorDialog(
+                    errorCode,
+                    this.getActivity(), REQUEST_RESOLVE_ERROR
+            );
+        }
+
+        @Override
+        public void onDismiss(DialogInterface dialog) {
+            ((MapItemsActivity)getActivity()).onDialogDismissed();
+        }
+    }
 
     //// ACTIONS ///////////////////////////////////////////////////////////////////////////////////
 
@@ -223,7 +345,6 @@ public class MapItemsActivity extends ActionBarActivity implements OnMapReadyCal
                             }, 300);
     }
 
-    GoogleMap googleMap;
     AsyncTask finder;
 
     public AsyncTask executeFinderTask(final LatLng where)
@@ -324,14 +445,14 @@ public class MapItemsActivity extends ActionBarActivity implements OnMapReadyCal
                                         .snippet(item.getHumanDistance())
                         );
 
-                        dropPinEffect(m, Math.round(i * 222 + 222 * 0.618 * 0.618 * Math.random()));
+                        dropPinEffect(m, Math.round(i * 222));
 
                         // We also map the markers to the items for the click callback
                         markerItemHashMap.put(m, item);
                     }
 
                     // Pan and zoom the camera
-                    //googleMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bc.build(), 55));
+                    googleMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bc.build(), 55));
 
                     // Hide the drawn region, and draw a circle instead
                     // This is a cheap solution to the problem of performance, as users may draw BIG regions
@@ -365,6 +486,11 @@ public class MapItemsActivity extends ActionBarActivity implements OnMapReadyCal
     {
         if (finder != null) finder.cancel(true);
         finder = null;
+    }
+
+    protected boolean isMapReady()
+    {
+        return googleMap != null;
     }
 
     @Override

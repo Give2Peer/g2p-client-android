@@ -17,43 +17,36 @@
         android:src="@drawable/item_thumbnail"
         android:layout_marginBottom="13dp" />
 
-    <LinearLayout
-        android:orientation="horizontal"
-        android:layout_width="fill_parent"
+    <EditText
+        android:id="@+id/newItemTitleEditText"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="13dp">
-
-        <!--<TextView-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="match_parent"-->
-            <!--android:textAppearance="?android:attr/textAppearanceMedium"-->
-            <!--android:text="@string/new_item_label_title"-->
-            <!--android:id="@+id/newItemTitleTextView"-->
-            <!--android:labelFor="@+id/newItemTitleEditText"-->
-            <!--android:gravity="center" />-->
-
-        <!-- The ellipsize attribute is to ensure that the hint shows on older devices -->
-        <!-- It's CSS madness all over again ! -->
-        <EditText
-            android:id="@+id/newItemTitleEditText"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            android:maxLength="32"
-            android:maxLines="1"
-            android:inputType="text|textAutoComplete|textAutoCorrect"
-            android:hint="@string/new_item_label_title"
-            android:textColorHint="@android:color/darker_gray"
-            android:ellipsize="start"
-            />
-
-    </LinearLayout>
-
-    <im.delight.android.keyvaluespinner.KeyValueSpinner
-        android:id="@+id/newItemLocationSpinner"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:maxLength="32"
+        android:maxLines="1"
+        android:inputType="text|textAutoComplete|textAutoCorrect"
+        android:hint="@string/new_item_label_title"
+        android:textColorHint="@android:color/darker_gray"
         />
+
+    <EditText
+        android:id="@+id/newItemLocationEditText"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:maxLength="256"
+        android:maxLines="1"
+        android:inputType="text|textAutoComplete|textAutoCorrect|textPostalAddress"
+        android:hint="@string/new_item_label_location"
+        android:textColorHint="@android:color/darker_gray"
+        />
+
+    <!--<im.delight.android.keyvaluespinner.KeyValueSpinner-->
+        <!--android:id="@+id/newItemLocationSpinner"-->
+        <!--android:layout_width="fill_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_weight="1"-->
+        <!--/>-->
 
     <!--<fragment android:name="org.give2peer.give2peer.fragment.LocationChooserFragment"-->
               <!--android:id="@+id/newItemLocationChooserFragment"-->

@@ -17,12 +17,15 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.model.LatLng;
 import com.orm.SugarApp;
 
 import org.give2peer.give2peer.entity.Location;
 import org.give2peer.give2peer.entity.Server;
 import org.give2peer.give2peer.exception.GeocodingException;
+import org.give2peer.give2peer.listener.GoogleApiClientListener;
 import org.ocpsoft.prettytime.PrettyTime;
 
 import java.io.File;
@@ -64,8 +67,11 @@ public class Application extends SugarApp
         super.onCreate();
         singleton = this;
 
+        // A debug message helping me to understand how/when the Application is created
+        Log.d("G2P", "G2P Application onCreate");
+
         // Load the Location from preferences
-        loadGeoLocation();
+        //loadGeoLocation();
 
         // Increment the tally of launches and fire appropriate methods, like `onFirstTime()`
         incrementLaunchesTally();
@@ -128,6 +134,20 @@ public class Application extends SugarApp
         return serverConfiguration;
     }
 
+    // PROPER LOCATION /////////////////////////////////////////////////////////////////////////////
+
+    public synchronized GoogleApiClient buildGoogleLocator(
+            Context context,
+            GoogleApiClientListener listener
+    ) {
+        return new GoogleApiClient.Builder(context)
+                .addConnectionCallbacks(listener)
+                .addOnConnectionFailedListener(listener)
+                .addApi(LocationServices.API)
+                .build();
+    }
+
+
     // GEO LOCATION ////////////////////////////////////////////////////////////////////////////////
 
     protected static String PREF_GEO_LAT = "geo_latitude";
@@ -169,7 +189,7 @@ public class Application extends SugarApp
     public void setGeoLocation(android.location.Location location)
     {
         this.location = location;
-        saveGeoLocation();
+        //saveGeoLocation();
     }
 
     public LatLng getGeoLocationLatLng()
@@ -335,9 +355,7 @@ public class Application extends SugarApp
             BitmapFactory.Options options = new BitmapFactory.Options();
             options.inSampleSize = 2; // halves the dimensions of the image
 
-            Log.d("G2P", "Before decodeStream");
             Bitmap bmp = BitmapFactory.decodeStream(fis, null, options);
-            Log.d("G2P", "After decodeStream");
             if (null == bmp) {
                 throw new Exception("Could not decode the bitmap stream.");
             }

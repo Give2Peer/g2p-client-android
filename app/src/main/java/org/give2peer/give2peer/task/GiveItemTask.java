@@ -34,8 +34,13 @@ public class GiveItemTask extends AsyncTask<Item, Void, Item> {
         }
 
         // And then upload the picture
-        File picture = item.getPictures().get(0);
-        item = app.getRestService().pictureItem(item, picture);
+        try {
+            File picture = item.getPictures().get(0);
+            item = app.getRestService().pictureItem(item, picture);
+        } catch (Exception e) {
+            exception = e;
+            return item;
+        }
 
         return item;
     }

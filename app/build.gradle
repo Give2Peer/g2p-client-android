@@ -48,6 +48,8 @@ dependencies {
     //compile 'com.google.android.gms:play-services:7.3.0'
     // MAPS GOOGLE API (more targeted dependency than above)
     compile 'com.google.android.gms:play-services-maps:7.3.0'
+    // LOCATION GOOGLE API (more targeted dependency than above)
+    compile 'com.google.android.gms:play-services-location:7.3.0'
     // HTTP
     compile 'org.apache.httpcomponents:httpmime:4.3'
     compile 'org.apache.httpcomponents:httpclient-android:4.3.5'

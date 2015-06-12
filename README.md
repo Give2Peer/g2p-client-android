@@ -126,6 +126,15 @@ and `org.apache.httpcomponents:httpclient-android:4.3.5`.
 There are duplication shenanigans with the `httpclient`.
 
 
+KeyValue Spinner
+----------------
+
+https://github.com/delight-im/Android-KeyValueSpinner
+
+This is pretty useful, and should probably be part of Android's core, somehow.
+That lib is added as a JAR file. This is bad. It should be added through gradle.
+
+
 RetroFit
 --------
 
