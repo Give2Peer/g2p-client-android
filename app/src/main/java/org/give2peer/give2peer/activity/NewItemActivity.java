@@ -2,6 +2,7 @@ package org.give2peer.give2peer.activity;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Environment;
@@ -56,14 +57,6 @@ public class NewItemActivity extends Activity
         // Grab the app
         app = (Application) getApplication();
 
-        // Check if there's a camera available
-        // todo: propose the gallery picker?
-        if (!app.hasCameraSupport()) {
-            app.toast(getString(R.string.toast_no_camera_available));
-            finish();
-            return;
-        }
-
         // On some devices, the Camera activity destroys this activity, so we need to restore the
         // paths of the files we created.
         if (null != savedInstanceState) {
@@ -77,18 +70,48 @@ public class NewItemActivity extends Activity
             imagePaths = new ArrayList<>();
         }
 
-        // Directly try to grab a new image if and only if there are no files paths stored
-        // Otherwise, it means that `onActivityResult` will be called.
-        if (imagePaths.size() == 0) {
-            try {
-                addNewPicture();
-            } catch (IOException ex) {
-                Log.e("G2P", "Failed to add a new picture.");
-                ex.printStackTrace();
-                app.toast(getString(R.string.toast_new_item_file_error), Toast.LENGTH_LONG);
-                finish();
+        // Handles images sent to this app by the "share" feature
+        Intent intent = getIntent();
+        String action = intent.getAction();
+        String type = intent.getType();
+        if (Intent.ACTION_SEND.equals(action) && type != null) {
+            if (type.startsWith("image/")) {
+                // Handle a single image being sent
+                Uri imageUri = (Uri) intent.getParcelableExtra(Intent.EXTRA_STREAM);
+                String imagePath = getPathFromImageURI(imageUri);
+                Log.d("G2P", "Add new item with shared image `"+imagePath+"`");
+                imagePaths.add(imagePath);
+                processImages();
+            } else {
+                // The intent filter in the manifest should ensure that we never EVER throw this.
+                throw new RuntimeException("You shared something that is not an image. Nooope.");
+            }
+//        } else if (Intent.ACTION_SEND_MULTIPLE.equals(action) && type != null) {
+//            if (type.startsWith("image/")) {
+//                handleSendMultipleImages(intent); // Handle multiple images being sent
+//            }
+        } else {
+            // Directly try to grab a new image if and only if there are no files paths stored
+            // Otherwise, it means that `onActivityResult` will be called.
+            if (imagePaths.size() == 0) {
+                try {
+                    // Check if there's a camera available
+                    // todo: propose the gallery picker?
+                    if (!app.hasCameraSupport()) {
+                        app.toast(getString(R.string.toast_no_camera_available));
+                        finish();
+                        return;
+                    }
+                    addNewPicture();
+                } catch (IOException ex) {
+                    Log.e("G2P", "Failed to add a new picture.");
+                    ex.printStackTrace();
+                    app.toast(getString(R.string.toast_new_item_file_error), Toast.LENGTH_LONG);
+                    finish();
+                }
             }
         }
+
 
     }
 
@@ -105,56 +128,7 @@ public class NewItemActivity extends Activity
     protected void onActivityResult(int requestCode, int resultCode, Intent intent)
     {
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
-
-            if (imagePaths.size() == 0) {
-                Log.e("G2P", "No image paths are prepared to receive camera output. Cancelling...");
-                finish();
-            }
-
-            // Right now there's only one image per item, but when there'll be multiple images...
-            String imagePath = imagePaths.get(imagePaths.size()-1);
-            File pictureFile = new File(imagePath);
-
-            Bitmap imageBitmap = null;
-
-            if (null != intent) {
-                // Unsure if this ever happens as we're providing `MediaStore.EXTRA_OUTPUT` now.
-                Log.d("G2P", "REQUEST_IMAGE_CAPTURE intent data is not null.");
-                Bundle extras = intent.getExtras();
-                imageBitmap = (Bitmap) extras.get("data");
-            } else {
-                Log.d("G2P", "REQUEST_IMAGE_CAPTURE intent data is null.");
-                imageBitmap = app.getBitmapFromPath(imagePath);
-            }
-
-            if (null == imageBitmap) {
-                Log.e("G2P", "Add new item : the image bitmap was `null` at : " + imagePath);
-                finish();
-                return;
-            }
-
-            // Sometimes the camera sends back an empty bitmap, so we're trying this
-            if (imageBitmap.getHeight() == 0 || imageBitmap.getWidth() == 0) {
-                Log.e("G2P", "Add new item : the bitmap is empty !");
-                finish();
-                return;
-            }
-
-            // Put the bitmap in the View to show the user
-            ((ImageView)findViewById(R.id.newItemImageView)).setImageBitmap(imageBitmap);
-
-            // Write the bitmap to file
-            FileOutputStream fOut;
-            try {
-                fOut = new FileOutputStream(pictureFile);
-                imageBitmap.compress(Bitmap.CompressFormat.JPEG, 85, fOut);
-                fOut.flush();
-                fOut.close();
-            } catch (Exception e) {
-                Log.e("G2P", e.getMessage());
-                e.printStackTrace();
-                finish();
-            }
+            processImages();
         } else if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_CANCELED) {
             // If the user cancelled the capture of a picture, we GTFO.
             // It may be nice to allow a user to add a picture from a gallery instead of taking one.
@@ -164,6 +138,65 @@ public class NewItemActivity extends Activity
         }
     }
 
+    protected void processImages()
+    {
+        if (imagePaths.size() == 0) {
+            String msg = getString(R.string.toast_no_image_paths);
+            Log.e("G2P", msg);
+            app.toast(msg, Toast.LENGTH_LONG);
+            finish();
+        }
+
+        // Right now there's only one image per item, but when there'll be multiple images...
+        String imagePath = imagePaths.get(imagePaths.size()-1);
+        File imageFile = new File(imagePath);
+
+        Bitmap imageBitmap = app.getBitmapFromPath(imagePath);
+
+        if (null == imageBitmap) {
+            Log.e("G2P", "Add new item : the image bitmap was `null` at : " + imagePath);
+            finish();
+            return;
+        }
+
+        // Sometimes the camera sends back an empty bitmap, so we're trying this
+        if (imageBitmap.getHeight() == 0 || imageBitmap.getWidth() == 0) {
+            Log.e("G2P", "Add new item : the bitmap is empty !");
+            finish();
+            return;
+        }
+
+        // Put the bitmap in the View to show the user
+        ((ImageView)findViewById(R.id.newItemImageView)).setImageBitmap(imageBitmap);
+
+        // Write the bitmap to file
+        FileOutputStream fOut;
+        try {
+            fOut = new FileOutputStream(imageFile);
+            imageBitmap.compress(Bitmap.CompressFormat.JPEG, 85, fOut);
+            fOut.flush();
+            fOut.close();
+        } catch (Exception e) {
+            Log.e("G2P", e.getMessage());
+            e.printStackTrace();
+            finish();
+        }
+    }
+
+    // Convert the image URI to the direct file system path of the image file
+    public String getPathFromImageURI(Uri contentUri) {
+
+        String [] proj={MediaStore.Images.Media.DATA};
+        Cursor cursor = managedQuery( contentUri,
+                                      proj, // Which columns to return
+                                      null,       // WHERE clause; which rows to return (all rows)
+                                      null,       // WHERE clause selection arguments (none)
+                                      null); // Order-by clause (ascending by name)
+        int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+        cursor.moveToFirst();
+
+        return cursor.getString(column_index);
+    }
 
     //// ACTIONS ///////////////////////////////////////////////////////////////////////////////////
 

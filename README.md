@@ -101,7 +101,7 @@ activities and tests application flows.
 
 Simply run `app/src/androidTest/java/org/give2peer/give2peer/test/MainTest.java` in Android Studio.
 
-The current feature suite is not as exhaustive as she should be.
+The current feature suite is not as exhaustive as it should be.
 The mandatory usage of the Camera or Gallery picker when adding a new Item is tricky.
 Robotium simply cannot control another application without some serious and delicate apk re-signing
 (which [requires rooting](https://code.google.com/p/robotium/wiki/RobotiumForPreInstalledApps)), or
@@ -223,7 +223,7 @@ Thanks
 - Ilane, for feeding us and putting up with our code-related ramblings.
 - Misha, for picking the name _give2peer_, and his general enthusiasm and advice.
 - Willou, for his mumbled advice.
-- Kiouze, for his
+- Kiouze, for his awesome æsthetics.
 - The ioth, because they can read between the books.
 - Our other friends, for not killing us when we pester them about this.
 - Our families, for their unwavering support.

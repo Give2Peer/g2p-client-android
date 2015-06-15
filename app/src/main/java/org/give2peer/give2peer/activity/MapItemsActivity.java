@@ -223,6 +223,19 @@ public class      MapItemsActivity
         }
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQUEST_RESOLVE_ERROR) {
+            isResolvingError = false;
+            if (resultCode == RESULT_OK) {
+                // Make sure the app is not already connected or attempting to connect
+                if (!googleLocator.isConnecting() && !googleLocator.isConnected()) {
+                    googleLocator.connect();
+                }
+            }
+        }
+    }
+
     // The rest of this code is all about building the error dialog
 
     /* Creates a dialog for an error message */
