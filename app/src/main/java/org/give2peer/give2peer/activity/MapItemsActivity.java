@@ -96,6 +96,9 @@ public class      MapItemsActivity
         // SERVICE_DISABLED, SERVICE_INVALID
         // Read more: http://developer.android.com/google/play-services/setup.html
 
+        isResolvingError = savedInstanceState != null
+                && savedInstanceState.getBoolean(STATE_RESOLVING_ERROR, false);
+
         if (availability != ConnectionResult.SUCCESS) {
             if (gaa.isUserResolvableError(availability)) {
                 app.toast("Google Play is unavailable or not up-to-date.");
@@ -166,9 +169,12 @@ public class      MapItemsActivity
     protected static final String DIALOG_ERROR = "dialog_error";
     // Bool to track whether the app is already resolving an error
     protected boolean isResolvingError = false;
+    // To save the state of the error resolving in case the screen is rotated for example
+    private static final String STATE_RESOLVING_ERROR = "resolving_error";
 
     @Override
-    protected void onStart() {
+    protected void onStart()
+    {
         super.onStart();
         if (!isResolvingError) {
             googleLocator.connect();
@@ -176,7 +182,8 @@ public class      MapItemsActivity
     }
 
     @Override
-    protected void onStop() {
+    protected void onStop()
+    {
         googleLocator.disconnect();
         super.onStop();
     }
@@ -224,7 +231,8 @@ public class      MapItemsActivity
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    protected void onActivityResult(int requestCode, int resultCode, Intent data)
+    {
         if (requestCode == REQUEST_RESOLVE_ERROR) {
             isResolvingError = false;
             if (resultCode == RESULT_OK) {
@@ -234,6 +242,13 @@ public class      MapItemsActivity
                 }
             }
         }
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState)
+    {
+        super.onSaveInstanceState(outState);
+        outState.putBoolean(STATE_RESOLVING_ERROR, isResolvingError);
     }
 
     // The rest of this code is all about building the error dialog
