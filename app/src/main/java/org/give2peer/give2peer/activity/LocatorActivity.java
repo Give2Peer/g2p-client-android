@@ -138,7 +138,9 @@ public class LocatorActivity
      * Override this in child classes
      * @param location The Location fetched from google api services
      */
-    public void onLocated(Location location) {}
+    public void onLocated(Location location) {
+        app.setGeoLocation(location);
+    }
 
     @Override
     public void onConnectionSuspended(int i)

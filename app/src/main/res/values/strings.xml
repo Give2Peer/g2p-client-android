@@ -13,6 +13,7 @@
 
     <string name="new_item_label_title">Title</string>
     <string name="new_item_label_location">Location</string>
+    <string name="new_item_label_location_optional">Location (leave blank to use GPS)</string>
     <string name="new_item_image_description">The picture of the item you just took.</string>
     <string name="new_item_send_button">Send</string>
 

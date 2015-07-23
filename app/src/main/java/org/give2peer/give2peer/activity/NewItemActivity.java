@@ -138,9 +138,10 @@ public class NewItemActivity extends LocatorActivity
     @Override
     public void onLocated(Location loc)
     {
-        super.onLocated(loc);
+        super.onLocated(loc); // parent saves the location Application-wise
+        // When we are located we tell the user that the Location input field is optional
         EditText locationInput = (EditText) findViewById(R.id.newItemLocationEditText);
-        locationInput.setText(String.format(Locale.US, "%f / %f", loc.getLatitude(), loc.getLongitude()));
+        locationInput.setHint(R.string.new_item_label_location_optional);
     }
 
     @Override
@@ -170,7 +171,8 @@ public class NewItemActivity extends LocatorActivity
     }
 
     /**
-     * This is crap. Besides, it MUTATES THE IMAGE AND DEGRADES ITS QUALITY !!!
+     * THIS IS CRAP.
+     * Besides, it MUTATES THE IMAGE AND DEGRADES ITS QUALITY !!!
      * fixme: create a proper thumbnail to send away and then to delete, or to store in the cache
      */
     protected void processImages()
@@ -215,7 +217,11 @@ public class NewItemActivity extends LocatorActivity
         }
     }
 
-    // Convert the image URI to the direct file system path of the image file
+    /**
+     * Convert the image URI to the direct file system path of the image file.
+     * @param contentUri
+     * @return
+     */
     public String getPathFromImageURI(Uri contentUri)
     {
         String [] proj={MediaStore.Images.Media.DATA};
@@ -232,6 +238,10 @@ public class NewItemActivity extends LocatorActivity
 
     //// ACTIONS ///////////////////////////////////////////////////////////////////////////////////
 
+    /**
+     * Try to fill the thumbnail view with the first image.
+     * Fail silently (kinda) if the image is invalid.
+     */
     protected void fillThumbnail()
     {
         if (imagePaths.size() > 0) {
@@ -275,6 +285,9 @@ public class NewItemActivity extends LocatorActivity
         }
     }
 
+    /**
+     * Send the new item data to the server, in a async task.
+     */
     public void send()
     {
         // Update the UI
@@ -290,7 +303,8 @@ public class NewItemActivity extends LocatorActivity
             android.location.Location location = app.getGeoLocation();
             if (null != location) {
                 locationInputValue = String.format(
-                        "%f/%f",
+                        Locale.US,
+                        "%f / %f",
                         location.getLatitude(),
                         location.getLongitude()
                 );
@@ -302,7 +316,7 @@ public class NewItemActivity extends LocatorActivity
         }
 
         // Grab the image files from the paths
-        // Remember, maybe this activity was destroyed while taking a picture
+        // Remember, maybe this activity was destroyed while taking a picture with the camera.
         List<File> imageFiles = new ArrayList<>();
         for (String path : imagePaths) {
             imageFiles.add(new File(path));
@@ -319,8 +333,8 @@ public class NewItemActivity extends LocatorActivity
             @Override
             protected void onPostExecute(Item item) {
                 if (!hasException()) {
-                    finish();
                     app.toast(getString(R.string.toast_new_item_uploaded, item.getTitle()));
+                    finish();
                 } else {
                     Exception e = getException();
                     String toast;
