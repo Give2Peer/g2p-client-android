@@ -12,12 +12,13 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 
 
-public class GiveItemTask extends AsyncTask<Item, Void, Item> {
+public class NewItemTask extends AsyncTask<Item, Void, Item>
+{
     Application app;
 
     Exception exception;
 
-    public GiveItemTask(Application app) {
+    public NewItemTask(Application app) {
         this.app = app;
     }
 
@@ -33,7 +34,7 @@ public class GiveItemTask extends AsyncTask<Item, Void, Item> {
             return item;
         }
 
-        // And then upload the picture
+        // And if successful then upload the picture
         try {
             File picture = item.getPictures().get(0);
             item = app.getRestService().pictureItem(item, picture);
@@ -49,5 +50,9 @@ public class GiveItemTask extends AsyncTask<Item, Void, Item> {
 
     public Exception getException() { return exception;         }
 
+    /**
+     * Override this to provide scoped logic.
+     * @param item that was added
+     */
     protected void onPostExecute(Item item) {}
 }

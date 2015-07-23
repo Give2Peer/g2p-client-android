@@ -1,6 +1,5 @@
 package org.give2peer.give2peer.activity;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -13,20 +12,16 @@ import android.support.annotation.NonNull;
 //import android.support.v7.internal.widget.AdapterViewCompat;
 import android.util.Log;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
-import android.widget.Spinner;
 import android.widget.Toast;
 
-import org.give2peer.give2peer.Application;
 import org.give2peer.give2peer.Item;
 import org.give2peer.give2peer.R;
 //import org.give2peer.give2peer.entity.Location;
-import org.give2peer.give2peer.task.GiveItemTask;
+import org.give2peer.give2peer.task.NewItemTask;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -41,8 +36,8 @@ import java.util.Locale;
 
 /**
  * Handles :
- * - Receiving an image from camera's share intent
- * - Launching the camera when no images are provided
+ * - Receiving an image from another activity's share intent
+ * - Launching the camera otherwise
  *
  * This is where the user adds new items in the database.
  * It should handle the three main moop intents :
@@ -62,9 +57,7 @@ public class NewItemActivity extends LocatorActivity
     static final int REQUEST_IMAGE_CAPTURE = 1;
     static final String BUNDLE_IMAGE_PATHS = "imagePaths";
 
-    protected Application app;
-
-    protected ArrayList<String> imagePaths; // stores the images Files paths, and is saved
+    protected ArrayList<String> imagePaths; // stores the image files paths, and is saved
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,9 +65,6 @@ public class NewItemActivity extends LocatorActivity
         setContentView(R.layout.activity_new_item);
 
         Log.d("G2P", "Starting new item activity.");
-
-        // Grab the app
-        app = (Application) getApplication();
 
         // On some devices, the Camera activity destroys this activity, so we need to restore the
         // paths of the files we created.
@@ -98,9 +88,10 @@ public class NewItemActivity extends LocatorActivity
                 // Handle a single image being sent
                 Uri imageUri = (Uri) intent.getParcelableExtra(Intent.EXTRA_STREAM);
                 String imagePath = getPathFromImageURI(imageUri);
-                Log.d("G2P", "Add new item with shared image `"+imagePath+"`");
+                Log.d("G2P", "Add new item with shared image `" + imagePath + "`.");
                 imagePaths.add(imagePath);
-                processImages();
+                fillThumbnail();
+                //processImages();
             } else {
                 // The intent filter in the manifest should ensure that we never EVER throw this.
                 throw new RuntimeException("You shared something that is not an image. Nooope.");
@@ -122,7 +113,7 @@ public class NewItemActivity extends LocatorActivity
                         return;
                     }
                     // Launch the camera to add a new picture
-                    addNewPicture();
+                    requestNewPicture();
                 } catch (IOException ex) {
                     Log.e("G2P", "Failed to add a new picture.");
                     ex.printStackTrace();
@@ -131,8 +122,6 @@ public class NewItemActivity extends LocatorActivity
                 }
             }
         }
-
-        fillThumbnail();
     }
 
     @Override
@@ -158,7 +147,7 @@ public class NewItemActivity extends LocatorActivity
     {
         super.onActivityResult(requestCode, resultCode, intent);
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
-            processImages();
+            //processImages();
             // Put the bitmap in the View to show the user
             fillThumbnail();
         } else if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_CANCELED) {
@@ -174,6 +163,7 @@ public class NewItemActivity extends LocatorActivity
      * THIS IS CRAP.
      * Besides, it MUTATES THE IMAGE AND DEGRADES ITS QUALITY !!!
      * fixme: create a proper thumbnail to send away and then to delete, or to store in the cache
+     * @deprecated
      */
     protected void processImages()
     {
@@ -258,7 +248,7 @@ public class NewItemActivity extends LocatorActivity
     /**
      * Launch the Camera activity to grab a picture, which will get back to `onActivityResult`.
      */
-    protected void addNewPicture() throws IOException
+    protected void requestNewPicture() throws IOException
     {
         // Create an new image capture intent
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
@@ -329,7 +319,7 @@ public class NewItemActivity extends LocatorActivity
         item.setPictures(imageFiles);
 
         // Try to upload it, along with its image(s).
-        GiveItemTask git = new GiveItemTask(app) {
+        NewItemTask nit = new NewItemTask(app) {
             @Override
             protected void onPostExecute(Item item) {
                 if (!hasException()) {
@@ -350,7 +340,7 @@ public class NewItemActivity extends LocatorActivity
                 }
             }
         };
-        git.execute(item);
+        nit.execute(item);
     }
 
 

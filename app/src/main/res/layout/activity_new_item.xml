@@ -2,44 +2,57 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="fill_parent"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
-    android:paddingBottom="@dimen/activity_vertical_margin"
     android:orientation="vertical"
     tools:context=".NewItemActivity" >
 
-    <ImageView
+    <ScrollView
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/newItemImageView"
-        android:contentDescription="@string/new_item_image_description"
-        android:src="@drawable/item_thumbnail"
-        android:layout_marginBottom="13dp" />
-
-    <EditText
-        android:id="@+id/newItemTitleEditText"
+        >
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="10dp"
-        android:maxLength="32"
-        android:maxLines="1"
-        android:inputType="text|textAutoComplete|textAutoCorrect"
-        android:hint="@string/new_item_label_title"
-        android:textColorHint="@android:color/darker_gray"
-        />
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin"
+        android:paddingTop="@dimen/activity_vertical_margin"
+        android:paddingBottom="@dimen/activity_vertical_margin"
+        android:orientation="vertical"
+        >
 
-    <EditText
-        android:id="@+id/newItemLocationEditText"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="10dp"
-        android:maxLength="256"
-        android:maxLines="1"
-        android:inputType="text|textAutoComplete|textAutoCorrect|textPostalAddress"
-        android:hint="@string/new_item_label_location"
-        android:textColorHint="@android:color/darker_gray"
-        />
+        <ImageView
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:id="@+id/newItemImageView"
+            android:contentDescription="@string/new_item_image_description"
+            android:src="@drawable/item_thumbnail"
+            android:layout_marginBottom="13dp" />
+
+        <EditText
+            android:id="@+id/newItemTitleEditText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:maxLength="32"
+            android:maxLines="1"
+            android:inputType="text|textAutoComplete|textAutoCorrect"
+            android:hint="@string/new_item_label_title"
+            android:textColorHint="@android:color/darker_gray"
+            />
+
+        <EditText
+            android:id="@+id/newItemLocationEditText"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:maxLength="256"
+            android:maxLines="1"
+            android:inputType="text|textAutoComplete|textAutoCorrect|textPostalAddress"
+            android:hint="@string/new_item_label_location"
+            android:textColorHint="@android:color/darker_gray"
+            />
+
+    </LinearLayout>
+    </ScrollView>
 
     <!--<im.delight.android.keyvaluespinner.KeyValueSpinner-->
         <!--android:id="@+id/newItemLocationSpinner"-->

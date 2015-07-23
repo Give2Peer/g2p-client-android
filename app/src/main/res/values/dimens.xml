@@ -1,3 +1,4 @@
+<!-- I have no idea why the tag is `dimen` and the filename is `dimens`. Unconsistency ! -->
 <resources>
     <!-- Default screen margins, per the Android Design guidelines. -->
     <dimen name="activity_horizontal_margin">16dp</dimen>

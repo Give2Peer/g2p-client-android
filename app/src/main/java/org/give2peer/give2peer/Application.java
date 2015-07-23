@@ -356,7 +356,7 @@ public class Application extends SugarApp
             mat.postRotate(rotate);
 
             BitmapFactory.Options options = new BitmapFactory.Options();
-            options.inSampleSize = 2; // halves the dimensions of the image
+            //options.inSampleSize = 2; // halves the dimensions of the image
 
             Bitmap bmp = BitmapFactory.decodeStream(fis, null, options);
             if (null == bmp) {
