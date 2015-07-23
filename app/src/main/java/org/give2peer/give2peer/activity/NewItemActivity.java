@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.location.Location;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
@@ -24,7 +25,7 @@ import android.widget.Toast;
 import org.give2peer.give2peer.Application;
 import org.give2peer.give2peer.Item;
 import org.give2peer.give2peer.R;
-import org.give2peer.give2peer.entity.Location;
+//import org.give2peer.give2peer.entity.Location;
 import org.give2peer.give2peer.task.GiveItemTask;
 
 import java.io.File;
@@ -36,9 +37,27 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-import im.delight.android.keyvaluespinner.KeyValueSpinner;
+//import im.delight.android.keyvaluespinner.KeyValueSpinner;
 
-public class NewItemActivity extends Activity
+/**
+ * Handles :
+ * - Receiving an image from camera's share intent
+ * - Launching the camera when no images are provided
+ *
+ * This is where the user adds new items in the database.
+ * It should handle the three main moop intents :
+ * - garbage is
+ *   - spotted
+ *   - recycled
+ *   - destroyed
+ * - lost&found is
+ *   - spotted
+ * - donation is
+ *   - made
+ * Unless we make multiple Activities for each, and make multiple share options.
+ * That would reduce the number of actions the app requires of the user.
+ */
+public class NewItemActivity extends LocatorActivity
 {
     static final int REQUEST_IMAGE_CAPTURE = 1;
     static final String BUNDLE_IMAGE_PATHS = "imagePaths";
@@ -102,6 +121,7 @@ public class NewItemActivity extends Activity
                         finish();
                         return;
                     }
+                    // Launch the camera to add a new picture
                     addNewPicture();
                 } catch (IOException ex) {
                     Log.e("G2P", "Failed to add a new picture.");
@@ -112,7 +132,15 @@ public class NewItemActivity extends Activity
             }
         }
 
+        fillThumbnail();
+    }
 
+    @Override
+    public void onLocated(Location loc)
+    {
+        super.onLocated(loc);
+        EditText locationInput = (EditText) findViewById(R.id.newItemLocationEditText);
+        locationInput.setText(String.format(Locale.US, "%f / %f", loc.getLatitude(), loc.getLongitude()));
     }
 
     @Override
@@ -127,8 +155,11 @@ public class NewItemActivity extends Activity
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent intent)
     {
+        super.onActivityResult(requestCode, resultCode, intent);
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
             processImages();
+            // Put the bitmap in the View to show the user
+            fillThumbnail();
         } else if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_CANCELED) {
             // If the user cancelled the capture of a picture, we GTFO.
             // It may be nice to allow a user to add a picture from a gallery instead of taking one.
@@ -138,6 +169,10 @@ public class NewItemActivity extends Activity
         }
     }
 
+    /**
+     * This is crap. Besides, it MUTATES THE IMAGE AND DEGRADES ITS QUALITY !!!
+     * fixme: create a proper thumbnail to send away and then to delete, or to store in the cache
+     */
     protected void processImages()
     {
         if (imagePaths.size() == 0) {
@@ -166,9 +201,6 @@ public class NewItemActivity extends Activity
             return;
         }
 
-        // Put the bitmap in the View to show the user
-        ((ImageView)findViewById(R.id.newItemImageView)).setImageBitmap(imageBitmap);
-
         // Write the bitmap to file
         FileOutputStream fOut;
         try {
@@ -184,13 +216,13 @@ public class NewItemActivity extends Activity
     }
 
     // Convert the image URI to the direct file system path of the image file
-    public String getPathFromImageURI(Uri contentUri) {
-
+    public String getPathFromImageURI(Uri contentUri)
+    {
         String [] proj={MediaStore.Images.Media.DATA};
         Cursor cursor = managedQuery( contentUri,
-                                      proj, // Which columns to return
-                                      null,       // WHERE clause; which rows to return (all rows)
-                                      null,       // WHERE clause selection arguments (none)
+                                      proj,  // Which columns to return
+                                      null,  // WHERE clause; which rows to return (all rows)
+                                      null,  // WHERE clause selection arguments (none)
                                       null); // Order-by clause (ascending by name)
         int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
         cursor.moveToFirst();
@@ -199,6 +231,19 @@ public class NewItemActivity extends Activity
     }
 
     //// ACTIONS ///////////////////////////////////////////////////////////////////////////////////
+
+    protected void fillThumbnail()
+    {
+        if (imagePaths.size() > 0) {
+            String imagePath = imagePaths.get(imagePaths.size() - 1);
+            try { // imagePaths may be set but the files may not exist yet
+                Bitmap imageBitmap = app.getBitmapFromPath(imagePath);
+                ((ImageView)findViewById(R.id.newItemImageView)).setImageBitmap(imageBitmap);
+            } catch (Exception e) {
+                Log.i("G2P", "Image path '"+imagePath+"' probably has no bitmap data.");
+            }
+        }
+    }
 
     /**
      * Launch the Camera activity to grab a picture, which will get back to `onActivityResult`.

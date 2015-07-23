@@ -3,6 +3,8 @@ Feature: Finding items
     As a gatherer
     I should be able to list items around my position
 
+# This scenario is obsolete o.O
+# TDD is hell on Android T_T
 Scenario: List without filters
     Given I start the main activity
      Then I should see a button named "Find"

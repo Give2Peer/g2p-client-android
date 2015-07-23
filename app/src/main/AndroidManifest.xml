@@ -58,11 +58,6 @@
             </intent-filter>
         </activity>
 
-        <!-- Displays a grid of items, from closest to furthest -->
-        <!-- Not used anymore, might be a good Map fallback when OpenGL 2.0 is unavailable ? -->
-        <activity android:name=".activity.ListAroundActivity">
-        </activity>
-
         <!-- Uses a system intent to capture an image and provides a form to add a new item. -->
         <activity
             android:name=".activity.NewItemActivity"
@@ -78,6 +73,13 @@
         <!-- App settings -->
         <activity
             android:name=".activity.SettingsActivity"
+            >
+        </activity>
+
+        <!-- Displays a grid of items, from closest to furthest -->
+        <!-- NOT USED anymore, might be a good Map fallback when OpenGL 2.0 is unavailable ? -->
+        <activity
+            android:name=".activity.ListAroundActivity"
             >
         </activity>
 

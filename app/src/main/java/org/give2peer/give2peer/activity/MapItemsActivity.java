@@ -58,19 +58,16 @@ import java.util.HashSet;
 import java.util.List;
 
 public class      MapItemsActivity
-       extends    ActionBarActivity
-       implements OnMapReadyCallback, GoogleApiClientListener
+       extends    LocatorActivity
+       implements OnMapReadyCallback
 {
-    Application app;
-
-    // Allows us to find items from their respective markers during UI events
+    // Allows us to find items from their respective markers during map UI events
     HashMap<Marker, Item> markerItemHashMap = new HashMap<Marker, Item>();
 
-    FrameLayout mapItemsDrawFrame;
-    Boolean     isDrawing = false; // whether the user is drawing or not
-
     GoogleMap googleMap;
-    GoogleApiClient googleLocator;
+
+    FrameLayout mapItemsDrawFrame;
+    Boolean     isDrawing = false; // whether or not the user is drawing
 
     ArrayList<LatLng> drawingCoordinates = new ArrayList<>();
 
@@ -87,29 +84,6 @@ public class      MapItemsActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map_items);
 
-        app = (Application) getApplication();
-
-        GoogleApiAvailability gaa = GoogleApiAvailability.getInstance();
-        int availability = gaa.isGooglePlayServicesAvailable(this);
-
-        // SUCCESS, SERVICE_MISSING, SERVICE_UPDATING, SERVICE_VERSION_UPDATE_REQUIRED,
-        // SERVICE_DISABLED, SERVICE_INVALID
-        // Read more: http://developer.android.com/google/play-services/setup.html
-
-        isResolvingError = savedInstanceState != null
-                && savedInstanceState.getBoolean(STATE_RESOLVING_ERROR, false);
-
-        if (availability != ConnectionResult.SUCCESS) {
-            if (gaa.isUserResolvableError(availability)) {
-                app.toast("Google Play is unavailable or not up-to-date.");
-            } else {
-                app.toast("Google Play is unavailable or not up-to-date, and it is not resolvable.");
-            }
-            gaa.getErrorDialog(this, availability, 0).show();
-
-            //finish();
-        }
-
         // I never had a failure there, but better safe than sorry !
         try {
             SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -124,9 +98,6 @@ public class      MapItemsActivity
 
             // todo: show a help view, and/or the "report a bug" button.
         }
-
-        Log.d("G2P", "Building Google API Client.");
-        googleLocator = app.buildGoogleLocator(this, this);
     }
 
     @Override
@@ -161,136 +132,11 @@ public class      MapItemsActivity
         return super.onOptionsItemSelected(item);
     }
 
-    //// GEO LOCATION //////////////////////////////////////////////////////////////////////////////
-
-    // Request code to use when launching the resolution activity
-    protected static final int REQUEST_RESOLVE_ERROR = 1001;
-    // Unique tag for the error dialog fragment
-    protected static final String DIALOG_ERROR = "dialog_error";
-    // Bool to track whether the app is already resolving an error
-    protected boolean isResolvingError = false;
-    // To save the state of the error resolving in case the screen is rotated for example
-    private static final String STATE_RESOLVING_ERROR = "resolving_error";
-
     @Override
-    protected void onStart()
+    public void onLocated(Location loc)
     {
-        super.onStart();
-        if (!isResolvingError) {
-            googleLocator.connect();
-        }
-    }
-
-    @Override
-    protected void onStop()
-    {
-        googleLocator.disconnect();
-        super.onStop();
-    }
-
-    @Override
-    public void onConnected(Bundle bundle)
-    {
-        Log.d("G2P", "Connection to Google Location API established.");
-        Location lastLocation = LocationServices.FusedLocationApi.getLastLocation(googleLocator);
-        if (lastLocation == null) {
-            Log.e("G2P", "Failed to retrieve the last known location.");
-        } else {
-            app.setGeoLocation(lastLocation);
-            if (isMapReady()) executeFinderTask(app.getGeoLocationLatLng());
-        }
-    }
-
-    @Override
-    public void onConnectionSuspended(int i)
-    {
-        Log.i("G2P", "Connection to Google API suspended.");
-        // I don't know what else to do here. Ideas ?
-    }
-
-    @Override
-    public void onConnectionFailed(ConnectionResult connectionResult)
-    {
-        Log.e("G2P", "Connection to Google API services failed.");
-        if (isResolvingError) {
-            // Already attempting to resolve an error.
-            return;
-        } else if (connectionResult.hasResolution()) {
-            try {
-                isResolvingError = true;
-                connectionResult.startResolutionForResult(this, REQUEST_RESOLVE_ERROR);
-            } catch (IntentSender.SendIntentException e) {
-                // There was an error with the resolution intent. Try again.
-                googleLocator.connect();
-            }
-        } else {
-            // Show dialog using GooglePlayServicesUtil.getErrorDialog()
-            showErrorDialog(connectionResult.getErrorCode());
-            isResolvingError = true;
-        }
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data)
-    {
-        if (requestCode == REQUEST_RESOLVE_ERROR) {
-            isResolvingError = false;
-            if (resultCode == RESULT_OK) {
-                // Make sure the app is not already connected or attempting to connect
-                if (!googleLocator.isConnecting() && !googleLocator.isConnected()) {
-                    googleLocator.connect();
-                }
-            }
-        }
-    }
-
-    @Override
-    protected void onSaveInstanceState(Bundle outState)
-    {
-        super.onSaveInstanceState(outState);
-        outState.putBoolean(STATE_RESOLVING_ERROR, isResolvingError);
-    }
-
-    // The rest of this code is all about building the error dialog
-
-    /* Creates a dialog for an error message */
-    private void showErrorDialog(int errorCode)
-    {
-        // Create a fragment for the error dialog
-        ErrorDialogFragment dialogFragment = new ErrorDialogFragment();
-        // Pass the error that should be displayed
-        Bundle args = new Bundle();
-        args.putInt(DIALOG_ERROR, errorCode);
-        dialogFragment.setArguments(args);
-        dialogFragment.show(getSupportFragmentManager(), DIALOG_ERROR);
-    }
-
-    /* Called from ErrorDialogFragment when the dialog is dismissed. */
-    public void onDialogDismissed()
-    {
-        isResolvingError = false;
-    }
-
-    /* A fragment to display an error dialog */
-    public static class ErrorDialogFragment extends DialogFragment
-    {
-        public ErrorDialogFragment() {}
-
-        @Override
-        @NonNull
-        public Dialog onCreateDialog(Bundle savedInstanceState) {
-            // Get the error code and retrieve the appropriate dialog
-            int errorCode = this.getArguments().getInt(DIALOG_ERROR);
-            return GooglePlayServicesUtil.getErrorDialog(
-                    errorCode,
-                    this.getActivity(), REQUEST_RESOLVE_ERROR
-            );
-        }
-
-        @Override
-        public void onDismiss(DialogInterface dialog) {
-            ((MapItemsActivity)getActivity()).onDialogDismissed();
-        }
+        super.onLocated(loc);
+        if (isMapReady()) executeFinderTask(new LatLng(loc.getLatitude(), loc.getLongitude()));
     }
 
     //// ACTIONS ///////////////////////////////////////////////////////////////////////////////////
@@ -725,7 +571,8 @@ public class      MapItemsActivity
      * @param polygon The list of the vertices of the polygon, sequential and looping.
      * @return whether the point is inside the polygon
      */
-    public boolean pointInPolygon(LatLng point, List<LatLng> polygon) {
+    public boolean pointInPolygon(LatLng point, List<LatLng> polygon)
+    {
         int crossings = 0;
         int verticesCount = polygon.size();
 
@@ -751,7 +598,8 @@ public class      MapItemsActivity
      * @param a
      * @param b
      */
-    public boolean rayCrossesSegment(LatLng point, LatLng a, LatLng b) {
+    public boolean rayCrossesSegment(LatLng point, LatLng a, LatLng b)
+    {
         double px = point.longitude,
                py = point.latitude,
                ax = a.longitude,
