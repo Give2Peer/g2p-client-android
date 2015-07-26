@@ -3,7 +3,6 @@ package org.give2peer.give2peer;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
@@ -13,10 +12,8 @@ import android.location.Geocoder;
 import android.media.ExifInterface;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.net.Uri;
 import android.os.Build;
 import android.preference.PreferenceManager;
-import android.provider.MediaStore;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -29,15 +26,12 @@ import org.give2peer.give2peer.entity.Location;
 import org.give2peer.give2peer.entity.Server;
 import org.give2peer.give2peer.exception.GeocodingException;
 import org.give2peer.give2peer.listener.GoogleApiClientListener;
-import org.json.JSONException;
-import org.json.JSONObject;
+import org.give2peer.give2peer.service.RestService;
 import org.ocpsoft.prettytime.PrettyTime;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 

@@ -1,33 +1,31 @@
 package org.give2peer.give2peer.listener;
 
-import android.app.AlertDialog;
 import android.app.ProgressDialog;
-import android.content.DialogInterface;
-import android.content.Intent;
 import android.os.AsyncTask;
 import android.preference.Preference;
-import android.util.Log;
 
 import org.give2peer.give2peer.Application;
-import org.give2peer.give2peer.RestService;
-import org.give2peer.give2peer.activity.SettingsActivity;
+import org.give2peer.give2peer.service.RestService;
 import org.give2peer.give2peer.entity.Server;
 import org.give2peer.give2peer.fragment.SettingsFragment;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
 
-public class OnTestServerClickListener implements Preference.OnPreferenceClickListener {
+public class OnTestServerClickListener implements Preference.OnPreferenceClickListener
+{
     SettingsFragment fragment;
     Server server;
+
     public OnTestServerClickListener(SettingsFragment fragment, Server server)
     {
         this.fragment = fragment;
         this.server = server;
     }
-    @Override
-    public boolean onPreferenceClick(Preference preference) {
 
+    @Override
+    public boolean onPreferenceClick(Preference preference)
+    {
         final Application app = (Application) fragment.getActivity().getApplication();
         final int maxAttempts = 3;
         final ProgressDialog progress = new ProgressDialog(fragment.getActivity());

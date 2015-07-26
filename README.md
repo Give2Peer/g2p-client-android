@@ -38,7 +38,8 @@ phone layouts.
 -----
 
 A version for everybody, working under API 10.
-This version (and all of 1.x.x) does not have a proper layout for tablets, and is ugly.
+This version (and all of 1.x.x) does not have a proper layout for tablets, and is ugly,
+but it has a very extensive hardware support.
 
 - [ ] Action points.
 - [ ] Experience points.
@@ -51,6 +52,9 @@ This version (and all of 1.x.x) does not have a proper layout for tablets, and i
 A version for the beta community.
 
 - [ ] Add a new Item offline, upload later.
+- [ ] List items submitted by self.
+- [ ] Edit items submitted by self.
+- [ ] Delete items submitted by self.
 - [ ] Require `https` servers.
 - [ ] Add french translation.
 
@@ -63,10 +67,9 @@ A version for the beta community.
 - [x] Start application by displaying items around the user on a map.
 - [x] Improve automatic location detection using Google API.
 - [x] Refactor to support API 10 (and onwards).
-- [ ] Add a new item using the "share" feature of the camera and gallery.
+- [x] Add a new item using the "share" feature of the camera and gallery.
 - [ ] Registration activity.
 - [ ] Register automatically when available. (?)
-- [ ] Delete items submitted by self.
 
 
 

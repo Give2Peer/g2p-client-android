@@ -1,4 +1,4 @@
-package org.give2peer.give2peer;
+package org.give2peer.give2peer.service;
 
 import android.util.Log;
 
@@ -19,6 +19,7 @@ import org.apache.http.impl.auth.BasicScheme;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
+import org.give2peer.give2peer.Item;
 import org.give2peer.give2peer.entity.Server;
 import org.give2peer.give2peer.exception.ErrorResponseException;
 import org.give2peer.give2peer.exception.UnavailableUsernameException;

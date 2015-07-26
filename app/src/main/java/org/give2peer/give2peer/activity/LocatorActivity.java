@@ -56,7 +56,11 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 
-public class LocatorActivity
+/**
+ * The purpose of this class is to be extended, and it provides the logic for Location detection,
+ * through the Google Play API.
+ */
+abstract public class LocatorActivity
        extends    ActionBarActivity
        implements GoogleApiClientListener
 {
