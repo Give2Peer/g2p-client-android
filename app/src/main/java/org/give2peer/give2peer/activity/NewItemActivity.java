@@ -1,5 +1,6 @@
 package org.give2peer.give2peer.activity;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -10,6 +11,7 @@ import android.provider.MediaStore;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 //import android.support.v7.internal.widget.AdapterViewCompat;
+import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -66,6 +68,37 @@ public class NewItemActivity extends LocatorActivity
         setContentView(R.layout.activity_new_item);
 
         Log.d("G2P", "Starting new item activity.");
+
+        // If the user is not registered, let's forward him to the registration page
+        if (!app.isUserRegistered()) {
+            new AlertDialog.Builder(this)
+                    .setTitle("Registration needed")
+                    .setMessage("To add items to the database, you need to be registered. Do so now?")
+                    .setCancelable(false)
+                    .setPositiveButton(
+                            android.R.string.yes, new DialogInterface.OnClickListener()
+                            {
+                                public void onClick(DialogInterface dialog, int which)
+                                {
+                                    // Go to the registration activity
+                                    Intent intent = new Intent(NewItemActivity.this, RegistrationActivity.class);
+                                    startActivity(intent);
+                                }
+                            }
+                    )
+                    .setNegativeButton(
+                            android.R.string.no, new DialogInterface.OnClickListener()
+                            {
+                                public void onClick(DialogInterface dialog, int which)
+                                {
+                                    // GTFO, then
+                                    finish();
+                                }
+                            }
+                    )
+                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    .show();
+        }
 
         // On some devices, the Camera activity destroys this activity, so we need to restore the
         // paths of the files we created.

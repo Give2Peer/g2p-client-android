@@ -72,6 +72,12 @@
 
         <!-- App settings -->
         <activity
+            android:name=".activity.RegistrationActivity"
+            >
+        </activity>
+
+        <!-- App settings -->
+        <activity
             android:name=".activity.SettingsActivity"
             >
         </activity>

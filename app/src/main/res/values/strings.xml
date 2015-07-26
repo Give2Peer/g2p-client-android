@@ -17,6 +17,11 @@
     <string name="new_item_image_description">The picture of the item you just took.</string>
     <string name="new_item_send_button">Send</string>
 
+    <string name="registration_label_username">Username</string>
+    <string name="registration_label_password">Password</string>
+    <string name="registration_label_email">Email</string>
+    <string name="registration_send_button">Send</string>
+
     <string name="toast_new_item_uploading">Uploading new item…</string>
     <string name="toast_new_item_uploaded">Item \'%s\' was uploaded.\nWell done!</string>
     <string name="toast_new_item_file_error">Could not create a file to store the picture.\nMaybe you\'re out of disk space?</string>

@@ -68,8 +68,7 @@ A version for the beta community.
 - [x] Improve automatic location detection using Google API.
 - [x] Refactor to support API 10 (and onwards).
 - [x] Add a new item using the "share" feature of the camera and gallery.
-- [ ] Registration activity.
-- [ ] Register automatically when available. (?)
+- [x] Registration activity.
 
 
 

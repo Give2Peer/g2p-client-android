@@ -1,0 +1,162 @@
+package org.give2peer.give2peer.activity;
+
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.Color;
+import android.location.Location;
+import android.net.Uri;
+import android.os.AsyncTask;
+import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
+import android.support.annotation.NonNull;
+import android.util.Log;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.ProgressBar;
+import android.widget.Toast;
+
+import org.give2peer.give2peer.Application;
+import org.give2peer.give2peer.Item;
+import org.give2peer.give2peer.R;
+import org.give2peer.give2peer.entity.Server;
+import org.give2peer.give2peer.exception.ErrorResponseException;
+import org.give2peer.give2peer.exception.UnavailableEmailException;
+import org.give2peer.give2peer.exception.UnavailableUsernameException;
+import org.give2peer.give2peer.task.NewItemTask;
+import org.json.JSONException;
+
+import java.io.File;
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
+import java.util.prefs.Preferences;
+
+//import android.support.v7.internal.widget.AdapterViewCompat;
+//import org.give2peer.give2peer.entity.Location;
+
+//import im.delight.android.keyvaluespinner.KeyValueSpinner;
+
+/**
+ *
+ */
+public class RegistrationActivity extends LocatorActivity
+{
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_registration);
+
+        Log.d("G2P", "Starting registration activity.");
+    }
+
+    /**
+     * Send the new item data to the server, in a async task.
+     */
+    public void send()
+    {
+        // Update the UI
+        disableSending();
+
+        // Collect inputs from the form
+        final EditText usrInput = (EditText) findViewById(R.id.registrationUsernameEditText);
+        final EditText pwdInput = (EditText) findViewById(R.id.registrationPasswordEditText);
+        final EditText emlInput = (EditText) findViewById(R.id.registrationEmailEditText);
+
+        final String username = usrInput.getText().toString();
+        final String password = pwdInput.getText().toString();
+        final String email    = emlInput.getText().toString();
+
+        new AsyncTask<Void, Void, Void>() {
+            Exception exception;
+
+            @Override
+            protected Void doInBackground(Void... nope)
+            {
+                try {
+                    app.getRestService().register(username, password, email);
+                } catch (Exception e) {
+                    exception = e;
+                }
+
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Void nope)
+            {
+                super.onPostExecute(nope);
+
+                if (exception != null) {
+                    enableSending();
+                    if (exception instanceof UnavailableUsernameException) {
+                        app.toast("That username is already taken.");
+                        usrInput.setBackgroundColor(Color.argb(255, 255, 0, 0));
+                    }
+                    else if (exception instanceof ErrorResponseException) {
+                        app.toast("That email is already taken.");
+                        emlInput.setBackgroundColor(Color.argb(255, 255, 0, 0));
+                    }
+                    else if (exception instanceof UnavailableEmailException) {
+                        app.toast("The server denied the registration.");
+                        exception.printStackTrace();
+                    }
+                    else {
+                        app.toast("An error occurred.");
+                        exception.printStackTrace();
+                    }
+                } else {
+                    // Everything went smoothly, let's save the username and password
+                    Server server = app.getCurrentServer();
+                    server.setUsername(username);
+                    server.setPassword(password);
+                    server.save();
+                    // In the prefs, too
+                    SharedPreferences prefs = app.getPrefs();
+                    String usrKey = String.format("server_%d_username", server.getId());
+                    String pwdKey = String.format("server_%d_password", server.getId());
+                    prefs.edit().putString(usrKey, username).putString(pwdKey, password).apply();
+
+                    app.toast("Registration successful !");
+                    finish();
+                }
+            }
+        }.execute();
+
+    }
+
+
+    //// UI ////////////////////////////////////////////////////////////////////////////////////////
+
+    public void onSend(View view)
+    {
+        send();
+    }
+
+    protected void enableSending()
+    {
+        Button      sendButton   = (Button)      findViewById(R.id.registrationSendButton);
+        ProgressBar sendProgress = (ProgressBar) findViewById(R.id.registrationProgressBar);
+
+        sendButton.setEnabled(true);
+        sendProgress.setVisibility(View.GONE);
+    }
+
+    protected void disableSending()
+    {
+        Button      sendButton   = (Button)      findViewById(R.id.registrationSendButton);
+        ProgressBar sendProgress = (ProgressBar) findViewById(R.id.registrationProgressBar);
+
+        sendButton.setEnabled(false);
+        sendProgress.setVisibility(View.VISIBLE);
+    }
+
+}

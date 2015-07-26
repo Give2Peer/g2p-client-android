@@ -92,7 +92,17 @@ public class Application extends SugarApp
         // nothing is cool
     }
 
+    // USER ////////////////////////////////////////////////////////////////////////////////////////
+
+    public boolean isUserRegistered()
+    {
+        Server server = getCurrentServer();
+        return null != server && !server.getUsername().equals(Server.DEFAULT_USERNAME);
+    }
+
     // SERVERS /////////////////////////////////////////////////////////////////////////////////////
+
+    public Server getCurrentServer() { return currentServer; }
 
     public void setServerConfiguration(Server config)
     {

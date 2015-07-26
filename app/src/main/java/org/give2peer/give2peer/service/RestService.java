@@ -22,6 +22,7 @@ import org.apache.http.util.EntityUtils;
 import org.give2peer.give2peer.Item;
 import org.give2peer.give2peer.entity.Server;
 import org.give2peer.give2peer.exception.ErrorResponseException;
+import org.give2peer.give2peer.exception.UnavailableEmailException;
 import org.give2peer.give2peer.exception.UnavailableUsernameException;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -61,6 +62,7 @@ public class RestService
     static int NOT_AUTHORIZED       = 4;
     static int SYSTEM_ERROR         = 5;
     static int BAD_LOCATION         = 6;
+    static int UNAVAILABLE_EMAIL    = 7;
 
     /**
      * The `scheme`://`authority` part of the URL of the server.
@@ -191,32 +193,33 @@ public class RestService
     }
 
 
-    public void register(String username, String password)
+    public void register(String username, String password, String email)
             throws URISyntaxException, IOException, JSONException, ErrorResponseException,
-                   UnavailableUsernameException
+                   UnavailableUsernameException, UnavailableEmailException
     {
         String url = serverUrl + "/register";
 
         HttpPost request = new HttpPost();
         request.setURI(new URI(url));
 
-        authenticate(request);
-
         List<NameValuePair> pairs = new ArrayList<NameValuePair>();
         pairs.add(new BasicNameValuePair("username", username));
         pairs.add(new BasicNameValuePair("password", password));
+        pairs.add(new BasicNameValuePair("email",    email));
         request.setEntity(new UrlEncodedFormEntity(pairs, "UTF-8")); // deprecated in API level 22 !
 
         HttpResponse response = client.execute(request);
         String json = EntityUtils.toString(response.getEntity(), "UTF-8");
 
-        if (response.getStatusLine().getStatusCode() > 400) {
+        if (response.getStatusLine().getStatusCode() >= 400) {
             JSONObject data = new JSONObject(json);
             JSONObject error = data.getJSONObject("error");
             int errorCode = error.getInt("code");
             String errorMessage = error.optString("message");
             if (errorCode == UNAVAILABLE_USERNAME) {
                 throw new UnavailableUsernameException(errorMessage);
+            } else if (errorCode == UNAVAILABLE_EMAIL) {
+                throw new UnavailableEmailException(errorMessage);
             } else {
                 throw new ErrorResponseException(json);
             }

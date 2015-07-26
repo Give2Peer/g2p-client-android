@@ -15,6 +15,11 @@ public class Server extends BaseEntity
     String username = "";
     String password = "";
 
+    public static String DEFAULT_URL = "http://g2p.give2peer.org";
+    public static String DEFAULT_NAME = "Give2Peer Beta";
+    public static String DEFAULT_USERNAME = "Goutte"; // fixme: use Anon
+    public static String DEFAULT_PASSWORD = "Goutte";
+
     /**
      * This loads the default configuration that is automatically added to the app on first launch.
      *
@@ -24,10 +29,10 @@ public class Server extends BaseEntity
      */
     public Server loadDefaults()
     {
-        url      = "http://g2p.give2peer.org";
-        name     = "Give2Peer Demo";
-        username = "Goutte";
-        password = "Goutte";
+        url      = DEFAULT_URL;
+        name     = DEFAULT_NAME;
+        username = DEFAULT_USERNAME;
+        password = DEFAULT_PASSWORD;
 
         return this;
     }
