@@ -29,11 +29,15 @@ import org.give2peer.give2peer.entity.Location;
 import org.give2peer.give2peer.entity.Server;
 import org.give2peer.give2peer.exception.GeocodingException;
 import org.give2peer.give2peer.listener.GoogleApiClientListener;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.ocpsoft.prettytime.PrettyTime;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
@@ -416,9 +420,6 @@ public class Application extends SugarApp
         return BitmapFactory.decodeFile(pathname, options);
     }
 
-
-
-
     /**
      * Corrects the orientation of a Bitmap. Orientation, depending of the device,
      * is not correctly set in the EXIF data of the taken image when it is saved
@@ -495,7 +496,7 @@ public class Application extends SugarApp
         getPrefs().edit().putInt("launches_tally", count).apply();
     }
 
-    // HELPERS /////////////////////////////////////////////////////////////////////////////////////
+    // UI //////////////////////////////////////////////////////////////////////////////////////////
 
     public void toast(String message) { toast(message, Toast.LENGTH_SHORT); }
     public void toast(String message, int duration)

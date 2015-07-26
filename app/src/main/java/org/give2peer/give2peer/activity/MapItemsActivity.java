@@ -304,7 +304,7 @@ public class      MapItemsActivity
                                 new MarkerOptions()
                                         .position(item.getLatLng())
                                         .title(item.getTitle())
-                                        .snippet(item.getHumanDistance())
+                                        .snippet(item.getHumanUpdatedAt())
                         );
 
                         dropPinEffect(m, Math.round(i * 222));

@@ -254,6 +254,8 @@ public class NewItemActivity extends LocatorActivity
 
     /**
      * Launch the Camera activity to grab a picture, which will get back to `onActivityResult`.
+     *
+     * todo: enable choosing from gallery or camera ? I thought ACTION_IMAGE_CAPTURE would suffice ?
      */
     protected void requestNewPicture() throws IOException
     {

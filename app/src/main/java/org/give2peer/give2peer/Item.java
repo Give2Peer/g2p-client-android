@@ -6,11 +6,15 @@ import android.view.View;
 
 import com.google.android.gms.maps.model.LatLng;
 
+import org.joda.time.DateTime;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.ocpsoft.prettytime.PrettyTime;
 
 import java.io.File;
+import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 
@@ -21,13 +25,14 @@ import java.util.List;
  */
 public class Item
 {
-    protected Integer id;
-    protected String  title;
-    protected String  description;
-    protected String  location;
-    protected Float   latitude;
-    protected Float   longitude;
-    protected Float   distance;
+    protected Integer  id;
+    protected String   title;
+    protected String   description;
+    protected String   location;
+    protected Float    latitude;
+    protected Float    longitude;
+    protected Float    distance;
+    protected DateTime updatedAt;
 
     protected String                thumbnail;
     protected View                  thumbnailView;
@@ -40,19 +45,22 @@ public class Item
 
     public Item() {}
 
-    public Item(JSONObject json) {
+    public Item(JSONObject json)
+    {
         updateWithJSON(json);
     }
 
-    public Item updateWithJSON(JSONObject json) {
+    public Item updateWithJSON(JSONObject json)
+    {
         try {
             setId(json.getInt("id"));
             setTitle(json.optString("title"));
             setDescription(json.optString("description"));
             setLocation(json.getString("location"));
-            setLatitude((float)json.getDouble("latitude"));
-            setLongitude((float)json.getDouble("longitude"));
-            setDistance((float)json.optDouble("distance", 0));
+            setLatitude((float) json.getDouble("latitude"));
+            setLongitude((float) json.getDouble("longitude"));
+            setDistance((float) json.optDouble("distance", 0));
+            setUpdatedAt(new DateTime(json.getString("updated_at")));
             setThumbnail(json.optString("thumbnail"));
         } catch (JSONException e) {
             Log.e("Item", e.getMessage());
@@ -62,9 +70,7 @@ public class Item
         return this;
     }
 
-    public String toString() {
-        return getTitle() + ' ' + getHumanDistance();
-    }
+    public String toString() { return getTitle() + ' ' + getHumanDistance(); }
 
     /**
      * Returns a string describing the distance in human-readable format, like :
@@ -74,7 +80,8 @@ public class Item
      *
      * This could be easily unit-tested. It isn't. But it could.
      */
-    public String getHumanDistance() {
+    public String getHumanDistance()
+    {
         int meters = Math.round(distance);
         if (meters <= 999) {
             return String.format("%dm", meters);
@@ -86,10 +93,16 @@ public class Item
         return String.format("%dm", meters);
     }
 
+    public String getHumanUpdatedAt()
+    {
+        return new PrettyTime().format(updatedAt.toDate());
+    }
+
     /**
      * @return a concatenation of the distance and the title, for the thumbnail
      */
-    public String getThumbnailTitle() {
+    public String getThumbnailTitle()
+    {
         String s = getHumanDistance();
         if (title.length() > 0) {
             s = s + "  " + title;
@@ -103,57 +116,57 @@ public class Item
      */
     public LatLng getLatLng() { return new LatLng(getLatitude(), getLongitude()); }
 
-    // ACCESSORS AND MUTATORS //////////////////////////////////////////////////////////////////////
+    // VANILLA ACCESSORS AND MUTATORS //////////////////////////////////////////////////////////////
 
-    public Integer getId() { return id; }
+    public Integer getId()                           { return id; }
 
-    public void setId(Integer id) { this.id = id; }
+    public void setId(Integer id)                    { this.id = id; }
 
-    public String getTitle() { return title; }
+    public String getTitle()                         { return title; }
 
-    public void setTitle(String title) { this.title = title; }
+    public void setTitle(String title)               { this.title = title; }
 
-    public String getDescription() { return description; }
+    public String getDescription()                   { return description; }
 
-    public void setDescription(String description) { this.description = description; }
+    public void setDescription(String description)   { this.description = description; }
 
-    public String getLocation() { return location; }
+    public String getLocation()                      { return location; }
 
-    public void setLocation(String location) { this.location = location; }
+    public void setLocation(String location)         { this.location = location; }
 
-    public Float getLatitude() { return latitude; }
+    public Float getLatitude()                       { return latitude; }
 
-    public void setLatitude(Float latitude) { this.latitude = latitude; }
+    public void setLatitude(Float latitude)          { this.latitude = latitude; }
 
-    public Float getLongitude() { return longitude; }
+    public Float getLongitude()                      { return longitude; }
 
-    public void setLongitude(Float longitude) { this.longitude = longitude; }
+    public void setLongitude(Float longitude)        { this.longitude = longitude; }
 
-    public Float getDistance() { return distance; }
+    public Float getDistance()                       { return distance; }
 
-    public void setDistance(Float distance) { this.distance = distance; }
+    public void setDistance(Float distance)          { this.distance = distance; }
 
-    public Image getPicture() {
-        return picture;
-    }
+    public DateTime getUpdatedAt()                   { return updatedAt; }
 
-    public void setPicture(Image picture) {
-        this.picture = picture;
-    }
+    public void setUpdatedAt(DateTime updatedAt)     { this.updatedAt = updatedAt; }
 
-    public boolean hasThumbnail() { return ! thumbnail.isEmpty(); }
+    public Image getPicture()                        { return picture; }
 
-    public String getThumbnail() { return thumbnail; }
+    public void setPicture(Image picture)            { this.picture = picture; }
 
-    public void setThumbnail(String thumbnail) { this.thumbnail = thumbnail; }
+    public boolean hasThumbnail()                    { return ! thumbnail.isEmpty(); }
 
-    public boolean hasThumbnailView() { return null != thumbnailView; }
+    public String getThumbnail()                     { return thumbnail; }
 
-    public View getThumbnailView() { return thumbnailView; }
+    public void setThumbnail(String thumbnail)       { this.thumbnail = thumbnail; }
+
+    public boolean hasThumbnailView()                { return null != thumbnailView; }
+
+    public View getThumbnailView()                   { return thumbnailView; }
 
     public void setThumbnailView(View thumbnailView) { this.thumbnailView = thumbnailView; }
 
-    public List<File> getPictures() { return pictures; }
+    public List<File> getPictures()                  { return pictures; }
 
-    public void setPictures(List<File> pictures) { this.pictures = pictures; }
+    public void setPictures(List<File> pictures)     { this.pictures = pictures; }
 }

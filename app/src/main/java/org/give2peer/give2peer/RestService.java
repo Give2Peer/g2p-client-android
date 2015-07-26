@@ -143,7 +143,12 @@ public class RestService
         return item;
     }
 
-
+    /**
+     * TODO: make a temp file with a smaller picture, upload it, and delete it afterwards
+     *
+     * @param item to add the picture to.
+     * @param picture to add to the item.
+     */
     public Item pictureItem(Item item, File picture)
     {
         String url = serverUrl + "/picture/" + item.getId().toString();
