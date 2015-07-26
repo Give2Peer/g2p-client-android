@@ -2,13 +2,13 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context=".MainActivity"
+    tools:context=".MapItemsActivity"
     >
 
     <item
         android:id="@+id/menu_action_add_item"
         android:title="@string/menu_action_add_item"
-        android:icon="@drawable/ic_add_circle_outline_white_36dp"
+        android:icon="@drawable/ic_camera_alt_white_36dp"
         android:orderInCategory="50"
         app:showAsAction="ifRoom"
         />

@@ -51,6 +51,8 @@ import java.util.List;
 public class Application extends SugarApp
 {
     public static String REPORT_BUG_URL = "https://github.com/Give2Peer/g2p-client-android/issues";
+    public static int THUMB_MAX_WIDTH  = 512;
+    public static int THUMB_MAX_HEIGHT = 512;
 
     private static Application singleton;
 
@@ -319,6 +321,8 @@ public class Application extends SugarApp
 
 
     /**
+     * @deprecated
+     *
      * Corrects the orientation of a Bitmap. Orientation, depending of the device,
      * is not correctly set in the EXIF data of the taken image when it is saved
      * into disk.
@@ -373,6 +377,105 @@ public class Application extends SugarApp
         return bitmap;
     }
 
+
+    // IMAGE HANDLING (better be moved to its own file) ////////////////////////////////////////////
+
+    public static int calculateInSampleSize(int inWidth, int inHeight, int outWidth, int outHeight)
+    {
+        int inSampleSize = 1;
+
+        if (inHeight > outHeight || inWidth > outWidth) {
+
+            final int halfHeight = inHeight / 2;
+            final int halfWidth  = inWidth  / 2;
+
+            // Calculate the largest inSampleSize value that is a power of 2 and keeps both
+            // height and width larger than the requested height and width.
+            while ((halfHeight / inSampleSize) > outHeight &&
+                    (halfWidth / inSampleSize) > outWidth) {
+                inSampleSize *= 2;
+            }
+        }
+
+        return inSampleSize;
+    }
+
+    public static Bitmap decodeSampledBitmapFromFile(String pathname, int reqWidth, int reqHeight)
+    {
+        // First decode with inJustDecodeBounds=true to check dimensions
+        final BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inJustDecodeBounds = true;
+        BitmapFactory.decodeFile(pathname, options);
+
+        // Calculate inSampleSize
+        options.inSampleSize = calculateInSampleSize(options.outWidth, options.outHeight,
+                                                             reqWidth,         reqHeight);
+        // Decode bitmap with inSampleSize set
+        options.inJustDecodeBounds = false;
+
+        return BitmapFactory.decodeFile(pathname, options);
+    }
+
+
+
+
+    /**
+     * Corrects the orientation of a Bitmap. Orientation, depending of the device,
+     * is not correctly set in the EXIF data of the taken image when it is saved
+     * into disk.
+     * Also ensures that the bitmap has no more than `maxWidth` and `maxHeight`.
+     *
+     * Explanation:
+     * 	Camera orientation is not working ok (as is when capturing an image) because
+     *  OEMs do not adhere to the standard. So, each company does this following their
+     *  own way.
+     *
+     * @param filepath	filepath to the file
+     */
+    public static Bitmap getThumbBitmap(String filepath, int maxWidth, int maxHeight)
+    {
+        Bitmap bitmap = null;
+
+        try {
+
+            File f = new File(filepath);
+            FileInputStream fis = new FileInputStream(f);
+
+            ExifInterface exif = new ExifInterface(f.getPath());
+            int orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION,
+                                                   ExifInterface.ORIENTATION_NORMAL);
+
+            int rotate = 0;
+            switch(orientation) {
+                case ExifInterface.ORIENTATION_ROTATE_270:
+                    rotate += 90;
+                case ExifInterface.ORIENTATION_ROTATE_180:
+                    rotate += 90;
+                case ExifInterface.ORIENTATION_ROTATE_90:
+                    rotate += 90;
+            }
+            Matrix mat = new Matrix();
+            mat.postRotate(rotate);
+
+            Bitmap bmp = Application.decodeSampledBitmapFromFile(filepath, maxWidth, maxHeight);
+
+            if (null == bmp) {
+                throw new Exception("Could not decode the bitmap stream.");
+            }
+            bitmap = Bitmap.createBitmap(bmp, 0, 0, bmp.getWidth(), bmp.getHeight(), mat, true);
+
+        } catch (OutOfMemoryError e) {
+            Log.e("G2P", "getThumbBitmap('"+filepath+"') [OutOfMemory!]: " + e.getMessage(), e);
+        } catch (Throwable e) {
+            Log.e("G2P","getThumbBitmap('"+filepath+"'): " + e.getMessage(), e);
+        }
+
+        return bitmap;
+    }
+
+
+
+    // SERVICES ////////////////////////////////////////////////////////////////////////////////////
 
     public RestService getRestService() { return restService; }
 

@@ -1,12 +1,12 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="fill_parent"
+    android:layout_height="match_parent"
     android:orientation="vertical"
     tools:context=".NewItemActivity" >
 
     <ScrollView
-        android:layout_width="fill_parent"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         >
     <LinearLayout
@@ -20,12 +20,14 @@
         >
 
         <ImageView
-            android:layout_width="100dp"
-            android:layout_height="100dp"
             android:id="@+id/newItemImageView"
+            android:layout_width="222dp"
+            android:layout_height="222dp"
+            android:layout_marginBottom="13dp"
+            android:layout_gravity="center_horizontal"
             android:contentDescription="@string/new_item_image_description"
             android:src="@drawable/item_thumbnail"
-            android:layout_marginBottom="13dp" />
+            />
 
         <EditText
             android:id="@+id/newItemTitleEditText"
@@ -41,7 +43,7 @@
 
         <EditText
             android:id="@+id/newItemLocationEditText"
-            android:layout_width="fill_parent"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
             android:maxLength="256"
@@ -69,10 +71,12 @@
     <!-- THE SUBMIT BUTTON AND THE SUBMISSION PROGRESSBAR -->
     <LinearLayout
         android:orientation="horizontal"
-        android:layout_width="fill_parent"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="end"
-        android:weightSum="1">
+        android:layout_gravity="bottom"
+        android:weightSum="1"
+        >
 
         <ProgressBar
             style="?android:attr/progressBarStyleSmall"

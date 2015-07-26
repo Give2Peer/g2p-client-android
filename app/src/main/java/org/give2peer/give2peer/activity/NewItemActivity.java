@@ -18,6 +18,7 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import org.give2peer.give2peer.Application;
 import org.give2peer.give2peer.Item;
 import org.give2peer.give2peer.R;
 //import org.give2peer.give2peer.entity.Location;
@@ -120,6 +121,8 @@ public class NewItemActivity extends LocatorActivity
                     app.toast(getString(R.string.toast_new_item_file_error), Toast.LENGTH_LONG);
                     finish();
                 }
+            } else {
+                fillThumbnail();
             }
         }
     }
@@ -159,53 +162,53 @@ public class NewItemActivity extends LocatorActivity
         }
     }
 
-    /**
-     * THIS IS CRAP.
-     * Besides, it MUTATES THE IMAGE AND DEGRADES ITS QUALITY !!!
-     * fixme: create a proper thumbnail to send away and then to delete, or to store in the cache
-     * @deprecated
-     */
-    protected void processImages()
-    {
-        if (imagePaths.size() == 0) {
-            String msg = getString(R.string.toast_no_image_paths);
-            Log.e("G2P", msg);
-            app.toast(msg, Toast.LENGTH_LONG);
-            finish();
-        }
-
-        // Right now there's only one image per item, but when there'll be multiple images...
-        String imagePath = imagePaths.get(imagePaths.size()-1);
-        File imageFile = new File(imagePath);
-
-        Bitmap imageBitmap = app.getBitmapFromPath(imagePath);
-
-        if (null == imageBitmap) {
-            Log.e("G2P", "Add new item : the image bitmap was `null` at : " + imagePath);
-            finish();
-            return;
-        }
-
-        // Sometimes the camera sends back an empty bitmap, so we're trying this
-        if (imageBitmap.getHeight() == 0 || imageBitmap.getWidth() == 0) {
-            Log.e("G2P", "Add new item : the bitmap is empty !");
-            finish();
-            return;
-        }
-
-        // Write the bitmap to file
-        FileOutputStream fOut;
-        try {
-            fOut = new FileOutputStream(imageFile);
-            imageBitmap.compress(Bitmap.CompressFormat.JPEG, 85, fOut);
-            fOut.flush();
-            fOut.close();
-        } catch (Exception e) {
-            Log.e("G2P", e.getMessage());
-            e.printStackTrace();
-            finish();
-        }
-    }
+//    /**
+//     * THIS IS CRAP.
+//     * Besides, it MUTATES THE IMAGE AND DEGRADES ITS QUALITY !!!
+//     * fixme: create a proper thumbnail to send away and then to delete, or to store in the cache
+//     * @deprecated
+//     */
+//    protected void processImages()
+//    {
+//        if (imagePaths.size() == 0) {
+//            String msg = getString(R.string.toast_no_image_paths);
+//            Log.e("G2P", msg);
+//            app.toast(msg, Toast.LENGTH_LONG);
+//            finish();
+//        }
+//
+//        // Right now there's only one image per item, but when there'll be multiple images...
+//        String imagePath = imagePaths.get(imagePaths.size()-1);
+//        File imageFile = new File(imagePath);
+//
+//        Bitmap imageBitmap = app.getBitmapFromPath(imagePath);
+//
+//        if (null == imageBitmap) {
+//            Log.e("G2P", "Add new item : the image bitmap was `null` at : " + imagePath);
+//            finish();
+//            return;
+//        }
+//
+//        // Sometimes the camera sends back an empty bitmap, so we're trying this
+//        if (imageBitmap.getHeight() == 0 || imageBitmap.getWidth() == 0) {
+//            Log.e("G2P", "Add new item : the bitmap is empty !");
+//            finish();
+//            return;
+//        }
+//
+//        // Write the bitmap to file
+//        FileOutputStream fOut;
+//        try {
+//            fOut = new FileOutputStream(imageFile);
+//            imageBitmap.compress(Bitmap.CompressFormat.JPEG, 85, fOut);
+//            fOut.flush();
+//            fOut.close();
+//        } catch (Exception e) {
+//            Log.e("G2P", e.getMessage());
+//            e.printStackTrace();
+//            finish();
+//        }
+//    }
 
     /**
      * Convert the image URI to the direct file system path of the image file.
@@ -237,8 +240,12 @@ public class NewItemActivity extends LocatorActivity
         if (imagePaths.size() > 0) {
             String imagePath = imagePaths.get(imagePaths.size() - 1);
             try { // imagePaths may be set but the files may not exist yet
-                Bitmap imageBitmap = app.getBitmapFromPath(imagePath);
-                ((ImageView)findViewById(R.id.newItemImageView)).setImageBitmap(imageBitmap);
+                ImageView view = (ImageView) findViewById(R.id.newItemImageView);
+                int w = Application.THUMB_MAX_WIDTH;
+                int h = Application.THUMB_MAX_HEIGHT;
+                Bitmap imageBitmap = Application.getThumbBitmap(imagePath, w, h);
+
+                view.setImageBitmap(imageBitmap);
             } catch (Exception e) {
                 Log.i("G2P", "Image path '"+imagePath+"' probably has no bitmap data.");
             }
