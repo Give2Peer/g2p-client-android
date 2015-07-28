@@ -39,7 +39,9 @@ phone layouts.
 
 A version for everybody, working under API 10.
 This version (and all of 1.x.x) does not have a proper layout for tablets, and is ugly,
-but it has a very extensive hardware support.
+but it has a very extensive hardware support, and will be kept published as fallback for
+users that are below API 21.
+
 
 - [ ] Action points.
 - [ ] Experience points.

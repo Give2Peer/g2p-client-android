@@ -69,37 +69,6 @@ public class NewItemActivity extends LocatorActivity
 
         Log.d("G2P", "Starting new item activity.");
 
-        // If the user is not registered, let's forward him to the registration page
-        if (!app.isUserRegistered()) {
-            new AlertDialog.Builder(this)
-                    .setTitle("Registration needed")
-                    .setMessage("To add items to the database, you need to be registered. Do so now?")
-                    .setCancelable(false)
-                    .setPositiveButton(
-                            android.R.string.yes, new DialogInterface.OnClickListener()
-                            {
-                                public void onClick(DialogInterface dialog, int which)
-                                {
-                                    // Go to the registration activity
-                                    Intent intent = new Intent(NewItemActivity.this, RegistrationActivity.class);
-                                    startActivity(intent);
-                                }
-                            }
-                    )
-                    .setNegativeButton(
-                            android.R.string.no, new DialogInterface.OnClickListener()
-                            {
-                                public void onClick(DialogInterface dialog, int which)
-                                {
-                                    // GTFO, then
-                                    finish();
-                                }
-                            }
-                    )
-                    .setIcon(android.R.drawable.ic_dialog_alert)
-                    .show();
-        }
-
         // On some devices, the Camera activity destroys this activity, so we need to restore the
         // paths of the files we created.
         if (null != savedInstanceState) {
@@ -158,6 +127,14 @@ public class NewItemActivity extends LocatorActivity
                 fillThumbnail();
             }
         }
+    }
+
+    @Override
+    protected void onResume()
+    {
+        super.onResume();
+        // If the user is not registered, let's forward him to the registration activity
+        requireRegistration();
     }
 
     @Override
@@ -283,6 +260,45 @@ public class NewItemActivity extends LocatorActivity
                 Log.i("G2P", "Image path '"+imagePath+"' probably has no bitmap data.");
             }
         }
+    }
+
+    protected void requireRegistration()
+    {
+        if (!app.isUserRegistered()) {
+            requestRegistration();
+        }
+    }
+
+    protected void requestRegistration()
+    {
+        new AlertDialog.Builder(this)
+                .setTitle("Registration needed")
+                .setMessage("To add items to the database, you need to be registered. Do so now?")
+                .setCancelable(false)
+                .setPositiveButton(
+                        android.R.string.yes, new DialogInterface.OnClickListener()
+                        {
+                            public void onClick(DialogInterface dialog, int which)
+                            {
+                                // Go to the registration activity
+                                Intent intent = new Intent(NewItemActivity.this,
+                                                           RegistrationActivity.class);
+                                startActivity(intent);
+                            }
+                        }
+                )
+                .setNegativeButton(
+                        android.R.string.no, new DialogInterface.OnClickListener()
+                        {
+                            public void onClick(DialogInterface dialog, int which)
+                            {
+                                // GTFO, then
+                                finish();
+                            }
+                        }
+                )
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .show();
     }
 
     /**

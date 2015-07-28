@@ -19,6 +19,7 @@
 
     <string name="registration_label_username">Username</string>
     <string name="registration_label_password">Password</string>
+    <string name="registration_label_password2">Password confirmation</string>
     <string name="registration_label_email">Email</string>
     <string name="registration_send_button">Send</string>
 

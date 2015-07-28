@@ -56,6 +56,18 @@
             android:textColorHint="@android:color/darker_gray"
             />
 
+        <EditText
+            android:id="@+id/registrationPassword2EditText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:maxLength="64"
+            android:maxLines="1"
+            android:inputType="text|textPassword"
+            android:hint="@string/registration_label_password2"
+            android:textColorHint="@android:color/darker_gray"
+            />
+
     </LinearLayout>
     </ScrollView>
 
@@ -64,8 +76,8 @@
         android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="end"
         android:layout_gravity="bottom"
+        android:gravity="end"
         android:weightSum="1"
         >
 
@@ -75,14 +87,17 @@
             android:layout_height="match_parent"
             android:id="@+id/registrationProgressBar"
             android:layout_weight="0.12"
-            android:visibility="invisible" />
+            android:visibility="invisible"
+            />
 
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/registration_send_button"
             android:id="@+id/registrationSendButton"
-            android:onClick="onSend" />
+            android:onClick="onSend"
+            />
+
     </LinearLayout>
 
 </LinearLayout>

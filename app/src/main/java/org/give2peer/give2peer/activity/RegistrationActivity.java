@@ -5,14 +5,20 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -32,6 +38,7 @@ import org.json.JSONException;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -50,12 +57,71 @@ import java.util.prefs.Preferences;
  */
 public class RegistrationActivity extends LocatorActivity
 {
+    static int COLOR_ERROR = Color.argb(255, 255, 0, 0);
+
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState)
+    {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_registration);
 
         Log.d("G2P", "Starting registration activity.");
+
+        final EditText usrInput = (EditText) findViewById(R.id.registrationUsernameEditText);
+        final EditText emlInput = (EditText) findViewById(R.id.registrationEmailEditText);
+        final EditText pwdInput = (EditText) findViewById(R.id.registrationPasswordEditText);
+        final EditText pw2Input = (EditText) findViewById(R.id.registrationPassword2EditText);
+
+        final int color = pw2Input.getCurrentTextColor();
+
+        // PASSWORDS MATCH
+        TextWatcher pwdMatchWatcher = new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {}
+            @Override
+            public void afterTextChanged(Editable s)
+            {
+                if (pwdInput.getText().toString().equals(pw2Input.getText().toString())) {
+                    pw2Input.setTextColor(color);
+                } else {
+                    pw2Input.setTextColor(COLOR_ERROR);
+                }
+            }
+        };
+        pwdInput.addTextChangedListener(pwdMatchWatcher);
+        pw2Input.addTextChangedListener(pwdMatchWatcher);
+
+        // USERNAME AVAILABILITY
+        TextWatcher usrAvailableWatcher = new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {}
+            @Override
+            public void afterTextChanged(Editable s)
+            {
+                usrInput.setTextColor(color);
+            }
+        };
+        usrInput.addTextChangedListener(usrAvailableWatcher);
+
+        // EMAIL AVAILABILITY
+        TextWatcher emlAvailableWatcher = new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {}
+            @Override
+            public void afterTextChanged(Editable s)
+            {
+                emlInput.setTextColor(color);
+            }
+        };
+        emlInput.addTextChangedListener(emlAvailableWatcher);
+
+
     }
 
     /**
@@ -68,13 +134,22 @@ public class RegistrationActivity extends LocatorActivity
 
         // Collect inputs from the form
         final EditText usrInput = (EditText) findViewById(R.id.registrationUsernameEditText);
-        final EditText pwdInput = (EditText) findViewById(R.id.registrationPasswordEditText);
         final EditText emlInput = (EditText) findViewById(R.id.registrationEmailEditText);
+        final EditText pwdInput = (EditText) findViewById(R.id.registrationPasswordEditText);
+        final EditText pw2Input = (EditText) findViewById(R.id.registrationPassword2EditText);
 
         final String username = usrInput.getText().toString();
         final String password = pwdInput.getText().toString();
         final String email    = emlInput.getText().toString();
 
+        // Check the password confirmation
+        if (! pwdInput.getText().toString().equals(pw2Input.getText().toString())) {
+            app.toast("The passwords do not match.");
+            enableSending();
+            return;
+        }
+
+        // Wrap the HTTP query in an async task
         new AsyncTask<Void, Void, Void>() {
             Exception exception;
 
@@ -99,18 +174,18 @@ public class RegistrationActivity extends LocatorActivity
                     enableSending();
                     if (exception instanceof UnavailableUsernameException) {
                         app.toast("That username is already taken.");
-                        usrInput.setBackgroundColor(Color.argb(255, 255, 0, 0));
+                        usrInput.setTextColor(COLOR_ERROR);
                     }
                     else if (exception instanceof ErrorResponseException) {
                         app.toast("That email is already taken.");
-                        emlInput.setBackgroundColor(Color.argb(255, 255, 0, 0));
+                        emlInput.setTextColor(COLOR_ERROR);
                     }
                     else if (exception instanceof UnavailableEmailException) {
                         app.toast("The server denied the registration.");
                         exception.printStackTrace();
                     }
                     else {
-                        app.toast("An error occurred.");
+                        app.toast("An error occurred.\nCheck your internet connection.");
                         exception.printStackTrace();
                     }
                 } else {
