@@ -24,6 +24,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import org.give2peer.give2peer.Application;
@@ -67,6 +68,12 @@ public class RegistrationActivity extends LocatorActivity
 
         Log.d("G2P", "Starting registration activity.");
 
+        // TEXT
+        Server server = app.getCurrentServer();
+        TextView help = (TextView) findViewById(R.id.registrationTopTextView);
+        help.setText(String.format("Create a new account on the server %s.", server.getName()));
+
+        // FORM
         final EditText usrInput = (EditText) findViewById(R.id.registrationUsernameEditText);
         final EditText emlInput = (EditText) findViewById(R.id.registrationEmailEditText);
         final EditText pwdInput = (EditText) findViewById(R.id.registrationPasswordEditText);
