@@ -70,9 +70,15 @@
             </intent-filter>
         </activity>
 
-        <!-- App settings -->
+        <!-- Registration -->
         <activity
             android:name=".activity.RegistrationActivity"
+            >
+        </activity>
+
+        <!-- Login -->
+        <activity
+            android:name=".activity.LoginActivity"
             >
         </activity>
 

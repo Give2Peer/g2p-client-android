@@ -71,7 +71,7 @@ public class RegistrationActivity extends LocatorActivity
         // TEXT
         Server server = app.getCurrentServer();
         TextView help = (TextView) findViewById(R.id.registrationTopTextView);
-        help.setText(String.format("Create a new account on the server %s.", server.getName()));
+        help.setText(String.format("Create a new account on the server %s by filling the form below.", server.getName()));
 
         // FORM
         final EditText usrInput = (EditText) findViewById(R.id.registrationUsernameEditText);

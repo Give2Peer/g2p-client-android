@@ -70,8 +70,8 @@ public class RestService
      */
     protected String serverUrl;
 
-    protected String username;
-    protected String password;
+//    protected String username;
+//    protected String password;
     protected UsernamePasswordCredentials credentials;
 
     protected HttpClient client;
@@ -79,11 +79,20 @@ public class RestService
     public RestService(Server config)
     {
         serverUrl = config.getUrl();
-        username = config.getUsername();
-        password = config.getPassword();
-        credentials = new UsernamePasswordCredentials(username, password);
+        setCredentials(config.getUsername(), config.getPassword());
 
         client = new DefaultHttpClient();
+    }
+
+    // CREDENTIALS /////////////////////////////////////////////////////////////////////////////////
+
+    public UsernamePasswordCredentials getCredentials() { return credentials; }
+
+    public void setCredentials(UsernamePasswordCredentials creds) { credentials = creds; }
+
+    public void setCredentials(String username, String password)
+    {
+        setCredentials(new UsernamePasswordCredentials(username, password));
     }
 
     // HTTP QUERIES ////////////////////////////////////////////////////////////////////////////////
@@ -189,6 +198,14 @@ public class RestService
             throws IOException, URISyntaxException
     {
         String json = getJson("/ping");
+        return json.equals("\"pong\"");
+    }
+
+
+    public boolean testLogin()
+            throws IOException, URISyntaxException
+    {
+        String json = getJson("/login");
         return json.equals("\"pong\"");
     }
 

@@ -112,6 +112,10 @@ public class      MapItemsActivity
             launchNewItem();
             return true;
         }
+        if (id == R.id.menu_action_profile) {
+            launchLogin();
+            return true;
+        }
         if (id == R.id.menu_action_report_bug) {
             launchBugReport();
             return true;
@@ -139,6 +143,12 @@ public class      MapItemsActivity
     public void launchNewItem()
     {
         Intent intent = new Intent(this, NewItemActivity.class);
+        startActivity(intent);
+    }
+
+    public void launchLogin()
+    {
+        Intent intent = new Intent(this, LoginActivity.class);
         startActivity(intent);
     }
 

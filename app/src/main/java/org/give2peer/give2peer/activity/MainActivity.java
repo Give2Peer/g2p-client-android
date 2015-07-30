@@ -24,7 +24,14 @@ import org.give2peer.give2peer.fragment.ServerChooserFragment;
 
 
 /**
- * This is the landing activity when a user starts the app.
+ *
+ * THIS IS NOT USED ANYMORE (remember, learner's code ?)
+ *
+ * The main landing activity is MapItems.
+ * This may hold a template for a "portal" activity in the future, I don't know.
+ * Still, snippets. Delete at will, though.
+ *
+ * This was the landing activity when a user started the app.
  *
  * Callbacks : http://developer.android.com/training/basics/activity-lifecycle/starting.html
  *

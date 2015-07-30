@@ -134,7 +134,7 @@ public class NewItemActivity extends LocatorActivity
     {
         super.onResume();
         // If the user is not registered, let's forward him to the registration activity
-        requireRegistration();
+        app.requireRegistration(this);
     }
 
     @Override
@@ -260,45 +260,6 @@ public class NewItemActivity extends LocatorActivity
                 Log.i("G2P", "Image path '"+imagePath+"' probably has no bitmap data.");
             }
         }
-    }
-
-    protected void requireRegistration()
-    {
-        if (!app.isUserRegistered()) {
-            requestRegistration();
-        }
-    }
-
-    protected void requestRegistration()
-    {
-        new AlertDialog.Builder(this)
-                .setTitle("Registration needed")
-                .setMessage("To add items to the database, you need to be registered. Do so now?")
-                .setCancelable(false)
-                .setPositiveButton(
-                        android.R.string.yes, new DialogInterface.OnClickListener()
-                        {
-                            public void onClick(DialogInterface dialog, int which)
-                            {
-                                // Go to the registration activity
-                                Intent intent = new Intent(NewItemActivity.this,
-                                                           RegistrationActivity.class);
-                                startActivity(intent);
-                            }
-                        }
-                )
-                .setNegativeButton(
-                        android.R.string.no, new DialogInterface.OnClickListener()
-                        {
-                            public void onClick(DialogInterface dialog, int which)
-                            {
-                                // GTFO, then
-                                finish();
-                            }
-                        }
-                )
-                .setIcon(android.R.drawable.ic_dialog_alert)
-                .show();
     }
 
     /**

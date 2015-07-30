@@ -1,6 +1,9 @@
 package org.give2peer.give2peer;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -14,6 +17,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Build;
 import android.preference.PreferenceManager;
+import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -22,6 +26,7 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.model.LatLng;
 import com.orm.SugarApp;
 
+import org.give2peer.give2peer.activity.RegistrationActivity;
 import org.give2peer.give2peer.entity.Location;
 import org.give2peer.give2peer.entity.Server;
 import org.give2peer.give2peer.exception.GeocodingException;
@@ -98,6 +103,46 @@ public class Application extends SugarApp
     {
         Server server = getCurrentServer();
         return null != server && !server.getUsername().equals(Server.DEFAULT_USERNAME);
+    }
+
+
+    public void requireRegistration(final Activity activity)
+    {
+        if (!isUserRegistered()) {
+            requestRegistration(activity);
+        }
+    }
+
+    public void requestRegistration(final Activity activity)
+    {
+        new AlertDialog.Builder(this)
+                .setTitle("Registration needed")
+                .setMessage("To add items to the database, you need to be registered. Do so now?")
+                .setCancelable(false)
+                .setPositiveButton(
+                        android.R.string.yes, new DialogInterface.OnClickListener()
+                        {
+                            public void onClick(DialogInterface dialog, int which)
+                            {
+                                // Go to the registration activity
+                                Intent intent = new Intent(activity,
+                                                           RegistrationActivity.class);
+                                startActivity(intent);
+                            }
+                        }
+                )
+                .setNegativeButton(
+                        android.R.string.no, new DialogInterface.OnClickListener()
+                        {
+                            public void onClick(DialogInterface dialog, int which)
+                            {
+                                // GTFO, then
+                                activity.finish();
+                            }
+                        }
+                )
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .show();
     }
 
     // SERVERS /////////////////////////////////////////////////////////////////////////////////////

@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".RegistrationActivity"
+    tools:context=".LoginActivity"
     >
 
     <ScrollView
@@ -21,57 +21,33 @@
         >
 
         <TextView
-            android:id="@+id/registrationTopTextView"
+            android:id="@+id/loginTopTextView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:paddingBottom="@dimen/activity_vertical_margin"
             />
 
         <EditText
-            android:id="@+id/registrationEmailEditText"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            android:maxLength="256"
-            android:maxLines="1"
-            android:inputType="text|textEmailAddress"
-            android:hint="@string/registration_label_email"
-            android:textColorHint="@android:color/darker_gray"
-            />
-
-        <EditText
-            android:id="@+id/registrationUsernameEditText"
+            android:id="@+id/loginUsernameEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
             android:maxLength="64"
             android:maxLines="1"
             android:inputType="text|textAutoComplete|textAutoCorrect"
-            android:hint="@string/registration_label_username"
+            android:hint="@string/login_label_username"
             android:textColorHint="@android:color/darker_gray"
             />
 
         <EditText
-            android:id="@+id/registrationPasswordEditText"
+            android:id="@+id/loginPasswordEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
             android:maxLength="64"
             android:maxLines="1"
             android:inputType="text|textPassword"
-            android:hint="@string/registration_label_password"
-            android:textColorHint="@android:color/darker_gray"
-            />
-
-        <EditText
-            android:id="@+id/registrationPassword2EditText"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            android:maxLength="64"
-            android:maxLines="1"
-            android:inputType="text|textPassword"
-            android:hint="@string/registration_label_password2"
+            android:hint="@string/login_label_password"
             android:textColorHint="@android:color/darker_gray"
             />
 
@@ -92,17 +68,17 @@
 
         <ProgressBar
             style="?android:attr/progressBarStyleSmall"
-            android:id="@+id/registrationProgressBar"
+            android:id="@+id/loginProgressBar"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:visibility="invisible"
             />
 
         <Button
-            android:id="@+id/registrationSendButton"
+            android:id="@+id/loginSendButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/registration_send_button"
+            android:text="@string/login_send_button"
             android:onClick="onSend"
             />
 
