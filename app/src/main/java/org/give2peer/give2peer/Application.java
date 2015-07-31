@@ -115,7 +115,7 @@ public class Application extends SugarApp
 
     public void requestRegistration(final Activity activity)
     {
-        new AlertDialog.Builder(this)
+        new AlertDialog.Builder(activity)
                 .setTitle("Registration needed")
                 .setMessage("To add items to the database, you need to be registered. Do so now?")
                 .setCancelable(false)
@@ -127,7 +127,7 @@ public class Application extends SugarApp
                                 // Go to the registration activity
                                 Intent intent = new Intent(activity,
                                                            RegistrationActivity.class);
-                                startActivity(intent);
+                                activity.startActivity(intent);
                             }
                         }
                 )

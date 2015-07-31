@@ -342,7 +342,7 @@ public class NewItemActivity extends LocatorActivity
             @Override
             protected void onPostExecute(Item item) {
                 if (!hasException()) {
-                    app.toast(getString(R.string.toast_new_item_uploaded, item.getTitle()));
+                    app.toast(getString(R.string.toast_new_item_uploaded, item.getTitle()), Toast.LENGTH_LONG);
                     finish();
                 } else {
                     Exception e = getException();
