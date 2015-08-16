@@ -15,6 +15,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import org.apache.http.auth.UsernamePasswordCredentials;
+import org.give2peer.give2peer.Application;
 import org.give2peer.give2peer.R;
 import org.give2peer.give2peer.entity.Server;
 import org.give2peer.give2peer.exception.ErrorResponseException;
@@ -31,11 +32,13 @@ import java.net.URISyntaxException;
  * This can also be done ine the preferences, but :
  * - this is prettier, and might pave the way for other login means.
  * - it is buried in the preferences, and hard to find.
- * - we cannot programmatically send the user there with an Intent (afaik). Complex business.
+ * - we cannot programmatically send the user in the prefs with an Intent (afaik). Complex business.
  */
 public class LoginActivity extends LocatorActivity
 {
     static int COLOR_ERROR = Color.argb(255, 255, 0, 0);
+
+    Application app;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -44,6 +47,8 @@ public class LoginActivity extends LocatorActivity
         setContentView(R.layout.activity_login);
 
         Log.d("G2P", "Starting login activity.");
+
+        app = (Application) getApplication();
 
         // TEXT
         Server server = app.getCurrentServer();
@@ -54,7 +59,7 @@ public class LoginActivity extends LocatorActivity
 
 
     /**
-     * Send the new item data to the server, in a async task.
+     * Send the login credentials to the server, in a async task.
      */
     public void send()
     {

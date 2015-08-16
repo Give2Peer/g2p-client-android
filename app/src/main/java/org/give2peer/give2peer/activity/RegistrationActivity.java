@@ -1,52 +1,25 @@
 package org.give2peer.give2peer.activity;
 
-import android.content.Intent;
 import android.content.SharedPreferences;
-import android.database.Cursor;
-import android.graphics.Bitmap;
 import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
-import android.graphics.drawable.Drawable;
-import android.location.Location;
-import android.net.Uri;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
-import android.provider.MediaStore;
-import android.support.annotation.NonNull;
+import android.support.v7.app.ActionBarActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import org.give2peer.give2peer.Application;
-import org.give2peer.give2peer.Item;
 import org.give2peer.give2peer.R;
 import org.give2peer.give2peer.entity.Server;
 import org.give2peer.give2peer.exception.ErrorResponseException;
 import org.give2peer.give2peer.exception.UnavailableEmailException;
 import org.give2peer.give2peer.exception.UnavailableUsernameException;
-import org.give2peer.give2peer.task.NewItemTask;
-import org.json.JSONException;
-
-import java.io.File;
-import java.io.IOException;
-import java.lang.reflect.Field;
-import java.net.URISyntaxException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Locale;
-import java.util.prefs.Preferences;
 
 //import android.support.v7.internal.widget.AdapterViewCompat;
 //import org.give2peer.give2peer.entity.Location;
@@ -56,9 +29,11 @@ import java.util.prefs.Preferences;
 /**
  *
  */
-public class RegistrationActivity extends LocatorActivity
+public class RegistrationActivity extends ActionBarActivity
 {
     static int COLOR_ERROR = Color.argb(255, 255, 0, 0);
+
+    Application app;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -67,6 +42,8 @@ public class RegistrationActivity extends LocatorActivity
         setContentView(R.layout.activity_registration);
 
         Log.d("G2P", "Starting registration activity.");
+
+        app = (Application) getApplication();
 
         // TEXT
         Server server = app.getCurrentServer();
