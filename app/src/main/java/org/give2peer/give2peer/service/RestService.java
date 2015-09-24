@@ -1,5 +1,6 @@
 package org.give2peer.give2peer.service;
 
+import android.support.annotation.Nullable;
 import android.util.Log;
 
 import org.apache.http.Header;
@@ -13,15 +14,21 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.params.HttpClientParams;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.impl.auth.BasicScheme;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.params.BasicHttpParams;
+import org.apache.http.params.HttpParams;
 import org.apache.http.util.EntityUtils;
 import org.give2peer.give2peer.Item;
 import org.give2peer.give2peer.entity.Server;
+import org.give2peer.give2peer.exception.AuthorizationException;
 import org.give2peer.give2peer.exception.ErrorResponseException;
+import org.give2peer.give2peer.exception.MaintenanceException;
+import org.give2peer.give2peer.exception.QuotaException;
 import org.give2peer.give2peer.exception.UnavailableEmailException;
 import org.give2peer.give2peer.exception.UnavailableUsernameException;
 import org.json.JSONArray;
@@ -42,11 +49,12 @@ import java.util.Map;
  * This is our REST client service.
  * This also manages the collections of Items, but should not.
  *
+ * It fetches data synchronously, so there's also a bunch of AsyncTasks that use these methods.
+ *
  * Responsibilities :
- * - Fetch items from server HTTP REST API.
- *   It fetches them synchronously, so there's also a bunch of AsyncTasks that use these methods.
- * - Keep fetched items up to date. (meh, no.)
- * - Store items locally in a cache for offline use. (don't know how, yet, and ... nope, anyway)
+ * - Fetch items from server's HTTP REST API.
+ * - Keep fetched items up to date. (meh, no. -- but someone has to !)
+ * - Store items locally in a cache for offline use. (don't know how, yet)
  */
 public class RestService
 {
@@ -54,7 +62,7 @@ public class RestService
      * The server limits the number of items sent in the response.
      * This constant is defined by the server.
      */
-    static int ITEMS_PER_PAGE = 128;
+    static int ITEMS_PER_PAGE = 64;
 
     static int UNAVAILABLE_USERNAME = 1;
     static int BANNED_FOR_ABUSE     = 2;
@@ -63,6 +71,8 @@ public class RestService
     static int SYSTEM_ERROR         = 5;
     static int BAD_LOCATION         = 6;
     static int UNAVAILABLE_EMAIL    = 7;
+    static int EXCEEDED_QUOTA       = 8;
+    static int BAD_USERNAME         = 9;
 
     /**
      * The `scheme`://`authority` part of the URL of the server.
@@ -70,11 +80,18 @@ public class RestService
      */
     protected String serverUrl;
 
-//    protected String username;
-//    protected String password;
+    /**
+     * The G2P REST API require credentials for most of its methods
+     */
     protected UsernamePasswordCredentials credentials;
 
+    /**
+     * Dependency : HttpClient
+     * Look into DIC with for example Dagger : http://square.github.io/dagger/
+     */
     protected HttpClient client;
+
+    // CONSTRUCTOR /////////////////////////////////////////////////////////////////////////////////
 
     public RestService(Server config)
     {
@@ -95,22 +112,22 @@ public class RestService
         setCredentials(new UsernamePasswordCredentials(username, password));
     }
 
-    // HTTP QUERIES ////////////////////////////////////////////////////////////////////////////////
+    // HTTP QUERIES : ITEMS ////////////////////////////////////////////////////////////////////////
 
     public ArrayList<Item> findAroundPaginated(double latitude, double longitude, int page)
-            throws IOException, URISyntaxException
+            throws IOException, URISyntaxException, AuthorizationException, MaintenanceException, QuotaException
     {
         return findAround(latitude, longitude, page * ITEMS_PER_PAGE);
     }
 
     public ArrayList<Item> findAround(double latitude, double longitude)
-            throws IOException, URISyntaxException
+            throws IOException, URISyntaxException, AuthorizationException, MaintenanceException, QuotaException
     {
         return findAround(latitude, longitude, 0);
     }
 
     /**
-     * Returns a list of at most 32 items.
+     * Returns a list of at most 64 items.
      * Pages start at 0, and hold `ITEMS_PER_PAGE` items per page.
      *
      * @param latitude
@@ -119,24 +136,28 @@ public class RestService
      * @return
      */
     public ArrayList<Item> findAround(double latitude, double longitude, int offset)
-            throws URISyntaxException, IOException
+            throws URISyntaxException, IOException, AuthorizationException, MaintenanceException, QuotaException
     {
-        String route = "/find/" + latitude + "/" + longitude + "/" + offset;
-        String json = getJson(route);
+        String route = "/item/around/" + latitude + "/" + longitude;
 
-        return jsonToItems(json);
+        BasicHttpParams params = new BasicHttpParams();
+        params.setParameter("skip", offset);
+
+        return jsonToItems(getJson(route, params));
     }
 
 
     public Item giveItem(Item item)
             throws URISyntaxException, IOException, JSONException, ErrorResponseException
     {
-        String url = serverUrl + "/give";
+        String url = serverUrl + "/item";
 
         HttpPost request = new HttpPost();
         request.setURI(new URI(url));
 
         authenticate(request);
+
+//        request.setParams(); // fixme: try it
 
         List<NameValuePair> pairs = new ArrayList<NameValuePair>();
         pairs.add(new BasicNameValuePair("location", item.getLocation()));
@@ -147,6 +168,7 @@ public class RestService
 
         String json = EntityUtils.toString(response.getEntity(), "UTF-8");
         if (response.getStatusLine().getStatusCode() < 400) {
+            Log.d("G2P", "Successfully gave an item. Response : " + json);
             item.updateWithJSON(new JSONObject(json));
         } else {
             throw new ErrorResponseException(json);
@@ -163,7 +185,7 @@ public class RestService
      */
     public Item pictureItem(Item item, File picture)
     {
-        String url = serverUrl + "/picture/" + item.getId().toString();
+        String url = serverUrl + String.format("/item/%s/picture", item.getId().toString());
         
         try {
             HttpPost request = new HttpPost();
@@ -193,22 +215,7 @@ public class RestService
         return item;
     }
 
-
-    public boolean testServer()
-            throws IOException, URISyntaxException
-    {
-        String json = getJson("/ping");
-        return json.equals("\"pong\"");
-    }
-
-
-    public boolean testLogin()
-            throws IOException, URISyntaxException
-    {
-        String json = getJson("/login");
-        return json.equals("\"pong\"");
-    }
-
+    // HTTP QUERIES : USERS ////////////////////////////////////////////////////////////////////////
 
     public void register(String username, String password, String email)
             throws URISyntaxException, IOException, JSONException, ErrorResponseException,
@@ -243,6 +250,22 @@ public class RestService
         }
     }
 
+    // HTTP QUERIES : TESTS ////////////////////////////////////////////////////////////////////////
+
+    public boolean testServer()
+            throws IOException, URISyntaxException, AuthorizationException, MaintenanceException, QuotaException
+    {
+        String json = getJson("/ping");
+        return json.equals("\"pong\"");
+    }
+
+
+    public boolean testLogin()
+            throws IOException, URISyntaxException, AuthorizationException, MaintenanceException, QuotaException
+    {
+        String json = getJson("/login");
+        return json.equals("\"pong\"");
+    }
 
     // UTILS ///////////////////////////////////////////////////////////////////////////////////////
 
@@ -263,22 +286,47 @@ public class RestService
         }
     }
 
-
     /**
      * @param route must start with `/`.
      * @return the raw server response body, which happens to be a JSON string
      */
     public String getJson(String route)
-            throws URISyntaxException, IOException
+    throws URISyntaxException, IOException, AuthorizationException, MaintenanceException, QuotaException
     {
-        String url = serverUrl + route;
+        return this.getJson(route, null);
+    }
 
+    /**
+     * Get a UTF-8 encoded response from method described by `route`.
+     *
+     * @param route  must start with `/`.
+     * @param params Optional parameters to send with the request
+     * @return the raw server response body, which happens to be a JSON string
+     */
+    public String getJson(String route, @Nullable HttpParams params)
+    throws URISyntaxException, IOException,
+           AuthorizationException, QuotaException, MaintenanceException
+    {
         HttpGet request = new HttpGet();
-        request.setURI(new URI(url));
-
+        request.setURI(new URI(serverUrl + route));
         authenticate(request);
-
+        if (null != params) request.setParams(params);
         HttpResponse response = client.execute(request);
+
+        // A lot of things can go wrong with each request
+        int code = response.getStatusLine().getStatusCode();
+
+        if (code >= 400) {
+            if (code == 401) {
+                throw new AuthorizationException();
+            }
+            if (code == 429) {
+                throw new QuotaException(); // instead maybe we could use the JSON response ?
+            }
+            if (code >= 500) {
+                throw new MaintenanceException();
+            }
+        }
 
         return EntityUtils.toString(response.getEntity(), "UTF-8");
     }
