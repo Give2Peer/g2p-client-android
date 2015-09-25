@@ -113,7 +113,7 @@ public class      MapItemsActivity
             return true;
         }
         if (id == R.id.menu_action_profile) {
-            launchLogin();
+            launchProfile();
             return true;
         }
         if (id == R.id.menu_action_report_bug) {
@@ -149,6 +149,12 @@ public class      MapItemsActivity
     public void launchLogin()
     {
         Intent intent = new Intent(this, LoginActivity.class);
+        startActivity(intent);
+    }
+
+    public void launchProfile()
+    {
+        Intent intent = new Intent(this, ProfileActivity.class);
         startActivity(intent);
     }
 
