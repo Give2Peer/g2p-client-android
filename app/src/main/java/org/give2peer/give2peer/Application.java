@@ -301,7 +301,7 @@ public class Application extends SugarApp
      * This MUST be called in async threads only, as it is a long operation.
      */
     public void geocodeLocationIfNeeded(Location location)
-            throws IOException, GeocodingException
+    throws IOException, GeocodingException
     {
         // No need to geolocate locations from GPS
         if (location.hasLatLng() && location.getPostal().isEmpty()) return;
@@ -311,11 +311,10 @@ public class Application extends SugarApp
 
         if (addresses == null || addresses.size() == 0) {
             throw new GeocodingException(getString(
-                    R.string.error_geocoding_failed,
-                    location.getName(),
-                    location.getPostal()
+                    R.string.error_geocoding_failed, location.getName(), location.getPostal()
             ));
         }
+        // We grab the first one, usually the best one, and discard the others.
         Address address = addresses.get(0);
         location.setLatitude(address.getLatitude());
         location.setLongitude(address.getLongitude());
@@ -548,6 +547,7 @@ public class Application extends SugarApp
     // UI //////////////////////////////////////////////////////////////////////////////////////////
 
     public void toast(String message) { toast(message, Toast.LENGTH_SHORT); }
+    public void toasty(String message) { toast(message, Toast.LENGTH_LONG); }
     public void toast(String message, int duration)
     {
         Context context = getApplicationContext();

@@ -10,4 +10,7 @@ import org.json.JSONObject;
 /**
  * Meh. We could use an Exception instead, but this feels nice.
  */
-public class GeocodingException extends Exception {}
+public class GeocodingException extends Exception
+{
+    public GeocodingException(String detailMessage) { super(detailMessage); }
+}
