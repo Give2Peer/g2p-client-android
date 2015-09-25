@@ -45,27 +45,21 @@ public class Item
 
     public Item() {}
 
-    public Item(JSONObject json)
-    {
-        updateWithJSON(json);
-    }
+    public Item(JSONObject json) throws JSONException { updateWithJSON(json); }
 
-    public Item updateWithJSON(JSONObject json)
+    public Item updateWithJSON(JSONObject jsonall) throws JSONException
     {
-        try {
-            setId(json.getInt("id"));
-            setTitle(json.optString("title"));
-            setDescription(json.optString("description"));
-            setLocation(json.getString("location"));
-            setLatitude((float) json.getDouble("latitude"));
-            setLongitude((float) json.getDouble("longitude"));
-            setDistance((float) json.optDouble("distance", 0));
-            setUpdatedAt(new DateTime(json.getString("updated_at")));
-            setThumbnail(json.optString("thumbnail"));
-        } catch (JSONException e) {
-            Log.e("Item", e.getMessage());
-            e.printStackTrace();
-        }
+        JSONObject json = jsonall.getJSONObject("item");
+
+        setId(json.getInt("id"));
+        setTitle(json.optString("title"));
+        setDescription(json.optString("description"));
+        setLocation(json.getString("location"));
+        setLatitude((float) json.getDouble("latitude"));
+        setLongitude((float) json.getDouble("longitude"));
+        setDistance((float) json.optDouble("distance", 0));
+        setUpdatedAt(new DateTime(json.getString("updated_at")));
+        setThumbnail(json.optString("thumbnail"));
 
         return this;
     }
