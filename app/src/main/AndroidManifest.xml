@@ -82,6 +82,12 @@
             >
         </activity>
 
+        <!-- Profile -->
+        <activity
+            android:name=".activity.ProfileActivity"
+            >
+        </activity>
+
         <!-- App settings -->
         <activity
             android:name=".activity.SettingsActivity"
