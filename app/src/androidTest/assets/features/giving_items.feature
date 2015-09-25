@@ -26,4 +26,5 @@ Scenario: With a location
 # title: Test
 # ...
 # """
-# -> We'll need serious inside-the-box here, no ? Parsing the interface seems too much
+# -> We'll need serious inside-the-box here, no ? Parsing the interface seems too much.
+# TDD on Android is Hell©
