@@ -103,7 +103,7 @@ public class RestService
 
     // CREDENTIALS /////////////////////////////////////////////////////////////////////////////////
 
-    public UsernamePasswordCredentials getCredentials() { return credentials; }
+    public UsernamePasswordCredentials getCredentials()           { return credentials; }
 
     public void setCredentials(UsernamePasswordCredentials creds) { credentials = creds; }
 
@@ -218,8 +218,8 @@ public class RestService
     // HTTP QUERIES : USERS ////////////////////////////////////////////////////////////////////////
 
     public void register(String username, String password, String email)
-            throws URISyntaxException, IOException, JSONException, ErrorResponseException,
-                   UnavailableUsernameException, UnavailableEmailException
+    throws URISyntaxException, IOException, JSONException, ErrorResponseException,
+           UnavailableUsernameException, UnavailableEmailException
     {
         String url = serverUrl + "/register";
 
@@ -253,7 +253,8 @@ public class RestService
     // HTTP QUERIES : TESTS ////////////////////////////////////////////////////////////////////////
 
     public boolean testServer()
-            throws IOException, URISyntaxException, AuthorizationException, MaintenanceException, QuotaException
+    throws IOException, URISyntaxException,
+           AuthorizationException, MaintenanceException, QuotaException
     {
         String json = getJson("/ping");
         return json.equals("\"pong\"");
@@ -261,7 +262,8 @@ public class RestService
 
 
     public boolean testLogin()
-            throws IOException, URISyntaxException, AuthorizationException, MaintenanceException, QuotaException
+    throws IOException, URISyntaxException,
+           AuthorizationException, MaintenanceException, QuotaException
     {
         String json = getJson("/login");
         return json.equals("\"pong\"");
@@ -270,6 +272,7 @@ public class RestService
     // UTILS ///////////////////////////////////////////////////////////////////////////////////////
 
     /**
+     * Authenticate the `request` using the `credentials`.
      *
      * @param request The request to authenticate
      */
@@ -291,7 +294,8 @@ public class RestService
      * @return the raw server response body, which happens to be a JSON string
      */
     public String getJson(String route)
-    throws URISyntaxException, IOException, AuthorizationException, MaintenanceException, QuotaException
+    throws URISyntaxException, IOException,
+           AuthorizationException, MaintenanceException, QuotaException
     {
         return this.getJson(route, null);
     }
@@ -312,7 +316,22 @@ public class RestService
         authenticate(request);
         if (null != params) request.setParams(params);
         HttpResponse response = client.execute(request);
+        inspectResponseForErrors(response);
 
+        return EntityUtils.toString(response.getEntity(), "UTF-8");
+    }
+
+    /**
+     * Throw related Exceptions if some specific HTTP Status Codes are returned in the `response`.
+     *
+     * @param response to inspect for errors.
+     * @throws AuthorizationException
+     * @throws QuotaException
+     * @throws MaintenanceException
+     */
+    protected void inspectResponseForErrors(HttpResponse response)
+    throws AuthorizationException, QuotaException, MaintenanceException
+    {
         // A lot of things can go wrong with each request
         int code = response.getStatusLine().getStatusCode();
 
@@ -327,16 +346,14 @@ public class RestService
                 throw new MaintenanceException();
             }
         }
-
-        return EntityUtils.toString(response.getEntity(), "UTF-8");
     }
 
 
     /**
      * Try to parse the `json` and build the items in it.
      *
-     * @param json
-     * @return
+     * @param  json to parse.
+     * @return the items built from the `json`.
      */
     protected ArrayList<Item> jsonToItems(String json)
     {
@@ -351,7 +368,7 @@ public class RestService
                 itemsList.add(item);
             }
         } catch (JSONException e) {
-            Log.e("JSON Parser", "Error parsing data : " + e.toString());
+            Log.e("G2P", "jsonToItems : Error parsing data : " + e.toString());
         }
 
         return itemsList;
