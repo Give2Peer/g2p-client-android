@@ -1,5 +1,6 @@
 package org.give2peer.give2peer.activity;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.AsyncTask;
@@ -144,6 +145,14 @@ public class LoginActivity extends LocatorActivity
     public void onSend(View view)
     {
         send();
+    }
+
+    public void onRegister(View view)
+    {
+        // Go to the registration activity
+        Intent intent = new Intent(this, RegistrationActivity.class);
+        startActivity(intent);
+        finish();
     }
 
     protected void enableSending()

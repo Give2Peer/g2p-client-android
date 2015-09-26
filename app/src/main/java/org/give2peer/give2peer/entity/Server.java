@@ -1,8 +1,6 @@
 package org.give2peer.give2peer.entity;
 
 
-import com.orm.SugarRecord;
-
 /**
  * This is a persistable entity.
  * Possible names :

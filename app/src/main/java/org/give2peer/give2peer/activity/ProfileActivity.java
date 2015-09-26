@@ -26,15 +26,18 @@ public class ProfileActivity extends ActionBarActivity
         app = (Application) getApplication();
 
         Log.d("G2P", "Starting profile activity.");
-
-
     }
 
     @Override
     protected void onResume()
     {
         super.onResume();
-        // If the user is not registered, let's forward him to the registration activity.
-        app.requireRegistration(this);
+        Log.d("G2P", "Resuming profile activity.");
+
+        // If the user is not authenticated, forward him to the login activity.
+        app.requireAuthentication(this);
+
+        // Fill up the profile page
+        // todo
     }
 }

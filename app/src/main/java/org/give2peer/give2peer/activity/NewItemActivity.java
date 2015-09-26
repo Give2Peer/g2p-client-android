@@ -128,7 +128,7 @@ public class NewItemActivity extends LocatorActivity
     {
         super.onResume();
         // If the user is not registered, let's forward him to the registration activity
-        app.requireRegistration(this);
+        app.requireAuthentication(this);
     }
 
     @Override

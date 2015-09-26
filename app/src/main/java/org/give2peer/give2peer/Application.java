@@ -17,6 +17,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Build;
 import android.preference.PreferenceManager;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.widget.Toast;
@@ -26,7 +27,7 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.model.LatLng;
 import com.orm.SugarApp;
 
-import org.give2peer.give2peer.activity.RegistrationActivity;
+import org.give2peer.give2peer.activity.LoginActivity;
 import org.give2peer.give2peer.entity.Location;
 import org.give2peer.give2peer.entity.Server;
 import org.give2peer.give2peer.exception.GeocodingException;
@@ -99,6 +100,10 @@ public class Application extends SugarApp
 
     // USER ////////////////////////////////////////////////////////////////////////////////////////
 
+    /**
+     * FIXME: this is horseshit
+     * @return whether the current user is registered or not
+     */
     public boolean isUserRegistered()
     {
         Server server = getCurrentServer();
@@ -106,43 +111,50 @@ public class Application extends SugarApp
     }
 
 
-    public void requireRegistration(final Activity activity)
+    public void requireAuthentication(final Activity activity)
+    {
+        requireAuthentication(activity, null);
+    }
+
+    public void requireAuthentication(final Activity activity, @Nullable String message)
     {
         if (!isUserRegistered()) {
-            requestRegistration(activity);
+            requestLogin(activity, message);
         }
     }
 
-    public void requestRegistration(final Activity activity)
+    public void requestLogin(final Activity activity, @Nullable String message)
     {
+        if (null == message) {
+            message = "To continue, you need to be logged in. Do so now?";
+        }
         new AlertDialog.Builder(activity)
-                .setTitle("Registration needed")
-                .setMessage("To add items to the database, you need to be registered. Do so now?")
-                .setCancelable(false)
-                .setPositiveButton(
-                        android.R.string.yes, new DialogInterface.OnClickListener()
+            .setTitle("Authentication needed")
+            .setMessage(message)
+            .setCancelable(false)
+            .setPositiveButton(
+                    android.R.string.yes, new DialogInterface.OnClickListener()
+                    {
+                        public void onClick(DialogInterface dialog, int which)
                         {
-                            public void onClick(DialogInterface dialog, int which)
-                            {
-                                // Go to the registration activity
-                                Intent intent = new Intent(activity,
-                                                           RegistrationActivity.class);
-                                activity.startActivity(intent);
-                            }
+                            // Go to the login activity
+                            Intent intent = new Intent(activity, LoginActivity.class);
+                            activity.startActivity(intent);
                         }
-                )
-                .setNegativeButton(
-                        android.R.string.no, new DialogInterface.OnClickListener()
+                    }
+            )
+            .setNegativeButton(
+                    android.R.string.no, new DialogInterface.OnClickListener()
+                    {
+                        public void onClick(DialogInterface dialog, int which)
                         {
-                            public void onClick(DialogInterface dialog, int which)
-                            {
-                                // GTFO, then
-                                activity.finish();
-                            }
+                            // GTFO, then
+                            activity.finish();
                         }
-                )
-                .setIcon(android.R.drawable.ic_dialog_alert)
-                .show();
+                    }
+            )
+            .setIcon(android.R.drawable.ic_dialog_alert)
+            .show();
     }
 
     // SERVERS /////////////////////////////////////////////////////////////////////////////////////
