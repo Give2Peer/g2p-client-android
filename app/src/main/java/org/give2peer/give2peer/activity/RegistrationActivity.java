@@ -160,11 +160,11 @@ public class RegistrationActivity extends ActionBarActivity
                         app.toast("That username is already taken.");
                         usrInput.setTextColor(COLOR_ERROR);
                     }
-                    else if (exception instanceof ErrorResponseException) {
+                    else if (exception instanceof UnavailableEmailException) {
                         app.toast("That email is already taken.");
                         emlInput.setTextColor(COLOR_ERROR);
                     }
-                    else if (exception instanceof UnavailableEmailException) {
+                    else if (exception instanceof ErrorResponseException) {
                         app.toast("The server denied the registration.");
                         exception.printStackTrace();
                     }
