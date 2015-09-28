@@ -3,6 +3,8 @@ package org.give2peer.give2peer.service;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
+import com.google.gson.Gson;
+
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpRequest;
@@ -25,6 +27,7 @@ import org.apache.http.params.HttpParams;
 import org.apache.http.util.EntityUtils;
 import org.give2peer.give2peer.Item;
 import org.give2peer.give2peer.entity.Server;
+import org.give2peer.give2peer.entity.User;
 import org.give2peer.give2peer.exception.AuthorizationException;
 import org.give2peer.give2peer.exception.ErrorResponseException;
 import org.give2peer.give2peer.exception.MaintenanceException;
@@ -248,6 +251,27 @@ public class RestService
                 throw new ErrorResponseException(json);
             }
         }
+    }
+
+    /**
+     * todo: create a PrivateProfile object that will mirror the server's response and use only GSON
+     *
+     * @throws IOException
+     * @throws URISyntaxException
+     * @throws JSONException
+     * @throws AuthorizationException
+     * @throws QuotaException
+     * @throws MaintenanceException
+     */
+    public User getProfile()
+    throws IOException, URISyntaxException, JSONException,
+    AuthorizationException, QuotaException, MaintenanceException
+    {
+        String json = getJson("/profile");
+        JSONObject data = new JSONObject(json);
+        JSONObject user = data.getJSONObject("user");
+        Gson gson = new Gson();
+        return gson.fromJson(user.toString(), User.class);
     }
 
     // HTTP QUERIES : TESTS ////////////////////////////////////////////////////////////////////////

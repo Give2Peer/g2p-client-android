@@ -57,6 +57,8 @@ dependencies {
     compile 'org.ocpsoft.prettytime:prettytime:3.2.7.Final'
     // JODA TIME (parse Dates from JSON)
     compile 'net.danlew:android.joda:2.8.1'
+    // GSON (JSON conversion made easy)
+    compile 'com.google.code.gson:gson:2.3.1'
     // IMAGE CACHE (pretty awesome)
     compile 'pl.polidea:android-image-cache-library:2.0'
     // FONT ICONS (clever, in case images become not enough)

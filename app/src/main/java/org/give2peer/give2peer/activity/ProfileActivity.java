@@ -1,11 +1,14 @@
 package org.give2peer.give2peer.activity;
 
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
+import android.widget.TextView;
 
 import org.give2peer.give2peer.Application;
 import org.give2peer.give2peer.R;
+import org.give2peer.give2peer.entity.User;
 
 
 /**
@@ -38,6 +41,47 @@ public class ProfileActivity extends ActionBarActivity
         app.requireAuthentication(this);
 
         // Fill up the profile page
-        // todo
+        refreshData();
+    }
+
+    protected void refreshData()
+    {
+        final Application app = this.app;
+        new AsyncTask<Void, Void, Void>()
+        {
+            User me;
+            Exception e;
+
+            @Override
+            protected Void doInBackground(Void... nope)
+            {
+                try {
+                    me = app.getRestService().getProfile();
+                } catch (Exception oops) {
+                    e = oops;
+                }
+
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Void nope)
+            {
+                super.onPostExecute(nope);
+
+                if (null != me) {
+                    refreshUI(me);
+                } else {
+                    app.toast(e.toString());
+                }
+            }
+        }.execute();
+    }
+
+    protected void refreshUI (User user)
+    {
+        // fixme : use Android Annotations, 'cause this is getting boring
+        TextView help = (TextView) findViewById(R.id.profileUsernameTextView);
+        help.setText(user.getUsername());
     }
 }
