@@ -4,8 +4,11 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import org.androidannotations.annotations.EActivity;
+import org.androidannotations.annotations.ViewById;
 import org.give2peer.give2peer.Application;
 import org.give2peer.give2peer.R;
 import org.give2peer.give2peer.entity.User;
@@ -17,15 +20,26 @@ import org.give2peer.give2peer.entity.User;
  * - User informations
  * - Items added by the user
  */
+@EActivity(R.layout.activity_profile)
 public class ProfileActivity extends ActionBarActivity
 {
     Application app;
+
+    @ViewById
+    TextView profileUsernameTextView;
+    @ViewById
+    TextView profileLevelTextView;
+    @ViewById
+    TextView profileExperienceProgressTextView;
+    @ViewById
+    TextView profileExperienceRequiredTextView;
+    @ViewById
+    ProgressBar profileLevelProgressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_profile);
         app = (Application) getApplication();
 
         Log.d("G2P", "Starting profile activity.");
@@ -41,10 +55,10 @@ public class ProfileActivity extends ActionBarActivity
         app.requireAuthentication(this);
 
         // Fill up the profile page
-        refreshData();
+        synchronize();
     }
 
-    protected void refreshData()
+    protected void synchronize()
     {
         final Application app = this.app;
         new AsyncTask<Void, Void, Void>()
@@ -80,8 +94,11 @@ public class ProfileActivity extends ActionBarActivity
 
     protected void refreshUI (User user)
     {
-        // fixme : use Android Annotations, 'cause this is getting boring
-        TextView help = (TextView) findViewById(R.id.profileUsernameTextView);
-        help.setText(user.getUsername());
+        profileUsernameTextView.setText(user.getPrettyUsername());
+        profileLevelTextView.setText(String.valueOf(user.getLevel()));
+        profileExperienceProgressTextView.setText(String.valueOf(user.getExperienceProgress()));
+        profileExperienceRequiredTextView.setText(String.valueOf(user.getExperienceRequired()));
+        profileLevelProgressBar.setMax(user.getExperienceRequired());
+        profileLevelProgressBar.setProgress(user.getExperienceProgress());
     }
 }
