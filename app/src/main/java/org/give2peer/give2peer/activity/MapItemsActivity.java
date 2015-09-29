@@ -154,7 +154,7 @@ public class      MapItemsActivity
 
     public void launchProfile()
     {
-        Intent intent = new Intent(this, ProfileActivity.class);
+        Intent intent = new Intent(this, ProfileActivity_.class);
         startActivity(intent);
     }
 

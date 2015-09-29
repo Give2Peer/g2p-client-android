@@ -46,6 +46,8 @@
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
 
+        <!-- Activities are suffixed by _ for AndroidAnnotations, as it generates subclasses -->
+
         <!-- The launcher immediately shows the items around the user's location, on a map -->
         <activity
             android:name=".activity.MapItemsActivity"
@@ -84,7 +86,7 @@
 
         <!-- Profile -->
         <activity
-            android:name=".activity.ProfileActivity"
+            android:name=".activity.ProfileActivity_"
             >
         </activity>
 

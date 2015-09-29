@@ -72,6 +72,7 @@ public class ProfileActivity extends ActionBarActivity
                 try {
                     me = app.getRestService().getProfile();
                 } catch (Exception oops) {
+                    // todo : better error handling here
                     e = oops;
                 }
 
