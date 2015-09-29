@@ -4,9 +4,14 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.ViewById;
 import org.give2peer.give2peer.Application;
@@ -26,15 +31,23 @@ public class ProfileActivity extends ActionBarActivity
     Application app;
 
     @ViewById
-    TextView profileUsernameTextView;
+    TextView       profileUsernameTextView;
     @ViewById
-    TextView profileLevelTextView;
+    TextView       profileLevelTextView;
     @ViewById
-    TextView profileExperienceProgressTextView;
+    TextView       profileExperienceProgressTextView;
     @ViewById
-    TextView profileExperienceRequiredTextView;
+    TextView       profileExperienceRequiredTextView;
     @ViewById
-    ProgressBar profileLevelProgressBar;
+    ProgressBar    profileLevelProgressBar;
+    @ViewById
+    LinearLayout   profileContentLayout;
+    @ViewById
+    RelativeLayout profileLoadingLayout;
+    @ViewById
+    ProgressBar    profileLoadingProgressBar;
+    @ViewById
+    Button         profileRetryButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -72,7 +85,6 @@ public class ProfileActivity extends ActionBarActivity
                 try {
                     me = app.getRestService().getProfile();
                 } catch (Exception oops) {
-                    // todo : better error handling here
                     e = oops;
                 }
 
@@ -87,10 +99,21 @@ public class ProfileActivity extends ActionBarActivity
                 if (null != me) {
                     refreshUI(me);
                 } else {
+                    // todo : better error handling here, depending on Exception type
                     app.toast(e.toString());
+                    profileRetryButton.setVisibility(View.VISIBLE);
+                    profileLoadingProgressBar.setVisibility(View.GONE);
                 }
             }
         }.execute();
+    }
+
+    @Click
+    void profileRetryButton()
+    {
+        profileRetryButton.setVisibility(View.GONE);
+        profileLoadingProgressBar.setVisibility(View.VISIBLE);
+        synchronize();
     }
 
     protected void refreshUI (User user)
@@ -101,5 +124,8 @@ public class ProfileActivity extends ActionBarActivity
         profileExperienceRequiredTextView.setText(String.valueOf(user.getExperienceRequired()));
         profileLevelProgressBar.setMax(user.getExperienceRequired());
         profileLevelProgressBar.setProgress(user.getExperienceProgress());
+
+        profileLoadingLayout.setVisibility(View.GONE);
+        profileContentLayout.setVisibility(View.VISIBLE);
     }
 }
