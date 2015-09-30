@@ -19,6 +19,8 @@ import org.give2peer.give2peer.Application;
 import org.give2peer.give2peer.R;
 import org.give2peer.give2peer.entity.User;
 
+import java.net.UnknownHostException;
+
 
 /**
  * The profile activity.
@@ -101,7 +103,8 @@ public class ProfileActivity extends ActionBarActivity
                     refreshUI(me);
                 } else {
                     String msg = e.toString();
-                    if (e instanceof HttpHostConnectException) {
+                    if (e instanceof HttpHostConnectException ||
+                            e instanceof UnknownHostException) {
                         msg = getString(R.string.toast_no_internet_available);
                     }
                     app.toasty(msg);
