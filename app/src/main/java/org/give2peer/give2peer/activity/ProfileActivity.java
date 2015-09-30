@@ -14,6 +14,7 @@ import android.widget.TextView;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.ViewById;
+import org.apache.http.conn.HttpHostConnectException;
 import org.give2peer.give2peer.Application;
 import org.give2peer.give2peer.R;
 import org.give2peer.give2peer.entity.User;
@@ -99,8 +100,11 @@ public class ProfileActivity extends ActionBarActivity
                 if (null != me) {
                     refreshUI(me);
                 } else {
-                    // todo : better error handling here, depending on Exception type
-                    app.toast(e.toString());
+                    String msg = e.toString();
+                    if (e instanceof HttpHostConnectException) {
+                        msg = getString(R.string.toast_no_internet_available);
+                    }
+                    app.toasty(msg);
                     profileRetryButton.setVisibility(View.VISIBLE);
                     profileLoadingProgressBar.setVisibility(View.GONE);
                 }
