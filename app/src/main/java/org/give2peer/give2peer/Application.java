@@ -27,7 +27,7 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.model.LatLng;
 import com.orm.SugarApp;
 
-import org.give2peer.give2peer.activity.LoginActivity;
+import org.give2peer.give2peer.activity.LoginActivity_;
 import org.give2peer.give2peer.entity.Location;
 import org.give2peer.give2peer.entity.Server;
 import org.give2peer.give2peer.exception.GeocodingException;
@@ -138,7 +138,7 @@ public class Application extends SugarApp
                         public void onClick(DialogInterface dialog, int which)
                         {
                             // Go to the login activity
-                            Intent intent = new Intent(activity, LoginActivity.class);
+                            Intent intent = new Intent(activity, LoginActivity_.class);
                             activity.startActivity(intent);
                         }
                     }

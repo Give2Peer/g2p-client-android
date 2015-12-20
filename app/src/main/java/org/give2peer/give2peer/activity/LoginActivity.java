@@ -5,8 +5,7 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.text.Editable;
-import android.text.TextWatcher;
+import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -15,13 +14,13 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.androidannotations.annotations.AfterViews;
+import org.androidannotations.annotations.EActivity;
+import org.androidannotations.annotations.ViewById;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.give2peer.give2peer.Application;
 import org.give2peer.give2peer.R;
 import org.give2peer.give2peer.entity.Server;
-import org.give2peer.give2peer.exception.ErrorResponseException;
-import org.give2peer.give2peer.exception.UnavailableEmailException;
-import org.give2peer.give2peer.exception.UnavailableUsernameException;
 import org.give2peer.give2peer.service.RestService;
 
 import java.io.IOException;
@@ -35,29 +34,41 @@ import java.net.URISyntaxException;
  * - it is buried in the preferences, and hard to find.
  * - we cannot programmatically send the user in the prefs with an Intent (afaik). Complex business.
  */
-public class LoginActivity extends LocatorActivity
+@EActivity(R.layout.activity_login)
+public class LoginActivity extends ActionBarActivity
 {
     static int COLOR_ERROR = Color.argb(255, 255, 0, 0);
 
     Application app;
 
+    @ViewById
+    TextView    loginTopTextView;
+    @ViewById
+    ProgressBar loginProgressBar;
+    @ViewById
+    Button      loginSendButton;
+    @ViewById
+    EditText    loginUsernameEditText;
+    @ViewById
+    EditText    loginPasswordEditText;
+
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_login);
-
-        Log.d("G2P", "Starting login activity.");
-
         app = (Application) getApplication();
 
-        // TEXT
-        Server server = app.getCurrentServer();
-        TextView help = (TextView) findViewById(R.id.loginTopTextView);
-        String text = String.format("Log on the server %s.", server.getName());
-        help.setText(text);
+        Log.d("G2P", "Starting login activity.");
     }
 
+    @AfterViews
+    void setTopTextView() {
+        // Injected Views are not available in onCreate, so we use @AfterView.
+        Server currentServer = app.getCurrentServer();
+        if (null != currentServer) {
+            loginTopTextView.setText(getString(R.string.login_top_text, currentServer.getName()));
+        }
+    }
 
     /**
      * Send the login credentials to the server, in a async task.
@@ -68,11 +79,11 @@ public class LoginActivity extends LocatorActivity
         disableSending();
 
         // Collect inputs from the form
-        final EditText usrInput = (EditText) findViewById(R.id.loginUsernameEditText);
-        final EditText pwdInput = (EditText) findViewById(R.id.loginPasswordEditText);
+//        final EditText loginUsernameEditText = (EditText) findViewById(R.id.loginUsernameEditText);
+//        final EditText loginPasswordEditText = (EditText) findViewById(R.id.loginPasswordEditText);
 
-        final String username = usrInput.getText().toString();
-        final String password = pwdInput.getText().toString();
+        final String username = loginUsernameEditText.getText().toString();
+        final String password = loginPasswordEditText.getText().toString();
 
         // Grab the REST service and save its initial credentials
         final RestService rs = app.getRestService();
@@ -124,7 +135,7 @@ public class LoginActivity extends LocatorActivity
                         server.setUsername(username);
                         server.setPassword(password);
                         server.save();
-                        // In the prefs, too
+                        // ... in the prefs, too
                         SharedPreferences prefs = app.getPrefs();
                         String usrKey = String.format("server_%d_username", server.getId());
                         String pwdKey = String.format("server_%d_password", server.getId());
@@ -157,20 +168,14 @@ public class LoginActivity extends LocatorActivity
 
     protected void enableSending()
     {
-        Button      sendButton   = (Button)      findViewById(R.id.loginSendButton);
-        ProgressBar sendProgress = (ProgressBar) findViewById(R.id.loginProgressBar);
-
-        sendButton.setEnabled(true);
-        sendProgress.setVisibility(View.GONE);
+        loginSendButton.setEnabled(true);
+        loginProgressBar.setVisibility(View.GONE);
     }
 
     protected void disableSending()
     {
-        Button      sendButton   = (Button)      findViewById(R.id.loginSendButton);
-        ProgressBar sendProgress = (ProgressBar) findViewById(R.id.loginProgressBar);
-
-        sendButton.setEnabled(false);
-        sendProgress.setVisibility(View.VISIBLE);
+        loginSendButton.setEnabled(false);
+        loginProgressBar.setVisibility(View.VISIBLE);
     }
 
 }

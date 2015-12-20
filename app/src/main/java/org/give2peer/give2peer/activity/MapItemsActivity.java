@@ -148,7 +148,7 @@ public class      MapItemsActivity
 
     public void launchLogin()
     {
-        Intent intent = new Intent(this, LoginActivity.class);
+        Intent intent = new Intent(this, LoginActivity_.class);
         startActivity(intent);
     }
 

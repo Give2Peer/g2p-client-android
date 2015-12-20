@@ -26,6 +26,7 @@
     <string name="login_label_username">Username</string>
     <string name="login_label_password">Password</string>
     <string name="login_send_button">Log In</string>
+    <string name="login_top_text">Log on the server %s.</string>
 
     <string name="toast_new_item_uploading">Uploading new item…</string>
     <string name="toast_new_item_uploaded">Item \'%s\' was uploaded.\nWell done!</string>
@@ -72,5 +73,6 @@
 
     <string name="toast_new_item_upload_failed">Failed to upload the item.</string>
     <string name="toast_no_image_paths">No image paths were provided.</string>
+
 
 </resources>

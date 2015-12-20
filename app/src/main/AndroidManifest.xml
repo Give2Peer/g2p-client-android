@@ -80,7 +80,7 @@
 
         <!-- Login -->
         <activity
-            android:name=".activity.LoginActivity"
+            android:name=".activity.LoginActivity_"
             >
         </activity>
 
