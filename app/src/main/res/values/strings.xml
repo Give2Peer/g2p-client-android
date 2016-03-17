@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
     <string name="app_name">Give2Peer</string>
 
     <string name="menu_action_settings">Settings</string>
@@ -26,6 +27,7 @@
     <string name="login_label_username">Username</string>
     <string name="login_label_password">Password</string>
     <string name="login_send_button">Log In</string>
+    <string name="login_register_button">Register</string>
     <string name="login_top_text">Log on the server %s.</string>
 
     <string name="toast_new_item_uploading">Uploading new item…</string>
@@ -73,6 +75,5 @@
 
     <string name="toast_new_item_upload_failed">Failed to upload the item.</string>
     <string name="toast_no_image_paths">No image paths were provided.</string>
-
 
 </resources>
