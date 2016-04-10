@@ -3,6 +3,9 @@ Give2Peer
 
 This is the source of the Android client application [Give2Peer](http://give2peer.org).
 
+It is made to be a client to the [Give2Peer REST API](http://g2p.give2peer.org/),
+run by a [FLOSS server written in PHP atop Symfony](https://github.com/Give2Peer/g2p-server-symfony).
+
 
 Goal
 ----
@@ -14,7 +17,7 @@ surplus).
 The user interface should be oriented towards speed. Adding a new item should not take more than a
 handful of seconds.
 
-The client is able to connect to multiple servers.
+The client should be able to connect to multiple servers.
 This will allow big organizations to staffsource internal item transfers and disgorge email inboxes
 by setting up their own private server.
 
@@ -30,6 +33,9 @@ A version with a more limited hardware support, since API 21.
 This version leverages the full power of Material design, and provides tablet layouts as well as
 phone layouts.
 
+Two concurrent versions will probably be made for Android at this point, one fully native and the other as a webapp within a `WebView`.
+The second one will probably be cheap to code as we'll need an HTML webapp for FirefoxOs anyways.
+
 - [ ] Design a launcher icon.
 - [ ] Statistics
 
@@ -43,9 +49,10 @@ but it has a very extensive hardware support, and will be kept published as fall
 users that are below API 21.
 
 
-- [ ] Action points.
-- [ ] Experience points.
-- [ ] Propose deletion of items submitted by someone else.
+- [x] Action quotas.
+- [x] Experience points.
+- [ ] Providing a lifespan to Items when adding them (needs some server work, yay!)
+- [ ] Propose deletion of items submitted by someone else. (tricky, may be postponed)
 
 
 0.4.0
@@ -59,6 +66,7 @@ A version for the beta community.
 - [ ] Delete items submitted by self.
 - [ ] Require `https` servers.
 - [ ] Add french translation.
+- [ ] Add spanish translation.
 
 
 0.3.0
@@ -189,7 +197,7 @@ _"When it's free, you're the product."_
 Hosting a server costs money. We can pay for a couple years from our own pocket, but eventually the
 service must be able to pay for its own running costs, or it will shut down.
 
-You'll be the product for a while, as the server will measure your total usage for a year or ten
+You'll be the product for a while, as the server will measure your total usage for a year
 and show you (exactly!) how much you should give to keep it afloat for another year.
 
 Of course, all these statistics will be published publicly.
@@ -215,7 +223,7 @@ _Do whatever you want._ (unless you're a patent troll)
 Disclaimer
 ----------
 
-This is our very first project with Android and Java.
+This is our very first project with both Android and Java.
 There's terrible code everywhere. **EVERYWHERE.**
 Please counsel.
 
