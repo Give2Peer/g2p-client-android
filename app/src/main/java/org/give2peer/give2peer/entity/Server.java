@@ -18,6 +18,8 @@ public class Server extends BaseEntity
     public static String DEFAULT_USERNAME = "Goutte"; // fixme: use Anon
     public static String DEFAULT_PASSWORD = "Goutte";
 
+    public Server() {}
+
     /**
      * This loads the default configuration that is automatically added to the app on first launch.
      *
