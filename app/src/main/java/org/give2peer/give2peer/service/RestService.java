@@ -78,8 +78,8 @@ public class RestService
     static int BAD_USERNAME         = 9;
 
     /**
-     * The `scheme`://`authority` part of the URL of the server.
-     * Eg: https://g2p.give2peer.org
+     * The `scheme`://`authority` part of the URL of the server, plus the route version prefix.
+     * Eg: https://g2p.give2peer.org/v1
      */
     protected String serverUrl;
 
@@ -98,7 +98,7 @@ public class RestService
 
     public RestService(Server config)
     {
-        serverUrl = config.getUrl();
+        serverUrl = config.getUrl() + "/v1";
         setCredentials(config.getUsername(), config.getPassword());
 
         client = new DefaultHttpClient();
@@ -118,13 +118,15 @@ public class RestService
     // HTTP QUERIES : ITEMS ////////////////////////////////////////////////////////////////////////
 
     public ArrayList<Item> findAroundPaginated(double latitude, double longitude, int page)
-            throws IOException, URISyntaxException, AuthorizationException, MaintenanceException, QuotaException
+            throws IOException, URISyntaxException, AuthorizationException, MaintenanceException,
+                   QuotaException
     {
         return findAround(latitude, longitude, page * ITEMS_PER_PAGE);
     }
 
     public ArrayList<Item> findAround(double latitude, double longitude)
-            throws IOException, URISyntaxException, AuthorizationException, MaintenanceException, QuotaException
+            throws IOException, URISyntaxException, AuthorizationException, MaintenanceException,
+                   QuotaException
     {
         return findAround(latitude, longitude, 0);
     }
@@ -139,9 +141,10 @@ public class RestService
      * @return
      */
     public ArrayList<Item> findAround(double latitude, double longitude, int offset)
-            throws URISyntaxException, IOException, AuthorizationException, MaintenanceException, QuotaException
+            throws URISyntaxException, IOException, AuthorizationException, MaintenanceException,
+                   QuotaException
     {
-        String route = "/item/around/" + latitude + "/" + longitude;
+        String route = "/items/around/" + latitude + "/" + longitude;
 
         BasicHttpParams params = new BasicHttpParams();
         params.setParameter("skip", offset);
@@ -392,7 +395,10 @@ public class RestService
                 itemsList.add(item);
             }
         } catch (JSONException e) {
-            Log.e("G2P", "jsonToItems : Error parsing data : " + e.toString());
+            Log.e("G2P",
+                    "jsonToItems : Error parsing data !\n" + e.toString() + "\n" +
+                    "The data that we failed to parse follows :\n"+json
+            );
         }
 
         return itemsList;

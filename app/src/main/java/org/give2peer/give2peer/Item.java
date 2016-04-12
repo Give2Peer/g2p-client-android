@@ -47,9 +47,9 @@ public class Item
 
     public Item(JSONObject json) throws JSONException { updateWithJSON(json); }
 
-    public Item updateWithJSON(JSONObject jsonall) throws JSONException
+    public Item updateWithJSON(JSONObject json) throws JSONException
     {
-        JSONObject json = jsonall.getJSONObject("item");
+//        JSONObject json = json.getJSONObject("item");
 
         setId(json.getInt("id"));
         setTitle(json.optString("title"));
