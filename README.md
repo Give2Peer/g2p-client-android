@@ -49,9 +49,7 @@ but it has a very extensive hardware support, and will be kept published as fall
 users that are below API 21.
 
 
-- [x] Action quotas.
-- [x] Experience points.
-- [ ] Providing a lifespan to Items when adding them (needs some server work, yay!)
+- [ ] Provide a lifespan to Items when adding them (needs some server work, yay!)
 - [ ] Propose deletion of items submitted by someone else. (tricky, may be postponed)
 
 
@@ -60,6 +58,9 @@ users that are below API 21.
 
 A version for the beta community.
 
+- [x] Action quotas.
+- [x] Experience points.
+- [ ] Move to the versioned API
 - [ ] Add a new Item offline, upload later.
 - [ ] List items submitted by self.
 - [ ] Edit items submitted by self.
@@ -68,6 +69,10 @@ A version for the beta community.
 - [ ] Add french translation.
 - [ ] Add spanish translation.
 
+
+
+CHANGELOG
+=========
 
 0.3.0
 -----
@@ -80,10 +85,6 @@ A version for the beta community.
 - [x] Add a new item using the "share" feature of the camera and gallery.
 - [x] Registration activity.
 
-
-
-CHANGELOG
-=========
 
 0.2.0
 -----
@@ -100,6 +101,14 @@ CHANGELOG
 - [x] Detect my location using the GPS or WiFi.
 - [x] List, add, edit and forget servers.
 - [x] List, add, edit and forget locations.
+
+
+CAVEATS
+=======
+
+They are plenty, in this project.
+Notably, you need at least Gradle `2.12` to be able to build,
+at least until `sugar` makes a release.
 
 
 

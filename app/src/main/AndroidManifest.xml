@@ -4,6 +4,7 @@
     package="org.give2peer.give2peer"
     >
 
+    <!-- PERMISSIONS -->
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
@@ -30,18 +31,20 @@
             android:value="give2peer.db" />
         <meta-data
             android:name="VERSION"
-            android:value="7" /> <!-- Every time the database structure changes, increment this -->
+            android:value="8" /> <!-- Every time the database structure changes, increment this -->
         <meta-data
             android:name="QUERY_LOG"
-            android:value="true" />
+            android:value="true" /> <!-- todo@prod disable logging -->
         <meta-data
             android:name="DOMAIN_PACKAGE_NAME"
             android:value="org.give2peer.give2peer.entity" />
 
         <!-- Google API -->
+        <!-- Such keys are going to be a problem to handle in a truly open project. -->
+        <!-- If you have ideas on how to handle these, I'd like to hear about them. -->
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyC9cBthk5qKbc_zW2TtjG9rjRZybzffYqU"/>
+            android:value="AIzaSyC9cBthk5qKbc_zW2TtjG9rjRZybzffYqU" />
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />

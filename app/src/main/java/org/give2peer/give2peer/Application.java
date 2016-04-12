@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.database.sqlite.SQLiteException;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
@@ -38,6 +39,7 @@ import org.ocpsoft.prettytime.PrettyTime;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -74,9 +76,10 @@ public class Application extends SugarApp
     public void onCreate()
     {
         super.onCreate();
+
         singleton = this;
 
-        // A debug message helping me to understand how/when the Application is created
+        // A debug message helping me understand when the Application is created
         Log.d("G2P", "G2P Application onCreate");
 
         // Load the Location from preferences
