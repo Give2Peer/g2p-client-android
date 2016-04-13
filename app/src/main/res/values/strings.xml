@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">Give2Peer</string>
+    <string name="app_name">Karma</string>
 
     <string name="menu_action_settings">Settings</string>
     <string name="menu_action_report_bug">Report Bug</string>
 
-    <string name="title_activity_settings">Give2Peer - Settings</string>
-    <string name="title_activity_new_item">Give2Peer - New Item</string>
-    <string name="title_activity_map_items">Give2Peer - Map items</string>
+    <string name="title_activity_settings">Karma - Settings</string>
+    <string name="title_activity_new_item">Karma - New Item</string>
+    <string name="title_activity_map_items">Karma - Map items</string>
 
     <string name="main_activity_top_message">Welcome! With this app, you can give an item you possess, spot an item that was lost or thrown away, and find items around a location.</string>
 

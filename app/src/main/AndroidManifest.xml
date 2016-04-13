@@ -51,7 +51,7 @@
 
         <!-- Activities are suffixed by _ for AndroidAnnotations, as it generates subclasses -->
 
-        <!-- The launcher immediately shows the items around the user's location, on a map -->
+        <!-- Map : the launcher immediately shows the items around the user's location. -->
         <activity
             android:name=".activity.MapItemsActivity"
             android:label="@string/app_name"

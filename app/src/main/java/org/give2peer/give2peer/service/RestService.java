@@ -372,6 +372,7 @@ public class RestService
             if (code >= 500) {
                 throw new MaintenanceException();
             }
+            // ... what about other codes, such as 404 ?
         }
     }
 
@@ -396,7 +397,7 @@ public class RestService
             }
         } catch (JSONException e) {
             Log.e("G2P",
-                    "jsonToItems : Error parsing data !\n" + e.toString() + "\n" +
+                    "Error parsing JSON of items !\n" + e.toString() + "\n" +
                     "The data that we failed to parse follows :\n"+json
             );
         }

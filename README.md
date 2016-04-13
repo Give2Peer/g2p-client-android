@@ -1,7 +1,7 @@
-Give2Peer
-=========
+Karma
+=====
 
-This is the source of the Android client application [Give2Peer](http://give2peer.org).
+This is the source of the Android client application [Karma](http://give2peer.org).
 
 It is made to be a client to the [Give2Peer REST API](http://g2p.give2peer.org/),
 run by a [FLOSS server written in PHP atop Symfony](https://github.com/Give2Peer/g2p-server-symfony).
@@ -26,6 +26,13 @@ by setting up their own private server.
 ROADMAP
 =======
 
+We plan to make at least two Android clients. One (this one, the first one) should support old
+phones (since API 11, Gingerbread), and the other should be coded properly, with partials, sliding
+menus, and overall material design suitable for phones, glasses, watches and tablets.
+
+There might even be a third (very light) version, using a `WebView` to load an HTML-based web app.
+
+
 2.0.0
 -----
 
@@ -48,7 +55,6 @@ This version (and all of 1.x.x) does not have a proper layout for tablets, and i
 but it has a very extensive hardware support, and will be kept published as fallback for
 users that are below API 21.
 
-
 - [ ] Provide a lifespan to Items when adding them (needs some server work, yay!)
 - [ ] Propose deletion of items submitted by someone else. (tricky, may be postponed)
 
@@ -56,11 +62,11 @@ users that are below API 21.
 0.4.0
 -----
 
-A version for the beta community.
+A version for the beta community, released on Google Play.
 
 - [x] Action quotas.
-- [x] Experience points.
-- [ ] Move to the versioned API
+- [x] Karma points.
+- [x] Move to the versioned API
 - [ ] Add a new Item offline, upload later.
 - [ ] List items submitted by self.
 - [ ] Edit items submitted by self.
