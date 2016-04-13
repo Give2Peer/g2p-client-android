@@ -164,11 +164,6 @@ public class      MapItemsActivity
         startActivity(intent);
     }
 
-    protected boolean isFinding()
-    {
-        return finder != null && finder.getStatus() != AsyncTask.Status.FINISHED;
-    }
-
     public void onDrawButton(View button)
     {
         // 1. We are currently finding items, and this button is a CANCEL button.
@@ -180,9 +175,11 @@ public class      MapItemsActivity
         // 2. We are on the map, and we want to FIND
         else if (!isDrawing) {
             isDrawing = true;
+            app.toast(getString(R.string.toast_draw_on_map));
         }
+        // 3. We managed to tap the Draw button twice REALLY fast. Like, flash-fast.
         else {
-            app.toast("How did you even manage to do that? Report a bug!");
+            app.toast(getString(R.string.toast_wtf_bug));
         }
 
         updateDrawButton();
@@ -251,13 +248,14 @@ public class      MapItemsActivity
 
                 // Remove duplicates (comparing getId)
                 // This logic should probably reside in an ItemsCache or some such
+                // pretty sure this does NOT work right now fixme
                 ArrayList<Item> newItems = new ArrayList<Item>();
                 for (Item newItem : items) {
                     boolean alreadyThere = false;
                     for (Item oldItem: displayedItems) {
                         if (newItem.getId() == oldItem.getId()) {
                             alreadyThere = true;
-                            Log.d("G2P", "Item already fetched, and subsenquently ignored.");
+                            Log.d("G2P", "Item already fetched, and subsequently ignored.");
                             break;
                         }
                     }
@@ -286,15 +284,15 @@ public class      MapItemsActivity
             {
                 super.onPostExecute(items);
 
-                // Hide the loader, whether there was an exception or not
+                // Hide the loader, whether there was an exception or not.
                 hideLoader();
 
-                // Disable the Cancel button, it's too late to cancel now
+                // Disable the Cancel button, It's too late to cancel now anyways.
                 findViewById(R.id.mapItemsDrawButton).setEnabled(false);
 
-                // Something went wrong with the request: probably no internet
+                // Something went wrong with the request: probably no internet.
                 if (null != exception) {
-                    exception.printStackTrace();
+                    //exception.printStackTrace();
                     findViewById(R.id.noInternetTextView).setVisibility(View.VISIBLE);
                     updateDrawButtonDelayed();
                     return;
@@ -340,8 +338,6 @@ public class      MapItemsActivity
 //                    drawCircleOnMap(googleMap, where, radius);
                 }
 
-
-
                 // Hmmmm... This is pretty bad.
                 // We need to be sure that this task's status is FINISHED before we update the UI.
                 // We could remove this hack by using a isFinished bool that we update ourselves
@@ -366,6 +362,11 @@ public class      MapItemsActivity
         finder = null;
     }
 
+    protected boolean isFinding()
+    {
+        return finder != null && finder.getStatus() != AsyncTask.Status.FINISHED;
+    }
+
     protected boolean isMapReady()
     {
         return googleMap != null;
@@ -384,7 +385,6 @@ public class      MapItemsActivity
             // We cannot find any geo location handy
             // Let's warn the user that he needs to draw a region
             hideLoader();
-            app.toast("Please draw the approximate region where you want to find (lost) items.");
         }
 
         mapItemsDrawFrame  = (FrameLayout) findViewById(R.id.mapItemsDrawFrame);

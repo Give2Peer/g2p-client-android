@@ -75,5 +75,7 @@
 
     <string name="toast_new_item_upload_failed">Failed to upload the item.</string>
     <string name="toast_no_image_paths">No image paths were provided.</string>
+    <string name="toast_draw_on_map">Please draw the approximate region where you want to find items.</string>
+    <string name="toast_wtf_bug">How did you even manage to do that? Report a bug!</string>
 
 </resources>
