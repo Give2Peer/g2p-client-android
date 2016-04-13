@@ -31,14 +31,14 @@ public class Item
     protected String   location;
     protected Float    latitude;
     protected Float    longitude;
-    protected Float    distance;
+    protected Float    distance; // in meters
     protected DateTime updatedAt;
 
-    protected String                thumbnail;
-    protected View                  thumbnailView;
+    protected String   thumbnail;
+    protected View     thumbnailView;
 
     // not sure this is used ?
-    protected Image   picture;
+    protected Image    picture;
 
     // Pictures to upload, (and maybe downloaded pictures, later on)
     protected List<File> pictures = new ArrayList<>();
@@ -49,8 +49,6 @@ public class Item
 
     public Item updateWithJSON(JSONObject json) throws JSONException
     {
-//        JSONObject json = json.getJSONObject("item");
-
         setId(json.getInt("id"));
         setTitle(json.optString("title"));
         setDescription(json.optString("description"));
@@ -73,6 +71,11 @@ public class Item
      * - 42km
      *
      * This could be easily unit-tested. It isn't. But it could.
+     *
+     * Also, we don't support non-scientific units, Nor we plan to.
+     * (it's an ideological choice, not a technological one)
+     *
+     * This method (and the one after) can (and probably should) be refactored elsewhere.
      */
     public String getHumanDistance()
     {
@@ -93,7 +96,7 @@ public class Item
     }
 
     /**
-     * @return a concatenation of the distance and the title, for the thumbnail
+     * @return a concatenation of the distance and the title, for the thumbnail.
      */
     public String getThumbnailTitle()
     {
@@ -110,57 +113,58 @@ public class Item
      */
     public LatLng getLatLng() { return new LatLng(getLatitude(), getLongitude()); }
 
+
     // VANILLA ACCESSORS AND MUTATORS //////////////////////////////////////////////////////////////
 
-    public Integer getId()                           { return id; }
+    public Integer getId()                           { return id;                                  }
 
-    public void setId(Integer id)                    { this.id = id; }
+    public void setId(Integer id)                    { this.id = id;                               }
 
-    public String getTitle()                         { return title; }
+    public String getTitle()                         { return title;                               }
 
-    public void setTitle(String title)               { this.title = title; }
+    public void setTitle(String title)               { this.title = title;                         }
 
-    public String getDescription()                   { return description; }
+    public String getDescription()                   { return description;                         }
 
-    public void setDescription(String description)   { this.description = description; }
+    public void setDescription(String description)   { this.description = description;             }
 
-    public String getLocation()                      { return location; }
+    public String getLocation()                      { return location;                            }
 
-    public void setLocation(String location)         { this.location = location; }
+    public void setLocation(String location)         { this.location = location;                   }
 
-    public Float getLatitude()                       { return latitude; }
+    public Float getLatitude()                       { return latitude;                            }
 
-    public void setLatitude(Float latitude)          { this.latitude = latitude; }
+    public void setLatitude(Float latitude)          { this.latitude = latitude;                   }
 
-    public Float getLongitude()                      { return longitude; }
+    public Float getLongitude()                      { return longitude;                           }
 
-    public void setLongitude(Float longitude)        { this.longitude = longitude; }
+    public void setLongitude(Float longitude)        { this.longitude = longitude;                 }
 
-    public Float getDistance()                       { return distance; }
+    public Float getDistance()                       { return distance;                            }
 
-    public void setDistance(Float distance)          { this.distance = distance; }
+    public void setDistance(Float distance)          { this.distance = distance;                   }
 
-    public DateTime getUpdatedAt()                   { return updatedAt; }
+    public DateTime getUpdatedAt()                   { return updatedAt;                           }
 
-    public void setUpdatedAt(DateTime updatedAt)     { this.updatedAt = updatedAt; }
+    public void setUpdatedAt(DateTime updatedAt)     { this.updatedAt = updatedAt;                 }
 
-    public Image getPicture()                        { return picture; }
+    public Image getPicture()                        { return picture;                             }
 
-    public void setPicture(Image picture)            { this.picture = picture; }
+    public void setPicture(Image picture)            { this.picture = picture;                     }
 
-    public boolean hasThumbnail()                    { return ! thumbnail.isEmpty(); }
+    public boolean hasThumbnail()                    { return ! thumbnail.isEmpty();               }
 
-    public String getThumbnail()                     { return thumbnail; }
+    public String getThumbnail()                     { return thumbnail;                           }
 
-    public void setThumbnail(String thumbnail)       { this.thumbnail = thumbnail; }
+    public void setThumbnail(String thumbnail)       { this.thumbnail = thumbnail;                 }
 
-    public boolean hasThumbnailView()                { return null != thumbnailView; }
+    public boolean hasThumbnailView()                { return null != thumbnailView;               }
 
-    public View getThumbnailView()                   { return thumbnailView; }
+    public View getThumbnailView()                   { return thumbnailView;                       }
 
-    public void setThumbnailView(View thumbnailView) { this.thumbnailView = thumbnailView; }
+    public void setThumbnailView(View thumbnailView) { this.thumbnailView = thumbnailView;         }
 
-    public List<File> getPictures()                  { return pictures; }
+    public List<File> getPictures()                  { return pictures;                            }
 
-    public void setPictures(List<File> pictures)     { this.pictures = pictures; }
+    public void setPictures(List<File> pictures)     { this.pictures = pictures;                   }
 }
