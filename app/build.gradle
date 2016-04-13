@@ -60,23 +60,25 @@ dependencies {
     compile 'com.google.android.gms:play-services-maps:8.4.0'
     // LOCATION GOOGLE API
     compile 'com.google.android.gms:play-services-location:8.4.0'
+    // FAB : Floating Action Button (nope)
+    //compile 'com.android.support:design:23.3.0'
     // HTTP
     compile 'org.apache.httpcomponents:httpmime:4.3'
     compile 'org.apache.httpcomponents:httpclient-android:4.3.5'
     // ORM
 //    compile 'com.github.satyan:sugar:1.5'
-    // ... but it is buggy with gradle 2.0, so we need the master branch
+    // ... but it is buggy with gradle 2.x, so we need the master branch
     compile 'com.github.satyan:sugar:master-SNAPSHOT'
 
     // SWEET SUGAR FOR HUMAN TIMES ("2 days ago")
     compile 'org.ocpsoft.prettytime:prettytime:3.2.7.Final'
     // JODA TIME (parse Dates from JSON)
     compile 'net.danlew:android.joda:2.8.1'
-    // GSON (JSON conversion made easy)
+    // GSON (JSON conversion made somewhat easy)
     compile 'com.google.code.gson:gson:2.4'
     // IMAGE CACHE (pretty awesome)
     compile 'pl.polidea:android-image-cache-library:2.0'
-    // Android Annotations
+    // ANDROID ANNOTATIONS
     apt     'org.androidannotations:androidannotations:3.3.2'
     compile 'org.androidannotations:androidannotations-api:3.3.2'
     // Capitalize

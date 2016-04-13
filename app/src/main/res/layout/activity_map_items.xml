@@ -1,6 +1,7 @@
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="org.give2peer.give2peer.activity.MapItemsActivity"
@@ -21,26 +22,39 @@
         android:layout_height="fill_parent"
         >
 
+        <!-- Well, that was a failure. It'll work on Karma v2 ! -->
+        <!--<android.support.design.widget.FloatingActionButton-->
+            <!--android:id="@+id/mapItemsFab"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_margin="16dp"-->
+            <!--android:clickable="true"-->
+            <!--android:src="@drawable/places_ic_search"-->
+            <!--app:layout_anchor="@id/mapItemsDrawFrame"-->
+            <!--app:layout_anchorGravity="bottom|right|end"/>-->
+
         <Button
             android:id="@+id/mapItemsDrawButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/button_find"
             android:onClick="onDrawButton"
-            android:layout_gravity="left|bottom"/>
+            android:layout_gravity="left|bottom"
+            />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceMedium"
-            android:text="Internet is unavailable.\nPlease connect and try again."
+            android:text="@string/toast_no_internet_available"
             android:id="@+id/noInternetTextView"
             android:layout_gravity="center_horizontal|top"
             android:background="@color/background_material_light"
             android:textColor="@color/primary_text_default_material_light"
             android:padding="5dp"
             android:textAlignment="center"
-            android:visibility="gone"/>
+            android:visibility="gone"
+            />
 
     </FrameLayout>
 

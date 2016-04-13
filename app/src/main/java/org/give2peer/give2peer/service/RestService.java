@@ -134,11 +134,6 @@ public class RestService
     /**
      * Returns a list of at most 64 items.
      * Pages start at 0, and hold `ITEMS_PER_PAGE` items per page.
-     *
-     * @param latitude
-     * @param longitude
-     * @param offset
-     * @return
      */
     public ArrayList<Item> findAround(double latitude, double longitude, int offset)
             throws URISyntaxException, IOException, AuthorizationException, MaintenanceException,
@@ -163,7 +158,7 @@ public class RestService
 
         authenticate(request);
 
-//        request.setParams(); // fixme: try it
+//        request.setParams(); // fixme: try it --- what for ?
 
         List<NameValuePair> pairs = new ArrayList<NameValuePair>();
         pairs.add(new BasicNameValuePair("location", item.getLocation()));
