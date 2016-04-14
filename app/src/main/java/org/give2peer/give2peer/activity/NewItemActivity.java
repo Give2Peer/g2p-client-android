@@ -33,8 +33,8 @@ import java.util.Locale;
 
 /**
  * Handles :
- * - Receiving an image from another activity's share intent
- * - Launching the camera otherwise
+ * - Receiving an image from another activity's share intent, launching the camera otherwise
+ * - A form to add a new item, with a nice Floating Action Button to send.
  *
  * This is where the user adds new items in the database.
  * It should handle the three main moop intents :
