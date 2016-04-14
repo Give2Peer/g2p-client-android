@@ -12,6 +12,14 @@ import org.give2peer.give2peer.task.FindItemsTask;
 
 
 /**
+ *
+ *
+ *
+ * THIS IS NOT USED ANYMORE. But it provides snippets. Yeah, I know, git. Still... Alone noob here !
+ *
+ *
+ *
+ *
  * This fullscreen activity lists items in a grid, from closest to furthest.
  * It lists at most 32 items. (as server API returns at most 32 items)
  *

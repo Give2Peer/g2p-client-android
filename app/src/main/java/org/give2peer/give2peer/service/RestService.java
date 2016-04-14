@@ -170,8 +170,12 @@ public class RestService
         String json = EntityUtils.toString(response.getEntity(), "UTF-8");
         if (response.getStatusLine().getStatusCode() < 400) {
             Log.d("G2P", "Successfully gave an item. Response : " + json);
-            item.updateWithJSON(new JSONObject(json));
+            JSONObject jsonObject = new JSONObject(json);
+            JSONObject itemJsonObject = jsonObject.getJSONObject("item");
+            // todo: there is `experience` here too, how to handle it ?
+            item.updateWithJSON(itemJsonObject);
         } else {
+            // fixme: need to handle quotas here
             throw new ErrorResponseException(json);
         }
 
