@@ -22,12 +22,15 @@ import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
 
 /**
- * This was HELL to figure out how to set up. But now it works ! :)
+ * This was HELL to figure out how to set up. But now it works ! :) (kinda)
+ * No, it does not, because our feature steps are much too difficult to write.
+ * If it's not difficult for you, may I suggest sending me an email ? ;)
  *
  * We use Cucumber to parse the features written in Gherkin, and Robotium to test through our
  * multiple activities.
  *
  * This is both the feature runner _and_ the step definitions. Not sure how to decouple those.
+ * It looks like Behavior-Driven Development on Android is not as evolved as with other languages.
  *
  * Run this class using Android Studio.
  */
