@@ -11,7 +11,7 @@ IMPORTANT: Change resDir to the appropriate `/res/` folder path.
 
 USAGE: ./mdcopy <icon> [<new name>]
 
-CREDITS: https://github.com/janclarin/copy-material-icons
+CREDITS: https://github.com/janclarin/copy-material-icons (this version is _slightly_ different)
 
 ICONS BROWSER: http://google.github.io/material-design-icons/
 """
@@ -22,7 +22,7 @@ resDir = 'app/src/main/res'
 # Material design icon folder path
 iconDir = '~/.material-design-icons'
 
-###########################################
+##############################################################################
 
 import fnmatch, os, shutil, subprocess, sys
 
@@ -37,7 +37,11 @@ def getFileName(pathname):
 
 # Require a correct number of arguments
 if len(sys.argv) > 3 or len(sys.argv) < 2:
-    sys.exit('Usage: ./mdcopy <icon> [<new name>]')
+    sys.exit("""
+Usage: ./mdcopy <icon> [<new name>]
+Download and install the specified icon from Google's material-design-icons.
+A list of available icons : http://google.github.io/material-design-icons/
+""")
 
 # Sanitize inputs
 findFile = sys.argv[1]
@@ -52,10 +56,10 @@ else:
 # File matching pattern
 find = '*' + findFile + '*.png'
 
-# Check if the material design icons are in the same folder
+# Check if the material design icons are in the same directory
 if not os.path.isdir(iconDir):
-    print('Cannot find Google\'s material-design-icons folder.')
-    answer = input('Would you like to clone it now? (y/n): ')
+    print('Cannot find Google\'s material-design-icons directory.')
+    answer = input('Would you like to download it now? (y/n): ')
 
     if 'y' in answer or 'Y' in answer:
         url = 'https://github.com/google/material-design-icons'
@@ -67,7 +71,7 @@ if not os.path.isdir(iconDir):
 
 # Check if resource directory exists
 if not os.path.isdir(resDir):
-    sys.exit('The specified resource folder \''
+    sys.exit('The specified resource directory \''
             + resDir + '\' does not exist.\n'
             + 'Change the \'resDir\' variable in this script.')
 
@@ -85,7 +89,7 @@ if len(matches) == 0:
 # Sort matches alphabetically
 matches.sort()
 
-# Options found within mdpi folder
+# Options found within mdpi directory
 options = []
 i = 0
 
