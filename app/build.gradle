@@ -60,8 +60,9 @@ dependencies {
     compile 'com.google.android.gms:play-services-maps:8.4.0'
     // LOCATION GOOGLE API
     compile 'com.google.android.gms:play-services-location:8.4.0'
-    // FAB : Floating Action Button (nope)
-    //compile 'com.android.support:design:23.3.0'
+    // FAB : Floating Action Button
+    //compile 'com.android.support:design:23.3.0' // nope
+    compile 'com.shamanland:fab:0.0.8'
     // HTTP
     compile 'org.apache.httpcomponents:httpmime:4.3'
     compile 'org.apache.httpcomponents:httpclient-android:4.3.5'

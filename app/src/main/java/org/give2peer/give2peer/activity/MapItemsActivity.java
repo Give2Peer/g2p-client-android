@@ -35,6 +35,7 @@ import com.google.android.gms.maps.model.Polygon;
 import com.google.android.gms.maps.model.PolygonOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.shamanland.fab.FloatingActionButton;
 
 import org.give2peer.give2peer.Application;
 import org.give2peer.give2peer.Item;
@@ -177,9 +178,9 @@ public class      MapItemsActivity
             isDrawing = true;
             app.toast(getString(R.string.toast_draw_on_map));
         }
-        // 3. We managed to tap the Draw button twice REALLY fast. Like, flash-fast.
+        // 3. We already clicked the button, and should be drawing. Let's cancel !
         else {
-            app.toast(getString(R.string.toast_wtf_bug));
+            isDrawing = false;
         }
 
         updateDrawButton();
@@ -188,22 +189,19 @@ public class      MapItemsActivity
 
     protected void updateDrawButton()
     {
-        Button mapItemsDrawButton = (Button) findViewById(R.id.mapItemsDrawButton);
+        FloatingActionButton mapItemsDrawButton = (FloatingActionButton) findViewById(R.id.mapItemsDrawButton);
 
         // 1. We are currently finding items, and this button is a CANCEL button.
         if (isFinding()) {
-            mapItemsDrawButton.setText("Cancel");
-            mapItemsDrawButton.setEnabled(true);
+            mapItemsDrawButton.setImageResource(R.drawable.ic_clear_white_24dp);
         }
         // 2. We are on the map, and we want to FIND
         else if (!isDrawing) {
-            mapItemsDrawButton.setText("Find");
-            mapItemsDrawButton.setEnabled(true);
+            mapItemsDrawButton.setImageResource(R.drawable.ic_search_white_24dp);
         }
-        // 3. We are already drawing, so we hint DRAW
+        // 3. We just clicked on it and are drawing, show CANCEL
         else {
-            mapItemsDrawButton.setText("Draw!");
-            mapItemsDrawButton.setEnabled(false);
+            mapItemsDrawButton.setImageResource(R.drawable.ic_clear_white_24dp);
         }
     }
 
@@ -286,9 +284,6 @@ public class      MapItemsActivity
 
                 // Hide the loader, whether there was an exception or not.
                 hideLoader();
-
-                // Disable the Cancel button, It's too late to cancel now anyways.
-                findViewById(R.id.mapItemsDrawButton).setEnabled(false);
 
                 // Something went wrong with the request: probably no internet.
                 if (null != exception) {

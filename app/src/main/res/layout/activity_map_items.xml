@@ -33,14 +33,29 @@
             <!--app:layout_anchor="@id/mapItemsDrawFrame"-->
             <!--app:layout_anchorGravity="bottom|right|end"/>-->
 
-        <Button
+        <!-- We always want this button on the left, not the right, (and not start) -->
+        <!-- because the Maps "fragment" shows its own controls on the right. -->
+        <com.shamanland.fab.FloatingActionButton
             android:id="@+id/mapItemsDrawButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/button_find"
+            android:src="@drawable/ic_search_white_24dp"
             android:onClick="onDrawButton"
             android:layout_gravity="left|bottom"
+            android:layout_marginBottom="5dp"
+            android:layout_marginLeft="5dp"
+            app:floatingActionButtonColor="@color/background_floating_material_dark"
+            app:floatingActionButtonSize="normal"
             />
+
+        <!--<Button-->
+            <!--android:id="@+id/mapItemsDrawButton"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:text="@string/button_find"-->
+            <!--android:onClick="onDrawButton"-->
+            <!--android:layout_gravity="left|bottom"-->
+            <!--/>-->
 
         <TextView
             android:layout_width="wrap_content"
