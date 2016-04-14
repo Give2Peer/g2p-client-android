@@ -45,6 +45,7 @@ The second one will probably be cheap to code as we'll need an HTML webapp for F
 
 - [ ] Design a launcher icon.
 - [ ] Statistics
+- [ ] Propose deletion of items submitted by someone else. (tricky)
 
 
 1.0.0
@@ -55,8 +56,11 @@ This version (and all of 1.x.x) does not have a proper layout for tablets, and i
 but it has a very extensive hardware support, and will be kept published as fallback for
 users that are below API 21.
 
-- [ ] Provide a lifespan to Items when adding them (needs some server work, yay!)
-- [ ] Propose deletion of items submitted by someone else. (tricky, may be postponed)
+- [ ] Provide a lifespan to Items when adding them (allowed lifespans depend on the user level)
+- [ ] Require `https` servers.
+- [ ] Add french translation.
+- [ ] Add spanish translation.
+- [ ] Add a new Item offline, upload later.
 
 
 0.4.0
@@ -64,16 +68,14 @@ users that are below API 21.
 
 A version for the beta community, released on Google Play.
 
-- [x] Action quotas.
-- [x] Karma points.
-- [x] Move to the versioned API
-- [ ] Add a new Item offline, upload later.
-- [ ] List items submitted by self.
-- [ ] Edit items submitted by self.
-- [ ] Delete items submitted by self.
-- [ ] Require `https` servers.
-- [ ] Add french translation.
-- [ ] Add spanish translation.
+- [x] Karma (experience) points.
+- [x] Move to the versioned API.
+- [ ] Action quotas depending on user level. (more work to be done client side)
+- [ ] Implement a Floating Action Button.
+- [ ] List items submitted by self in the Profile.
+- [ ] Edit items submitted by self from the Profile.
+- [ ] Delete items submitted by self from the Profile.
+- [ ] Automatic pre-registration.
 
 
 
@@ -123,18 +125,25 @@ TESTS AND SPECS
 
 We are big believers in behavior-driven development.
 
-We use [Cucumber] and [Robotium] to set up a [Gherkin]-based feature suite than spans multiple
-activities and tests application flows.
+We (tried to) use [Cucumber] and [Robotium] to set up a [Gherkin]-based feature suite than spans
+multiple activities and tests application flows.
 
 Simply run `app/src/androidTest/java/org/give2peer/give2peer/test/MainTest.java` in Android Studio.
 
-The current feature suite is not as exhaustive as it should be.
+Sadly, our current feature suite covers nothing, and is totally deprecated.
 The mandatory usage of the Camera or Gallery picker when adding a new Item is tricky.
 Robotium simply cannot control another application without some serious and delicate apk re-signing
 (which [requires rooting](https://code.google.com/p/robotium/wiki/RobotiumForPreInstalledApps)), or
 [clever mocking](https://github.com/bryanl/FakeCamera).
-For the latter, we are looking into ways of automatizing the setup and update of the preferences
-configuration (the android intent chooser), with gradle or anything else. Feel free to chime in!
+
+Mocking sounds nice, but we never could manage to set it up properly.
+And never mind about automatizing the setup !
+
+Advice would be warmly welcome !
+
+We really want a feature suite for the native Android app. It would make this project great.
+We'll make one for the HTML/JS web app in the future, 'cause it is easy, and the Gherkin should be
+almost the same.
 
 
 [Cucumber]: https://cucumber.io
