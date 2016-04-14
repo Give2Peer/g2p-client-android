@@ -1,25 +1,24 @@
 #! /usr/bin/python3
 
-"""
+usage = """
 Searches Google's material-design-icons for a certain icon.
 Upon finding a match, asks for confirmation for file name.
-Then, copies the proper resources to the corresponding drawable folder
-of the desired program into the correct folders:
+Then, copies the proper resources into their appropriate directories:
 drawable-mdpi, drawable-hdpi, drawable-xhdpi, drawable-xxhpdi, drawable-xxxhdpi
-
-IMPORTANT: Change resDir to the appropriate `/res/` folder path.
 
 USAGE: ./mdcopy <icon> [<new name>]
 
-CREDITS: https://github.com/janclarin/copy-material-icons (this version is _slightly_ different)
+CREDITS: https://github.com/janclarin/copy-material-icons
+         Thanks a gig for making this MUST-HAVE script !
+         This version is _slightly_ different from the original.
 
 ICONS BROWSER: http://google.github.io/material-design-icons/
 """
 
-# CHANGE THIS PATH TO YOUR RES FOLDER
+# Change this path to your `res` directory (if necessary)
 resDir = 'app/src/main/res'
 
-# Material design icon folder path
+# Material design icon directory path
 iconDir = '~/.material-design-icons'
 
 ##############################################################################
@@ -37,11 +36,7 @@ def getFileName(pathname):
 
 # Require a correct number of arguments
 if len(sys.argv) > 3 or len(sys.argv) < 2:
-    sys.exit("""
-Usage: ./mdcopy <icon> [<new name>]
-Download and install the specified icon from Google's material-design-icons.
-A list of available icons : http://google.github.io/material-design-icons/
-""")
+    sys.exit(usage)
 
 # Sanitize inputs
 findFile = sys.argv[1]
