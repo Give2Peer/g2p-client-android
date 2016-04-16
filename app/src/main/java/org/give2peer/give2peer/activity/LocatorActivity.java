@@ -58,7 +58,9 @@ import java.util.List;
 
 /**
  * The purpose of this class is to be extended, and it provides the logic for Location detection,
- * through the Google Play API.
+ * through the Google Play API, to any Activity that extends it.
+ * I'm not sure this is the correct way of doing this (and I strongly suspect that it is not).
+ * But it was accessible to a beginner, so here it is.
  */
 abstract public class LocatorActivity
        extends    ActionBarActivity

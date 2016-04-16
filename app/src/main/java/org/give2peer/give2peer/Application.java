@@ -28,6 +28,8 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.model.LatLng;
 import com.orm.SugarApp;
 
+import net.danlew.android.joda.JodaTimeAndroid;
+
 import org.give2peer.give2peer.activity.LoginActivity_;
 import org.give2peer.give2peer.entity.Location;
 import org.give2peer.give2peer.entity.Server;
@@ -47,11 +49,19 @@ import java.util.List;
 /**
  * The application is a singleton instance that is shared through all of our Activities.
  * It is created automatically when the app starts.
- * I'm not sure we're using the fact that it is a singleton right now, though.
+ * I'm not sure we're using the fact that it is a singleton right now, though. Maybe the OS does ?
  *
- * In the activity, grab it like this :
+ * Anyhow, it extends SugarDb, but that's not mandatory, we could just as well extend something else
+ * if need be. This is just ... well... even more sugar.
+ *
+ * In an activity, grab the Application like this :
  * ```
  * Application app = (Application) getApplication();
+ * ```
+ * or, with Android Annotations, ever-so-simply define and annotate the `app` property :
+ * ```
+ * @App
+ * Application app;
  * ```
  */
 public class Application extends SugarApp
@@ -81,6 +91,9 @@ public class Application extends SugarApp
 
         // A debug message helping me understand when the Application is created
         Log.d("G2P", "G2P Application onCreate");
+
+        // Otherwise, get get a `Resource not found: "org/joda/time/tz/data/ZoneInfoMap"`.
+        JodaTimeAndroid.init(this);
 
         // Load the Location from preferences
         //loadGeoLocation();
@@ -562,7 +575,7 @@ public class Application extends SugarApp
     // UI //////////////////////////////////////////////////////////////////////////////////////////
 
     public void toast(String message) { toast(message, Toast.LENGTH_SHORT); }
-    public void toasty(String message) { toast(message, Toast.LENGTH_LONG); }
+    public void toasty(String message) { toast(message, Toast.LENGTH_LONG); } // toastLong ?
     public void toast(String message, int duration)
     {
         Context context = getApplicationContext();

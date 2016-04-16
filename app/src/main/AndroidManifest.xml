@@ -65,13 +65,13 @@
 
         <!-- Uses a system intent to capture an image and provides a form to add a new item. -->
         <activity
-            android:name=".activity.NewItemActivity"
+            android:name=".activity.NewItemActivity_"
             android:windowSoftInputMode="adjustPan|stateHidden"
             >
             <intent-filter>
-                <action   android:name="android.intent.action.SEND" />
+                <action   android:name="android.intent.action.SEND"      />
                 <category android:name="android.intent.category.DEFAULT" />
-                <data     android:mimeType="image/*" />
+                <data     android:mimeType="image/*"                     />
             </intent-filter>
         </activity>
 

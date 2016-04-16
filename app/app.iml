@@ -79,6 +79,7 @@
       <sourceFolder url="file://$MODULE_DIR$/src/test/rs" isTestSource="true" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/assets" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/blame" />
+      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/builds" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/bundles" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/classes" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/dependency-cache" />
@@ -99,6 +100,7 @@
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/instant-run-support" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/jniLibs" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/manifests" />
+      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/pre-dexed" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/reload-dex" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/res" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/restart-dex" />
@@ -119,23 +121,23 @@
     <orderEntry type="library" exported="" name="play-services-location-8.4.0" level="project" />
     <orderEntry type="library" exported="" name="play-services-basement-8.4.0" level="project" />
     <orderEntry type="library" exported="" name="play-services-maps-8.4.0" level="project" />
+    <orderEntry type="library" exported="" name="android-image-cache-library-2.0" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="cucumber-jvm-deps-1.0.3" level="project" />
     <orderEntry type="library" exported="" name="httpclient-android-4.3.5" level="project" />
-    <orderEntry type="library" exported="" name="android-image-cache-library-2.0" level="project" />
     <orderEntry type="library" exported="" name="appcompat-v7-22.1.1" level="project" />
     <orderEntry type="library" exported="" name="fab-0.0.8" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="cucumber-html-0.2.3" level="project" />
     <orderEntry type="library" exported="" name="preferencefragment-0.1.1" level="project" />
     <orderEntry type="library" exported="" name="httpmime-4.3" level="project" />
-    <orderEntry type="library" exported="" name="androidannotations-api-3.3.2" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="cucumber-core-1.2.2" level="project" />
+    <orderEntry type="library" exported="" name="androidannotations-api-3.3.2" level="project" />
     <orderEntry type="library" exported="" name="commons-lang3-3.4" level="project" />
     <orderEntry type="library" exported="" name="android.joda-2.8.1" level="project" />
     <orderEntry type="library" exported="" name="sugar-master-SNAPSHOT" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="robotium-solo-5.2.1" level="project" />
     <orderEntry type="library" exported="" name="joda-time-2.8.1-no-tzdb" level="project" />
     <orderEntry type="library" exported="" name="gson-2.4" level="project" />
-    <orderEntry type="library" exported="" name="support-annotations-23.0.0" level="project" />
     <orderEntry type="library" exported="" name="prettytime-3.2.7.Final" level="project" />
+    <orderEntry type="library" exported="" name="support-annotations-23.0.0" level="project" />
   </component>
 </module>

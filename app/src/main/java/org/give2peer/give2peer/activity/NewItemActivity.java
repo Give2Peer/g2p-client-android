@@ -17,9 +17,15 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.shamanland.fab.FloatingActionButton;
+
+import org.androidannotations.annotations.AfterViews;
+import org.androidannotations.annotations.EActivity;
+import org.androidannotations.annotations.ViewById;
 import org.give2peer.give2peer.Application;
 import org.give2peer.give2peer.Item;
 import org.give2peer.give2peer.R;
+import org.give2peer.give2peer.exception.QuotaException;
 import org.give2peer.give2peer.task.NewItemTask;
 
 import java.io.File;
@@ -49,6 +55,7 @@ import java.util.Locale;
  * Unless we make multiple Activities for each, and make multiple share options.
  * That would reduce the number of actions the app requires of the user.
  */
+@EActivity(R.layout.activity_new_item)
 public class NewItemActivity extends LocatorActivity
 {
     static final int REQUEST_IMAGE_CAPTURE = 1;
@@ -56,19 +63,41 @@ public class NewItemActivity extends LocatorActivity
 
     protected ArrayList<String> imagePaths; // stores the image files paths, and is saved
 
+    @ViewById
+    FloatingActionButton newItemSendButton;
+    @ViewById
+    ProgressBar          newItemProgressBar;
+    @ViewById
+    ImageView            newItemImageView;
+    @ViewById
+    EditText             newItemTitleEditText;
+    @ViewById
+    EditText             newItemLocationEditText;
+
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState)
+    {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_new_item);
 
         Log.d("G2P", "Starting new item activity.");
 
-        // On some devices, the Camera activity destroys this activity, so we need to restore the
-        // paths of the files we created.
+        // For when we launched the Camera Activity FROM Karma (and are not using the share...),
+        // on some devices, the Camera activity destroys this activity, so we need to restore the
+        // paths of the files we created before launching the Camera.
+        // This is an edge-case of an edge-case, as most users will add new items via the Camera's
+        // share function...
+        // We should redo the whole image handling business, to make it clearer and more robust.
+        // because I can see how lines such as this one may screw up the app, possibly :
+        // what happens when we have a savedinstancestate but the picture comes from the share ?
         if (null != savedInstanceState) {
             imagePaths = savedInstanceState.getStringArrayList(BUNDLE_IMAGE_PATHS);
         }
 
+    }
+
+    @AfterViews
+    public void recoverImage()
+    {
         // This activity may have been destroyed by the Camera activity ; if it's the case,
         // the imagePaths is not null, as we saved it.
         if (null == imagePaths) {
@@ -80,7 +109,7 @@ public class NewItemActivity extends LocatorActivity
         Intent intent = getIntent();
         String action = intent.getAction();
         String type = intent.getType();
-        if (Intent.ACTION_SEND.equals(action) && type != null) {
+        if (action.equals(Intent.ACTION_SEND) && type != null) {
             if (type.startsWith("image/")) {
                 // Handle a single image being sent
                 Uri imageUri = (Uri) intent.getParcelableExtra(Intent.EXTRA_STREAM);
@@ -128,6 +157,7 @@ public class NewItemActivity extends LocatorActivity
     {
         super.onResume();
         // If the user is not registered, let's forward him to the registration activity
+        // todo: this is crappety crap. We should register automatically.
         app.requireAuthentication(this);
     }
 
@@ -135,9 +165,8 @@ public class NewItemActivity extends LocatorActivity
     public void onLocated(Location loc)
     {
         super.onLocated(loc); // parent saves the location Application-wise
-        // When we are located we tell the user that the Location input field is optional
-        EditText locationInput = (EditText) findViewById(R.id.newItemLocationEditText);
-        locationInput.setHint(R.string.new_item_label_location_optional);
+        // Sucessfully located device : we hint to the user that the Location field is optional.
+        newItemLocationEditText.setHint(R.string.new_item_label_location_optional);
     }
 
     @Override
@@ -242,20 +271,23 @@ public class NewItemActivity extends LocatorActivity
     /**
      * Try to fill the thumbnail view with the first image.
      * Fail silently (kinda) if the image is invalid.
+     * Ideally, we should make a "Report Bug" activity that provides the logs and stacktrace, and
+     * means to share them. How about some karma points as incentive to report bugs ? ;)
      */
     protected void fillThumbnail()
     {
         if (imagePaths.size() > 0) {
             String imagePath = imagePaths.get(imagePaths.size() - 1);
             try { // imagePaths may be set but the files may not exist yet
-                ImageView view = (ImageView) findViewById(R.id.newItemImageView);
                 int w = Application.THUMB_MAX_WIDTH;
                 int h = Application.THUMB_MAX_HEIGHT;
                 Bitmap imageBitmap = Application.getThumbBitmap(imagePath, w, h);
 
-                view.setImageBitmap(imageBitmap);
+                newItemImageView.setImageBitmap(imageBitmap);
             } catch (Exception e) {
-                Log.i("G2P", "Image path '"+imagePath+"' probably has no bitmap data.");
+                Log.e("G2P", "Failed to create a thumbnail.\n" +
+                             "Image '"+imagePath+"' probably has no bitmap data.");
+                e.printStackTrace();
             }
         }
     }
@@ -300,12 +332,8 @@ public class NewItemActivity extends LocatorActivity
         // Update the UI
         disableSending();
 
-        // Collect inputs from the form
-        EditText titleInput    = (EditText) findViewById(R.id.newItemTitleEditText);
-        EditText locationInput = (EditText) findViewById(R.id.newItemLocationEditText);
-
         // Grab the Location, from input or GPS. It is MANDATORY.
-        String locationInputValue = locationInput.getText().toString();
+        String locationInputValue = newItemLocationEditText.getText().toString();
         if (locationInputValue.isEmpty()) {
             android.location.Location location = app.getGeoLocation();
             if (null != location) {
@@ -332,7 +360,7 @@ public class NewItemActivity extends LocatorActivity
         // Create a new Item with all that data
         Item item = new Item();
         item.setLocation(locationInputValue);
-        item.setTitle(titleInput.getText().toString());
+        item.setTitle(newItemTitleEditText.getText().toString());
         item.setPictures(imageFiles);
 
         // Try to upload it, along with its image(s).
@@ -341,17 +369,23 @@ public class NewItemActivity extends LocatorActivity
             protected void onPostExecute(Item item) {
                 if (!hasException()) {
                     app.toast(getString(R.string.toast_new_item_uploaded, item.getTitle()), Toast.LENGTH_LONG);
+                    // todo: here, continue to profile
                     finish();
                 } else {
                     Exception e = getException();
                     String toast;
                     if (e instanceof IOException) {
                         toast = getString(R.string.toast_no_internet_available);
+                    } else if (e instanceof QuotaException) {
+                        toast = getString(R.string.toast_new_item_error_quota_reached);
                     } else {
                         toast = getString(R.string.toast_new_item_upload_failed);
                     }
                     app.toast(toast, Toast.LENGTH_LONG);
-                    Log.e("G2P", e.getMessage());
+                    String loggedMsg = e.getMessage();
+                    if ( ! (null == loggedMsg || loggedMsg.isEmpty()))  {
+                        Log.e("G2P", e.getMessage());
+                    }
                     e.printStackTrace();
                     enableSending();
                 }
@@ -370,20 +404,14 @@ public class NewItemActivity extends LocatorActivity
 
     protected void enableSending()
     {
-        Button      sendButton   = (Button)      findViewById(R.id.newItemSendButton);
-        ProgressBar sendProgress = (ProgressBar) findViewById(R.id.newItemProgressBar);
-
-        sendButton.setEnabled(true);
-        sendProgress.setVisibility(View.GONE);
+        newItemSendButton.setEnabled(true);
+        newItemProgressBar.setVisibility(View.GONE);
     }
 
     protected void disableSending()
     {
-        Button      sendButton   = (Button)      findViewById(R.id.newItemSendButton);
-        ProgressBar sendProgress = (ProgressBar) findViewById(R.id.newItemProgressBar);
-
-        sendButton.setEnabled(false);
-        sendProgress.setVisibility(View.VISIBLE);
+        newItemSendButton.setEnabled(false);
+        newItemProgressBar.setVisibility(View.VISIBLE);
     }
 
 

@@ -4,7 +4,10 @@ import android.os.AsyncTask;
 
 import org.give2peer.give2peer.Application;
 import org.give2peer.give2peer.Item;
+import org.give2peer.give2peer.exception.AuthorizationException;
 import org.give2peer.give2peer.exception.ErrorResponseException;
+import org.give2peer.give2peer.exception.MaintenanceException;
+import org.give2peer.give2peer.exception.QuotaException;
 import org.json.JSONException;
 
 import java.io.File;
@@ -29,7 +32,8 @@ public class NewItemTask extends AsyncTask<Item, Void, Item>
         // Upload the item properties (at least try to)
         try {
             item = app.getRestService().giveItem(item);
-        } catch (URISyntaxException | IOException | JSONException | ErrorResponseException e) {
+        } catch (URISyntaxException | IOException | JSONException | ErrorResponseException |
+                MaintenanceException | QuotaException | AuthorizationException e) {
             exception = e;
             return item;
         }

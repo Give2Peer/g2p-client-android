@@ -149,8 +149,7 @@ public class RestService
 
 
     public Item giveItem(Item item)
-            throws URISyntaxException, IOException, JSONException, ErrorResponseException
-    {
+            throws URISyntaxException, IOException, JSONException, ErrorResponseException, AuthorizationException, MaintenanceException, QuotaException {
         String url = serverUrl + "/item";
 
         HttpPost request = new HttpPost();
@@ -175,7 +174,9 @@ public class RestService
             // todo: there is `experience` here too, how to handle it ?
             item.updateWithJSON(itemJsonObject);
         } else {
+
             // fixme: need to handle quotas here
+            inspectResponseForErrors(response);
             throw new ErrorResponseException(json);
         }
 

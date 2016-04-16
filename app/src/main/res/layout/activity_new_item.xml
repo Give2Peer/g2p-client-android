@@ -1,59 +1,86 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".NewItemActivity" >
+    tools:context=".NewItemActivity_"
+    >
 
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         >
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingLeft="@dimen/activity_horizontal_margin"
-        android:paddingRight="@dimen/activity_horizontal_margin"
-        android:paddingTop="@dimen/activity_vertical_margin"
-        android:paddingBottom="@dimen/activity_vertical_margin"
-        android:orientation="vertical"
-        >
 
-        <ImageView
-            android:id="@+id/newItemImageView"
-            android:layout_width="222dp"
-            android:layout_height="222dp"
-            android:layout_marginBottom="13dp"
-            android:layout_gravity="center_horizontal"
-            android:contentDescription="@string/new_item_image_description"
-            android:src="@drawable/item_thumbnail"
-            />
-
-        <EditText
-            android:id="@+id/newItemTitleEditText"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            android:maxLength="32"
-            android:maxLines="1"
-            android:inputType="text|textAutoComplete|textAutoCorrect"
-            android:hint="@string/new_item_label_title"
-            android:textColorHint="@android:color/darker_gray"
-            />
+            android:orientation="vertical"
+            >
 
-        <EditText
-            android:id="@+id/newItemLocationEditText"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            android:maxLength="256"
-            android:maxLines="1"
-            android:inputType="text|textAutoComplete|textAutoCorrect|textPostalAddress"
-            android:hint="@string/new_item_label_location"
-            android:textColorHint="@android:color/darker_gray"
-            />
+            <ImageView
+                android:id="@+id/newItemImageView"
+                android:layout_width="match_parent"
+                android:layout_height="240dp"
+                android:layout_marginBottom="13dp"
+                android:layout_gravity="center_horizontal"
+                android:contentDescription="@string/new_item_image_description"
+                android:src="@drawable/item_thumbnail"
+                />
 
-    </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingLeft="@dimen/activity_horizontal_margin"
+                android:paddingRight="@dimen/activity_horizontal_margin"
+                android:paddingTop="@dimen/activity_vertical_margin"
+                android:paddingBottom="@dimen/activity_vertical_margin"
+                android:orientation="vertical"
+                >
+                <EditText
+                    android:id="@+id/newItemTitleEditText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginStart="10dp"
+                    android:maxLength="32"
+                    android:maxLines="1"
+                    android:inputType="text|textAutoComplete|textAutoCorrect"
+                    android:hint="@string/new_item_label_title"
+                    android:textColorHint="@android:color/darker_gray"
+                    />
+
+                <EditText
+                    android:id="@+id/newItemLocationEditText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginStart="10dp"
+                    android:maxLength="256"
+                    android:maxLines="1"
+                    android:inputType="text|textAutoComplete|textAutoCorrect|textPostalAddress"
+                    android:hint="@string/new_item_label_location"
+                    android:textColorHint="@android:color/darker_gray"
+                    />
+
+            </LinearLayout>
+
+            <com.shamanland.fab.FloatingActionButton
+                android:id="@+id/newItemSendButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_send_white_24dp"
+                android:onClick="onSend"
+                android:layout_gravity="right|bottom"
+                android:layout_marginTop="2dp"
+                android:layout_marginBottom="5dp"
+                android:layout_marginRight="15dp"
+                app:floatingActionButtonColor="@color/background_floating_material_dark"
+                app:floatingActionButtonSize="normal"
+                />
+
+        </LinearLayout>
+
     </ScrollView>
 
     <!--<im.delight.android.keyvaluespinner.KeyValueSpinner-->
@@ -78,20 +105,27 @@
         android:weightSum="1"
         >
 
-        <ProgressBar
-            style="?android:attr/progressBarStyleSmall"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:id="@+id/newItemProgressBar"
-            android:layout_weight="0.12"
-            android:visibility="invisible" />
+        <!-- Small and ugly progress bar... Not good. -->
+        <!--<ProgressBar-->
+            <!--style="?android:attr/progressBarStyleSmall"-->
+            <!--android:layout_width="0dp"-->
+            <!--android:layout_height="match_parent"-->
+            <!--android:id="@+id/newItemProgressBar"-->
+            <!--android:layout_weight="0.12"-->
+            <!--android:visibility="invisible"-->
+            <!--/>-->
 
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/new_item_send_button"
-            android:id="@+id/newItemSendButton"
-            android:onClick="onSend" />
+
     </LinearLayout>
 
-</LinearLayout>
+    <ProgressBar
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/newItemProgressBar"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true"
+        android:visibility="invisible"
+        />
+
+</RelativeLayout>

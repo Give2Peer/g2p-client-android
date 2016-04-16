@@ -119,6 +119,11 @@ Notably, you need at least Gradle `2.12` to be able to build,
 at least until `sugar` makes a release.
 
 
+TROUBLESHOOTING
+===============
+
+`peer not authenticated` : install Gradle `2.12` and configure Android Studio to use it.
+
 
 TESTS AND SPECS
 ===============
