@@ -33,7 +33,7 @@
     <string name="toast_new_item_uploading">Uploading new item…</string>
     <string name="toast_new_item_uploaded">Item \'%s\' was uploaded.\nWell done!</string>
     <string name="toast_new_item_file_error">Could not create a file to store the picture.\nMaybe you\'re out of disk space?</string>
-    <string name="toast_new_item_error_quota_reached">You reached your daily quota of adding items.\nPlease try again tomorrow !\nLevel up or contact us if you want a bigger quota.</string>
+    <string name="toast_new_item_error_quota_reached">You reached your daily quota of items.\nPlease try again tomorrow !\nLevel up or contact us if you want a bigger quota.</string>
     <string name="toast_no_camera_available">No camera could be found.\nAsk for support of gallery images!</string>
     <string name="toast_no_mapping_activity">Could not find any mapping activity to go to.</string>
     <string name="toast_no_internet_available">Internet is unavailable.\nPlease connect and try again.</string>
