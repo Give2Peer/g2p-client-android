@@ -70,8 +70,8 @@ A version for the beta community, released on Google Play.
 
 - [x] Karma (experience) points.
 - [x] Move to the versioned API.
-- [ ] Action quotas depending on user level. (more work to be done client side)
-- [ ] Implement a Floating Action Button.
+- [x] Implement a Floating Action Button.
+- [x] Action quotas depending on user level.
 - [ ] List items submitted by self in the Profile.
 - [ ] Edit items submitted by self from the Profile.
 - [ ] Delete items submitted by self from the Profile.
@@ -114,7 +114,8 @@ CHANGELOG
 CAVEATS
 =======
 
-They are plenty, in this project.
+_They are plenty, in this project._
+
 Notably, you need at least Gradle `2.12` to be able to build,
 at least until `sugar` makes a release.
 
@@ -123,6 +124,8 @@ TROUBLESHOOTING
 ===============
 
 `peer not authenticated` : install Gradle `2.12` and configure Android Studio to use it.
+
+Sometimes, Android Studio will _forget_ which gradle version to use.
 
 
 TESTS AND SPECS
@@ -135,14 +138,14 @@ multiple activities and tests application flows.
 
 Simply run `app/src/androidTest/java/org/give2peer/give2peer/test/MainTest.java` in Android Studio.
 
-Sadly, our current feature suite covers nothing, and is totally deprecated.
+Sadly, our current feature suite does not pass because _steps are too hard to implement_.
 The mandatory usage of the Camera or Gallery picker when adding a new Item is tricky.
 Robotium simply cannot control another application without some serious and delicate apk re-signing
 (which [requires rooting](https://code.google.com/p/robotium/wiki/RobotiumForPreInstalledApps)), or
 [clever mocking](https://github.com/bryanl/FakeCamera).
 
 Mocking sounds nice, but we never could manage to set it up properly.
-And never mind about automatizing the setup !
+And never mind about automatizing the setup of mocks on the emulator !
 
 Advice would be warmly welcome !
 
@@ -204,7 +207,7 @@ If you know Android and/or Java, we need some technical expertise :
 - Refactor this learner's code into a beautiful codebase.
 - Suggest good third-party libraries to DRY the code.
 - Give advice on how to give the emulator a default `geo fix`.
-- Give advice on how to somehow publish the release `keystore` of an open-source project.
+- Give advice on how to handle the release `keystore` of an open-source project.
 - Enrich and give advice for the feature suite.
 - Write good code guidelines for Android / Java.
 

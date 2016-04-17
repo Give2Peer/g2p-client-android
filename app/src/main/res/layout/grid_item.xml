@@ -6,6 +6,8 @@
     android:background="@drawable/abc_list_selector_holo_dark"
     >
 
+    <!-- THIS IS NOT USED ANYMORE -->
+
     <pl.polidea.webimageview.WebImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

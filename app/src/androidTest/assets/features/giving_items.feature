@@ -3,11 +3,16 @@ Feature: Giving items
     As a wise being
     I should be able to give an item
 
-Scenario: With a location
-    Given I start the main activity
-     Then I should see a button named "Give"
-     When I click on the button named "Give"
-     Then I should be on the new item activity
+Scenario: Use the "share via..." feature of the Camera app
+    Given I take a picture with the Camera and share it via Karma
+     Then I should see a thumbnail of my picture
+      And I should see a form input field for the title
+      And I should see a form input field for the location
+     When I fill the title with "My test item"
+      And I fill the location with "Toulouse"
+      And I submit
+     Then I should be on my profile
+
      # There are multiple ways to control or mock the camera in order to keep testing here.
      # https://code.google.com/p/robotium/wiki/RobotiumForPreInstalledApps
      # https://github.com/bryanl/FakeCamera
@@ -18,13 +23,4 @@ Scenario: With a location
 # With a location and a title and a description and tags
 # With a location and a title and a description and tags and a category
 
-# Assertions ideas
-# When I find the items around the same location
-# -> We can do this by clicking the buttons
-# Then there should be an item with the following properties:
-# """
-# title: Test
-# ...
-# """
-# -> We'll need serious inside-the-box here, no ? Parsing the interface seems too much.
-# TDD on Android is Hell©
+# BDD on Android is Hell©
