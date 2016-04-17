@@ -74,6 +74,33 @@ public class ProfileActivity extends ActionBarActivity
         synchronize();
     }
 
+    @Click
+    void profileRetryButton()
+    {
+        profileRetryButton.setVisibility(View.GONE);
+        profileLoadingProgressBar.setVisibility(View.VISIBLE);
+        synchronize();
+    }
+
+    protected void refreshUI (User user)
+    {
+        profileLoadingLayout.setVisibility(View.GONE);
+        profileRetryButton.setVisibility(View.GONE);
+
+        profileUsernameTextView.setText(user.getPrettyUsername());
+        profileLevelTextView.setText(String.valueOf(user.getLevel()));
+        profileExperienceProgressTextView.setText(String.valueOf(user.getExperienceProgress()));
+        profileExperienceRequiredTextView.setText(String.valueOf(user.getExperienceRequired()));
+        profileLevelProgressBar.setMax(user.getExperienceRequired());
+        profileLevelProgressBar.setProgress(user.getExperienceProgress());
+
+        profileContentLayout.setVisibility(View.VISIBLE);
+    }
+
+    /**
+     * Download the profile data from the server and trigger a refresh of the UI.
+     * This is really too verbose.
+     */
     protected void synchronize()
     {
         final Application app = this.app;
@@ -113,26 +140,5 @@ public class ProfileActivity extends ActionBarActivity
                 }
             }
         }.execute();
-    }
-
-    @Click
-    void profileRetryButton()
-    {
-        profileRetryButton.setVisibility(View.GONE);
-        profileLoadingProgressBar.setVisibility(View.VISIBLE);
-        synchronize();
-    }
-
-    protected void refreshUI (User user)
-    {
-        profileUsernameTextView.setText(user.getPrettyUsername());
-        profileLevelTextView.setText(String.valueOf(user.getLevel()));
-        profileExperienceProgressTextView.setText(String.valueOf(user.getExperienceProgress()));
-        profileExperienceRequiredTextView.setText(String.valueOf(user.getExperienceRequired()));
-        profileLevelProgressBar.setMax(user.getExperienceRequired());
-        profileLevelProgressBar.setProgress(user.getExperienceProgress());
-
-        profileLoadingLayout.setVisibility(View.GONE);
-        profileContentLayout.setVisibility(View.VISIBLE);
     }
 }

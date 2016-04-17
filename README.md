@@ -4,22 +4,21 @@ Karma
 This is the source of the Android client application [Karma](http://give2peer.org).
 
 It is made to be a client to the [Give2Peer REST API](http://g2p.give2peer.org/),
-run by a [FLOSS server written in PHP atop Symfony](https://github.com/Give2Peer/g2p-server-symfony).
+run by another FLOSS [server](https://github.com/Give2Peer/g2p-server-symfony) written in PHP.
 
 
 Goal
 ----
 
 Photograph and geotag lost items in public spaces (eg: a glove, a shoe, a 500€ bill), recyclable
-detritus (eg: planks of wood, broken mirrors), and just plain gifts (eg: child apparatus, attic
-surplus).
+detritus (eg: planks of wood, broken mirrors), and just plain gifts (eg: child toys, attic surplus).
 
 The user interface should be oriented towards speed. Adding a new item should not take more than a
 handful of seconds.
 
 The client should be able to connect to multiple servers.
-This will allow big organizations to staffsource internal item transfers and disgorge email inboxes
-by setting up their own private server.
+This may allow big organizations to staffsource internal item transfers and disgorge email inboxes
+by setting up their own private server. "Who wants the old computer taking up space in my office ?"
 
 
 
@@ -61,6 +60,8 @@ users that are below API 21.
 - [ ] Add french translation.
 - [ ] Add spanish translation.
 - [ ] Add a new Item offline, upload later.
+- [ ] Warn the user that the app is unavailable during server maintenance.
+- [ ] Provide a means to easily send a bug report to developers.
 
 
 0.4.0

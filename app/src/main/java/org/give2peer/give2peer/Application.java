@@ -365,21 +365,22 @@ public class Application extends SugarApp
         return criteria;
     }
 
+    /**
+     * @return whether this device supports icons the the preferences.
+     */
     public boolean canSetIcons()
     {
         return (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB);
     }
 
-    // UTILS ///////////////////////////////////////////////////////////////////////////////////////
-
-    public SharedPreferences getPrefs()
-    {
-        return PreferenceManager.getDefaultSharedPreferences(this);
-    }
-
     /**
+     * Use our ACCESS_NETWORK_STATE to guess if Internet is available.
+     *
      * People say that this may return false negatives in some edge cases.
-     * It's best to also provide a way for the user to try to connect anyway.
+     * It's best to also provide a way for the user to try to connect anyway, which is why we also
+     * have a `/ping` API on the server, that simply answers with "pong" and a 200 HTTP status.
+     * Note : that ping API requires authentication to the server, whereas this method does not.
+     *
      * @return whether internet is available or not.
      */
     public boolean isOnline()
@@ -396,169 +397,35 @@ public class Application extends SugarApp
     public boolean hasCameraSupport()
     {
         return getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA) ||
-               getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA_FRONT);
+                getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA_FRONT);
     }
 
+    // UTILS ///////////////////////////////////////////////////////////////////////////////////////
 
     /**
-     * @deprecated
-     *
-     * Corrects the orientation of a Bitmap. Orientation, depending of the device,
-     * is not correctly set in the EXIF data of the taken image when it is saved
-     * into disk.
-     *
-     * Explanation:
-     * 	Camera orientation is not working ok (as is when capturing an image) because
-     *  OEMs do not adhere to the standard. So, each company does this following their
-     *  own way.
-     *
-     * @param path	path to the file
+     * Preferences are Android's application configuration registry, which can be deleted by the
+     * user at any time.
      */
-    public Bitmap getBitmapFromPath(String path)
+    public SharedPreferences getPrefs()
     {
-        Bitmap bitmap = null;
-
-        try {
-
-            File f = new File(path);
-            FileInputStream fis = new FileInputStream(f);
-
-            ExifInterface exif = new ExifInterface(f.getPath());
-            int orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION,
-                                                   ExifInterface.ORIENTATION_NORMAL);
-
-            int rotate = 0;
-            switch(orientation) {
-                case ExifInterface.ORIENTATION_ROTATE_270:
-                    rotate += 90;
-                case ExifInterface.ORIENTATION_ROTATE_180:
-                    rotate += 90;
-                case ExifInterface.ORIENTATION_ROTATE_90:
-                    rotate += 90;
-            }
-            Matrix mat = new Matrix();
-            mat.postRotate(rotate);
-
-            BitmapFactory.Options options = new BitmapFactory.Options();
-            //options.inSampleSize = 2; // halves the dimensions of the image
-
-            Bitmap bmp = BitmapFactory.decodeStream(fis, null, options);
-            if (null == bmp) {
-                throw new Exception("Could not decode the bitmap stream.");
-            }
-            bitmap = Bitmap.createBitmap(bmp, 0, 0, bmp.getWidth(), bmp.getHeight(), mat, true);
-
-        } catch (OutOfMemoryError e) {
-            Log.e("G2P", "getBitmapFromPath('"+path+"') [OutOfMemory!]: " + e.getMessage(), e);
-        } catch (Throwable e) {
-            Log.e("G2P","getBitmapFromPath('"+path+"'): " + e.getMessage(), e);
-        }
-
-        return bitmap;
+        return PreferenceManager.getDefaultSharedPreferences(this);
     }
-
-
-    // IMAGE HANDLING (better be moved to its own file) ////////////////////////////////////////////
-
-    public static int calculateInSampleSize(int inWidth, int inHeight, int outWidth, int outHeight)
-    {
-        int inSampleSize = 1;
-
-        if (inHeight > outHeight || inWidth > outWidth) {
-
-            final int halfHeight = inHeight / 2;
-            final int halfWidth  = inWidth  / 2;
-
-            // Calculate the largest inSampleSize value that is a power of 2 and keeps both
-            // height and width larger than the requested height and width.
-            while ((halfHeight / inSampleSize) > outHeight &&
-                    (halfWidth / inSampleSize) > outWidth) {
-                inSampleSize *= 2;
-            }
-        }
-
-        return inSampleSize;
-    }
-
-    public static Bitmap decodeSampledBitmapFromFile(String pathname, int reqWidth, int reqHeight)
-    {
-        // First decode with inJustDecodeBounds=true to check dimensions
-        final BitmapFactory.Options options = new BitmapFactory.Options();
-        options.inJustDecodeBounds = true;
-        BitmapFactory.decodeFile(pathname, options);
-
-        // Calculate inSampleSize
-        options.inSampleSize = calculateInSampleSize(options.outWidth, options.outHeight,
-                                                             reqWidth,         reqHeight);
-        // Decode bitmap with inSampleSize set
-        options.inJustDecodeBounds = false;
-
-        return BitmapFactory.decodeFile(pathname, options);
-    }
-
-    /**
-     * Corrects the orientation of a Bitmap. Orientation, depending of the device,
-     * is not correctly set in the EXIF data of the taken image when it is saved
-     * into disk.
-     * Also ensures that the bitmap has no more than `maxWidth` and `maxHeight`.
-     *
-     * Explanation:
-     * 	Camera orientation is not working ok (as is when capturing an image) because
-     *  OEMs do not adhere to the standard. So, each company does this following their
-     *  own way.
-     *
-     * @param filepath	filepath to the file
-     */
-    public static Bitmap getThumbBitmap(String filepath, int maxWidth, int maxHeight)
-    {
-        Bitmap bitmap = null;
-
-        try {
-
-            File f = new File(filepath);
-            FileInputStream fis = new FileInputStream(f);
-
-            ExifInterface exif = new ExifInterface(f.getPath());
-            int orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION,
-                                                   ExifInterface.ORIENTATION_NORMAL);
-
-            int rotate = 0;
-            switch(orientation) {
-                case ExifInterface.ORIENTATION_ROTATE_270:
-                    rotate += 90;
-                case ExifInterface.ORIENTATION_ROTATE_180:
-                    rotate += 90;
-                case ExifInterface.ORIENTATION_ROTATE_90:
-                    rotate += 90;
-            }
-            Matrix mat = new Matrix();
-            mat.postRotate(rotate);
-
-            Bitmap bmp = Application.decodeSampledBitmapFromFile(filepath, maxWidth, maxHeight);
-
-            if (null == bmp) {
-                throw new Exception("Could not decode the bitmap stream.");
-            }
-            bitmap = Bitmap.createBitmap(bmp, 0, 0, bmp.getWidth(), bmp.getHeight(), mat, true);
-
-        } catch (OutOfMemoryError e) {
-            Log.e("G2P", "getThumbBitmap('"+filepath+"') [OutOfMemory!]: " + e.getMessage(), e);
-        } catch (Throwable e) {
-            Log.e("G2P","getThumbBitmap('"+filepath+"'): " + e.getMessage(), e);
-        }
-
-        return bitmap;
-    }
-
 
 
     // SERVICES ////////////////////////////////////////////////////////////////////////////////////
 
+    /**
+     * The REST service handles all the HTTP nitty-gritty, and provides named methods for each API.
+     */
     public RestService getRestService() { return restService; }
 
 
     // STATS ///////////////////////////////////////////////////////////////////////////////////////
 
+    /**
+     * Called on creation of this application, every time.
+     * This will be useful for tutorials and other events in the future.
+     */
     protected void incrementLaunchesTally()
     {
         int count = getPrefs().getInt("launches_tally", 0) + 1;

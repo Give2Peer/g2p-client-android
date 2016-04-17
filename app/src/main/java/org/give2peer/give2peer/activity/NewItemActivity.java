@@ -26,6 +26,7 @@ import org.give2peer.give2peer.Application;
 import org.give2peer.give2peer.Item;
 import org.give2peer.give2peer.R;
 import org.give2peer.give2peer.exception.QuotaException;
+import org.give2peer.give2peer.factory.BitmapFactory;
 import org.give2peer.give2peer.task.NewItemTask;
 
 import java.io.File;
@@ -193,58 +194,10 @@ public class NewItemActivity extends LocatorActivity
             // If the user cancelled the capture of a picture, we GTFO.
             // It may be nice to allow a user to add a picture from a gallery instead of taking one.
             // see http://stackoverflow.com/questions/20021431/android-how-to-take-a-picture-from-camera-or-gallery
-            Log.d("G2P", "User Cancelled the image capture.");
+            Log.d("G2P", "User cancelled the image capture.");
             finish();
         }
     }
-
-//    /**
-//     * THIS IS CRAP.
-//     * Besides, it MUTATES THE IMAGE AND DEGRADES ITS QUALITY !!!
-//     * fixme: create a proper thumbnail to send away and then to delete, or to store in the cache
-//     * @deprecated
-//     */
-//    protected void processImages()
-//    {
-//        if (imagePaths.size() == 0) {
-//            String msg = getString(R.string.toast_no_image_paths);
-//            Log.e("G2P", msg);
-//            app.toast(msg, Toast.LENGTH_LONG);
-//            finish();
-//        }
-//
-//        // Right now there's only one image per item, but when there'll be multiple images...
-//        String imagePath = imagePaths.get(imagePaths.size()-1);
-//        File imageFile = new File(imagePath);
-//
-//        Bitmap imageBitmap = app.getBitmapFromPath(imagePath);
-//
-//        if (null == imageBitmap) {
-//            Log.e("G2P", "Add new item : the image bitmap was `null` at : " + imagePath);
-//            finish();
-//            return;
-//        }
-//
-//        // Sometimes the camera sends back an empty bitmap, so we're trying this
-//        if (imageBitmap.getHeight() == 0 || imageBitmap.getWidth() == 0) {
-//            Log.e("G2P", "Add new item : the bitmap is empty !");
-//            finish();
-//            return;
-//        }
-//
-//        // Write the bitmap to file
-//        FileOutputStream fOut;
-//        try {
-//            fOut = new FileOutputStream(imageFile);
-//            imageBitmap.compress(Bitmap.CompressFormat.JPEG, 85, fOut);
-//            fOut.flush();
-//            fOut.close();
-//        } catch (Exception e) {
-//            Log.e("G2P", e.getMessage());
-//            e.printStackTrace();
-//            finish();
-//        }
-//    }
 
     /**
      * Convert the image URI to the direct file system path of the image file.
@@ -281,7 +234,7 @@ public class NewItemActivity extends LocatorActivity
             try { // imagePaths may be set but the files may not exist yet
                 int w = Application.THUMB_MAX_WIDTH;
                 int h = Application.THUMB_MAX_HEIGHT;
-                Bitmap imageBitmap = Application.getThumbBitmap(imagePath, w, h);
+                Bitmap imageBitmap = BitmapFactory.getThumbBitmap(imagePath, w, h);
 
                 newItemImageView.setImageBitmap(imageBitmap);
             } catch (Exception e) {
