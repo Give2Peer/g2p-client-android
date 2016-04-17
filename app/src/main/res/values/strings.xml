@@ -55,6 +55,7 @@
     <string name="button_map">Find on map</string>
     <string name="button_give">Give</string>
     <string name="button_spot">Spot</string>
+    <string name="button_retry">Retry</string>
     <string name="button_find_label">List items close to the provided location.</string>
     <string name="button_map_label">Browse on a map for items close to the provided location.</string>
     <string name="button_give_label">When you want to give something for free.</string>

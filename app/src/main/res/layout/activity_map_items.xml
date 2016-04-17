@@ -22,21 +22,11 @@
         android:layout_height="fill_parent"
         >
 
-        <!-- Well, that was a failure. It'll work on Karma v2 ! -->
-        <!--<android.support.design.widget.FloatingActionButton-->
-            <!--android:id="@+id/mapItemsFab"-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:layout_margin="16dp"-->
-            <!--android:clickable="true"-->
-            <!--android:src="@drawable/places_ic_search"-->
-            <!--app:layout_anchor="@id/mapItemsDrawFrame"-->
-            <!--app:layout_anchorGravity="bottom|right|end"/>-->
-
         <!-- We always want this button on the left, not the right, (and not start) -->
         <!-- because the Maps fragment shows its own controls on the bottom right.  -->
         <!-- The best solution would be to be able to configure the third-party map -->
         <!-- to make it put its controls on the left to allow our FAB on the right. -->
+        <!-- Also, we cannot (easily) animate that FAB, because of API 11 support.  -->
         <com.shamanland.fab.FloatingActionButton
             android:id="@+id/mapItemsDrawButton"
             android:layout_width="wrap_content"
