@@ -33,7 +33,7 @@
         <fragment
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:name="org.give2peer.give2peer.fragment.ServerChooserFragment"
+            android:name="org.give2peer.karma.fragment.ServerChooserFragment"
             android:id="@+id/serverChooserFragment"
             />
 
@@ -41,7 +41,7 @@
         <fragment
             android:layout_width="wrap_content"
             android:layout_height="121dp"
-            android:name="org.give2peer.give2peer.fragment.LocationChooserFragment"
+            android:name="org.give2peer.karma.fragment.LocationChooserFragment"
             android:id="@+id/locationChooserFragment"
             />
 

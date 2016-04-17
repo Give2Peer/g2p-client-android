@@ -37,6 +37,7 @@
                 android:paddingBottom="@dimen/activity_vertical_margin"
                 android:orientation="vertical"
                 >
+
                 <EditText
                     android:id="@+id/newItemTitleEditText"
                     android:layout_width="match_parent"
@@ -90,7 +91,7 @@
         <!--android:layout_weight="1"-->
         <!--/>-->
 
-    <!--<fragment android:name="org.give2peer.give2peer.fragment.LocationChooserFragment"-->
+    <!--<fragment android:name="org.give2peer.karma.fragment.LocationChooserFragment"-->
               <!--android:id="@+id/newItemLocationChooserFragment"-->
               <!--android:layout_width="match_parent"-->
               <!--android:layout_height="wrap_content" />-->
