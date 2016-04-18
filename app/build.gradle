@@ -90,15 +90,17 @@ dependencies {
     // LEGACY
     //compile 'com.squareup.retrofit:retrofit:1.6.0'
 
-    // TESTS AND FEATURES
+    // FEATURES-TESTING
     androidTestCompile 'info.cukes:cucumber-core:1.2.2'
     androidTestCompile 'info.cukes:cucumber-java:1.2.2'
     androidTestCompile 'info.cukes:cucumber-android:1.2.2@jar'
     androidTestCompile 'com.jayway.android.robotium:robotium-solo:5.2.1'
     // SOME OTHER TEST LIBS we don't need right now (but might later on)
-    //androidTestCompile 'junit:junit:4.12'
     //androidTestCompile 'info.cukes:cucumber-junit:1.2.2'
     //androidTestCompile 'info.cukes:gherkin:2.12.2'
+    // UNIT-TESTING
+    testCompile        'org.testng:testng:6.9.6'
+    androidTestCompile 'junit:junit:4.12'
     // TRUTH looks nice, but we have enough assertions for our uses
     //androidTestCompile 'com.google.truth:truth:0.26'
 }
