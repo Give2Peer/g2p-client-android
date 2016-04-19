@@ -19,20 +19,25 @@ import java.util.List;
  * Items are first-class citizens in this app.
  * They are fetched as JSON from the server.
  * They handle their own image downloads through async tasks.
+ *
+ * DEPRECATED
+ *
+ * Use entity.Item instead, as this fails to be loaded by GSON, but only in the code
+ * ran on devices (physical or emulated). IT WORKS in our unit-tests, though, which is UNNERVING.
  */
 public class Item
 {
-    protected Integer  id;
-    protected String   title;
-    protected String   description;
-    protected String   location;
-    protected Float    latitude;
-    protected Float    longitude;
-    protected Float    distance; // in meters
-    protected DateTime updatedAt;
+    public Integer  id;
+    public String   title;
+    public String   description;
+    public String   location;
+    public Float    latitude;
+    public Float    longitude;
+    public Float    distance; // in meters
+    public DateTime updatedAt;
 
-    protected String   thumbnail;
-    protected View     thumbnailView;
+    public String   thumbnail;
+    public View     thumbnailView;
 
     // not sure this is used ?
     protected Image    picture;

@@ -25,6 +25,7 @@ import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpParams;
 import org.apache.http.util.EntityUtils;
 import org.give2peer.karma.Item;
+import org.give2peer.karma.entity.PrivateProfile;
 import org.give2peer.karma.entity.Server;
 import org.give2peer.karma.entity.User;
 import org.give2peer.karma.exception.AuthorizationException;
@@ -167,7 +168,7 @@ public class RestService
             Log.d("G2P", "Successfully gave an item. Response : " + json);
             JSONObject jsonObject = new JSONObject(json);
             JSONObject itemJsonObject = jsonObject.getJSONObject("item");
-            // todo: there is `experience` here too, how to handle it ?
+            // todo: there is `karma` here too, how to handle it ?
             item.updateWithJSON(itemJsonObject);
         } else {
 
@@ -262,15 +263,20 @@ public class RestService
      * @throws QuotaException
      * @throws MaintenanceException
      */
-    public User getProfile()
+    public PrivateProfile getProfile()
     throws IOException, URISyntaxException, JSONException,
     AuthorizationException, QuotaException, MaintenanceException
     {
         String json = getJson("/profile");
-        JSONObject data = new JSONObject(json);
-        JSONObject user = data.getJSONObject("user");
+//        JSONObject data = new JSONObject(json);
+//        JSONObject user = data.getJSONObject("user");
+        // Shit, is not encoding...
+//        String json = "{\"user\":{\"id\":3,\"username\":\"gizko\",\"email\":\"gizko@give2peer.org\",\"created_at\":{\"date\":\"2016-04-07 22:11:48.000000\",\"timezone_type\":3,\"timezone\":\"Europe\\/Paris\"},\"karma\":3,\"level\":0},\"items\":[]}";
+        Log.d("G2P", "Profile json reponse :\n"+json);
+
+
         Gson gson = new Gson();
-        return gson.fromJson(user.toString(), User.class);
+        return gson.fromJson(json, PrivateProfile.class);
     }
 
     // HTTP QUERIES : TESTS ////////////////////////////////////////////////////////////////////////

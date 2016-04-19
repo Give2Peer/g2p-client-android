@@ -17,6 +17,7 @@ import org.androidannotations.annotations.ViewById;
 import org.apache.http.conn.HttpHostConnectException;
 import org.give2peer.karma.Application;
 import org.give2peer.karma.R;
+import org.give2peer.karma.entity.PrivateProfile;
 import org.give2peer.karma.entity.User;
 
 import java.net.UnknownHostException;
@@ -55,17 +56,18 @@ public class ProfileActivity extends ActionBarActivity
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
+        Log.d("G2P", "Starting profile activity.");
+
         super.onCreate(savedInstanceState);
         app = (Application) getApplication();
-
-        Log.d("G2P", "Starting profile activity.");
     }
 
     @Override
     protected void onResume()
     {
-        super.onResume();
         Log.d("G2P", "Resuming profile activity.");
+
+        super.onResume();
 
         // If the user is not authenticated, forward him to the login activity.
         app.requireAuthentication(this);
@@ -82,18 +84,34 @@ public class ProfileActivity extends ActionBarActivity
         synchronize();
     }
 
-    protected void refreshUI (User user)
+    protected void refreshUI (PrivateProfile profile)
     {
+        //Log.d("G2P", "Refreshed !");
+
+        // Clear the space
         profileLoadingLayout.setVisibility(View.GONE);
         profileRetryButton.setVisibility(View.GONE);
 
+        // User
+        User user = profile.user;
         profileUsernameTextView.setText(user.getPrettyUsername());
         profileLevelTextView.setText(String.valueOf(user.getLevel()));
-        profileExperienceProgressTextView.setText(String.valueOf(user.getExperienceProgress()));
-        profileExperienceRequiredTextView.setText(String.valueOf(user.getExperienceRequired()));
-        profileLevelProgressBar.setMax(user.getExperienceRequired());
-        profileLevelProgressBar.setProgress(user.getExperienceProgress());
+        profileExperienceProgressTextView.setText(String.valueOf(user.getKarmaProgress()));
+        profileExperienceRequiredTextView.setText(String.valueOf(user.getKarmaRequired()));
+        profileLevelProgressBar.setMax(user.getKarmaRequired());
+        profileLevelProgressBar.setProgress(user.getKarmaProgress());
 
+        // Items authored
+        Log.d("G2P", "ITEMS");
+        for (org.give2peer.karma.entity.Item item : profile.items) {
+            Log.d("G2P", "Item : "+item.getTitle()+" - "+item.getLocation()+" - "+item.getCreatedAt());
+        }
+        Log.d("G2P", "END ITEMS");
+
+
+
+
+        // Show the content
         profileContentLayout.setVisibility(View.VISIBLE);
     }
 
@@ -106,14 +124,14 @@ public class ProfileActivity extends ActionBarActivity
         final Application app = this.app;
         new AsyncTask<Void, Void, Void>()
         {
-            User me;
+            PrivateProfile profile;
             Exception e;
 
             @Override
             protected Void doInBackground(Void... nope)
             {
                 try {
-                    me = app.getRestService().getProfile();
+                    profile = app.getRestService().getProfile();
                 } catch (Exception oops) {
                     e = oops;
                 }
@@ -126,8 +144,8 @@ public class ProfileActivity extends ActionBarActivity
             {
                 super.onPostExecute(nope);
 
-                if (null != me) {
-                    refreshUI(me);
+                if (null != profile) {
+                    refreshUI(profile);
                 } else {
                     String msg = e.toString();
                     if (e instanceof HttpHostConnectException ||

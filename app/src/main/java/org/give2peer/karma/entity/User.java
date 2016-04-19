@@ -4,13 +4,25 @@ package org.give2peer.karma.entity;
 import org.apache.commons.lang3.text.WordUtils;
 
 /**
+ * Users are the humanoids holding their phones with their gorilla fingers.
+ *
+ * This class should closely mirror the user model returned by the API.
  * We use GSON to populate instances of this, usually.
  */
 public class User
 {
     String username;
+
+    /**
+     * The level of a User limits what the user may or may not do in the app, as well as its quotas.
+     * It is not stored, but dynamically derived from the karma points.
+     */
     int level;
-    int experience;
+
+    /**
+     * The karma of a User defines its level.
+     */
+    int karma;
 
     /**
      * Acceleration of Experience cost per level.
@@ -19,10 +31,10 @@ public class User
     public static final int ACC_EXP_COST = 15;
 
     /**
-     * Required Experience to be level 2.
+     * Required Experience to be level 1.
      * Used as a constant in the formulas for levelling up.
      */
-    public static final int EXP_LVL_2    = 10;
+    public static final int EXP_LVL_1    = 10;
 
 
     //// HUMANIZATION //////////////////////////////////////////////////////////////////////////////
@@ -36,32 +48,32 @@ public class User
     //// LEVEL & EXPERIENCE ////////////////////////////////////////////////////////////////////////
 
     /**
-     * This is the total of experience points minus the experience points
+     * This is the total of karma points minus the karma points
      * required to attain the current level of the user.
      *
-     * @return the experience points acquired towards next level.
+     * @return the karma points acquired towards next level.
      */
-    public int getExperienceProgress()
+    public int getKarmaProgress()
     {
-        return getExperience() - experienceOf(getLevel());
+        return getKarma() - karmaOf(getLevel());
     }
 
     /**
-     * @return the amount of experience points missing to gain next level.
+     * @return the amount of karma points missing to gain next level.
      */
-    public int getExperienceMissing()
+    public int getKarmaMissing()
     {
-        return experienceOf(getLevel() + 1) - getExperience();
+        return karmaOf(getLevel() + 1) - getKarma();
     }
 
     /**
-     * This ignores the current experience points, it's xp(N+1) minus xp(N).
+     * This ignores the current karma points, it's xp(N+1) minus xp(N).
      *
-     * @return the relative amount of experience points needed to gain next level.
+     * @return the relative amount of karma points needed to gain next level.
      */
-    public int getExperienceRequired()
+    public int getKarmaRequired()
     {
-        return experienceOf(getLevel()+1) - experienceOf(getLevel());
+        return karmaOf(getLevel()+1) - karmaOf(getLevel());
     }
 
 
@@ -70,33 +82,33 @@ public class User
     /**
      * Thanks Aurel Page for the formula ♥
      *
-     * @param experience points to compute the level of.
-     * @return the level at which we are when we have `experience` points.
+     * @param karma points to compute the level of.
+     * @return the level at which we are when we have `karma` points.
      */
-    static int levelOf(int experience)
+    static int levelOf(int karma)
     {
         int a = ACC_EXP_COST;
-        int b = EXP_LVL_2;
+        int b = EXP_LVL_1;
         int n = (int) Math.floor(
-                (3 * a - 2 * b + Math.sqrt(Math.pow(2 * b - a, 2) + 8 * a * experience))
+                (3 * a - 2 * b + Math.sqrt(Math.pow(2 * b - a, 2) + 8 * a * karma))
                 /
                 (2 * a)
         );
 
-        return Math.max(n, 1);
+        return Math.max(n, 1) - 1;
     }
 
     /**
      * Thanks Aurel Page for the formula ♥
      *
-     * @param level to compute the needed experience of.
-     * @return the experience required to be `level`.
+     * @param level to compute the needed karma of.
+     * @return the karma required to be `level`.
      */
-    static int experienceOf(int level)
+    static int karmaOf(int level)
     {
         int a = ACC_EXP_COST;
-        int b = EXP_LVL_2;
-        int n = level;
+        int b = EXP_LVL_1;
+        int n = level + 1;
 
         return (b - a) * (n - 1) + a * (n * n - n) / 2;
     }
@@ -104,10 +116,10 @@ public class User
 
     //// BORING STUFF //////////////////////////////////////////////////////////////////////////////
 
-    public String getUsername()               { return username;              }
-    public void setUsername(String username)  { this.username = username;     }
-    public int getLevel()                     { return level;                 }
-    public void setLevel(int level)           { this.level = level;           }
-    public int getExperience()                { return experience;            }
-    public void setExperience(int experience) { this.experience = experience; }
+    public String getUsername()               { return username;                                   }
+    public void setUsername(String username)  { this.username = username;                          }
+    public int getLevel()                     { return level;                                      }
+    public void setLevel(int level)           { this.level = level;                                }
+    public int getKarma()                     { return karma;                                      }
+    public void setKarma(int karma)           { this.karma = karma;                                }
 }

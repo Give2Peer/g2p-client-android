@@ -1,7 +1,5 @@
 package org.give2peer.karma.entity;
 
-import org.give2peer.karma.Item;
-
 import java.util.List;
 
 /**
