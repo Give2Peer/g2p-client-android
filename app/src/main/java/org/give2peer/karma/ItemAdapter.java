@@ -18,18 +18,29 @@ import pl.polidea.webimageview.WebImageView;
 
 
 /**
+ * DEPRECATED
+ *
  * This adapter transforms items into their own thumbnail view.
  * Each thumbnail can be clicked on. Right now, doing so opens a third-party mapping activity.
  *
  * The `WebImageView` handles the local caching of the thumbnails, so we do not have to worry about
  * exceeding bandwidth usage. We hope there are no memory leaks in the lib we use.
+ *
+ * This WAS used in conjunction with the layout `grid_item.xml`.
  */
+@Deprecated
 public class ItemAdapter extends ArrayAdapter
 {
     private final List<Item> objects;
     private final int layoutResource;
     private final Context context;
     protected int size;
+
+    static class ItemHolder
+    {
+        WebImageView imgThumb;
+        TextView     txtTitle;
+    }
 
     @SuppressWarnings("unchecked")
     public ItemAdapter(Context context, int resource, int size, List<Item> objects)
@@ -86,19 +97,14 @@ public class ItemAdapter extends ArrayAdapter
         // Fill up the View with the item's data
         holder.txtTitle.setText(item.getThumbnailTitle());
         if (item.hasThumbnail()) {
-            // The WebImageView uses internal LRU caches
+            // The WebImageView uses internal LRU caches so we don't have to care about caching.
+            // I think. Not sure. At all.
             holder.imgThumb.setImageURL(item.getThumbnail());
         }
 
         item.setThumbnailView(row);
 
         return row;
-    }
-
-    static class ItemHolder
-    {
-        WebImageView imgThumb;
-        TextView     txtTitle;
     }
 
 }
