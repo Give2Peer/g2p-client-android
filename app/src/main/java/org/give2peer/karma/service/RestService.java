@@ -4,6 +4,7 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
@@ -25,15 +26,16 @@ import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpParams;
 import org.apache.http.util.EntityUtils;
 import org.give2peer.karma.Item;
+import org.give2peer.karma.adapter.DateTimeTypeAdapter;
 import org.give2peer.karma.entity.PrivateProfile;
 import org.give2peer.karma.entity.Server;
-import org.give2peer.karma.entity.User;
 import org.give2peer.karma.exception.AuthorizationException;
 import org.give2peer.karma.exception.ErrorResponseException;
 import org.give2peer.karma.exception.MaintenanceException;
 import org.give2peer.karma.exception.QuotaException;
 import org.give2peer.karma.exception.UnavailableEmailException;
 import org.give2peer.karma.exception.UnavailableUsernameException;
+import org.joda.time.DateTime;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -268,14 +270,10 @@ public class RestService
     AuthorizationException, QuotaException, MaintenanceException
     {
         String json = getJson("/profile");
-//        JSONObject data = new JSONObject(json);
-//        JSONObject user = data.getJSONObject("user");
-        // Shit, is not encoding...
-//        String json = "{\"user\":{\"id\":3,\"username\":\"gizko\",\"email\":\"gizko@give2peer.org\",\"created_at\":{\"date\":\"2016-04-07 22:11:48.000000\",\"timezone_type\":3,\"timezone\":\"Europe\\/Paris\"},\"karma\":3,\"level\":0},\"items\":[]}";
         Log.d("G2P", "Profile json reponse :\n"+json);
 
+        Gson gson = createGson();
 
-        Gson gson = new Gson();
         return gson.fromJson(json, PrivateProfile.class);
     }
 
@@ -299,6 +297,16 @@ public class RestService
     }
 
     // UTILS ///////////////////////////////////////////////////////////////////////////////////////
+
+    protected Gson createGson()
+    {
+        GsonBuilder gsonBuilder = new GsonBuilder();
+        // Register a Joda time adapter for ISO8601 strings. Otherwise it expects an object.
+        gsonBuilder.registerTypeAdapter(DateTime.class, new DateTimeTypeAdapter());
+        // We don't need to specify the DateFormat, Joda time accepts ISO8601 in our converter.
+        // gsonBuilder.setDateFormat("yyyy-MM-dd'T'HH:mm:ssZ"); // ISO8601
+        return gsonBuilder.create();
+    }
 
     /**
      * Authenticate the `request` using the `credentials`.

@@ -7,6 +7,7 @@ import org.joda.time.DateTime;
  */
 public class Item
 {
+
     Integer  id;
     String   title;
     String   description;
@@ -14,8 +15,8 @@ public class Item
     Float    latitude;
     Float    longitude;
     Float    distance; // in meters
-    DateTime createdAt;
-    DateTime updatedAt;
+    DateTime created_at;
+    DateTime updated_at;
 
 
     // CONSTRUCTOR /////////////////////////////////////////////////////////////////////////////////
@@ -53,13 +54,13 @@ public class Item
 
     public void setDistance(Float distance)          { this.distance = distance;                   }
 
-    public DateTime getCreatedAt()                   { return createdAt;                           }
+    public DateTime getCreatedAt()                   { return created_at;                          }
 
-    public void setCreatedAt(DateTime createdAt)     { this.createdAt = createdAt;                 }
+    public void setCreatedAt(DateTime createdAt)     { this.created_at = createdAt;                }
 
-    public DateTime getUpdatedAt()                   { return updatedAt;                           }
+    public DateTime getUpdatedAt()                   { return updated_at;                          }
 
-    public void setUpdatedAt(DateTime updatedAt)     { this.updatedAt = updatedAt;                 }
+    public void setUpdatedAt(DateTime updatedAt)     { this.updated_at = updatedAt;                }
 
 //    public Image getPicture()                        { return picture;                             }
 //

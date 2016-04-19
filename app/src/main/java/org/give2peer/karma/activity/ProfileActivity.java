@@ -102,14 +102,11 @@ public class ProfileActivity extends ActionBarActivity
         profileLevelProgressBar.setProgress(user.getKarmaProgress());
 
         // Items authored
-        Log.d("G2P", "ITEMS");
+        Log.d("G2P", "ITEMS!");
         for (org.give2peer.karma.entity.Item item : profile.items) {
             Log.d("G2P", "Item : "+item.getTitle()+" - "+item.getLocation()+" - "+item.getCreatedAt());
         }
         Log.d("G2P", "END ITEMS");
-
-
-
 
         // Show the content
         profileContentLayout.setVisibility(View.VISIBLE);
@@ -153,6 +150,7 @@ public class ProfileActivity extends ActionBarActivity
                         msg = getString(R.string.toast_no_internet_available);
                     }
                     app.toasty(msg);
+                    Log.e("G2P", "Unable to update profile : " + msg);
                     profileRetryButton.setVisibility(View.VISIBLE);
                     profileLoadingProgressBar.setVisibility(View.GONE);
                 }
