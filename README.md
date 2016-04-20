@@ -10,15 +10,17 @@ run by another FLOSS [server](https://github.com/Give2Peer/g2p-server-symfony) w
 Goal
 ----
 
-Photograph and geotag lost items in public spaces (eg: a glove, a shoe, a 500€ bill), recyclable
-detritus (eg: planks of wood, broken mirrors), and just plain gifts (eg: child toys, attic surplus).
+**Photograph** and **geotag lost items** in public spaces (eg: a glove, a shoe, ~~a 500€ bill~~),
+recyclable **MOOP** (eg: planks of wood), and just plain **gifts**.
 
-The user interface should be oriented towards speed. Adding a new item should not take more than a
-handful of seconds.
+Adding a new item should not take more than a handful of seconds.
 
-The client should be able to connect to multiple servers.
-This may allow big organizations to staffsource internal item transfers and disgorge email inboxes
-by setting up their own private server. "Who wants the old computer taking up space in my office ?"
+The app should display items on a map around your position.
+
+The client should be able to **connect to multiple servers**.
+Big organizations should be able to use it privately for their internal item transfers.
+
+_"Who wants the old computer taking up space in my office ?"_
 
 
 
@@ -31,6 +33,8 @@ menus, and overall material design suitable for phones, glasses, watches and tab
 
 There might even be a third (very light) version, using a `WebView` to load an HTML-based web app.
 
+All list items followed by parenthesis are optional, and the parenthesis should explain why.
+
 
 2.0.0
 -----
@@ -39,29 +43,31 @@ A version with a more limited hardware support, since API 21.
 This version leverages the full power of Material design, and provides tablet layouts as well as
 phone layouts.
 
-Two concurrent versions will probably be made for Android at this point, one fully native and the other as a webapp within a `WebView`.
-The second one will probably be cheap to code as we'll need an HTML webapp for FirefoxOs anyways.
+Another (concurrent) app named "Karma Web" (or something) will probably be made for Android at this
+point, as an HTML webapp within a `WebView`. Favorably in Dart, if it can be done.
 
-- [ ] Design a launcher icon.
-- [ ] Statistics
-- [ ] Propose deletion of items submitted by someone else. (tricky)
 
 
 1.0.0
 -----
 
-A version for everybody, working under API 10.
-This version (and all of 1.x.x) does not have a proper layout for tablets, and is ugly,
-but it has a very extensive hardware support, and will be kept published as fallback for
-users that are below API 21.
+A version for everybody, working as early as API 10 (Android 3.0 Gingerbread).
 
-- [ ] Provide a lifespan to Items when adding them (allowed lifespans depend on the user level)
-- [ ] Require `https` servers.
-- [ ] Add french translation.
-- [ ] Add spanish translation.
-- [ ] Add a new Item offline, upload later.
-- [ ] Warn the user that the app is unavailable during server maintenance.
-- [ ] Provide a means to easily send a bug report to developers.
+This version (and all of `1.x.x`) will not have a proper layout for tablets, and will be ugly,
+but it will have a very extensive hardware support, and will be kept published as fallback for
+users that won't be able to run the `2.x.x`.
+
+- [ ] Design: a launcher icon. _(fake it 'til you make it)_
+- [ ] Feature: a whole activity dedicated to statistics of the server usage.
+- [ ] Feature: propose deletion of items submitted by someone else. (tricky)
+- [ ] Feature: provide a lifespan to items I tag (lifespans depend on the user karmic level)
+- [ ] Translation: french.
+- [ ] Translation: español.
+- [ ] Feature: add a new Item offline, upload later. (lots of work)
+- [ ] Feature: warn the user that the app is unavailable during server maintenance.
+- [ ] Feature: easily send a bug report to developers on caught error.
+- [ ] Feature: some form of OAuth2
+- [ ] Setting: enable `https` protocol.
 
 
 0.4.0
@@ -69,14 +75,16 @@ users that are below API 21.
 
 A version for the beta community, released on Google Play.
 
-- [x] Karma (experience) points.
-- [x] Move to the versioned API.
-- [x] Implement a Floating Action Button.
-- [x] Action quotas depending on user level.
-- [ ] List items submitted by self in the Profile.
-- [ ] Edit items submitted by self from the Profile.
-- [ ] Delete items submitted by self from the Profile.
-- [ ] Automatic pre-registration.
+- [x] Feature: karma points.
+- [x] Feature: display karma points in the profile.
+- [x] Feature: item tagging quotas depending on user's karmic level.
+- [x] Setting: move to the versioned API `v1/`.
+- [x] Design: Floating Action Button.
+- [x] Feature: list items I tagged in my profile.
+- [ ] Feature: edit items I tagged in my profile.
+- [ ] Feature: delete items I tagged in my profile.
+- [ ] Feature: gain one karma point when launching the app, once per day.
+- [ ] Feature: automatic pre-registration.
 
 
 
@@ -86,30 +94,30 @@ CHANGELOG
 0.3.0
 -----
 
-- [x] Locally cache item thumbnail images.
-- [x] Design a temporary basic launcher icon.
-- [x] Start application by displaying items around the user on a map.
-- [x] Improve automatic location detection using Google API.
-- [x] Refactor to support API 10 (and onwards).
-- [x] Add a new item using the "share" feature of the camera and gallery.
-- [x] Registration activity.
+- [x] Feature: locally cache item thumbnail images.
+- [x] Design: a temporary basic launcher icon.
+- [x] Feature: display items around my position on a map.
+- [x] Feature: automatic location detection using Google Services API.
+- [x] Refacto: support for API 10 with appcompat and lucky charms.
+- [x] Feature: register manually on the registration activity.
 
 
 0.2.0
 -----
 
-- [x] Set up a feature suite in Gherkin.
-- [x] Add a Report Bug button.
+- [x] Setting: set up a feature suite in Gherkin. (now oh-so broken ._.)
+- [x] Feature: add a new item using the "share" feature of the camera or gallery.
+- [x] Feature: send a picture along with an item.
+- [x] Feature: display the profile after adding a new item.
 
 
 0.1.0
 -----
 
-- [x] List 32 items around my position, and launch maps and navigation.
-- [x] Add a new Item with a location, a picture, and an optional title.
-- [x] Detect my location using the GPS or WiFi.
-- [x] List, add, edit and forget servers.
-- [x] List, add, edit and forget locations.
+- [x] Feature: guess my location using the GPS or WiFi.
+- [x] Feature: list, add, edit and forget servers.
+- [x] Feature: list, add, edit and forget locations.
+- [x] Feature: open github.com from the menus to manually report a bug.
 
 
 CAVEATS
@@ -124,9 +132,10 @@ at least until `sugar` makes a release.
 TROUBLESHOOTING
 ===============
 
-`peer not authenticated` : install Gradle `2.12` and configure Android Studio to use it.
+`peer not authenticated` : this is because of the caveat above.
+install Gradle `2.12` and configure Android Studio to use it.
 
-Sometimes, Android Studio will _forget_ which gradle version to use.
+Note: sometimes, Android Studio will _forget_ which gradle version to use and revert to `2.10` ?
 
 
 TESTS AND SPECS
@@ -192,7 +201,8 @@ RetroFit
 https://square.github.io/retrofit/
 
 We do not use that lib right now because the default adapters choked on our JSON.
-A refactorization implementing support for this (or an even better REST lib) is welcome.
+I suspect this would not be the case anymore, so a refactorization implementing support for this
+(or an even better REST lib) would be welcome.
 
 
 
@@ -272,3 +282,6 @@ Thanks
 - The ioth, because they can read between the books.
 - Our other friends, for not killing us when we pester them about this.
 - Our families, for their unwavering support.
+
+
+[MOOP]: http://burningman.org/event/preparation/leaving-no-trace/moop/
