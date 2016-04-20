@@ -316,12 +316,15 @@ public class NewItemActivity extends LocatorActivity
         item.setPictures(imageFiles);
 
         // Try to upload it, along with its image(s).
-        NewItemTask nit = new NewItemTask(app) {
+        NewItemTask nit = new NewItemTask(app, this) {
             @Override
             protected void onPostExecute(Item item) {
                 if (!hasException()) {
                     app.toast(getString(R.string.toast_new_item_uploaded, item.getTitle()), Toast.LENGTH_LONG);
-                    // todo: here, continue to profile
+                    // Continue to the profile
+                    Intent intent = new Intent(this.activity, ProfileActivity_.class);
+                    this.activity.startActivity(intent);
+                    // ... but close this activity, we don't want it in the history stack.
                     finish();
                 } else {
                     Exception e = getException();

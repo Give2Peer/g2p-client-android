@@ -27,7 +27,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceLarge"
-                android:text="Goutte"
+                android:text="Universe"
                 android:id="@+id/profileUsernameTextView"
                 />
 
@@ -53,20 +53,22 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceMedium"
-                android:text="1"
+                android:text="∞"
                 android:id="@+id/profileLevelTextView"
                 android:layout_marginLeft="5dp"
                 />
 
         </LinearLayout>
 
+        <!-- Karma Score Label -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Experience"
+            android:text="Karma"
             android:id="@+id/textView"
             />
 
+        <!-- Karma Score -->
         <LinearLayout
             android:orientation="horizontal"
             android:layout_width="match_parent"
@@ -74,6 +76,7 @@
             android:weightSum="1"
             >
 
+            <!-- Karma ProgressBar Score -->
             <ProgressBar
                 style="?android:attr/progressBarStyleHorizontal"
                 android:layout_width="0dp"
@@ -85,6 +88,7 @@
                 android:layout_weight="1"
                 />
 
+            <!-- Karma Numeric Score -->
             <LinearLayout
                 android:orientation="horizontal"
                 android:layout_width="wrap_content"
@@ -115,16 +119,36 @@
                     android:text="0"
                     android:id="@+id/profileExperienceRequiredTextView"
                     />
-            </LinearLayout>
 
-        </LinearLayout>
+            </LinearLayout> <!-- END Karma Numeric Score -->
+
+        </LinearLayout> <!-- Karma Score -->
+
+        <!-- Horizontal Ruler -->
+        <View
+            android:layout_width="fill_parent"
+            android:layout_height="1px"
+            android:background="#4e4e4e"
+            android:layout_marginTop="30dp"
+            android:layout_marginBottom="0dp"
+            />
+
+        <!-- Items -->
+        <ListView xmlns:android="http://schemas.android.com/apk/res/android"
+            android:id="@+id/profileItemsListView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+
+            />
+
     </LinearLayout>
 
     <RelativeLayout
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/profileLoadingLayout">
+        android:id="@+id/profileLoadingLayout"
+        >
 
         <ProgressBar
             style="?android:attr/progressBarStyleLarge"

@@ -1,5 +1,6 @@
 package org.give2peer.karma.task;
 
+import android.app.Activity;
 import android.os.AsyncTask;
 
 import org.give2peer.karma.Application;
@@ -17,12 +18,14 @@ import java.net.URISyntaxException;
 
 public class NewItemTask extends AsyncTask<Item, Void, Item>
 {
-    Application app;
+    public Application app;
+    public Activity activity;
 
     Exception exception;
 
-    public NewItemTask(Application app) {
+    public NewItemTask(Application app, Activity activity) {
         this.app = app;
+        this.activity = activity;
     }
 
     protected Item doInBackground(Item... items)

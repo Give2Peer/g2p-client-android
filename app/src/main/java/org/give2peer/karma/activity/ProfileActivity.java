@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -17,6 +18,7 @@ import org.androidannotations.annotations.ViewById;
 import org.apache.http.conn.HttpHostConnectException;
 import org.give2peer.karma.Application;
 import org.give2peer.karma.R;
+import org.give2peer.karma.adapter.ItemsListViewAdapter;
 import org.give2peer.karma.entity.PrivateProfile;
 import org.give2peer.karma.entity.User;
 
@@ -28,6 +30,9 @@ import java.net.UnknownHostException;
  * It requires the user to be registered.
  * - User informations
  * - Items added by the user
+ *
+ * ActionBarActivity is deprecated, so we should use something else. We failed to. Maybe YOU won't ?
+ *
  */
 @EActivity(R.layout.activity_profile)
 public class ProfileActivity extends ActionBarActivity
@@ -52,6 +57,8 @@ public class ProfileActivity extends ActionBarActivity
     ProgressBar    profileLoadingProgressBar;
     @ViewById
     Button         profileRetryButton;
+    @ViewById
+    ListView       profileItemsListView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -60,6 +67,8 @@ public class ProfileActivity extends ActionBarActivity
 
         super.onCreate(savedInstanceState);
         app = (Application) getApplication();
+
+//        profileItemsListView
     }
 
     @Override
@@ -107,6 +116,8 @@ public class ProfileActivity extends ActionBarActivity
             Log.d("G2P", "Item : "+item.getTitle()+" - "+item.getLocation()+" - "+item.getCreatedAt());
         }
         Log.d("G2P", "END ITEMS");
+        profileItemsListView.setAdapter(new ItemsListViewAdapter(this, R.layout.items_list_view, profile.items));
+
 
         // Show the content
         profileContentLayout.setVisibility(View.VISIBLE);
