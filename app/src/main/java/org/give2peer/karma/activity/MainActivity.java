@@ -26,6 +26,7 @@ import org.give2peer.karma.fragment.ServerChooserFragment;
  * Callbacks : http://developer.android.com/training/basics/activity-lifecycle/starting.html
  *
  */
+@Deprecated
 public class MainActivity extends ActionBarActivity
 {
 

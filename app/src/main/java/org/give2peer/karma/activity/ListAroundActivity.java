@@ -26,6 +26,7 @@ import org.give2peer.karma.task.FindItemsTask;
  *   - list more items when we get to the bottom
  *   - don't reload the items when the orientation changes
  */
+@Deprecated
 public class ListAroundActivity extends Activity
 {
     Application app;

@@ -22,9 +22,14 @@ import java.util.List;
  *
  * DEPRECATED
  *
- * Use entity.Item instead, as this fails to be loaded by GSON, but only in the code
+ * Use `entity.Item` instead, as this fails to be loaded by GSON, but only in the code
  * ran on devices (physical or emulated). IT WORKS in our unit-tests, though, which is UNNERVING.
+ * ...
+ * It's because I'm stupid. A `View` !? NO NO NOOOO ! StackOverflowErrors should've tipped me...
+ *
+ * Well, no worries, this file is going to be deleted soon enough.
  */
+@Deprecated
 public class Item
 {
     public Integer  id;
@@ -37,7 +42,7 @@ public class Item
     public DateTime updatedAt;
 
     public String   thumbnail;
-    public View     thumbnailView;
+    public View     thumbnailView;  // <= don't do that ; for my defense, it was hackathon code
 
     // not sure this is used ?
     protected Image    picture;
