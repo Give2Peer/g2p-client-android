@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
+import org.apache.commons.lang3.StringUtils;
 import org.give2peer.karma.entity.Item;
 import org.give2peer.karma.R;
 
@@ -66,11 +67,29 @@ public class ItemsListViewAdapter extends ArrayAdapter
             itemView = inflater.inflate(layout, parent, false);
 
             WebImageView thumb = (WebImageView)itemView.findViewById(R.id.itemsListViewThumb);
+
             TextView Line1 = (TextView)itemView.findViewById(R.id.itemsListViewFirstLine);
             TextView Line2 = (TextView)itemView.findViewById(R.id.itemsListViewSecondLine);
 
-            Line1.setText(item.getTitle());
-            Line2.setText(String.format(Locale.getDefault(), "%s at %s", item.getHumanUpdatedAt(), item.getLocation()));
+            String sl1;
+            String sl2;
+
+            List<String> tags = item.getTags();
+
+            sl1 = item.getTitle();
+            if (sl1.isEmpty() && ! tags.isEmpty()) {
+                // No title, try tags instead.
+                sl1 = StringUtils.join();
+            }
+            if (sl1.isEmpty()) {
+                // No title and no tags, move the location to the first line
+                sl1 = item.getLocation();
+                sl2 = item.getHumanUpdatedAt();
+            } else {
+                sl2 = String.format(Locale.getDefault(), "%s at %s", item.getHumanUpdatedAt(), item.getLocation());
+            }
+            Line1.setText(sl1);
+            Line2.setText(sl2);
 
             // The WebImageView uses internal LRU caches so we don't have to care about caching.
             // https://github.com/Polidea/AndroidImageCache

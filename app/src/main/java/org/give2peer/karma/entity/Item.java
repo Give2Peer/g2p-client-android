@@ -3,6 +3,7 @@ package org.give2peer.karma.entity;
 import org.joda.time.DateTime;
 import org.ocpsoft.prettytime.PrettyTime;
 
+import java.util.List;
 import java.util.Locale;
 
 /**
@@ -21,6 +22,8 @@ public class Item
     DateTime created_at;
     DateTime updated_at;
     String   thumbnail;
+
+    List<String> tags;
 
 
     // CONSTRUCTOR /////////////////////////////////////////////////////////////////////////////////
@@ -129,15 +132,13 @@ public class Item
 
     public void setThumbnail(String thumbnail)       { this.thumbnail = thumbnail;                 }
 
+    public List<String> getTags()                    { return tags;                                }
+
+    public void setTags(List<String> tags)           { this.tags = tags;                           }
+
 //    public Image getPicture()                        { return picture;                             }
 //
 //    public void setPicture(Image picture)            { this.picture = picture;                     }
-//
-//    public boolean hasThumbnailView()                { return null != thumbnailView;               }
-//
-//    public View getThumbnailView()                   { return thumbnailView;                       }
-//
-//    public void setThumbnailView(View thumbnailView) { this.thumbnailView = thumbnailView;         }
 //
 //    public List<File> getPictures()                  { return pictures;                            }
 //
