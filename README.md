@@ -57,7 +57,7 @@ This version (and all of `1.x.x`) will not have a proper layout for tablets, and
 but it will have a very extensive hardware support, and will be kept published as fallback for
 users that won't be able to run the `2.x.x`.
 
-- [ ] Design: a launcher icon. _(fake it 'til you make it)_
+- [ ] Design:  a launcher icon. _(fake it 'til you make it)_
 - [ ] Feature: a whole activity dedicated to statistics of the server usage.
 - [ ] Feature: propose deletion of items submitted by someone else. (tricky)
 - [ ] Feature: provide a lifespan to items I tag (lifespans depend on the user karmic level)
@@ -66,8 +66,10 @@ users that won't be able to run the `2.x.x`.
 - [ ] Feature: add a new Item offline, upload later. (lots of work)
 - [ ] Feature: warn the user that the app is unavailable during server maintenance.
 - [ ] Feature: easily send a bug report to developers on caught error.
-- [ ] Feature: some form of OAuth2
+- [ ] Feature: some form of OAuth2.
 - [ ] Setting: enable `https` protocol.
+- [ ] Feature: edit items I tagged in my profile.
+- [ ] Feature: delete items I tagged in my profile.
 
 
 0.4.0
@@ -79,10 +81,9 @@ A version for the beta community, released on Google Play.
 - [x] Feature: display karma points in the profile.
 - [x] Feature: item tagging quotas depending on user's karmic level.
 - [x] Setting: move to the versioned API `v1/`.
-- [x] Design: Floating Action Button.
+- [x] Design:  Floating Action Button.
 - [x] Feature: list items I tagged in my profile.
-- [ ] Feature: edit items I tagged in my profile.
-- [ ] Feature: delete items I tagged in my profile.
+- [x] Bugfix:  crash upon manual registration
 - [ ] Feature: gain one karma point when launching the app, once per day.
 - [ ] Feature: automatic pre-registration.
 

@@ -161,7 +161,7 @@ public class RegistrationActivity extends ActionBarActivity
                         usrInput.setTextColor(COLOR_ERROR);
                     }
                     else if (exception instanceof UnavailableEmailException) {
-                        app.toast("That email is already taken.");
+                        app.toast("That email is already taken or invalid.");
                         emlInput.setTextColor(COLOR_ERROR);
                     }
                     else if (exception instanceof ErrorResponseException) {
@@ -178,7 +178,12 @@ public class RegistrationActivity extends ActionBarActivity
                     server.setUsername(username);
                     server.setPassword(password);
                     server.save();
-                    // In the prefs, too
+                    // Update the REST service
+                    app.setServerConfiguration(server);
+                    // we could also do
+                    //app.getRestService().setCredentials(username, password);
+                    // .. not sure which is best.
+                    // In the prefs, too. Yeah, technical debt...
                     SharedPreferences prefs = app.getPrefs();
                     String usrKey = String.format("server_%d_username", server.getId());
                     String pwdKey = String.format("server_%d_password", server.getId());

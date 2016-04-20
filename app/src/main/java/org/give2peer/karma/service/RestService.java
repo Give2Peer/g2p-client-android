@@ -97,10 +97,15 @@ public class RestService
 
     public RestService(Server config)
     {
-        serverUrl = config.getUrl() + "/v1";
-        setCredentials(config.getUsername(), config.getPassword());
+        setServer(config);
 
         client = new DefaultHttpClient();
+    }
+
+    public void setServer(Server config)
+    {
+        serverUrl = config.getUrl() + "/v1";
+        setCredentials(config.getUsername(), config.getPassword());
     }
 
     // CREDENTIALS /////////////////////////////////////////////////////////////////////////////////

@@ -5,13 +5,15 @@
     android:padding="6dip"
     >
 
+    <!-- This is used in the ProfileActivity, by the ItemListViewAdapter -->
+
     <!-- wrap_content width takes half the parent width, which is not what we want. -->
+    <!-- this width behavior is different from a simple ImageView ? -->
     <pl.polidea.webimageview.WebImageView
         android:id="@+id/itemsListViewThumb"
         android:layout_width="?android:attr/listPreferredItemHeight"
         android:layout_height="fill_parent"
         android:layout_marginRight="6dip"
-        android:contentDescription="TODO"
         android:layout_alignParentTop   ="true"
         android:layout_alignParentBottom="true"
         android:layout_alignParentLeft  ="true"

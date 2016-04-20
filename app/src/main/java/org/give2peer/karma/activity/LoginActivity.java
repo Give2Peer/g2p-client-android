@@ -135,7 +135,9 @@ public class LoginActivity extends ActionBarActivity
                         server.setUsername(username);
                         server.setPassword(password);
                         server.save();
-                        // ... in the prefs, too
+                        // The REST service has already been updated
+                        //
+                        // ... in the prefs, too. (argh, this "preferences" hack is so hurtful)
                         SharedPreferences prefs = app.getPrefs();
                         String usrKey = String.format("server_%d_username", server.getId());
                         String pwdKey = String.format("server_%d_password", server.getId());
