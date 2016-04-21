@@ -10,13 +10,13 @@
     <string name="title_activity_new_item">Karma - New Item</string>
     <string name="title_activity_map_items">Karma - Map items</string>
 
-    <string name="main_activity_top_message">Welcome! With this app, you can give an item you possess, spot an item that was lost or thrown away, and find items around a location.</string>
+    <string name="profile_no_items_help">Use your camera to share to Karma a picture of a lost item, a gift, or plain MOOP.\n\nItems you added will be listed here.\n\n\nMOOP : Matter Out Of Place</string>
 
     <string name="new_item_label_title">Title</string>
     <string name="new_item_label_location">Location</string>
     <string name="new_item_label_location_optional">Location (leave blank to use GPS)</string>
     <string name="new_item_image_description">The picture of the item you just took.</string>
-    <string name="new_item_send_button">Send</string>
+    <string name="new_item_send_button">Send</string><!-- deprecated: we use an icon FAB now -->
 
     <string name="registration_label_username">Username</string>
     <string name="registration_label_password">Password</string>
@@ -76,7 +76,10 @@
     <string name="settings_location_forget">Forget this location</string>
     <string name="settings_location_add">Add a location</string>
 
-    <string name="menu_action_add_item">Add</string>
+    <string name="menu_action_add_item">Add Item</string>
     <string name="menu_action_profile">Profile</string>
+
+    <!-- deprecated -->
+    <string name="main_activity_top_message">Welcome! With this app, you can give an item you possess, spot an item that was lost or thrown away, and find items around a location.</string>
 
 </resources>

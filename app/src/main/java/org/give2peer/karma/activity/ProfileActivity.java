@@ -48,6 +48,8 @@ public class ProfileActivity extends ActionBarActivity
     @ViewById
     TextView       profileExperienceRequiredTextView;
     @ViewById
+    TextView       profileNoItemsTextView;
+    @ViewById
     ProgressBar    profileLevelProgressBar;
     @ViewById
     LinearLayout   profileContentLayout;
@@ -110,14 +112,18 @@ public class ProfileActivity extends ActionBarActivity
         profileLevelProgressBar.setMax(user.getKarmaRequired());
         profileLevelProgressBar.setProgress(user.getKarmaProgress());
 
-        // Items authored
-        Log.d("G2P", "ITEMS!");
-        for (org.give2peer.karma.entity.Item item : profile.items) {
-            Log.d("G2P", "Item : "+item.getTitle()+" - "+item.getLocation()+" - "+item.getCreatedAt());
+        // No items help text
+        if (profile.items.isEmpty()) {
+            profileNoItemsTextView.setVisibility(View.VISIBLE);
+        } else {
+            profileNoItemsTextView.setVisibility(View.GONE);
         }
-        Log.d("G2P", "END ITEMS");
-        profileItemsListView.setAdapter(new ItemsListViewAdapter(this, R.layout.items_list_view, profile.items));
 
+        // Items authored
+        for (org.give2peer.karma.entity.Item item : profile.items) {
+            Log.d("G2P", "Profile item : "+item.getTitle()+" - "+item.getLocation()+" - "+item.getCreatedAt());
+        }
+        profileItemsListView.setAdapter(new ItemsListViewAdapter(this, R.layout.items_list_view, profile.items));
 
         // Show the content
         profileContentLayout.setVisibility(View.VISIBLE);

@@ -133,12 +133,21 @@
             android:layout_marginBottom="0dp"
             />
 
+        <!-- No items here tutorial -->
+        <TextView
+            android:id="@+id/profileNoItemsTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="25dp"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:text="@string/profile_no_items_help"
+            />
+
         <!-- Items -->
         <ListView xmlns:android="http://schemas.android.com/apk/res/android"
             android:id="@+id/profileItemsListView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-
             />
 
     </LinearLayout>
