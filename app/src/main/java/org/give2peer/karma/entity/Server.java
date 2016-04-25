@@ -13,9 +13,9 @@ public class Server extends BaseEntity
     String username = "";
     String password = "";
 
-    public static String DEFAULT_URL = "http://g2p.give2peer.org";
+    public static String DEFAULT_URL = "http://g2p.give2peer.org/v1";
     public static String DEFAULT_NAME = "Give2Peer Beta";
-    public static String DEFAULT_USERNAME = "Goutte"; // fixme: use Anon
+    public static String DEFAULT_USERNAME = "Goutte";
     public static String DEFAULT_PASSWORD = "Goutte";
 
     public Server() {}

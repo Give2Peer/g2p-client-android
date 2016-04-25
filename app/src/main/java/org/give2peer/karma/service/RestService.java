@@ -27,7 +27,7 @@ import org.apache.http.params.HttpParams;
 import org.apache.http.util.EntityUtils;
 import org.give2peer.karma.Item;
 import org.give2peer.karma.adapter.DateTimeTypeAdapter;
-import org.give2peer.karma.entity.PrivateProfile;
+import org.give2peer.karma.response.PrivateProfileResponse;
 import org.give2peer.karma.entity.Server;
 import org.give2peer.karma.exception.AuthorizationException;
 import org.give2peer.karma.exception.ErrorResponseException;
@@ -35,6 +35,7 @@ import org.give2peer.karma.exception.MaintenanceException;
 import org.give2peer.karma.exception.QuotaException;
 import org.give2peer.karma.exception.UnavailableEmailException;
 import org.give2peer.karma.exception.UnavailableUsernameException;
+import org.give2peer.karma.response.RegistrationResponse;
 import org.joda.time.DateTime;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -76,14 +77,19 @@ public class RestService
     static int EXCEEDED_QUOTA       = 8;
     static int BAD_USERNAME         = 9;
 
-    /**
-     * The `scheme`://`authority` part of the URL of the server, plus the route version prefix.
-     * Eg: https://g2p.give2peer.org/v1
-     */
-    protected String serverUrl;
+    static String ROUTE_HELLO        = "/hello";
+    static String ROUTE_CHECK        = "/check";
+    static String ROUTE_USER         = "/profile";
+    static String ROUTE_USERS        = "/users";
+    static String ROUTE_ITEM         = "/item";
+    static String ROUTE_ITEM_PICTURE = "/item/{id}/picture";
+    static String ROUTE_ITEMS_AROUND = "/items/around/{latitude}/{longitude}";
+
+    protected Server currentServer;
 
     /**
      * The G2P REST API require credentials for most of its methods
+     *
      */
     protected UsernamePasswordCredentials credentials;
 
@@ -104,8 +110,13 @@ public class RestService
 
     public void setServer(Server config)
     {
-        serverUrl = config.getUrl() + "/v1";
+        currentServer = config;
         setCredentials(config.getUsername(), config.getPassword());
+    }
+
+    public String makeUrl(String route)
+    {
+        return currentServer.getUrl() + route;
     }
 
     // CREDENTIALS /////////////////////////////////////////////////////////////////////////////////
@@ -143,7 +154,8 @@ public class RestService
             throws URISyntaxException, IOException, AuthorizationException, MaintenanceException,
                    QuotaException
     {
-        String route = "/items/around/" + latitude + "/" + longitude;
+        String route = ROUTE_ITEMS_AROUND.replaceAll("\\{latitude\\}",  String.valueOf(latitude))
+                                         .replaceAll("\\{longitude\\}", String.valueOf(longitude));
 
         BasicHttpParams params = new BasicHttpParams();
         params.setParameter("skip", offset);
@@ -154,7 +166,7 @@ public class RestService
 
     public Item giveItem(Item item)
             throws URISyntaxException, IOException, JSONException, ErrorResponseException, AuthorizationException, MaintenanceException, QuotaException {
-        String url = serverUrl + "/item";
+        String url = makeUrl(ROUTE_ITEM);
 
         HttpPost request = new HttpPost();
         request.setURI(new URI(url));
@@ -195,7 +207,7 @@ public class RestService
      */
     public Item pictureItem(Item item, File picture)
     {
-        String url = serverUrl + String.format("/item/%s/picture", item.getId().toString());
+        String url = makeUrl(ROUTE_ITEM_PICTURE.replaceAll("\\{id\\}", item.getId().toString()));
         
         try {
             HttpPost request = new HttpPost();
@@ -227,19 +239,26 @@ public class RestService
 
     // HTTP QUERIES : USERS ////////////////////////////////////////////////////////////////////////
 
-    public void register(String username, String password, String email)
+    public RegistrationResponse preregister()
     throws URISyntaxException, IOException, JSONException, ErrorResponseException,
            UnavailableUsernameException, UnavailableEmailException
     {
-        String url = serverUrl + "/register";
+        return register("", "", "");
+    }
+
+    public RegistrationResponse register(String username, String password, String email)
+    throws URISyntaxException, IOException, JSONException, ErrorResponseException,
+           UnavailableUsernameException, UnavailableEmailException
+    {
+        String url = makeUrl(ROUTE_USERS);
 
         HttpPost request = new HttpPost();
         request.setURI(new URI(url));
 
         List<NameValuePair> pairs = new ArrayList<NameValuePair>();
-        pairs.add(new BasicNameValuePair("username", username));
-        pairs.add(new BasicNameValuePair("password", password));
-        pairs.add(new BasicNameValuePair("email",    email));
+        if ( ! username.isEmpty()) pairs.add(new BasicNameValuePair("username", username));
+        if ( ! password.isEmpty()) pairs.add(new BasicNameValuePair("password", password));
+        if ( !    email.isEmpty()) pairs.add(new BasicNameValuePair("email",    email));
         request.setEntity(new UrlEncodedFormEntity(pairs, "UTF-8")); // deprecated in API level 22 !
 
         HttpResponse response = client.execute(request);
@@ -258,11 +277,13 @@ public class RestService
                 throw new ErrorResponseException(json);
             }
         }
+
+        Gson gson = createGson();
+
+        return gson.fromJson(json, RegistrationResponse.class);
     }
 
     /**
-     * todo: create a PrivateProfile object that will mirror the server's response and use only GSON
-     *
      * @throws IOException
      * @throws URISyntaxException
      * @throws JSONException
@@ -270,16 +291,16 @@ public class RestService
      * @throws QuotaException
      * @throws MaintenanceException
      */
-    public PrivateProfile getProfile()
+    public PrivateProfileResponse getProfile()
     throws IOException, URISyntaxException, JSONException,
     AuthorizationException, QuotaException, MaintenanceException
     {
-        String json = getJson("/profile");
+        String json = getJson(ROUTE_USER);
         Log.d("G2P", "Profile json reponse :\n"+json);
 
         Gson gson = createGson();
 
-        return gson.fromJson(json, PrivateProfile.class);
+        return gson.fromJson(json, PrivateProfileResponse.class);
     }
 
     // HTTP QUERIES : TESTS ////////////////////////////////////////////////////////////////////////
@@ -288,16 +309,16 @@ public class RestService
     throws IOException, URISyntaxException,
            AuthorizationException, MaintenanceException, QuotaException
     {
-        String json = getJson("/ping");
+        String json = getJson(ROUTE_HELLO);
         return json.equals("\"pong\"");
     }
 
 
-    public boolean testLogin()
+    public boolean checkAuthentication()
     throws IOException, URISyntaxException,
            AuthorizationException, MaintenanceException, QuotaException
     {
-        String json = getJson("/login");
+        String json = getJson(ROUTE_CHECK);
         return json.equals("\"pong\"");
     }
 
@@ -322,7 +343,7 @@ public class RestService
     {
         try {
             BasicScheme scheme = new BasicScheme();
-            Header authorizationHeader = scheme.authenticate(credentials, request);
+            Header authorizationHeader = scheme.authenticate(getCredentials(), request);
             request.addHeader(authorizationHeader);
         } catch (AuthenticationException e) {
             Log.e("G2P", "Authentication failure !");
@@ -354,9 +375,10 @@ public class RestService
            AuthorizationException, QuotaException, MaintenanceException
     {
         HttpGet request = new HttpGet();
-        request.setURI(new URI(serverUrl + route));
+        request.setURI(new URI(makeUrl(route)));
         authenticate(request);
         if (null != params) request.setParams(params);
+        Log.d("G2P", String.format("Querying `%s`.", request.getURI()));
         HttpResponse response = client.execute(request);
         inspectResponseForErrors(response);
 
@@ -393,6 +415,7 @@ public class RestService
 
 
     /**
+     * @deprecated
      * Try to parse the `json` and build the items in it.
      *
      * @param  json to parse.

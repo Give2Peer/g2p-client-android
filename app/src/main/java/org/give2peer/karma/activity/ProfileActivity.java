@@ -19,7 +19,7 @@ import org.apache.http.conn.HttpHostConnectException;
 import org.give2peer.karma.Application;
 import org.give2peer.karma.R;
 import org.give2peer.karma.adapter.ItemsListViewAdapter;
-import org.give2peer.karma.entity.PrivateProfile;
+import org.give2peer.karma.response.PrivateProfileResponse;
 import org.give2peer.karma.entity.User;
 
 import java.net.UnknownHostException;
@@ -95,7 +95,7 @@ public class ProfileActivity extends ActionBarActivity
         synchronize();
     }
 
-    protected void refreshUI (PrivateProfile profile)
+    protected void refreshUI (PrivateProfileResponse profile)
     {
         //Log.d("G2P", "Refreshed !");
 
@@ -138,7 +138,7 @@ public class ProfileActivity extends ActionBarActivity
         final Application app = this.app;
         new AsyncTask<Void, Void, Void>()
         {
-            PrivateProfile profile;
+            PrivateProfileResponse profile;
             Exception e;
 
             @Override

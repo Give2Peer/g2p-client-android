@@ -52,8 +52,8 @@ import java.util.List;
  * ```
  * or, with Android Annotations, ever-so-simply define and annotate the `app` property :
  * ```
- * @App
- * Application app;
+ * * @App
+ * * Application app;
  * ```
  */
 public class Application extends SugarApp
@@ -70,6 +70,7 @@ public class Application extends SugarApp
 
     protected RestService restService;
 
+    // Unsure if this is even used somewhere...
     public Application getInstance() { return singleton; }
 
     // FLOW ////////////////////////////////////////////////////////////////////////////////////////
