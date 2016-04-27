@@ -1,6 +1,7 @@
 package org.give2peer.karma;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -11,6 +12,7 @@ import android.location.Criteria;
 import android.location.Geocoder;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
@@ -28,12 +30,18 @@ import net.danlew.android.joda.JodaTimeAndroid;
 import org.give2peer.karma.activity.LoginActivity_;
 import org.give2peer.karma.entity.Location;
 import org.give2peer.karma.entity.Server;
+import org.give2peer.karma.exception.ErrorResponseException;
 import org.give2peer.karma.exception.GeocodingException;
+import org.give2peer.karma.exception.UnavailableEmailException;
+import org.give2peer.karma.exception.UnavailableUsernameException;
 import org.give2peer.karma.listener.GoogleApiClientListener;
+import org.give2peer.karma.response.RegistrationResponse;
 import org.give2peer.karma.service.RestService;
+import org.json.JSONException;
 import org.ocpsoft.prettytime.PrettyTime;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.Date;
 import java.util.List;
 
@@ -70,6 +78,8 @@ public class Application extends SugarApp
 
     protected RestService restService;
 
+    protected boolean isFirstTime = false;
+
     // Unsure if this is even used somewhere...
     public Application getInstance() { return singleton; }
 
@@ -104,7 +114,19 @@ public class Application extends SugarApp
      */
     protected void onFirstTime()
     {
-        // nothing is cool
+        isFirstTime = true;
+    }
+
+    /**
+     * Note: not really reliable for pre-registration.
+     * Note: may be reset by the user, very probably.
+     * => probably only good for tutorials.
+     *
+     * @return whether or not it is the very first time this application is ran.
+     */
+    public boolean isFirstTime()
+    {
+        return isFirstTime;
     }
 
     // USER ////////////////////////////////////////////////////////////////////////////////////////
@@ -116,7 +138,7 @@ public class Application extends SugarApp
     public boolean isUserRegistered()
     {
         Server server = getCurrentServer();
-        return null != server && !server.getUsername().equals(Server.DEFAULT_USERNAME);
+        return null != server && server.isComplete();
     }
 
 
@@ -127,8 +149,63 @@ public class Application extends SugarApp
 
     public void requireAuthentication(final Activity activity, @Nullable String message)
     {
-        if (!isUserRegistered()) {
-            requestLogin(activity, message);
+        if ( ! isUserRegistered()) {
+                //generateServerConfiguration(); // -- launches an async !
+
+            final Server config = getCurrentServer();
+
+            new AsyncTask<Void, Void, RegistrationResponse>() {
+                private final ProgressDialog dialog = new ProgressDialog(activity);
+
+                @Override
+                protected RegistrationResponse doInBackground(Void... voids) {
+                    RegistrationResponse rr = null;
+
+                    try {
+                        rr = restService.preregister();
+                        config.setUsername(rr.getUser().getUsername());
+                        if ( ! rr.getPassword().isEmpty()) {
+                            config.setPassword(rr.getPassword());
+                        }
+                        config.save();
+                        setServerConfiguration(config);
+                    } catch (URISyntaxException e) {
+                        e.printStackTrace();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    } catch (ErrorResponseException e) {
+                        e.printStackTrace();
+                    } catch (UnavailableUsernameException e) {
+                        e.printStackTrace();
+                    } catch (UnavailableEmailException e) {
+                        e.printStackTrace();
+                    }
+
+                    return rr;
+                }
+
+                protected void onPreExecute() {
+                    this.dialog.setCancelable(false);
+                    this.dialog.setMessage("Signing in...");
+                    this.dialog.show();
+                }
+
+                protected void onPostExecute(final RegistrationResponse response) {
+                    if (this.dialog.isShowing()) {
+                        this.dialog.dismiss();
+                    }
+                    if (null != response) {
+                        Log.d("G2P", "VICTORY");
+
+                        toasty(String.format("Welcome, %s", response.getUser().getPrettyUsername()));
+                    } else {
+                        // fixme : OOOOOPS what to do here ?
+                    }
+                }
+            }.execute();
+
         }
     }
 
@@ -168,13 +245,45 @@ public class Application extends SugarApp
 
     // SERVERS /////////////////////////////////////////////////////////////////////////////////////
 
-    public Server getCurrentServer() { return currentServer; }
+    /**
+     * Should never fail.
+     * Ideally, run this in an async task as there may be SQL requests made.
+     * @return
+     */
+    public Server getCurrentServer()
+    {
+        if (null == currentServer) {
+            currentServer = guessServerConfiguration();
+        }
+        return currentServer;
+    }
 
     public void setServerConfiguration(Server config)
     {
         currentServer = config;
         restService = new RestService(currentServer);
     }
+
+    public boolean hasServerConfiguration()
+    {
+        // Grab the locally-stored servers in our yummy SQLite database
+        List<Server> servers = Server.listAll(Server.class);
+
+        return 0 < servers.size();
+    }
+
+    /**
+     * We're checking the presence of a username and password.
+     * If either is empty, the server configuration is not complete !
+     *
+     * @param config the server configuration to check
+     * @return whether the server configuration is complete
+     */
+    public boolean isServerConfigurationComplete(Server config)
+    {
+        return config.isComplete();
+    }
+
 
     public Server guessServerConfiguration()
     {

@@ -106,7 +106,7 @@ public class ProfileActivity extends ActionBarActivity
         // User
         User user = profile.user;
         profileUsernameTextView.setText(user.getPrettyUsername());
-        profileLevelTextView.setText(String.valueOf(user.getLevel()));
+        profileLevelTextView.setText(String.valueOf(user.getLevel()+1));
         profileExperienceProgressTextView.setText(String.valueOf(user.getKarmaProgress()));
         profileExperienceRequiredTextView.setText(String.valueOf(user.getKarmaRequired()));
         profileLevelProgressBar.setMax(user.getKarmaRequired());

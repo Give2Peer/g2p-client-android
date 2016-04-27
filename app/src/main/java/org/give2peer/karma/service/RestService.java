@@ -79,8 +79,7 @@ public class RestService
 
     static String ROUTE_HELLO        = "/hello";
     static String ROUTE_CHECK        = "/check";
-    static String ROUTE_USER         = "/profile";
-    static String ROUTE_USERS        = "/users";
+    static String ROUTE_USER         = "/user";
     static String ROUTE_ITEM         = "/item";
     static String ROUTE_ITEM_PICTURE = "/item/{id}/picture";
     static String ROUTE_ITEMS_AROUND = "/items/around/{latitude}/{longitude}";
@@ -250,7 +249,7 @@ public class RestService
     throws URISyntaxException, IOException, JSONException, ErrorResponseException,
            UnavailableUsernameException, UnavailableEmailException
     {
-        String url = makeUrl(ROUTE_USERS);
+        String url = makeUrl(ROUTE_USER);
 
         HttpPost request = new HttpPost();
         request.setURI(new URI(url));

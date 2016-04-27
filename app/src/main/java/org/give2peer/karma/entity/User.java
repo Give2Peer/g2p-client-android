@@ -39,9 +39,14 @@ public class User
 
     //// HUMANIZATION //////////////////////////////////////////////////////////////////////////////
 
+    /**
+     * @return a pretty-formatted username
+     */
     public String getPrettyUsername()
     {
-        return WordUtils.capitalizeFully(getUsername());
+        String s = getUsername().replaceAll("[\\d]+$", "");
+        s = s.replaceAll("[_]+", " ");
+        return WordUtils.capitalizeFully(s);
     }
 
 

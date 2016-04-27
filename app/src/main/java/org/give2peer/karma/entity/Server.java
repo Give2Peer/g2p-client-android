@@ -13,10 +13,12 @@ public class Server extends BaseEntity
     String username = "";
     String password = "";
 
+    boolean isEditedByUser = false;
+
     public static String DEFAULT_URL = "http://g2p.give2peer.org/v1";
-    public static String DEFAULT_NAME = "Give2Peer Beta";
-    public static String DEFAULT_USERNAME = "Goutte";
-    public static String DEFAULT_PASSWORD = "Goutte";
+    public static String DEFAULT_NAME = "Give2Peer \uD835\uDEC2";
+    public static String DEFAULT_USERNAME = ""; // the emptiness is detected in the app onCreate
+    public static String DEFAULT_PASSWORD = ""; // and we ask the server for credentials
 
     public Server() {}
 
@@ -39,7 +41,7 @@ public class Server extends BaseEntity
 
     public Server loadDummy()
     {
-        url      = "http://yourserver";
+        url      = "http://";
         name     = "Unnamed";
         username = "";
         password = "";
@@ -47,19 +49,44 @@ public class Server extends BaseEntity
         return this;
     }
 
-    public String getUrl()                   { return url;               }
+    /**
+     * Password and username MUST both be filled for this to be true.
+     *
+     * @return whether or not this server configuration is complete.
+     */
+    public boolean isComplete()
+    {
+        return ( ! getUsername().isEmpty()) && ( ! getPassword().isEmpty());
+    }
 
-    public void setUrl(String url)           { this.url = url;           }
+    /**
+     * This is false by default.
+     *
+     * @return whether or not this server configuration as been edited by the hand of the user.
+     */
+    public boolean isEditedByUser() { return isEditedByUser; }
 
-    public String getName()                  { return name;              }
+    /**
+     * Set this to true when the user edits "by hand" the configuration (ie: registers manually).
+     */
+    public void setEditedByUser() { this.isEditedByUser = true; }
 
-    public void setName(String name)         { this.name = name;         }
+    /**********************************************************************************************/
 
-    public String getUsername()              { return username;          }
+    public String getUrl()                   { return url;                                         }
 
-    public void setUsername(String username) { this.username = username; }
+    public void setUrl(String url)           { this.url = url;                                     }
 
-    public String getPassword()              { return password;          }
+    public String getName()                  { return name;                                        }
 
-    public void setPassword(String password) { this.password = password; }
+    public void setName(String name)         { this.name = name;                                   }
+
+    public String getUsername()              { return username;                                    }
+
+    public void setUsername(String username) { this.username = username;                           }
+
+    public String getPassword()              { return password;                                    }
+
+    public void setPassword(String password) { this.password = password;                           }
+
 }
