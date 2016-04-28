@@ -36,16 +36,34 @@ There might even be a third (very light) version, using a `WebView` to load an H
 All list items followed by parenthesis are optional, and the parenthesis should explain why.
 
 
-2.0.0
------
 
-A version with a more limited hardware support, since API 21.
+Future concurrent versions
+--------------------------
+
+They will be handled in different git repositories.
+
+
+### Karma²
+
+Another native app, but well-coded this time.
+A version with support for more modern hardware only, since API 21. (or more)
 This version leverages the full power of Material design, and provides tablet layouts as well as
 phone layouts.
+It will be kickstarted during a hackathon sometime this year or next, if enough people are interested.
+Write hackathon@give2peer.org to be added to the hackathon mailing list.
+
+Karma², when released, should become the mainstream app.
+(unless KarmaWeb proves more efficient, but why would it ?)
+Karma (v1, the app in this repository) will be considered as fallback for older devices.
+
+### Karma Web
 
 Another (concurrent) app named "Karma Web" (or something) will probably be made for Android at this
 point, as an HTML webapp within a `WebView`. Favorably in Dart, if it can be done.
 
+The native Android code should handle receiving picture intents, but the rest should be mostly config.
+
+We're very interested in benchmarking these apps against each other.
 
 
 1.0.0
@@ -66,16 +84,29 @@ users that won't be able to run the `2.x.x`.
 - [ ] Feature: add a new Item offline, upload later. (lots of work)
 - [ ] Feature: warn the user that the app is unavailable during server maintenance.
 - [ ] Feature: easily send a bug report to developers on caught error.
-- [ ] Feature: some form of OAuth2.
+- [ ] Feature: some form of OAuth2 as fallback for Maps (we are subjected to quotas)
 - [ ] Setting: enable `https` protocol.
-- [ ] Feature: edit items I tagged in my profile.
-- [ ] Feature: delete items I tagged in my profile.
+- [ ] Feature: edit items I authored in my profile.
+- [ ] Feature: delete items I authored in my profile.
 
 
-0.4.0
------
 
-A version for the beta community, released on Google Play.
+1.0.0-alpha1 (01-05-16)
+-----------------------
+
+A version for the alpha community, released on Google Play.
+
+This version will be available by invitation only.
+
+- [ ] Feature: see item details
+- [ ] Feature: change your username
+
+
+
+0.4.0 (28-04-16)
+----------------
+
+A marathon of code !
 
 - [x] Feature: karma points.
 - [x] Feature: display karma points in the profile.
@@ -84,8 +115,8 @@ A version for the beta community, released on Google Play.
 - [x] Design:  Floating Action Button.
 - [x] Feature: list items I tagged in my profile.
 - [x] Bugfix:  crash upon manual registration
-- [ ] Feature: gain one karma point when launching the app, once per day.
-- [ ] Feature: automatic pre-registration.
+- [x] Feature: gain one karma point when launching the map, once per day.
+- [x] Feature: automatic pre-registration.
 
 
 
@@ -96,7 +127,7 @@ CHANGELOG
 -----
 
 - [x] Feature: locally cache item thumbnail images.
-- [x] Design: a temporary basic launcher icon.
+- [x] Design:  a temporary basic launcher icon.
 - [x] Feature: display items around my position on a map.
 - [x] Feature: automatic location detection using Google Services API.
 - [x] Refacto: support for API 10 with appcompat and lucky charms.
@@ -128,6 +159,9 @@ _They are plenty, in this project._
 
 Notably, you need at least Gradle `2.12` to be able to build,
 at least until `sugar` makes a release.
+
+We hacked in and around the Settings to handle Servers, and now they're a mess.
+Server configurations should have proper dedicated CRUD activities, instead.
 
 
 TROUBLESHOOTING
@@ -241,8 +275,8 @@ _"When it's free, you're the product."_
 Hosting a server costs money. We can pay for a couple years from our own pocket, but eventually the
 service must be able to pay for its own running costs, or it will shut down.
 
-You'll be the product for a while, as the server will measure your total usage for a year
-and show you (exactly!) how much you should give to keep it afloat for another year.
+You'll be the product for a while, as the server will measure its costs for a year and show
+you (exactly!) how much life expectancy (in minutes) you add to the service when you donate.
 
 Of course, all these statistics will be published publicly.
 
