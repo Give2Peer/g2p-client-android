@@ -1,9 +1,15 @@
 package org.give2peer.karma.exception;
 
+import org.give2peer.karma.response.ErrorResponse;
+
 /**
- * Thrown when registration fails because the submitted username is already taken.
+ * Thrown when (pre)registration or user edition fails because the submitted username is already
+ * taken, or more generally unavailable (invalid, blacklisted, etc.)
+ *
+ * Activities should catch these and react accordingly, like highlighting the field and/or notifying
+ * the user.
  */
-public class UnavailableUsernameException extends Exception
+public class UnavailableUsernameException extends ErrorResponseException
 {
-    public UnavailableUsernameException(String detailMessage) { super(detailMessage); }
+    public UnavailableUsernameException(ErrorResponse errorResponse) {    super(errorResponse);    }
 }
