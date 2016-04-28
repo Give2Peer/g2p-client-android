@@ -4,6 +4,8 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
@@ -69,8 +71,6 @@ public class ProfileActivity extends ActionBarActivity
 
         super.onCreate(savedInstanceState);
         app = (Application) getApplication();
-
-//        profileItemsListView
     }
 
     @Override
@@ -80,12 +80,31 @@ public class ProfileActivity extends ActionBarActivity
 
         super.onResume();
 
-        // If the user is not authenticated, forward him to the login activity.
+        // If the user is not authenticated, take care of it
         app.requireAuthentication(this);
 
         // Fill up the profile page
         synchronize();
     }
+
+    // OPTIONS MENU ////////////////////////////////////////////////////////////////////////////////
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu)
+    {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_profile, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item)
+    {
+        boolean found = app.onOptionsItemSelected(item, this);
+        return found || super.onOptionsItemSelected(item);
+    }
+
+    // INTERFACE LISTENERS /////////////////////////////////////////////////////////////////////////
 
     @Click
     void profileRetryButton()

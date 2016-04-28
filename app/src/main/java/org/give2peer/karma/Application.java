@@ -12,12 +12,14 @@ import android.location.Criteria;
 import android.location.Geocoder;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
+import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -28,6 +30,10 @@ import com.orm.SugarApp;
 import net.danlew.android.joda.JodaTimeAndroid;
 
 import org.give2peer.karma.activity.LoginActivity_;
+import org.give2peer.karma.activity.MapItemsActivity;
+import org.give2peer.karma.activity.NewItemActivity_;
+import org.give2peer.karma.activity.ProfileActivity_;
+import org.give2peer.karma.activity.SettingsActivity;
 import org.give2peer.karma.entity.Location;
 import org.give2peer.karma.entity.Server;
 import org.give2peer.karma.exception.ErrorResponseException;
@@ -209,38 +215,75 @@ public class Application extends SugarApp
         }
     }
 
-    public void requestLogin(final Activity activity, @Nullable String message)
+    //// ACTIONS ///////////////////////////////////////////////////////////////////////////////////
+
+    public void launchBugReport(Activity activity)
     {
-        if (null == message) {
-            message = "To continue, you need to be logged in. Do so now?";
+        Intent i = new Intent(Intent.ACTION_VIEW);
+        i.setData(Uri.parse(Application.REPORT_BUG_URL));
+        startActivity(i);
+    }
+
+    public void launchNewItem(Activity activity)
+    {
+        Intent intent = new Intent(this, NewItemActivity_.class);
+        activity.startActivity(intent);
+    }
+
+    public void launchLogin(Activity activity)
+    {
+        Intent intent = new Intent(this, LoginActivity_.class);
+        activity.startActivity(intent);
+    }
+
+    public void launchMap(Activity activity)
+    {
+        Intent intent = new Intent(this, MapItemsActivity.class);
+        activity.startActivity(intent);
+    }
+
+    public void launchProfile(Activity activity)
+    {
+        Intent intent = new Intent(this, ProfileActivity_.class);
+        activity.startActivity(intent);
+    }
+
+    public void launchSettings(Activity activity)
+    {
+        Intent intent = new Intent(this, SettingsActivity.class);
+        activity.startActivity(intent);
+    }
+
+
+    public boolean onOptionsItemSelected(MenuItem item, Activity activity)
+    {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        if (id == R.id.menu_action_settings) {
+            launchSettings(activity);
+            return true;
         }
-        new AlertDialog.Builder(activity)
-            .setTitle("Authentication needed")
-            .setMessage(message)
-            .setCancelable(false)
-            .setPositiveButton(
-                    android.R.string.yes, new DialogInterface.OnClickListener()
-                    {
-                        public void onClick(DialogInterface dialog, int which)
-                        {
-                            // Go to the login activity
-                            Intent intent = new Intent(activity, LoginActivity_.class);
-                            activity.startActivity(intent);
-                        }
-                    }
-            )
-            .setNegativeButton(
-                    android.R.string.no, new DialogInterface.OnClickListener()
-                    {
-                        public void onClick(DialogInterface dialog, int which)
-                        {
-                            // GTFO, then
-                            activity.finish();
-                        }
-                    }
-            )
-            .setIcon(android.R.drawable.ic_dialog_alert)
-            .show();
+//        if (id == R.id.menu_action_add_item) {
+//            launchNewItem();
+//            return true;
+//        }
+        if (id == R.id.menu_action_map) {
+            launchMap(activity);
+            return true;
+        }
+        if (id == R.id.menu_action_profile) {
+            launchProfile(activity);
+            return true;
+        }
+        if (id == R.id.menu_action_report_bug) {
+            launchBugReport(activity);
+            return true;
+        }
+
+        return false;
     }
 
     // SERVERS /////////////////////////////////////////////////////////////////////////////////////
@@ -248,7 +291,7 @@ public class Application extends SugarApp
     /**
      * Should never fail.
      * Ideally, run this in an async task as there may be SQL requests made.
-     * @return
+     * @return the currently used Server configuration
      */
     public Server getCurrentServer()
     {
@@ -321,6 +364,40 @@ public class Application extends SugarApp
 
         return serverConfiguration;
     }
+
+//    public void requestLogin(final Activity activity, @Nullable String message)
+//    {
+//        if (null == message) {
+//            message = "To continue, you need to be logged in. Do so now?";
+//        }
+//        new AlertDialog.Builder(activity)
+//            .setTitle("Authentication needed")
+//            .setMessage(message)
+//            .setCancelable(false)
+//            .setPositiveButton(
+//                    android.R.string.yes, new DialogInterface.OnClickListener()
+//                    {
+//                        public void onClick(DialogInterface dialog, int which)
+//                        {
+//                            // Go to the login activity
+//                            Intent intent = new Intent(activity, LoginActivity_.class);
+//                            activity.startActivity(intent);
+//                        }
+//                    }
+//            )
+//            .setNegativeButton(
+//                    android.R.string.no, new DialogInterface.OnClickListener()
+//                    {
+//                        public void onClick(DialogInterface dialog, int which)
+//                        {
+//                            // GTFO, then
+//                            activity.finish();
+//                        }
+//                    }
+//            )
+//            .setIcon(android.R.drawable.ic_dialog_alert)
+//            .show();
+//    }
 
     // PROPER LOCATION /////////////////////////////////////////////////////////////////////////////
 

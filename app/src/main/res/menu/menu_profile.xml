@@ -2,24 +2,16 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context=".MapItemsActivity"
+    tools:context=".ProfileActivity_"
     >
 
     <item
-        android:id="@+id/menu_action_profile"
-        android:title="@string/menu_action_profile"
-        android:icon="@drawable/ic_perm_identity_white_36dp"
+        android:id="@+id/menu_action_map"
+        android:title="@string/menu_action_map"
+        android:icon="@drawable/ic_map_white_36dp"
         android:orderInCategory="40"
         app:showAsAction="ifRoom"
         />
-
-    <!--<item-->
-        <!--android:id="@+id/menu_action_add_item"-->
-        <!--android:title="@string/menu_action_add_item"-->
-        <!--android:icon="@drawable/ic_camera_alt_white_36dp"-->
-        <!--android:orderInCategory="50"-->
-        <!--app:showAsAction="ifRoom"-->
-        <!--/>-->
 
     <item
         android:id="@+id/menu_action_settings"

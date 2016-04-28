@@ -72,6 +72,9 @@ public class      MapItemsActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map_items);
 
+        // If the user is not authenticated, take care of it
+        app.requireAuthentication(this);
+
         // I never had a failure there, but better safe than sorry !
         try {
             SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -89,6 +92,15 @@ public class      MapItemsActivity
     }
 
     @Override
+    public void onLocated(Location loc)
+    {
+        super.onLocated(loc);
+        if (isMapReady()) executeFinderTask(new LatLng(loc.getLatitude(), loc.getLongitude()));
+    }
+
+    // OPTIONS MENU ////////////////////////////////////////////////////////////////////////////////
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu)
     {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -99,36 +111,8 @@ public class      MapItemsActivity
     @Override
     public boolean onOptionsItemSelected(MenuItem item)
     {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        if (id == R.id.menu_action_settings) {
-            launchSettings();
-            return true;
-        }
-        if (id == R.id.menu_action_add_item) {
-            launchNewItem();
-            return true;
-        }
-        if (id == R.id.menu_action_profile) {
-            launchProfile();
-            return true;
-        }
-        if (id == R.id.menu_action_report_bug) {
-            launchBugReport();
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    public void onLocated(Location loc)
-    {
-        super.onLocated(loc);
-        if (isMapReady()) executeFinderTask(new LatLng(loc.getLatitude(), loc.getLongitude()));
+        boolean found = app.onOptionsItemSelected(item, this);
+        return found || super.onOptionsItemSelected(item);
     }
 
     //// ACTIONS ///////////////////////////////////////////////////////////////////////////////////
@@ -138,24 +122,6 @@ public class      MapItemsActivity
         Intent i = new Intent(Intent.ACTION_VIEW);
         i.setData(Uri.parse(Application.REPORT_BUG_URL));
         startActivity(i);
-    }
-
-    public void launchNewItem()
-    {
-        Intent intent = new Intent(this, NewItemActivity.class);
-        startActivity(intent);
-    }
-
-    public void launchLogin()
-    {
-        Intent intent = new Intent(this, LoginActivity_.class);
-        startActivity(intent);
-    }
-
-    public void launchProfile()
-    {
-        Intent intent = new Intent(this, ProfileActivity_.class);
-        startActivity(intent);
     }
 
     public void launchSettings()
