@@ -19,14 +19,13 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
-import android.text.Layout;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -36,6 +35,7 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.model.LatLng;
 import com.orm.SugarApp;
+import com.shamanland.fab.FloatingActionButton;
 
 import net.danlew.android.joda.JodaTimeAndroid;
 
@@ -47,25 +47,13 @@ import org.give2peer.karma.activity.SettingsActivity;
 import org.give2peer.karma.entity.Location;
 import org.give2peer.karma.entity.Server;
 import org.give2peer.karma.entity.Item;
-import org.give2peer.karma.exception.AuthorizationException;
-import org.give2peer.karma.exception.BadConfigException;
-import org.give2peer.karma.exception.CriticalException;
-import org.give2peer.karma.exception.ErrorResponseException;
 import org.give2peer.karma.exception.GeocodingException;
-import org.give2peer.karma.exception.MaintenanceException;
-import org.give2peer.karma.exception.NoInternetException;
-import org.give2peer.karma.exception.QuotaException;
-import org.give2peer.karma.exception.UnavailableEmailException;
-import org.give2peer.karma.exception.UnavailableUsernameException;
 import org.give2peer.karma.listener.GoogleApiClientListener;
 import org.give2peer.karma.response.RegistrationResponse;
 import org.give2peer.karma.service.RestService;
-import org.json.JSONException;
 import org.ocpsoft.prettytime.PrettyTime;
 
 import java.io.IOException;
-import java.net.URISyntaxException;
-import java.net.UnknownHostException;
 import java.util.Date;
 import java.util.List;
 
@@ -658,20 +646,20 @@ public class Application extends SugarApp
                     R.layout.popup_item,
                     (ViewGroup) activity.findViewById(R.id.popupItemRoot)
             );
-            // create a 300px width and 470px height PopupWindow
-//            pw = new PopupWindow(layout);
-            pw = new PopupWindow(layout, 300, 470, true);
+            // Create a 300px width and 485px height PopupWindow
+            // It's BAD to set the dimensions like that ! Wow ! No !
+            // pw = new PopupWindow(layout); // but ... nope,
+            pw = new PopupWindow(layout, 300, 485, true);
             pw.setFocusable(true);
+            // pw.setAnimationStyle(R.anim.abc_popup_enter); // good try, does nothing
 
             // We have a transparent background by default ?
-            // What the hack, let's duct-tape this
-            Drawable d = new ColorDrawable(Color.DKGRAY);
-            d.setAlpha(222);
-            pw.setBackgroundDrawable(d);
+            // It's fine, we set a background to the layouts
+//            Drawable d = new ColorDrawable(Color.DKGRAY);
+//            d.setAlpha(222);
+//            pw.setBackgroundDrawable(d);
 
-            // Display the popup in the center
-            pw.showAtLocation(layout, Gravity.CENTER, 0, 0);
-
+            // Hook clicking anywhere to the popup window dismissal
             RelativeLayout root = (RelativeLayout) layout.findViewById(R.id.popupItemRoot);
             root.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -680,12 +668,22 @@ public class Application extends SugarApp
                 }
             });
 
+            // Show the thank you button
+            // todo: but only if you're level 2 ?
+            FloatingActionButton tyb = (FloatingActionButton) layout.findViewById(R.id.popupItemThankButton);
+            if (null != item.getAuthor() && ! isCurrentUserAuthorOf(item)) {
+                tyb.setVisibility(View.VISIBLE);
+            } else {
+                tyb.setVisibility(View.GONE);
+            }
+
             // Set an image if there's one
             WebImageView image = (WebImageView) layout.findViewById(R.id.popupItemImageView);
-            if (item.getThumbnail().isEmpty()) {
-                image.setVisibility(View.GONE);
-            } else {
+            if ( ! item.getThumbnail().isEmpty()) {
                 image.setImageURL(item.getThumbnail());
+//            } else {
+                // Nah, this screws up the FAB's relative position
+                // image.setVisibility(View.GONE);
             }
 
             // Set a title if there's one
@@ -704,6 +702,9 @@ public class Application extends SugarApp
                 by.setText(String.format("by %s", item.getAuthor().getPrettyUsername()));
             }
 
+            // Display the popup in the center
+            pw.showAtLocation(layout, Gravity.CENTER, 0, 0);
+
 
 
 //            Button cancelButton = (Button) layout.findViewById(R.id.end_data_send_button);
@@ -716,6 +717,11 @@ public class Application extends SugarApp
             e.printStackTrace();
         }
 
+    }
+
+    public boolean isCurrentUserAuthorOf(Item item)
+    {
+        return getCurrentServer().getUsername().equals(item.getAuthor().getUsername());
     }
 
     /**

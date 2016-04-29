@@ -98,7 +98,7 @@ A version for the alpha community, released on Google Play.
 
 This version will be available by invitation only.
 
-- [ ] Feature: see item details
+- [x] Feature: see item details
 - [ ] Feature: change your username
 
 

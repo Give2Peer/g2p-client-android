@@ -6,17 +6,21 @@
     android:orientation="vertical"
     android:id="@+id/popupItemRoot"
     android:paddingTop="0dp"
+
     >
 
-    <ScrollView
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    >
+    <!--<ScrollView-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--&gt;-->
 
-        <LinearLayout
+        <RelativeLayout
+            android:id="@+id/popupItemDataLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
+            android:background="#565656"
+            android:paddingBottom="3dp"
             >
 
             <pl.polidea.webimageview.WebImageView
@@ -28,7 +32,29 @@
                 android:src="@drawable/item_thumbnail"
                 />
 
+            <com.shamanland.fab.FloatingActionButton
+                android:id="@+id/popupItemThankButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_thank_24dp"
+                android:layout_gravity="center|bottom"
+                android:layout_marginTop="-22dp"
+                android:layout_marginBottom="0dp"
+                android:layout_marginRight="2dp"
+                android:layout_below="@+id/popupItemImageView"
+                app:floatingActionButtonColor="@color/background_floating_material_dark"
+                app:floatingActionButtonSize="mini"
+                android:layout_alignParentTop   ="false"
+                android:layout_alignParentBottom="false"
+                android:layout_alignParentLeft  ="false"
+                android:layout_alignParentRight ="true"
+                android:layout_alignParentStart ="false"
+                android:layout_alignParentEnd   ="false"
+                android:visibility="gone"
+                />
+
             <LinearLayout
+                android:id="@+id/popupItemInfoLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:paddingLeft="@dimen/activity_horizontal_margin"
@@ -36,6 +62,7 @@
                 android:paddingTop="@dimen/activity_vertical_margin"
                 android:paddingBottom="@dimen/activity_vertical_margin"
                 android:orientation="vertical"
+                android:layout_below="@+id/popupItemImageView"
                 >
 
                 <TextView
@@ -75,35 +102,8 @@
 
             </LinearLayout>
 
-            <!--<com.shamanland.fab.FloatingActionButton-->
-                <!--android:id="@+id/popupItemSendButton"-->
-                <!--android:layout_width="wrap_content"-->
-                <!--android:layout_height="wrap_content"-->
-                <!--android:src="@drawable/ic_send_white_24dp"-->
-                <!--android:onClick="onSend"-->
-                <!--android:layout_gravity="right|bottom"-->
-                <!--android:layout_marginTop="2dp"-->
-                <!--android:layout_marginBottom="5dp"-->
-                <!--android:layout_marginRight="15dp"-->
-                <!--app:floatingActionButtonColor="@color/background_floating_material_dark"-->
-                <!--app:floatingActionButtonSize="normal"-->
-                <!--/>-->
+        </RelativeLayout>
 
-        </LinearLayout>
-
-    </ScrollView>
-
-    <!--<im.delight.android.keyvaluespinner.KeyValueSpinner-->
-        <!--android:id="@+id/popupItemLocationSpinner"-->
-        <!--android:layout_width="fill_parent"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:layout_weight="1"-->
-        <!--/>-->
-
-    <!--<fragment android:name="org.give2peer.karma.fragment.LocationChooserFragment"-->
-              <!--android:id="@+id/popupItemLocationChooserFragment"-->
-              <!--android:layout_width="match_parent"-->
-              <!--android:layout_height="wrap_content" />-->
 
     <!--<ProgressBar-->
         <!--style="?android:attr/progressBarStyleLarge"-->

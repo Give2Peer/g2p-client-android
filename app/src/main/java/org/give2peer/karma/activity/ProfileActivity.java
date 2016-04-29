@@ -107,7 +107,7 @@ public class ProfileActivity extends ActionBarActivity
     // INTERFACE LISTENERS /////////////////////////////////////////////////////////////////////////
 
     @Click
-    void profileRetryButton()
+    public void profileRetryButton()
     {
         profileRetryButton.setVisibility(View.GONE);
         profileLoadingProgressBar.setVisibility(View.VISIBLE);
@@ -194,4 +194,5 @@ public class ProfileActivity extends ActionBarActivity
             }
         }.execute();
     }
+
 }
