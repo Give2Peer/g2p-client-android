@@ -19,11 +19,12 @@
 
     <application
         android:name="org.give2peer.karma.Application"
-        android:allowBackup="true"
         android:icon="@drawable/ic_launcher_48dp"
         android:label="@string/app_name"
         android:theme="@style/Theme.AppCompat"
         >
+        <!-- we should use that ! -->
+        <!--android:allowBackup="true"-->
 
         <!-- Sugar ORM -->
         <meta-data
@@ -31,7 +32,7 @@
             android:value="give2peer.db" />
         <meta-data
             android:name="VERSION"
-            android:value="8" /> <!-- Every time the database structure changes, increment this -->
+            android:value="9" /> <!-- Every time the database structure changes, increment this -->
         <meta-data
             android:name="QUERY_LOG"
             android:value="true" /> <!-- todo@prod disable logging -->

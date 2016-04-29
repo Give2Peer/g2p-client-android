@@ -634,7 +634,7 @@ public class Application extends SugarApp
         toast.show();
     }
 
-    public void showItemPopup(Activity activity, Item item)
+    public void showItemPopup(Activity activity, final Item item)
     {
         final PopupWindow pw;
 
@@ -676,6 +676,21 @@ public class Application extends SugarApp
             } else {
                 tyb.setVisibility(View.GONE);
             }
+            tyb.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    String message;
+                    if (null != item.getAuthor()) {
+                        message = String.format(
+                                "In the future, you will be able to thank %s.",
+                                item.getAuthor().getPrettyUsername()
+                        );
+                    } else {
+                        message = "In the future, you will be able to thank people.";
+                    }
+                    toast(message);
+                }
+            });
 
             // Set an image if there's one
             WebImageView image = (WebImageView) layout.findViewById(R.id.popupItemImageView);
