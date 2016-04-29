@@ -52,7 +52,7 @@ public class OnTestServerClickListener implements Preference.OnPreferenceClickLi
                 int currentAttempt = 0;
                 while (shouldKeepTesting() && currentAttempt++ <= NUMBER_OF_ATTEMPTS) {
                     try {
-                        isServerOk = restService.testServer();
+                        isServerOk = restService.checkServerAndAuthentication();
                     } catch (AuthorizationException e) {
                         areCredentialsBad = true;
                     } catch (MaintenanceException e) {

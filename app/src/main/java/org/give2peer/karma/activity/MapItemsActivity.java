@@ -37,10 +37,12 @@ import com.google.android.gms.maps.model.PolylineOptions;
 import com.shamanland.fab.FloatingActionButton;
 
 import org.give2peer.karma.Application;
-import org.give2peer.karma.Item;
+import org.give2peer.karma.entity.Item;
 import org.give2peer.karma.R;
+import org.give2peer.karma.response.FindItemsResponse;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -202,11 +204,16 @@ public class      MapItemsActivity
             @Override
             protected ArrayList<Item> doInBackground(Void... params)
             {
-                ArrayList<Item> items = new ArrayList<Item>();
+                FindItemsResponse itemsResponse = new FindItemsResponse();
                 try {
-                    items = app.getRestService().findAround(where.latitude, where.longitude);
+                    itemsResponse = app.getRestService().findAround(where.latitude, where.longitude);
                 } catch (Exception e) {
                     exception = e;
+                }
+
+                ArrayList<Item> items = new ArrayList<Item>();
+                if (null != itemsResponse.getItems()) {
+                    Collections.addAll(items, itemsResponse.getItems());
                 }
 
                 // Remove duplicates (comparing getId)
@@ -216,6 +223,7 @@ public class      MapItemsActivity
                 for (Item newItem : items) {
                     boolean alreadyThere = false;
                     for (Item oldItem: displayedItems) {
+                        Log.d("G2P", String.format("Comparing %d and %d", newItem.getId(), oldItem.getId()));
                         if (newItem.getId() == oldItem.getId()) {
                             alreadyThere = true;
                             Log.d("G2P", "Item already fetched, and subsequently ignored.");

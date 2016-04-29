@@ -3,7 +3,6 @@ package org.give2peer.karma;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -17,7 +16,6 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
-import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.MenuItem;
 import android.widget.Toast;
@@ -36,8 +34,14 @@ import org.give2peer.karma.activity.ProfileActivity_;
 import org.give2peer.karma.activity.SettingsActivity;
 import org.give2peer.karma.entity.Location;
 import org.give2peer.karma.entity.Server;
+import org.give2peer.karma.exception.AuthorizationException;
+import org.give2peer.karma.exception.BadConfigException;
+import org.give2peer.karma.exception.CriticalException;
 import org.give2peer.karma.exception.ErrorResponseException;
 import org.give2peer.karma.exception.GeocodingException;
+import org.give2peer.karma.exception.MaintenanceException;
+import org.give2peer.karma.exception.NoInternetException;
+import org.give2peer.karma.exception.QuotaException;
 import org.give2peer.karma.exception.UnavailableEmailException;
 import org.give2peer.karma.exception.UnavailableUsernameException;
 import org.give2peer.karma.listener.GoogleApiClientListener;
@@ -48,6 +52,7 @@ import org.ocpsoft.prettytime.PrettyTime;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.net.UnknownHostException;
 import java.util.Date;
 import java.util.List;
 
@@ -138,8 +143,9 @@ public class Application extends SugarApp
     // USER ////////////////////////////////////////////////////////////////////////////////////////
 
     /**
-     * FIXME: this is horseshit
-     * @return whether the current user is registered or not
+     * Ripple effect : creates a (incomplete) server in the database if none exists, and then in
+     *                 that case obviously returns false.
+     * @return whether the current user is (pre)registered or not at all. (no username or password)
      */
     public boolean isUserRegistered()
     {
@@ -156,45 +162,37 @@ public class Application extends SugarApp
     public void requireAuthentication(final Activity activity, @Nullable String message)
     {
         if ( ! isUserRegistered()) {
-                //generateServerConfiguration(); // -- launches an async !
+
+            // Launch an async !
 
             final Server config = getCurrentServer();
 
             new AsyncTask<Void, Void, RegistrationResponse>() {
                 private final ProgressDialog dialog = new ProgressDialog(activity);
+                Exception exception;
 
                 @Override
                 protected RegistrationResponse doInBackground(Void... voids) {
-                    RegistrationResponse rr = null;
+                    RegistrationResponse response = null;
 
                     try {
-                        rr = restService.preregister();
-                        config.setUsername(rr.getUser().getUsername());
-                        if ( ! rr.getPassword().isEmpty()) {
-                            config.setPassword(rr.getPassword());
+                        response = restService.preregister();
+                        config.setUsername(response.getUser().getUsername());
+                        if ( ! response.getPassword().isEmpty()) {
+                            config.setPassword(response.getPassword());
                         }
                         config.save();
                         setServerConfiguration(config);
-                    } catch (URISyntaxException e) {
-                        e.printStackTrace();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    } catch (ErrorResponseException e) {
-                        e.printStackTrace();
-                    } catch (UnavailableUsernameException e) {
-                        e.printStackTrace();
-                    } catch (UnavailableEmailException e) {
-                        e.printStackTrace();
+                    } catch (Exception e) {
+                        exception = e;
                     }
 
-                    return rr;
+                    return response;
                 }
 
                 protected void onPreExecute() {
                     this.dialog.setCancelable(false);
-                    this.dialog.setMessage("Signing in...");
+                    this.dialog.setMessage(getString(R.string.preregistration_dialog));
                     this.dialog.show();
                 }
 
@@ -205,9 +203,13 @@ public class Application extends SugarApp
                     if (null != response) {
                         Log.d("G2P", "VICTORY");
 
-                        toasty(String.format("Welcome, %s", response.getUser().getPrettyUsername()));
+                        toasty(String.format(getString(R.string.toast_preregistration_welcome), response.getUser().getPrettyUsername()));
+                    } else if (null != exception) {
+                        // fixme : ExceptionHandler OOOOOPS what to do here ?
+
+
                     } else {
-                        // fixme : OOOOOPS what to do here ?
+                        // Should never EVER happen, right ?
                     }
                 }
             }.execute();

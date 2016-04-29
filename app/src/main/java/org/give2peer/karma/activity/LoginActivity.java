@@ -98,7 +98,7 @@ public class LoginActivity extends ActionBarActivity
             {
                 try {
                     rs.setCredentials(username, password);
-                    return rs.testServer();
+                    return rs.checkServerAndAuthentication();
                 } catch (Exception e) {
                     exception = e;
                 }

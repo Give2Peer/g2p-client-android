@@ -4,47 +4,56 @@ import android.app.Activity;
 import android.os.AsyncTask;
 
 import org.give2peer.karma.Application;
-import org.give2peer.karma.Item;
+import org.give2peer.karma.entity.Item;
 import org.give2peer.karma.exception.AuthorizationException;
 import org.give2peer.karma.exception.ErrorResponseException;
 import org.give2peer.karma.exception.MaintenanceException;
 import org.give2peer.karma.exception.QuotaException;
+import org.give2peer.karma.response.CreateItemResponse;
 import org.json.JSONException;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.List;
 
 
-public class NewItemTask extends AsyncTask<Item, Void, Item>
+public class NewItemTask extends AsyncTask<Void, Void, Item>
 {
     public Application app;
     public Activity activity;
+    private final Item item;
+    private final List<File> pictures;
 
     Exception exception;
 
-    public NewItemTask(Application app, Activity activity) {
+    public NewItemTask(Application app, Activity activity, Item item, List<File> pictures)
+    {
         this.app = app;
         this.activity = activity;
+        this.item = item;
+        this.pictures = pictures;
     }
 
-    protected Item doInBackground(Item... items)
+    protected Item doInBackground(Void... nope)
     {
-        Item item = items[0];
+        Item item;
 
         // Upload the item properties (at least try to)
         try {
-            item = app.getRestService().giveItem(item);
-        } catch (URISyntaxException | IOException | JSONException | ErrorResponseException |
-                MaintenanceException | QuotaException | AuthorizationException e) {
+            item = app.getRestService().createItem(this.item).getItem();
+        } catch (Exception e) {
             exception = e;
-            return item;
+            return null;
         }
 
         // And if successful then upload the picture
+        // We only upload the first one for now, but ideally we should try to upload all of them
         try {
-            File picture = item.getPictures().get(0);
-            item = app.getRestService().pictureItem(item, picture);
+            if ( ! pictures.isEmpty()) {
+                File picture = pictures.get(0);
+                item = app.getRestService().pictureItem(item, picture).getItem();
+            }
         } catch (Exception e) {
             exception = e;
             return item;

@@ -8,12 +8,14 @@ import android.widget.GridView;
 import android.widget.Toast;
 
 import org.give2peer.karma.Application;
-import org.give2peer.karma.Item;
+import org.give2peer.karma.entity.Item;
 import org.give2peer.karma.ItemAdapter;
 import org.give2peer.karma.R;
 import org.give2peer.karma.entity.Location;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 
 /**
  * @Deprecated
@@ -43,7 +45,8 @@ public class FindItemsTask extends AsyncTask<Void, Void, ArrayList<Item>>
             app.geocodeLocationIfNeeded(l);
             double latitude  = l.getLatitude();
             double longitude = l.getLongitude();
-            items = app.getRestService().findAroundPaginated(latitude, longitude, page);
+            Collections.addAll(items, app.getRestService().findAroundPaginated(latitude, longitude, page).getItems());
+//            items = app.getRestService().findAroundPaginated(latitude, longitude, page).getItems();
         } catch (Exception e) {
             exception = e;
         }
@@ -76,9 +79,9 @@ public class FindItemsTask extends AsyncTask<Void, Void, ArrayList<Item>>
         itemsLoadingSpinner.setVisibility(View.GONE);
         itemsLoadingText   .setVisibility(View.GONE);
 
-        // Fill the gridView with our items
+        // Fill the gridView with our items (we commenter out code because it was annoying)
         GridView itemsGridView = (GridView) activity.findViewById(R.id.itemsGridView);
-        itemsGridView.setAdapter(new ItemAdapter(activity, R.layout.grid_item, size, items));
+//        itemsGridView.setAdapter(new ItemAdapter(activity, R.layout.grid_item, size, items));
         itemsGridView.setVisibility(View.VISIBLE);
     }
 

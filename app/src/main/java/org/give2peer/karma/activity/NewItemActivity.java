@@ -22,7 +22,7 @@ import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.ViewById;
 import org.give2peer.karma.Application;
-import org.give2peer.karma.Item;
+import org.give2peer.karma.entity.Item;
 import org.give2peer.karma.R;
 import org.give2peer.karma.exception.QuotaException;
 import org.give2peer.karma.factory.BitmapFactory;
@@ -156,8 +156,7 @@ public class NewItemActivity extends LocatorActivity
     protected void onResume()
     {
         super.onResume();
-        // If the user is not registered, let's forward him to the registration activity
-        // todo: this is crappety crap. We should register automatically.
+        // If the user is not preregistered, let's do this dudez !
         app.requireAuthentication(this);
     }
 
@@ -313,10 +312,10 @@ public class NewItemActivity extends LocatorActivity
         Item item = new Item();
         item.setLocation(locationInputValue);
         item.setTitle(newItemTitleEditText.getText().toString());
-        item.setPictures(imageFiles);
+//        item.setPictures(imageFiles);
 
         // Try to upload it, along with its image(s).
-        NewItemTask nit = new NewItemTask(app, this) {
+        (new NewItemTask(app, this, item, imageFiles) {
             @Override
             protected void onPostExecute(Item item) {
                 if (!hasException()) {
@@ -345,8 +344,7 @@ public class NewItemActivity extends LocatorActivity
                     enableSending();
                 }
             }
-        };
-        nit.execute(item);
+        }).execute();
     }
 
 

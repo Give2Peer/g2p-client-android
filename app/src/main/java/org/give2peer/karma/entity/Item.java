@@ -1,5 +1,7 @@
 package org.give2peer.karma.entity;
 
+import com.google.android.gms.maps.model.LatLng;
+
 import org.joda.time.DateTime;
 import org.ocpsoft.prettytime.PrettyTime;
 
@@ -86,6 +88,12 @@ public class Item
     {
         return new PrettyTime().format(updated_at.toDate());
     }
+
+    /**
+     * A convenience method.
+     * @return a `LatLng` object that some third-party applications (notably, Google Maps) use.
+     */
+    public LatLng getLatLng() { return new LatLng(getLatitude(), getLongitude()); }
 
 
     // VANILLA ACCESSORS AND MUTATORS //////////////////////////////////////////////////////////////

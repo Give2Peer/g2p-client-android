@@ -5,6 +5,7 @@ import android.util.Log;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonSyntaxException;
 
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
@@ -13,10 +14,12 @@ import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.auth.AuthenticationException;
 import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.impl.auth.BasicScheme;
@@ -25,8 +28,16 @@ import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpParams;
 import org.apache.http.util.EntityUtils;
-import org.give2peer.karma.Item;
+import org.apache.http.util.ExceptionUtils;
+import org.give2peer.karma.entity.Item;
 import org.give2peer.karma.adapter.DateTimeTypeAdapter;
+import org.give2peer.karma.exception.BadConfigException;
+import org.give2peer.karma.exception.CriticalException;
+import org.give2peer.karma.exception.NoInternetException;
+import org.give2peer.karma.response.CreateItemResponse;
+import org.give2peer.karma.response.ErrorResponse;
+import org.give2peer.karma.response.FindItemsResponse;
+import org.give2peer.karma.response.PictureItemResponse;
 import org.give2peer.karma.response.PrivateProfileResponse;
 import org.give2peer.karma.entity.Server;
 import org.give2peer.karma.exception.AuthorizationException;
@@ -43,9 +54,12 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -67,22 +81,15 @@ public class RestService
      */
     static int ITEMS_PER_PAGE = 64;
 
-    static int UNAVAILABLE_USERNAME = 1;
-    static int BANNED_FOR_ABUSE     = 2;
-    static int UNSUPPORTED_FILE     = 3;
-    static int NOT_AUTHORIZED       = 4;
-    static int SYSTEM_ERROR         = 5;
-    static int BAD_LOCATION         = 6;
-    static int UNAVAILABLE_EMAIL    = 7;
-    static int EXCEEDED_QUOTA       = 8;
-    static int BAD_USERNAME         = 9;
-
     static String ROUTE_HELLO        = "/hello";
     static String ROUTE_CHECK        = "/check";
     static String ROUTE_USER         = "/user";
     static String ROUTE_ITEM         = "/item";
     static String ROUTE_ITEM_PICTURE = "/item/{id}/picture";
     static String ROUTE_ITEMS_AROUND = "/items/around/{latitude}/{longitude}";
+
+    static String METHOD_GET  = "GET";
+    static String METHOD_POST = "POST";
 
     protected Server currentServer;
 
@@ -131,17 +138,17 @@ public class RestService
 
     // HTTP QUERIES : ITEMS ////////////////////////////////////////////////////////////////////////
 
-    public ArrayList<Item> findAroundPaginated(double latitude, double longitude, int page)
-            throws IOException, URISyntaxException, AuthorizationException, MaintenanceException,
-                   QuotaException
-    {
+    public FindItemsResponse findAroundPaginated(double latitude, double longitude, int page)
+            throws AuthorizationException, MaintenanceException,
+            QuotaException, BadConfigException, ErrorResponseException,
+            CriticalException, NoInternetException {
         return findAround(latitude, longitude, page * ITEMS_PER_PAGE);
     }
 
-    public ArrayList<Item> findAround(double latitude, double longitude)
-            throws IOException, URISyntaxException, AuthorizationException, MaintenanceException,
-                   QuotaException
-    {
+    public FindItemsResponse findAround(double latitude, double longitude)
+            throws AuthorizationException, MaintenanceException,
+            QuotaException, BadConfigException, ErrorResponseException,
+            CriticalException, NoInternetException {
         return findAround(latitude, longitude, 0);
     }
 
@@ -149,53 +156,55 @@ public class RestService
      * Returns a list of at most 64 items.
      * Pages start at 0, and hold `ITEMS_PER_PAGE` items per page.
      */
-    public ArrayList<Item> findAround(double latitude, double longitude, int offset)
-            throws URISyntaxException, IOException, AuthorizationException, MaintenanceException,
-                   QuotaException
-    {
+    public FindItemsResponse findAround(double latitude, double longitude, int offset)
+            throws AuthorizationException, MaintenanceException,
+            QuotaException, BadConfigException, ErrorResponseException,
+            CriticalException, NoInternetException {
         String route = ROUTE_ITEMS_AROUND.replaceAll("\\{latitude\\}",  String.valueOf(latitude))
                                          .replaceAll("\\{longitude\\}", String.valueOf(longitude));
 
-        BasicHttpParams params = new BasicHttpParams();
-        params.setParameter("skip", offset);
+        HashMap<String, String> params = new HashMap<String, String>();
+        params.put("skip", String.valueOf(offset));
 
-        return jsonToItems(getJson(route, params));
+        String json = getJson(route, params);
+
+        FindItemsResponse findItemsResponse = new FindItemsResponse();
+
+        try {
+            Gson gson = createGson();
+            findItemsResponse = gson.fromJson(json, FindItemsResponse.class);
+        } catch (JsonSyntaxException e) {
+            String msg = "Failed to parse finding items `%s` response :\n%s";
+            throw new CriticalException(String.format(msg, route, json), e);
+        }
+
+        return findItemsResponse;
     }
 
 
-    public Item giveItem(Item item)
-            throws URISyntaxException, IOException, JSONException, ErrorResponseException, AuthorizationException, MaintenanceException, QuotaException {
-        String url = makeUrl(ROUTE_ITEM);
+    public CreateItemResponse createItem(Item item)
+            throws
+            AuthorizationException, QuotaException, MaintenanceException,
+            ErrorResponseException, NoInternetException, BadConfigException,
+            CriticalException
+    {
+        HashMap<String, String> params = new HashMap<String, String>();
+        params.put("location", item.getLocation());
+        params.put("title", item.getTitle());
 
-        HttpPost request = new HttpPost();
-        request.setURI(new URI(url));
+        String jsonResponse = postJson(ROUTE_ITEM, params, false);
 
-        authenticate(request);
+        CreateItemResponse createItemResponse = new CreateItemResponse();
 
-//        request.setParams(); // fixme: try it --- what for ?
-
-        List<NameValuePair> pairs = new ArrayList<NameValuePair>();
-        pairs.add(new BasicNameValuePair("location", item.getLocation()));
-        pairs.add(new BasicNameValuePair("title",    item.getTitle()));
-        request.setEntity(new UrlEncodedFormEntity(pairs, "UTF-8")); // deprecated in API level 22 !
-
-        HttpResponse response = client.execute(request);
-
-        String json = EntityUtils.toString(response.getEntity(), "UTF-8");
-        if (response.getStatusLine().getStatusCode() < 400) {
-            Log.d("G2P", "Successfully gave an item. Response : " + json);
-            JSONObject jsonObject = new JSONObject(json);
-            JSONObject itemJsonObject = jsonObject.getJSONObject("item");
-            // todo: there is `karma` here too, how to handle it ?
-            item.updateWithJSON(itemJsonObject);
-        } else {
-
-            // fixme: need to handle quotas here
-            inspectResponseForErrors(response);
-            throw new ErrorResponseException(json);
+        try {
+            Gson gson = createGson();
+            createItemResponse = gson.fromJson(jsonResponse, CreateItemResponse.class);
+        } catch (JsonSyntaxException e) {
+            String msg = "Failed to parse item creation response :\n%s";
+            throw new CriticalException(String.format(msg, jsonResponse), e);
         }
 
-        return item;
+        return createItemResponse;
     }
 
     /**
@@ -204,125 +213,147 @@ public class RestService
      * @param item to add the picture to.
      * @param picture to add to the item.
      */
-    public Item pictureItem(Item item, File picture)
+    public PictureItemResponse pictureItem(Item item, File picture)
+            throws
+            CriticalException, AuthorizationException, QuotaException, MaintenanceException,
+            NoInternetException, BadConfigException, ErrorResponseException
     {
-        String url = makeUrl(ROUTE_ITEM_PICTURE.replaceAll("\\{id\\}", item.getId().toString()));
-        
+        String route = ROUTE_ITEM_PICTURE.replaceAll("\\{id\\}", item.getId().toString());
+
+        HashMap<String, String> params = new HashMap<String, String>();
+
+        String json = requestJson(METHOD_POST, route, params, true, picture);
+
+        PictureItemResponse pictureItemResponse = new PictureItemResponse();
+
         try {
-            HttpPost request = new HttpPost();
-            request.setURI(new URI(url));
-
-            authenticate(request);
-
-            HttpEntity httpEntity = MultipartEntityBuilder
-                    .create()
-                    .addBinaryBody("picture", picture, ContentType.create("image/jpg"), picture.getName())
-                    .build();
-            request.setEntity(httpEntity);
-
-            HttpResponse response = client.execute(request);
-
-            String json = EntityUtils.toString(response.getEntity(), "UTF-8");
-            if (response.getStatusLine().getStatusCode() < 400) {
-                item.updateWithJSON(new JSONObject(json));
-            } else {
-                Log.e("G2P", "Picture Item Error : "+json);
-            }
-        } catch (URISyntaxException|IOException|JSONException e) {
-            Log.e("G2P", e.getMessage());
-            e.printStackTrace();
+            Gson gson = createGson();
+            pictureItemResponse = gson.fromJson(json, PictureItemResponse.class);
+        } catch (JsonSyntaxException e) {
+            String msg = "Failed to parse picture item response :\n%s";
+            throw new CriticalException(String.format(msg, json), e);
         }
 
-        return item;
+        return pictureItemResponse;
     }
 
     // HTTP QUERIES : USERS ////////////////////////////////////////////////////////////////////////
 
     public RegistrationResponse preregister()
-    throws URISyntaxException, IOException, JSONException, ErrorResponseException,
-           UnavailableUsernameException, UnavailableEmailException
+            throws
+                    // see method below for more details
+                    ErrorResponseException, UnavailableUsernameException, UnavailableEmailException,
+                    AuthorizationException, MaintenanceException, QuotaException, CriticalException,
+                    BadConfigException, NoInternetException
     {
         return register("", "", "");
     }
 
     public RegistrationResponse register(String username, String password, String email)
-    throws URISyntaxException, IOException, JSONException, ErrorResponseException,
-           UnavailableUsernameException, UnavailableEmailException
+            throws
+                UnavailableUsernameException, UnavailableEmailException // obvious
+                , ErrorResponseException // never if we implement everything the server responds
+                , AuthorizationException // server credentials don't check out -> BadConfigError
+                , MaintenanceException   // such pro, very maintain wow
+                , CriticalException      // we want to know when they happen
+                , QuotaException
+                , BadConfigException     // something is badly configured ! User's fault, 99.99%
+                , NoInternetException
+
     {
-        String url = makeUrl(ROUTE_USER);
+        HashMap<String, String> params = new HashMap<String, String>();
+        params.put("username", username);
+        params.put("password", password);
+        params.put("email", email);
+        String json = postJson(ROUTE_USER, params, false);
 
-        HttpPost request = new HttpPost();
-        request.setURI(new URI(url));
+        RegistrationResponse registrationResponse = new RegistrationResponse();
 
-        List<NameValuePair> pairs = new ArrayList<NameValuePair>();
-        if ( ! username.isEmpty()) pairs.add(new BasicNameValuePair("username", username));
-        if ( ! password.isEmpty()) pairs.add(new BasicNameValuePair("password", password));
-        if ( !    email.isEmpty()) pairs.add(new BasicNameValuePair("email",    email));
-        request.setEntity(new UrlEncodedFormEntity(pairs, "UTF-8")); // deprecated in API level 22 !
-
-        HttpResponse response = client.execute(request);
-        String json = EntityUtils.toString(response.getEntity(), "UTF-8");
-
-        if (response.getStatusLine().getStatusCode() >= 400) {
-            JSONObject data = new JSONObject(json);
-            JSONObject error = data.getJSONObject("error");
-            int errorCode = error.getInt("code");
-            String errorMessage = error.optString("message");
-            if (errorCode == UNAVAILABLE_USERNAME) {
-                throw new UnavailableUsernameException(errorMessage);
-            } else if (errorCode == UNAVAILABLE_EMAIL) {
-                throw new UnavailableEmailException(errorMessage);
-            } else {
-                throw new ErrorResponseException(json);
-            }
+        try {
+            Gson gson = createGson();
+            registrationResponse = gson.fromJson(json, RegistrationResponse.class);
+        } catch (JsonSyntaxException e) {
+            String msg = "Failed to parse registration response :\n%s";
+            throw new CriticalException(String.format(msg, json), e);
         }
 
-        Gson gson = createGson();
-
-        return gson.fromJson(json, RegistrationResponse.class);
+        return registrationResponse;
     }
 
     /**
-     * @throws IOException
-     * @throws URISyntaxException
-     * @throws JSONException
      * @throws AuthorizationException
      * @throws QuotaException
      * @throws MaintenanceException
      */
     public PrivateProfileResponse getProfile()
-    throws IOException, URISyntaxException, JSONException,
-    AuthorizationException, QuotaException, MaintenanceException
+            throws
+            AuthorizationException, QuotaException, MaintenanceException,
+            NoInternetException, ErrorResponseException, BadConfigException, CriticalException
     {
         String json = getJson(ROUTE_USER);
         Log.d("G2P", "Profile json reponse :\n"+json);
 
-        Gson gson = createGson();
+        PrivateProfileResponse privateProfileResponse = new PrivateProfileResponse();
 
-        return gson.fromJson(json, PrivateProfileResponse.class);
+        try {
+            Gson gson = createGson();
+            privateProfileResponse = gson.fromJson(json, PrivateProfileResponse.class);
+        } catch (JsonSyntaxException e) {
+            String msg = "Failed to parse private profile response :\n%s";
+            throw new CriticalException(String.format(msg, json), e);
+        }
+
+        return privateProfileResponse;
     }
 
     // HTTP QUERIES : TESTS ////////////////////////////////////////////////////////////////////////
 
-    public boolean testServer()
-    throws IOException, URISyntaxException,
-           AuthorizationException, MaintenanceException, QuotaException
-    {
-        String json = getJson(ROUTE_HELLO);
+    /**
+     * Does not check credentials. Mostly tells us that the server URL is correct.
+     * Tells us :
+     * - if the server URL is correct (failed or suceeded)
+     * - additional info on the server, and we might make the app say hello on create ?
+     *
+     * @throws AuthorizationException
+     * @throws MaintenanceException
+     * @throws QuotaException
+     * @throws NoInternetException
+     * @throws ErrorResponseException
+     * @throws BadConfigException
+     * @throws CriticalException
+     */
+    public boolean checkServer()
+            throws
+            AuthorizationException, MaintenanceException, QuotaException,
+            NoInternetException, ErrorResponseException, BadConfigException, CriticalException {
+        String json = getJson(ROUTE_HELLO, new HashMap<String, String>(), false);
         return json.equals("\"pong\"");
     }
 
-
-    public boolean checkAuthentication()
-    throws IOException, URISyntaxException,
-           AuthorizationException, MaintenanceException, QuotaException
-    {
+    /**
+     * Checks connection to server to a route behind the authentication firewall.
+     *
+     * @throws AuthorizationException
+     * @throws MaintenanceException
+     * @throws QuotaException
+     * @throws NoInternetException
+     * @throws ErrorResponseException
+     * @throws BadConfigException
+     * @throws CriticalException
+     */
+    public boolean checkServerAndAuthentication()
+            throws
+            AuthorizationException, MaintenanceException, QuotaException,
+            NoInternetException, ErrorResponseException, BadConfigException, CriticalException {
         String json = getJson(ROUTE_CHECK);
         return json.equals("\"pong\"");
     }
 
     // UTILS ///////////////////////////////////////////////////////////////////////////////////////
 
+    /**
+     * Our own very puny Gson factory, to attach our DateTime adapter.
+     */
     protected Gson createGson()
     {
         GsonBuilder gsonBuilder = new GsonBuilder();
@@ -338,50 +369,215 @@ public class RestService
      *
      * @param request The request to authenticate
      */
-    protected void authenticate(HttpRequest request)
+    protected void authenticate(HttpRequest request) throws AuthenticationException
     {
-        try {
-            BasicScheme scheme = new BasicScheme();
-            Header authorizationHeader = scheme.authenticate(getCredentials(), request);
-            request.addHeader(authorizationHeader);
-        } catch (AuthenticationException e) {
-            Log.e("G2P", "Authentication failure !");
-            Log.e("G2P", e.getMessage());
-            e.printStackTrace();
-        }
+        BasicScheme scheme = new BasicScheme();
+        Header authorizationHeader = scheme.authenticate(getCredentials(), request);
+        request.addHeader(authorizationHeader);
     }
 
-    /**
-     * @param route must start with `/`.
-     * @return the raw server response body, which happens to be a JSON string
-     */
     public String getJson(String route)
-    throws URISyntaxException, IOException,
-           AuthorizationException, MaintenanceException, QuotaException
+            throws
+            CriticalException, MaintenanceException, QuotaException, ErrorResponseException,
+            NoInternetException, BadConfigException, AuthorizationException
     {
-        return this.getJson(route, null);
+        return this.getJson(route, new HashMap<String, String>(), true);
+    }
+
+    public String getJson(String route, HashMap<String, String> parameters)
+            throws
+            AuthorizationException, QuotaException, MaintenanceException, ErrorResponseException,
+            CriticalException, BadConfigException, NoInternetException
+    {
+        return getJson(route, parameters, true);
     }
 
     /**
      * Get a UTF-8 encoded response from method described by `route`.
      *
      * @param route  must start with `/`.
-     * @param params Optional parameters to send with the request
+     * @param parameters Optional parameters to send with the request
      * @return the raw server response body, which happens to be a JSON string
      */
-    public String getJson(String route, @Nullable HttpParams params)
-    throws URISyntaxException, IOException,
-           AuthorizationException, QuotaException, MaintenanceException
+    public String getJson(String route, HashMap<String, String> parameters, boolean authenticated)
+            throws
+            AuthorizationException, QuotaException, MaintenanceException, ErrorResponseException,
+            CriticalException, BadConfigException, NoInternetException
     {
-        HttpGet request = new HttpGet();
-        request.setURI(new URI(makeUrl(route)));
-        authenticate(request);
-        if (null != params) request.setParams(params);
-        Log.d("G2P", String.format("Querying `%s`.", request.getURI()));
-        HttpResponse response = client.execute(request);
-        inspectResponseForErrors(response);
+        return requestJson(METHOD_GET, route, parameters, authenticated, null);
+    }
 
-        return EntityUtils.toString(response.getEntity(), "UTF-8");
+
+    public String postJson(String route, HashMap<String, String> parameters) throws CriticalException, AuthorizationException, QuotaException, MaintenanceException, NoInternetException, BadConfigException, ErrorResponseException {
+        return postJson(route, parameters, true);
+    }
+
+
+    public String postJson(String route, HashMap<String, String> parameters, boolean authenticated) throws CriticalException, AuthorizationException, QuotaException, MaintenanceException, NoInternetException, BadConfigException, ErrorResponseException {
+        return requestJson(METHOD_POST, route, parameters, authenticated, null);
+    }
+
+    /**
+     * This is the heart of darkness.
+     * Pretty much every HTTP request goes through here.
+     *
+     * => Retrofit, please !
+     *
+     * @param method
+     * @param route
+     * @param parameters
+     * @param authenticated
+     * @param picture
+     * @return
+     * @throws UnavailableUsernameException
+     * @throws UnavailableEmailException
+     * @throws ErrorResponseException
+     * @throws AuthorizationException
+     * @throws MaintenanceException
+     * @throws CriticalException
+     * @throws QuotaException
+     * @throws BadConfigException
+     * @throws NoInternetException
+     */
+    public String requestJson(String method, String route, HashMap<String, String> parameters,
+                              boolean authenticated, @Nullable File picture)
+            throws
+            UnavailableUsernameException, UnavailableEmailException // obvious
+            , ErrorResponseException // never if we implement everything the server responds
+            , AuthorizationException // server credentials don't check out -> BadConfigError
+            , MaintenanceException   // such pro, very maintain wow
+            , CriticalException      // we want to know when they happen
+            , QuotaException         // (daily) quotas were exceeded
+            , BadConfigException     // something is badly configured ! User's fault, 99.99%
+            , NoInternetException
+
+    {
+        String url = makeUrl(route);
+
+        HttpResponse response = null;
+        String json = null;
+
+        try {
+            HttpRequestBase request;
+
+            if (method.equals(METHOD_POST)) {
+                request = new HttpPost();
+            } else if (method.equals(METHOD_GET)) {
+                request = new HttpGet();
+            } else {
+                throw new CriticalException(String.format("Unsupported HTTP method `%s`.", method));
+            }
+
+            request.setURI(new URI(url));
+
+            if (method.equals(METHOD_POST)) {
+
+                HttpEntity httpEntity = null;
+                if (null == picture) {
+                    // Add the POST parameters to the request
+                    // The following is deprecated in API level 22 !
+                    List<NameValuePair> pairs = new ArrayList<NameValuePair>();
+                    for (String name : parameters.keySet()) {
+                        String value = parameters.get(name);
+                        if ( ! value.isEmpty()) {
+                            pairs.add(new BasicNameValuePair(name, value));
+                        }
+                    }
+                    httpEntity = new UrlEncodedFormEntity(pairs, "UTF-8");
+                } else {
+                    // We want to upload a picture file *instead* !
+                    // This is a haxxx ; but release day is in 2 days !
+                    httpEntity = MultipartEntityBuilder
+                            .create()
+                            .addBinaryBody(
+                                    "picture", picture,
+                                    ContentType.create("image/jpg"),
+                                    picture.getName()
+                            ).build();
+                }
+
+                try {
+                    ((HttpPost)request).setEntity(httpEntity);
+                } catch (ClassCastException e) {
+                    throw new CriticalException("Failed to cast to HttpPost.");
+                }
+
+            } else if (method.equals(METHOD_GET)) {
+                // Add the GET parameters to the request
+                if ( ! parameters.isEmpty()) {
+                    BasicHttpParams params = new BasicHttpParams();
+                    for (String key : parameters.keySet()) {
+                        String value = parameters.get(key);
+                        params.setParameter(key, value);
+                    }
+                    request.setParams(params);
+                }
+
+            } else {
+                throw new CriticalException(String.format("Unsupported HTTP method `%s`.", method));
+            }
+
+            if (authenticated) authenticate(request);
+
+            // Let's exchange some bytes !
+            response = client.execute(request);
+
+            // Get the response as a UTF-8 string
+            json = EntityUtils.toString(response.getEntity(), "UTF-8");
+
+            // Inspect the response and throw accordingly
+            inspectResponseForErrors(response);
+
+        } catch (URISyntaxException e) {
+            // That's on the user ; probably entered a wrong URI in the server config.
+            throw new BadConfigException(BadConfigException.URL, url, e);
+
+        } catch (AuthenticationException e) {
+            // AuthenticationException is when apache fails to set HTTPAuth headers
+            // If this happens, the app is useless. So, very much critical. Never happened yet.
+            // This is NOT AuthorizationException that therefore happens both (i know, bad) when
+            // credentials don't check out and user is not authorized by level.
+            // This is much more dire than that: the app has failed before even asking.
+            String msg = "Apache failed to set headers for `%s`.";
+            throw new CriticalException(String.format(msg, url), e);
+
+        } catch (ClientProtocolException e) {
+            // ProtocolException: Signals that an HTTP protocol violation has occurred.
+            // For example a malformed status line or headers, a missing message body, etc.
+            // We need to make sure our server never triggers this exception, so it's critical.
+            String msg = "Protocol failed for `%s`.";
+            throw new CriticalException(String.format(msg, url), e);
+
+        } catch (UnsupportedEncodingException e) {
+            // We want to know when this happens, maybe we'll have to roll out some appcompat
+            String msg = "Trouble with UTF-8 on POST to `%s` with values `%s`.";
+            throw new CriticalException(String.format(msg, url, parameters.toString()), e);
+
+        } catch (IOException e) {
+            // Let's assume for now that this can either be a bad server url or no internet
+            throw new NoInternetException();
+
+        } catch (Exception e) {
+            // ... just propagate up other errors
+            e.printStackTrace();
+            throw e;
+
+        } finally {
+            if (null != response) {
+                try {
+                    response.getEntity().consumeContent();
+                } catch (IOException e) {
+                    String msg = "I never happen. Nope. Consuming response failed for `%s`.";
+                    Log.e("G2P", String.format(msg, url));
+                }
+            }
+        }
+
+        if (null == json) {
+            throw new CriticalException("Sanity check. If this happens, I am mad.");
+        }
+
+        return json;
     }
 
     /**
@@ -393,7 +589,10 @@ public class RestService
      * @throws MaintenanceException
      */
     protected void inspectResponseForErrors(HttpResponse response)
-    throws AuthorizationException, QuotaException, MaintenanceException
+            throws
+            AuthorizationException, QuotaException, MaintenanceException, CriticalException,
+            BadConfigException, UnavailableUsernameException, UnavailableEmailException,
+            ErrorResponseException
     {
         // A lot of things can go wrong with each request
         int code = response.getStatusLine().getStatusCode();
@@ -402,44 +601,59 @@ public class RestService
             if (code == 401) {
                 throw new AuthorizationException();
             }
+            if (code == 404) {
+                // when you badly configured the server URL
+                throw new BadConfigException();
+                // when querying a deleted entity (it WILL happen someday)
+//                throw new OutOfSyncException();
+                // which should not be decided here, this should simply throw a NotFoundException
+                // and let the parent decide.
+            }
             if (code == 429) {
                 throw new QuotaException(); // instead maybe we could use the JSON response ?
             }
             if (code >= 500) {
                 throw new MaintenanceException();
             }
-            // ... what about other codes, such as 404 ?
-        }
-    }
 
+            // ... fixme what about other codes ?
 
-    /**
-     * @deprecated
-     * Try to parse the `json` and build the items in it.
-     *
-     * @param  json to parse.
-     * @return the items built from the `json`.
-     */
-    protected ArrayList<Item> jsonToItems(String json)
-    {
-        ArrayList<Item> itemsList = new ArrayList<Item>();
-        try {
-            Item item;
-            JSONObject jsonObject;
-            JSONArray rows = new JSONArray(json);
-            for (int i = 0 ; i < rows.length() ; i++) {
-                jsonObject = rows.getJSONObject(i);
-                item = new Item(jsonObject);
-                itemsList.add(item);
+            String json = "";
+
+            try {
+                json = EntityUtils.toString(response.getEntity(), "UTF-8");
+            } catch (IOException e) {
+                String msg = "Trouble with UTF-8 on %d response.";
+                throw new CriticalException(String.format(msg, code), e);
             }
-        } catch (JSONException e) {
-            Log.e("G2P",
-                    "Error parsing JSON of items !\n" + e.toString() + "\n" +
-                    "The data that we failed to parse follows :\n"+json
-            );
-        }
 
-        return itemsList;
+            ErrorResponse er = null;
+
+            try {
+                Gson gson = createGson();
+                er = gson.fromJson(json, ErrorResponse.class);
+            } catch (JsonSyntaxException e) {
+                String msg = "The server probably chip-farted.\n" +
+                             "Failed to parse json into an ErrorReponse on a %d :\n%s";
+                throw new CriticalException(String.format(msg, code, json), e);
+            }
+
+            if (null == er) {
+                // This can happen only if you change the code above, which might happen out of
+                // annoyance because the critical above may happen a lot until the server is OK.
+                throw new CriticalException("NEIN ! ... NEIN !");
+            } else {
+                if (er.isBadEmail()) {
+                    throw new UnavailableEmailException(er);
+                }
+                if (er.isBadUsername()) {
+                    throw new UnavailableUsernameException(er);
+                }
+            }
+
+            // The default, for what we don't yet explicitely support
+            throw new ErrorResponseException(er);
+        }
     }
 
 }

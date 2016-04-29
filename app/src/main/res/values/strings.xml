@@ -1,15 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">Karma</string>
+    <string name="app_name">Karma ∝</string>
 
     <string name="menu_action_map">Map</string>
     <string name="menu_action_settings">Settings</string>
     <string name="menu_action_report_bug">Report Bug</string>
 
+    <!-- pretty sure these are not used anymore -->
     <string name="title_activity_settings">Karma - Settings</string>
     <string name="title_activity_new_item">Karma - New Item</string>
     <string name="title_activity_map_items">Karma - Map items</string>
+    <!---->
 
     <string name="profile_no_items_help">Use your camera to share to Karma a picture of a lost item, a gift, or plain MOOP.\n\nItems you added will be listed here.\n\n\nMOOP : Matter Out Of Place</string>
 
@@ -44,6 +46,7 @@
     <string name="toast_no_image_paths">No image paths were provided.</string>
     <string name="toast_draw_on_map">Draw the approximate region where you want to find items.</string>
     <string name="toast_wtf_bug">How did you even manage to do that?\nReport a bug!</string>
+    <string name="toast_preregistration_welcome">Welcome, %s.</string>
 
     <string name="title_current_location">Current location</string>
     <string name="title_set_up_location">Set up a location</string>
@@ -80,7 +83,7 @@
     <string name="menu_action_add_item">Add Item</string>
     <string name="menu_action_profile">Profile</string>
 
-    <!-- deprecated -->
-    <string name="main_activity_top_message">Welcome! With this app, you can give an item you possess, spot an item that was lost or thrown away, and find items around a location.</string>
+    <string name="tutorial_top_message">Welcome! With this app, you can give an item you possess, spot an item that was lost or thrown away, and find items around a location.</string>
+    <string name="preregistration_dialog">Signing in…</string>
 
 </resources>
