@@ -1,5 +1,6 @@
 package org.give2peer.karma.activity;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Point;
 import android.location.Location;
@@ -197,6 +198,8 @@ public class      MapItemsActivity
         cancelFinderTask();
         showLoader();
 
+        final Activity activity = this;
+
         finder = new AsyncTask<Void, Void, ArrayList<Item>>()
         {
             Exception exception;
@@ -212,7 +215,8 @@ public class      MapItemsActivity
                 }
 
                 ArrayList<Item> items = new ArrayList<Item>();
-                if (null != itemsResponse.getItems()) {
+                if (null != itemsResponse.getItems())
+                {
                     Collections.addAll(items, itemsResponse.getItems());
                 }
 
@@ -260,7 +264,8 @@ public class      MapItemsActivity
 
                 // Something went wrong with the request: probably no internet.
                 if (null != exception) {
-                    //exception.printStackTrace();
+                    Log.e("G2P", "Something went wrong while finding items !");
+                    exception.printStackTrace();
                     findViewById(R.id.noInternetTextView).setVisibility(View.VISIBLE);
                     updateDrawButtonDelayed();
                     return;
@@ -276,6 +281,8 @@ public class      MapItemsActivity
                 } else {
                     // Collect the LatLngs to zoom and pan the camera ideally
                     LatLngBounds.Builder bc = new LatLngBounds.Builder();
+
+                    // todo : Use our own custom InfoWindowAdapter ?
 
                     for (int i=0; i<itemsCount; i++) {
                         Item item = items.get(i);
@@ -297,6 +304,14 @@ public class      MapItemsActivity
 
                     // Pan and zoom the camera
                     googleMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bc.build(), 55));
+
+                    googleMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
+                        @Override
+                        public void onInfoWindowClick(Marker marker) {
+                            Item item = markerItemHashMap.get(marker);
+                            app.showItemPopup(activity, item);
+                        }
+                    });
 
                     // Hide the drawn region, and draw a circle instead
                     // This is a cheap solution to the problem of performance, as users may draw BIG regions

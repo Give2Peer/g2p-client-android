@@ -192,7 +192,7 @@ public class RestService
         params.put("location", item.getLocation());
         params.put("title", item.getTitle());
 
-        String jsonResponse = postJson(ROUTE_ITEM, params, false);
+        String jsonResponse = postJson(ROUTE_ITEM, params);
 
         CreateItemResponse createItemResponse = new CreateItemResponse();
 

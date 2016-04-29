@@ -9,6 +9,7 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
 import org.apache.commons.lang3.StringUtils;
+import org.give2peer.karma.Application;
 import org.give2peer.karma.entity.Item;
 import org.give2peer.karma.R;
 
@@ -49,7 +50,7 @@ public class ItemsListViewAdapter extends ArrayAdapter
     }
 
     @Override
-    public View getView(int position, View convertView, ViewGroup parent)
+    public View getView(final int position, View convertView, ViewGroup parent)
     {
         // We're going to create a View by inflating our item layout and filling its ~fields with
         // the item's properties. We'll want to memoize that View because it seems that scrolling
@@ -97,6 +98,14 @@ public class ItemsListViewAdapter extends ArrayAdapter
             if ( ! thumbUrl.isEmpty()) {
                 thumb.setImageURL(thumbUrl);
             }
+
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Activity a = (Activity) getContext();
+                    ((Application) a.getApplication()).showItemPopup(a, item);
+                }
+            });
 
             // Memoize our newly inflated View.
             // /!\ RAM may explode if this gets too big !

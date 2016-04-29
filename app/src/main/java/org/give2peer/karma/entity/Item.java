@@ -27,6 +27,8 @@ public class Item
 
     List<String> tags;
 
+    User author;
+
 
     // CONSTRUCTOR /////////////////////////////////////////////////////////////////////////////////
 
@@ -143,6 +145,8 @@ public class Item
     public List<String> getTags()                    { return tags;                                }
 
     public void setTags(List<String> tags)           { this.tags = tags;                           }
+
+    public User getAuthor()                          { return author;                              }
 
 //    public Image getPicture()                        { return picture;                             }
 //

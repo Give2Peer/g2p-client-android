@@ -6,6 +6,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.location.Address;
 import android.location.Criteria;
 import android.location.Geocoder;
@@ -16,8 +19,17 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
+import android.text.Layout;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.PopupWindow;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -34,6 +46,7 @@ import org.give2peer.karma.activity.ProfileActivity_;
 import org.give2peer.karma.activity.SettingsActivity;
 import org.give2peer.karma.entity.Location;
 import org.give2peer.karma.entity.Server;
+import org.give2peer.karma.entity.Item;
 import org.give2peer.karma.exception.AuthorizationException;
 import org.give2peer.karma.exception.BadConfigException;
 import org.give2peer.karma.exception.CriticalException;
@@ -55,6 +68,8 @@ import java.net.URISyntaxException;
 import java.net.UnknownHostException;
 import java.util.Date;
 import java.util.List;
+
+import pl.polidea.webimageview.WebImageView;
 
 
 /**
@@ -629,6 +644,78 @@ public class Application extends SugarApp
         Context context = getApplicationContext();
         Toast toast = Toast.makeText(context, message, duration);
         toast.show();
+    }
+
+    public void showItemPopup(Activity activity, Item item)
+    {
+        final PopupWindow pw;
+
+        try {
+            // We need to get the instance of the LayoutInflater, use the context of this activity
+            LayoutInflater inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            // Inflate the view from a predefined XML layout
+            View layout = inflater.inflate(
+                    R.layout.popup_item,
+                    (ViewGroup) activity.findViewById(R.id.popupItemRoot)
+            );
+            // create a 300px width and 470px height PopupWindow
+//            pw = new PopupWindow(layout);
+            pw = new PopupWindow(layout, 300, 470, true);
+            pw.setFocusable(true);
+
+            // We have a transparent background by default ?
+            // What the hack, let's duct-tape this
+            Drawable d = new ColorDrawable(Color.DKGRAY);
+            d.setAlpha(222);
+            pw.setBackgroundDrawable(d);
+
+            // Display the popup in the center
+            pw.showAtLocation(layout, Gravity.CENTER, 0, 0);
+
+            RelativeLayout root = (RelativeLayout) layout.findViewById(R.id.popupItemRoot);
+            root.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    pw.dismiss();
+                }
+            });
+
+            // Set an image if there's one
+            WebImageView image = (WebImageView) layout.findViewById(R.id.popupItemImageView);
+            if (item.getThumbnail().isEmpty()) {
+                image.setVisibility(View.GONE);
+            } else {
+                image.setImageURL(item.getThumbnail());
+            }
+
+            // Set a title if there's one
+            TextView title = (TextView) layout.findViewById(R.id.popupItemTitleText);
+            if (item.getTitle().isEmpty()) {
+                title.setVisibility(View.GONE);
+            } else {
+                title.setText(item.getTitle());
+            }
+
+            // Set an authorship if there's one
+            TextView by = (TextView) layout.findViewById(R.id.popupItemByText);
+            if (null == item.getAuthor()) {
+                by.setVisibility(View.GONE);
+            } else {
+                by.setText(String.format("by %s", item.getAuthor().getPrettyUsername()));
+            }
+
+
+
+//            Button cancelButton = (Button) layout.findViewById(R.id.end_data_send_button);
+//            makeBlack(cancelButton);
+
+//            cancelButton.setOnClickListener(cancel_button_click_listener);
+
+        } catch (Exception e) {
+            // we're not even giving a shit anymore
+            e.printStackTrace();
+        }
+
     }
 
     /**

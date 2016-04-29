@@ -5,4 +5,10 @@
         <!-- Customize your theme here. -->
     </style>
 
+    <!-- API 11 :( -->
+    <!--<item name="android:popupMenuStyle">@style/PopupMenu</item>-->
+    <!--<style name="PopupMenu" parent="@android:style/Widget.PopupMenu">-->
+        <!--<item name="android:popupBackground">@android:color/white</item>-->
+    <!--</style>-->
+
 </resources>
