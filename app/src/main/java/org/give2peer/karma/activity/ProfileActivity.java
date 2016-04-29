@@ -111,6 +111,7 @@ public class ProfileActivity extends ActionBarActivity
     {
         profileRetryButton.setVisibility(View.GONE);
         profileLoadingProgressBar.setVisibility(View.VISIBLE);
+        app.requireAuthentication(this);
         synchronize();
     }
 
