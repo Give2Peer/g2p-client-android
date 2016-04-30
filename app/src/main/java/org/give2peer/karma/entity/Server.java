@@ -16,7 +16,7 @@ public class Server extends BaseEntity
     boolean isEditedByUser = false;
 
     public static String DEFAULT_URL = "http://g2p.give2peer.org/v1";
-    public static String DEFAULT_NAME = "Give2Peer \uD835\uDEC2";
+    public static String DEFAULT_NAME = "Give2Peer";
     public static String DEFAULT_USERNAME = ""; // the emptiness is detected in the app onCreate
     public static String DEFAULT_PASSWORD = ""; // and we ask the server for credentials
 
@@ -26,8 +26,6 @@ public class Server extends BaseEntity
      * This loads the default configuration that is automatically added to the app on first launch.
      *
      * Note: putting these in a class extending Server is a bad idea: the ORM chokes.
-     *
-     * TODO@beta: either automatic registration somewhere, or a proper Anon account.
      */
     public Server loadDefaults()
     {
@@ -39,6 +37,10 @@ public class Server extends BaseEntity
         return this;
     }
 
+    /**
+     * When we create a new server configuration, we fill it with this.
+     * This is because we hacked the Settings to get our Server CRUD. It's BAD.
+     */
     public Server loadDummy()
     {
         url      = "http://";
