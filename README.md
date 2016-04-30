@@ -1,10 +1,13 @@
 Karma
 =====
 
-This is the source of the Android client application [Karma](http://give2peer.org).
+This is the source of the Android client application [Karma ∝](http://give2peer.org).
 
 It is made to be a client to the [Give2Peer REST API](http://g2p.give2peer.org/),
-run by another FLOSS [server](https://github.com/Give2Peer/g2p-server-symfony) written in PHP.
+run by another FLOSS [server](https://github.com/Give2Peer/g2p-server-symfony) written in PHP,
+and [heavily featured](https://github.com/Give2Peer/g2p-server-symfony/tree/master/features#what).
+
+
 
 
 Goal
@@ -28,7 +31,7 @@ ROADMAP
 =======
 
 We plan to make at least two Android clients. One (this one, the first one) should support old
-phones (since API 11, Gingerbread), and the other should be coded properly, with partials, sliding
+phones (since API 10, Gingerbread), and the other should be coded properly, with partials, sliding
 menus, and overall material design suitable for phones, glasses, watches and tablets.
 
 There might even be a third (very light) version, using a `WebView` to load an HTML-based web app.
@@ -37,33 +40,49 @@ All list items followed by parenthesis are optional, and the parenthesis should 
 
 
 
-Future concurrent versions
---------------------------
+Major versions
+--------------
 
 They will be handled in different git repositories.
 
 
-### Karma²
+### Karma ∝ (Karma Unfinity)
+
+This is the initial version, the version of this git repository.
+It is messy, buggy, with little to no tablet layout support.
+
+It should be made bug-free, but at some point we'll need to feature-freeze it.
+
+It should work on almost all Android devices, but should only be offered as fallback when Karma ∞ is
+unavailable.
+
+
+### Karma ∞ (Karma Infinity)
+
+Will be in repo `g2p-client-android-modern`.
 
 Another native app, but well-coded this time.
-A version with support for more modern hardware only, since API 21. (or more)
+A version with support for more modern hardware only, since API 21. (probably even higher)
 This version leverages the full power of Material design, and provides tablet layouts as well as
 phone layouts.
 It will be kickstarted during a hackathon sometime this year or next, if enough people are interested.
 Write hackathon@give2peer.org to be added to the hackathon mailing list.
 
-Karma², when released, should become the mainstream app.
+Karma ∞, when released, should become the mainstream app.
 (unless KarmaWeb proves more efficient, but why would it ?)
-Karma (v1, the app in this repository) will be considered as fallback for older devices.
+Karma ∝(the app in this repository) will be considered as fallback for older devices.
 
-### Karma Web
 
-Another (concurrent) app named "Karma Web" (or something) will probably be made for Android at this
-point, as an HTML webapp within a `WebView`. Favorably in Dart, if it can be done.
+### Karma @ (Karma Web)
+
+Will be in repo `g2p-client-android-web`.
+
+Another (concurrent) app named "Karma Web" (or something) will possibly be made for Android at this
+point, as an HTML webapp within a `WebView`. Favorably in [Dart], if it can be done.
 
 The native Android code should handle receiving picture intents, but the rest should be mostly config.
-
 We're very interested in benchmarking these apps against each other.
+
 
 
 1.0.0
@@ -88,6 +107,7 @@ users that won't be able to run the `2.x.x`.
 - [ ] Setting: enable `https` protocol.
 - [ ] Feature: edit items I authored in my profile.
 - [ ] Feature: delete items I authored in my profile.
+- [ ] Feature: change your username when level 1, against 9 karma points.
 
 
 
@@ -99,7 +119,10 @@ A version for the alpha community, released on Google Play.
 This version will be available by invitation only.
 
 - [x] Feature: see item details
-- [ ] Feature: change your username
+- [x] Bugfix: support for images shared through browser downloads and others
+- [ ] Feature: add your email to your user account
+- [ ] Feature: log in with existing user account
+- [ ] Feature: ask for new credentials with email
 
 
 
@@ -306,8 +329,8 @@ There's terrible code everywhere. **EVERYWHERE.**
 Please counsel.
 
 
-Thanks
-------
+Credits
+-------
 
 - The community, without you there'd be nothing. You know who you are.
 - Ilane, for feeding us and putting up with our code-related ramblings.
@@ -320,3 +343,4 @@ Thanks
 
 
 [MOOP]: http://burningman.org/event/preparation/leaving-no-trace/moop/
+[Dart]: https://www.dartlang.org/

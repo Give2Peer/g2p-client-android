@@ -271,10 +271,6 @@ public class Application extends SugarApp
             launchSettings(activity);
             return true;
         }
-//        if (id == R.id.menu_action_add_item) {
-//            launchNewItem();
-//            return true;
-//        }
         if (id == R.id.menu_action_map) {
             launchMap(activity);
             return true;
@@ -283,10 +279,16 @@ public class Application extends SugarApp
             launchProfile(activity);
             return true;
         }
-        if (id == R.id.menu_action_report_bug) {
-            launchBugReport(activity);
-            return true;
-        }
+        // Nah, use the "Share Via..."
+//        if (id == R.id.menu_action_add_item) {
+//            launchNewItem();
+//            return true;
+//        }
+        // Froyo has its own bug reporting system.
+//        if (id == R.id.menu_action_report_bug) {
+//            launchBugReport(activity);
+//            return true;
+//        }
 
         return false;
     }

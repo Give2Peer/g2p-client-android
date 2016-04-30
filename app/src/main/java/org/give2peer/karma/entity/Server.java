@@ -3,22 +3,29 @@ package org.give2peer.karma.entity;
 
 /**
  * This is a persistable entity.
+ *
  * Possible names :
  * - ServerConfiguration (bit long)
  */
 public class Server extends BaseEntity
 {
-    String url      = "";
-    String name     = "";
-    String username = "";
-    String password = "";
-
-    boolean isEditedByUser = false;
-
     public static String DEFAULT_URL = "http://g2p.give2peer.org/v1";
     public static String DEFAULT_NAME = "Give2Peer";
     public static String DEFAULT_USERNAME = ""; // the emptiness is detected in the app onCreate
     public static String DEFAULT_PASSWORD = ""; // and we ask the server for credentials
+
+    String url      = DEFAULT_URL;
+    String name     = DEFAULT_NAME;
+    String username = "";
+    String password = "";
+
+    /**
+     * We use this in the registration activity to either try to register a new account (if this is
+     * true) or try to edit an existing account (if this is false) because we only pre-registered.
+     */
+    boolean isEditedByUser = false;
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////
 
     public Server() {}
 
@@ -64,6 +71,7 @@ public class Server extends BaseEntity
     /**
      * This is false by default.
      *
+     *
      * @return whether or not this server configuration as been edited by the hand of the user.
      */
     public boolean isEditedByUser() { return isEditedByUser; }
@@ -73,7 +81,7 @@ public class Server extends BaseEntity
      */
     public void setEditedByUser() { this.isEditedByUser = true; }
 
-    /**********************************************************************************************/
+    ////////////////////////////////////////////////////////////////////////////////////////////////
 
     public String getUrl()                   { return url;                                         }
 
