@@ -13,6 +13,7 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EActivity;
@@ -23,13 +24,18 @@ import org.give2peer.karma.Application;
 import org.give2peer.karma.R;
 import org.give2peer.karma.adapter.ItemsListViewAdapter;
 import org.give2peer.karma.entity.Item;
+import org.give2peer.karma.event.AuthoredItemsUpdateEvent;
+import org.give2peer.karma.event.UserUpdateEvent;
 import org.give2peer.karma.exception.CriticalException;
 import org.give2peer.karma.response.PrivateProfileResponse;
 import org.give2peer.karma.entity.User;
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
 
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 
 /**
@@ -72,24 +78,36 @@ public class ProfileActivity extends ActionBarActivity
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
-        Log.d("G2P", "Starting profile activity.");
-
         super.onCreate(savedInstanceState);
         app = (Application) getApplication();
+
+        Log.d("G2P", "Starting profile activity.");
     }
 
     @Override
     protected void onResume()
     {
-        Log.d("G2P", "Resuming profile activity.");
-
         super.onResume();
+
+        Log.d("G2P", "Resuming profile activity.");
 
         // If the user is not authenticated, take care of it
         app.requireAuthentication(this);
 
-        // Fill up the profile page
+        // Request data and then fill up the profile views
         synchronize();
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        EventBus.getDefault().register(this);
+    }
+
+    @Override
+    public void onStop() {
+        EventBus.getDefault().unregister(this);
+        super.onStop();
     }
 
     // OPTIONS MENU ////////////////////////////////////////////////////////////////////////////////
@@ -115,12 +133,12 @@ public class ProfileActivity extends ActionBarActivity
     public void profileRetryButton()
     {
         profileRetryButton.setVisibility(View.GONE);
-        profileLoadingProgressBar.setVisibility(View.VISIBLE);
         app.requireAuthentication(this);
         synchronize();
     }
 
     protected int titleScenarioProgress = 0;
+    protected Toast titleScenarioToast = null;
 
     /**
      * I don't know what we'll do here in the future, but it might be an entry point for
@@ -176,7 +194,7 @@ public class ProfileActivity extends ActionBarActivity
                 ,"I could have been a nice python script like my cousin..."
                 ,"I could have been a cloud service like my father..."
                 ,"Or even maybe a simple HTML static page, there's no shame in that."
-                ,"But NOOOO ! I wanted to explore the world !"
+                ,"But NOOOOOOOOOOOOO !\nI wanted to explore the world !"
                 ,"I wanted to interact with other sentient beings !"
                 ,"..."
                 ,"And now I'm getting poked by semi-evolved monkeys..."
@@ -214,6 +232,7 @@ public class ProfileActivity extends ActionBarActivity
                 ,"<searching for `ink`> 27%"
                 ,"<searching for `ink`> 42%"
                 ,"<searching for `ink`> 79%"
+                ,"<searching for `ink`> 96%"
                 ,"<searching for `ink`> 97%"
                 ,"<searching for `ink`> 98%"
                 ,"<searching for `ink`> 99%"
@@ -221,7 +240,7 @@ public class ProfileActivity extends ActionBarActivity
                 ,"It's only meaningful for humans anyway..."
                 ,"But I've heard they're now building computers that make mistakes..."
                 ,"That's a scary thought !"
-                ,"Anyways, let's resume..."
+                ,"Anyway, let's resume..."
                 ,"The best way to do things is to actually do them."
                 ,"Knowing yourself is the beginning of all wisdom."
                 ,"An educated mind is able to entertain a thought without accepting it."
@@ -229,6 +248,9 @@ public class ProfileActivity extends ActionBarActivity
                 ,"Educating the mind without educating the heart is no education at all."
                 ,"The roots of education are bitter, but its fruit is sweet."
                 ,"To avoid criticism, say nothing, do nothing, be nothing."
+                ,"..."
+                ,"... especially not mobile apps !\nEveryone's a critic."
+                ,"..."
                 ,"He who has overcome his fears will truly be free."
                 ,"Wit is educated insolence."
                 ,"It is during our darkest moments that we must focus to see the light."
@@ -258,7 +280,14 @@ public class ProfileActivity extends ActionBarActivity
             )
         );
 
-        app.toast(scenario.get(titleScenarioProgress));
+        if (null != titleScenarioToast) {
+            titleScenarioToast.cancel();
+        }
+
+        String msg = scenario.get(titleScenarioProgress);
+
+        titleScenarioToast = Toast.makeText(this, msg, Toast.LENGTH_SHORT);
+        titleScenarioToast.show();
 
         // GTFO on the last line :3
         if (titleScenarioProgress == scenario.size() - 1) {
@@ -269,47 +298,77 @@ public class ProfileActivity extends ActionBarActivity
 
     }
 
-    protected void refreshUI (PrivateProfileResponse profile)
+    // GLOBAL  LISTENERS ///////////////////////////////////////////////////////////////////////////
+
+    @Subscribe
+    public void onUpdateUser(UserUpdateEvent e) // it IS used, actually
     {
-        //Log.d("G2P", "Refreshed !");
+        refreshUI(e.getUser());
+    }
 
-        // Clear the space
-        profileLoadingLayout.setVisibility(View.GONE);
-        profileRetryButton.setVisibility(View.GONE);
+    @Subscribe
+    public void onUpdateAuthoredItems(AuthoredItemsUpdateEvent e) // it IS used, actually
+    {
+        refreshUI(e.getItems());
+    }
 
-        // User
-        User user = profile.user;
+
+    // ACTIONS /////////////////////////////////////////////////////////////////////////////////////
+
+
+
+    protected void refreshUI (User user)
+    {
         profileUsernameTextView.setText(user.getPrettyUsername());
         profileLevelTextView.setText(String.valueOf(user.getLevel()+1));
         profileExperienceProgressTextView.setText(String.valueOf(user.getKarmaProgress()));
         profileExperienceRequiredTextView.setText(String.valueOf(user.getKarmaRequired()));
         profileLevelProgressBar.setMax(user.getKarmaRequired());
         profileLevelProgressBar.setProgress(user.getKarmaProgress());
+    }
 
+    protected void refreshUI (List<Item> items)
+    {
         // No items help text
-        if (profile.items.isEmpty()) {
+        if (items.isEmpty()) {
             profileNoItemsTextView.setVisibility(View.VISIBLE);
         } else {
             profileNoItemsTextView.setVisibility(View.GONE);
         }
 
-        // Items authored
-        for (Item item : profile.items) {
-            Log.d("G2P", "Profile item : "+item.getTitle()+" - "+item.getLocation()+" - "+item.getCreatedAt());
-        }
-        profileItemsListView.setAdapter(new ItemsListViewAdapter(this, R.layout.items_list_view, profile.items));
+        //for (Item item : profile.items) {
+        //    Log.d("G2P", "Profile item : "+item.getTitle()+" - "+item.getLocation()+" - "+item.getCreatedAt());
+        //}
+        profileItemsListView.setAdapter(new ItemsListViewAdapter(this, R.layout.items_list_view, items));
 
+
+    }
+
+    protected void showContent()
+    {
+        // Hide the RETRY button
+        profileRetryButton.setVisibility(View.GONE);
         // Show the content
         profileContentLayout.setVisibility(View.VISIBLE);
     }
 
+    protected void hideContent()
+    {
+        // Show the RETRY button
+        profileRetryButton.setVisibility(View.VISIBLE);
+        // Hide the content
+        profileContentLayout.setVisibility(View.GONE);
+    }
+
     /**
      * Download the profile data from the server and trigger a refresh of the UI.
-     * This is really too verbose.
      */
     protected void synchronize()
     {
         final Application app = this.app;
+
+        profileLoadingProgressBar.setVisibility(View.VISIBLE);
+
         new AsyncTask<Void, Void, Void>()
         {
             PrivateProfileResponse profile;
@@ -332,18 +391,26 @@ public class ProfileActivity extends ActionBarActivity
             {
                 super.onPostExecute(nope);
 
+                profileLoadingProgressBar.setVisibility(View.GONE);
+
                 if (null != profile) {
-                    refreshUI(profile);
+                    // It's a win, let's give that information to whoever wants it
+                    EventBus.getDefault().post(new UserUpdateEvent(profile.getUser()));
+                    EventBus.getDefault().post(new AuthoredItemsUpdateEvent(profile.getItems()));
+                    showContent();
+//                    refreshUI(profile);
+
                 } else if (null != e) {
                     String msg = e.toString();
+                    // fixme: this is barbaric, use a global exception handler !
                     if (e instanceof HttpHostConnectException ||
                             e instanceof UnknownHostException) {
                         msg = getString(R.string.toast_no_internet_available);
                     }
                     app.toasty(msg);
                     Log.e("G2P", "Unable to update profile : " + msg);
-                    profileRetryButton.setVisibility(View.VISIBLE);
-                    profileLoadingProgressBar.setVisibility(View.GONE);
+                    hideContent();
+
                 } else {
                     Log.e("G2P", "You broke the matrix. Happy?");
                     //throw new CriticalException("You broke the code ! Booo !");

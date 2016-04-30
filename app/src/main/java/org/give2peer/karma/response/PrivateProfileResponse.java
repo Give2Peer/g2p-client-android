@@ -10,9 +10,14 @@ import java.util.List;
  */
 public class PrivateProfileResponse
 {
+
     public User user;
 
     public List<Item> items;
 
     public PrivateProfileResponse() {} // maybe needed, maybe not
+
+    public User getUser() { return user; }
+
+    public List<Item> getItems() { return items; }
 }
