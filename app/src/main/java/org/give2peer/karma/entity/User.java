@@ -44,7 +44,7 @@ public class User
      */
     public String getPrettyUsername()
     {
-        String s = getUsername().replaceAll("[\\d]+$", "");
+        String s = getUsername().replaceAll("[_\\s\\d]+$", "");
         s = s.replaceAll("[_]+", " ");
         return WordUtils.capitalizeFully(s);
     }

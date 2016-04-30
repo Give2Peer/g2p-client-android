@@ -22,6 +22,7 @@ import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.ViewById;
 import org.give2peer.karma.Application;
+import org.give2peer.karma.FileUtils;
 import org.give2peer.karma.entity.Item;
 import org.give2peer.karma.R;
 import org.give2peer.karma.exception.QuotaException;
@@ -113,8 +114,9 @@ public class NewItemActivity extends LocatorActivity
             if (type.startsWith("image/")) {
                 // Handle a single image being sent
                 Uri imageUri = (Uri) intent.getParcelableExtra(Intent.EXTRA_STREAM);
+                Log.d("G2P", "Add new item with shared image URl `" + imageUri.toString() + "`.");
                 String imagePath = getPathFromImageURI(imageUri);
-                Log.d("G2P", "Add new item with shared image `" + imagePath + "`.");
+                Log.d("G2P", "... which translates into path `" + imagePath + "`.");
                 imagePaths.add(imagePath);
                 fillThumbnail();
                 //processImages();
@@ -201,20 +203,33 @@ public class NewItemActivity extends LocatorActivity
      * Convert the image URI to the direct file system path of the image file.
      * This is prety crappy too.
      * @param contentUri
-     * @return the system path of the file de scribed by the Uri.
+     * @return the system path of the file described by the Uri.
      */
     public String getPathFromImageURI(Uri contentUri)
     {
-        String [] proj={MediaStore.Images.Media.DATA};
-        Cursor cursor = managedQuery( contentUri,
-                                      proj,  // Which columns to return
-                                      null,  // WHERE clause; which rows to return (all rows)
-                                      null,  // WHERE clause selection arguments (none)
-                                      null); // Order-by clause (ascending by name)
-        int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
-        cursor.moveToFirst();
+        String path = null;
 
-        return cursor.getString(column_index);
+        // Support for Urls of type content://com.android.providers.downloads.documents/document/4
+        // todo: don't assume it's local ?
+        path = FileUtils.getPath(this, contentUri);
+
+
+        // Fallback support for Camera URLs such as content://media/external/images/media/78
+        if (null == path) {
+            Log.d("G2P", "We tried to use the fallback path finder method for that image.");
+            String [] proj={MediaStore.Images.Media.DATA};
+            Cursor cursor = managedQuery( contentUri,
+                    proj,  // Which columns to return
+                    null,  // WHERE clause; which rows to return (all rows)
+                    null,  // WHERE clause selection arguments (none)
+                    null); // Order-by clause (ascending by name)
+            int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+
+            cursor.moveToFirst();
+            path = cursor.getString(column_index);
+        }
+
+        return path;
     }
 
     //// ACTIONS ///////////////////////////////////////////////////////////////////////////////////
