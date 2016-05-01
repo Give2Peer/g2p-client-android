@@ -17,6 +17,7 @@ public class Item
     Integer  id;
     String   title;
     String   description;
+    String   type = Item.TYPE_MOOP; // server will only accept one of Item.TYPE_****
     String   location;
     Float    latitude;
     Float    longitude;
@@ -28,6 +29,10 @@ public class Item
     List<String> tags;
 
     User author;
+
+    static public String TYPE_MOOP = "moop";
+    static public String TYPE_GIFT = "gift";
+    static public String TYPE_LOST = "lost";
 
 
     // CONSTRUCTOR /////////////////////////////////////////////////////////////////////////////////
@@ -103,6 +108,10 @@ public class Item
     public Integer getId()                           { return id;                                  }
 
     public void setId(Integer id)                    { this.id = id;                               }
+
+    public String getType()                          { return type;                                }
+
+    public void setType(String type)                 { this.type = type;                           }
 
     public String getTitle()                         { return title;                               }
 

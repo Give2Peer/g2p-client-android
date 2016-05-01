@@ -11,6 +11,7 @@ import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.util.Log;
 import android.view.View;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -25,6 +26,7 @@ import org.give2peer.karma.Application;
 import org.give2peer.karma.FileUtils;
 import org.give2peer.karma.entity.Item;
 import org.give2peer.karma.R;
+import org.give2peer.karma.exception.NoInternetException;
 import org.give2peer.karma.exception.QuotaException;
 import org.give2peer.karma.factory.BitmapFactory;
 import org.give2peer.karma.task.NewItemTask;
@@ -74,6 +76,8 @@ public class NewItemActivity extends LocatorActivity
     EditText             newItemTitleEditText;
     @ViewById
     EditText             newItemLocationEditText;
+    @ViewById
+    CheckBox             newItemGiftCheckBox;
 
     @Override
     public void onCreate(Bundle savedInstanceState)
@@ -96,6 +100,19 @@ public class NewItemActivity extends LocatorActivity
 
     }
 
+    /**
+     * This is to recover the image from the Intent, or launch the Camera to pick one if we
+     * arrived on this activity by other means (ie: the Intent is empty).
+     * We shouldn't use the second use case, it's not very stable and I'd like to remove it
+     * to de-clutter the code. Right now we disabled any way to come here but users may inspect and
+     * launch activities of their choice from the OS, if they so choose to, I believe.
+     * Instead, we could warn the user and suggest to either launch the camera or return to the map.
+     * Not sure when happens in the "back" history in that case.
+     * I'd love a tool to inspect in real-time that information. There's probably one already.
+     *
+     * Note that this is in AfterViews because we're using Android Annotations.
+     * todo: make it lazy
+     */
     @AfterViews
     public void recoverImage()
     {
@@ -327,6 +344,14 @@ public class NewItemActivity extends LocatorActivity
         Item item = new Item();
         item.setLocation(locationInputValue);
         item.setTitle(newItemTitleEditText.getText().toString());
+
+        if (newItemGiftCheckBox.isChecked()) {
+            item.setType(Item.TYPE_GIFT);
+        } else {
+            item.setType(Item.TYPE_LOST);
+        } // todo: handle type MOOP with radio icons ? (find or make a lib for that !)
+          // or not : http://stackoverflow.com/questions/29411752/custom-icon-for-a-radio-button
+
 //        item.setPictures(imageFiles);
 
         // Try to upload it, along with its image(s).
@@ -343,7 +368,7 @@ public class NewItemActivity extends LocatorActivity
                 } else {
                     Exception e = getException();
                     String toast;
-                    if (e instanceof IOException) {
+                    if (e instanceof IOException || e instanceof NoInternetException) {
                         toast = getString(R.string.toast_no_internet_available);
                     } else if (e instanceof QuotaException) {
                         toast = getString(R.string.toast_new_item_error_quota_reached);

@@ -263,6 +263,13 @@ I suspect this would not be the case anymore, so a refactorization implementing 
 (or an even better REST lib) would be welcome.
 
 
+Real-time Database Inspection
+-----------------------------
+
+Not used right now, but may be very useful some day.
+
+http://www.idescout.com/wiki/index.php/Main/ConnectToAndroidDbs
+
 
 OTHERS
 ======

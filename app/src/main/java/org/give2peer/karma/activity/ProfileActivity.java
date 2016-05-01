@@ -415,8 +415,9 @@ public class ProfileActivity extends ActionBarActivity
                     if (e instanceof HttpHostConnectException ||
                             e instanceof UnknownHostException) {
                         msg = getString(R.string.toast_no_internet_available);
+                    } else {
+                        app.toasty(msg);
                     }
-                    app.toasty(msg);
                     Log.e("G2P", "Unable to update profile : " + msg);
                     hideContent();
 

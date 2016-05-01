@@ -7,12 +7,6 @@
     <string name="menu_action_settings">Settings</string>
     <string name="menu_action_report_bug">Report Bug</string>
 
-    <!-- pretty sure these are not used anymore -->
-    <string name="title_activity_settings">Karma - Settings</string>
-    <string name="title_activity_new_item">Karma - New Item</string>
-    <string name="title_activity_map_items">Karma - Map items</string>
-    <!---->
-
     <string name="profile_no_items_help">Use your camera to share to Karma a picture of a lost item, a gift, or plain MOOP.\n\nItems you added will be listed here.\n\n\nMOOP : Matter Out Of Place</string>
 
     <string name="new_item_label_title">Title</string>
@@ -85,5 +79,6 @@
 
     <string name="tutorial_top_message">Welcome! With this app, you can give an item you possess, spot an item that was lost or thrown away, and find items around a location.</string>
     <string name="preregistration_dialog">Signing in…</string>
+    <string name="new_item_checkbox_gift">Gift (I legally own this item)</string>
 
 </resources>

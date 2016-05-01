@@ -33,30 +33,13 @@
                 android:layout_height="wrap_content"
                 android:paddingLeft="@dimen/activity_horizontal_margin"
                 android:paddingRight="@dimen/activity_horizontal_margin"
-                android:paddingTop="@dimen/activity_vertical_margin"
-                android:paddingBottom="@dimen/activity_vertical_margin"
                 android:orientation="vertical"
                 >
-
-                <EditText
-                    android:id="@+id/newItemTitleEditText"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="10dp"
-                    android:layout_marginStart="10dp"
-                    android:maxLength="32"
-                    android:maxLines="1"
-                    android:inputType="text|textAutoComplete|textAutoCorrect"
-                    android:hint="@string/new_item_label_title"
-                    android:textColorHint="@android:color/darker_gray"
-                    />
 
                 <EditText
                     android:id="@+id/newItemLocationEditText"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="10dp"
-                    android:layout_marginStart="10dp"
                     android:maxLength="256"
                     android:maxLines="1"
                     android:inputType="text|textAutoComplete|textAutoCorrect|textPostalAddress"
@@ -64,25 +47,46 @@
                     android:textColorHint="@android:color/darker_gray"
                     />
 
-            </LinearLayout>
+                <EditText
+                    android:id="@+id/newItemTitleEditText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:maxLength="32"
+                    android:maxLines="1"
+                    android:inputType="text|textAutoComplete|textAutoCorrect"
+                    android:hint="@string/new_item_label_title"
+                    android:textColorHint="@android:color/darker_gray"
+                    />
 
-            <com.shamanland.fab.FloatingActionButton
-                android:id="@+id/newItemSendButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/ic_send_white_24dp"
-                android:onClick="onSend"
-                android:layout_gravity="right|bottom"
-                android:layout_marginTop="2dp"
-                android:layout_marginBottom="5dp"
-                android:layout_marginRight="15dp"
-                app:floatingActionButtonColor="@color/background_floating_material_dark"
-                app:floatingActionButtonSize="normal"
-                />
+                <CheckBox
+                    android:id="@+id/newItemGiftCheckBox"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/new_item_checkbox_gift"
+                    android:layout_marginTop="10dp"
+                    />
+
+            </LinearLayout>
 
         </LinearLayout>
 
     </ScrollView>
+
+    <com.shamanland.fab.FloatingActionButton
+        android:id="@+id/newItemSendButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_send_white_24dp"
+        android:onClick="onSend"
+        android:layout_gravity="right|bottom"
+        android:layout_marginBottom="12dp"
+        android:layout_marginRight="12dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        app:floatingActionButtonColor="@color/background_floating_material_dark"
+        app:floatingActionButtonSize="normal"
+        />
 
     <!--<im.delight.android.keyvaluespinner.KeyValueSpinner-->
         <!--android:id="@+id/newItemLocationSpinner"-->

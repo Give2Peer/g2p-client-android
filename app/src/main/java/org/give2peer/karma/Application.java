@@ -48,6 +48,7 @@ import org.give2peer.karma.entity.Location;
 import org.give2peer.karma.entity.Server;
 import org.give2peer.karma.entity.Item;
 import org.give2peer.karma.exception.GeocodingException;
+import org.give2peer.karma.exception.NoInternetException;
 import org.give2peer.karma.listener.GoogleApiClientListener;
 import org.give2peer.karma.response.RegistrationResponse;
 import org.give2peer.karma.service.RestService;
@@ -109,7 +110,7 @@ public class Application extends SugarApp
         // A debug message helping me understand when the Application is created
         Log.d("G2P", "G2P Application onCreate");
 
-        // Otherwise, get get a `Resource not found: "org/joda/time/tz/data/ZoneInfoMap"`.
+        // Otherwise, we get a `Resource not found: "org/joda/time/tz/data/ZoneInfoMap"`.
         JodaTimeAndroid.init(this);
 
         // Load the Location from preferences
@@ -174,6 +175,7 @@ public class Application extends SugarApp
                 private final ProgressDialog dialog = new ProgressDialog(activity);
                 Exception exception;
 
+
                 @Override
                 protected RegistrationResponse doInBackground(Void... voids) {
                     RegistrationResponse response = null;
@@ -204,15 +206,20 @@ public class Application extends SugarApp
                         this.dialog.dismiss();
                     }
                     if (null != response) {
-                        Log.d("G2P", "VICTORY");
-
+                        Log.d("G2P", "Pre-registered successfully.");
                         toasty(String.format(getString(R.string.toast_preregistration_welcome), response.getUser().getPrettyUsername()));
                     } else if (null != exception) {
                         // fixme : ExceptionHandler OOOOOPS what to do here ?
-
+                        if (exception instanceof NoInternetException) {
+                            toasty(getString(R.string.toast_no_internet_available));
+                        } else {
+                            Log.d("G2P", "Failed to pre-register.");
+                            exception.printStackTrace();
+                        }
 
                     } else {
                         // Should never EVER happen, right ?
+                        Log.e("G2P", "I should never happen.");
                     }
                 }
             }.execute();
