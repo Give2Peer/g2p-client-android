@@ -2,9 +2,10 @@ apply plugin: 'com.android.application'
 apply plugin: 'android-apt'
 
 android {
+    signingConfigs {
+    }
     compileSdkVersion 21
     buildToolsVersion "21.1.2"
-
     defaultConfig {
         applicationId "org.give2peer.karma"
         minSdkVersion 10
@@ -32,7 +33,6 @@ android {
         exclude 'META-INF/LICENSE.txt'
         exclude 'LICENSE.txt'
     }
-
 }
 
 // Android Annotations needs this
@@ -60,19 +60,21 @@ dependencies {
     compile 'com.google.android.gms:play-services-maps:8.4.0'
     // GOOGLE - LOCATION API
     compile 'com.google.android.gms:play-services-location:8.4.0'
-    // FAB : Floating Action Button
-    //compile 'com.android.support:design:23.3.0' // nope
+    // FAB (Floating Action Button)
     compile 'com.shamanland:fab:0.0.8'
+    //compile 'com.android.support:design:23.3.0' // nope
+
     // HTTP
     compile 'org.apache.httpcomponents:httpmime:4.3'
     compile 'org.apache.httpcomponents:httpclient-android:4.3.5'
     // EVENT BUS (because UI flows are complicated enough)
     compile 'org.greenrobot:eventbus:3.0.0'
     // ORM
-//    compile 'com.github.satyan:sugar:1.5'
+
+    // compile 'com.github.satyan:sugar:1.5'
+
     // ... but it is buggy with gradle 2.x, so we need the master branch
     compile 'com.github.satyan:sugar:master-SNAPSHOT'
-
     // SWEET SUGAR FOR HUMAN TIMES ("2 days ago")
     compile 'org.ocpsoft.prettytime:prettytime:3.2.7.Final'
     // JODA TIME (parse Dates from JSON)
@@ -82,14 +84,18 @@ dependencies {
     // IMAGE CACHE (pretty awesome)
     compile 'pl.polidea:android-image-cache-library:2.0'
     // ANDROID ANNOTATIONS
-    apt     'org.androidannotations:androidannotations:3.3.2'
+    apt 'org.androidannotations:androidannotations:3.3.2'
     compile 'org.androidannotations:androidannotations-api:3.3.2'
     // Capitalize
-    compile "org.apache.commons:commons-lang3:3.4"
+    compile 'org.apache.commons:commons-lang3:3.4'
     // FONT ICONS (clever, in case images become not enough)
+
     // http://zavoloklom.github.io/material-design-iconic-font/icons.html
+
     //compile 'com.malinskiy:materialicons:1.0.1'
+
     // RETROFIT : use this if we can
+
     //compile 'com.squareup.retrofit:retrofit:1.6.0'
 
     // FEATURES-TESTING
@@ -97,14 +103,19 @@ dependencies {
     androidTestCompile 'info.cukes:cucumber-java:1.2.2'
     androidTestCompile 'info.cukes:cucumber-android:1.2.2@jar'
     androidTestCompile 'com.jayway.android.robotium:robotium-solo:5.2.1'
+
     // SOME OTHER TEST LIBS we don't need right now (but might later on)
+
     //androidTestCompile 'info.cukes:cucumber-junit:1.2.2'
+
     //androidTestCompile 'info.cukes:gherkin:2.12.2'
+
     // UNIT-TESTING
-    testCompile        'org.testng:testng:6.9.6'
-//    testCompile        'org.mockito:mockito-core:1.10.19'
+    testCompile 'org.testng:testng:6.9.6'
+    //    testCompile        'org.mockito:mockito-core:1.10.19'
     androidTestCompile 'junit:junit:4.12'
     // TRUTH looks nice, but we have enough assertions for our uses
+
     //androidTestCompile 'com.google.truth:truth:0.26'
 }
 

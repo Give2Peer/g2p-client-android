@@ -253,79 +253,79 @@ public class SettingsFragment extends PreferenceFragment
 
         /// THE LOCATIONS //////////////////////////////////////////////////////////////////////////
 
-        // List the server configurations
-        Iterator<Location> locationsIterator = Location.findAll(Location.class);
-
-        // Create the Server category
-        PreferenceCategory locationsCategory = new PreferenceCategory(context);
-        locationsCategory.setTitle(app.getString(R.string.settings_category_locations));
-
-        // The category MUST be added to the root node BEFORE we add screens to it
-        // (something about injected deps like PreferenceManager, probably)
-        // This code can possibly be improved by much, remember.
-        getPreferenceScreen().addPreference(locationsCategory);
-
-        for (;locationsIterator.hasNext();) {
-            Location location = locationsIterator.next();
-
-            //locations.put(location.getId(), location);
-
-            // Create a sub-screen for that location
-
-            PreferenceScreen screen = pm.createPreferenceScreen(context);
-            screen.setTitle(location.getName());
-            if (canSetIcons) screen.setIcon(R.drawable.ic_edit_black_36dp);
-
-            // Our change and click listeners, that will update the database and the UI
-            OnPreferenceChangeListener nameListener   = new OnLocationNameChangeListener(location, screen);
-            OnPreferenceChangeListener postalListener = new OnLocationPostalChangeListener(location);
-            OnPreferenceClickListener  forgetListener = new OnForgetEntityClickListener(this, location);
-            // We hard-reference them so that the garbage collector does not destroy them
-            notGarbageChangeListeners.add(nameListener);
-            notGarbageChangeListeners.add(postalListener);
-            notGarbageClickListeners.add(forgetListener);
-
-            EditTextPreference name = new EditTextPreference(context);
-            name.setTitle(app.getString(R.string.settings_location_name));
-            name.setKey(String.format("location_%d_name", location.getId()));
-            name.setSummary(location.getName());
-            name.setText(location.getName());
-            name.setOnPreferenceChangeListener(nameListener);
-            screen.addPreference(name);
-
-            EditTextPreference postal = new EditTextPreference(context);
-            postal.setTitle(app.getString(R.string.settings_location_address));
-            postal.setKey(String.format("location_%d_postal", location.getId()));
-            postal.setSummary(location.getPostal());
-            postal.setText(location.getPostal());
-            postal.setOnPreferenceChangeListener(postalListener);
-            screen.addPreference(postal);
-
-            // Forget this location
-            Preference delLocation = new Preference(context);
-            delLocation.setTitle(app.getString(R.string.settings_location_forget));
-            if (canSetIcons) delLocation.setIcon(R.drawable.ic_remove_circle_outline_black_36dp);
-            delLocation.setOnPreferenceClickListener(forgetListener);
-            screen.addPreference(delLocation);
-
-            locationsCategory.addPreference(screen);
-        }
-
-        // Add a location
-        Preference addLocation = new Preference(context);
-        addLocation.setTitle(app.getString(R.string.settings_location_add));
-        if (canSetIcons) addLocation.setIcon(R.drawable.ic_add_circle_outline_black_36dp);
-        addLocation.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-            @Override
-            public boolean onPreferenceClick(Preference preference) {
-                Location newLocation = (new Location()).loadDummy();
-                newLocation.save();
-                refreshView();
-                return true;
-            }
-        });
-
-        locationsCategory.addPreference(addLocation);
+//        // List the server configurations
+//        Iterator<Location> locationsIterator = Location.findAll(Location.class);
+//
+//        // Create the Server category
+//        PreferenceCategory locationsCategory = new PreferenceCategory(context);
+//        locationsCategory.setTitle(app.getString(R.string.settings_category_locations));
+//
+//        // The category MUST be added to the root node BEFORE we add screens to it
+//        // (something about injected deps like PreferenceManager, probably)
+//        // This code can possibly be improved by much, remember.
+//        getPreferenceScreen().addPreference(locationsCategory);
+//
+//        for (;locationsIterator.hasNext();) {
+//            Location location = locationsIterator.next();
+//
+//            //locations.put(location.getId(), location);
+//
+//            // Create a sub-screen for that location
+//
+//            PreferenceScreen screen = pm.createPreferenceScreen(context);
+//            screen.setTitle(location.getName());
+//            if (canSetIcons) screen.setIcon(R.drawable.ic_edit_black_36dp);
+//
+//            // Our change and click listeners, that will update the database and the UI
+//            OnPreferenceChangeListener nameListener   = new OnLocationNameChangeListener(location, screen);
+//            OnPreferenceChangeListener postalListener = new OnLocationPostalChangeListener(location);
+//            OnPreferenceClickListener  forgetListener = new OnForgetEntityClickListener(this, location);
+//            // We hard-reference them so that the garbage collector does not destroy them
+//            notGarbageChangeListeners.add(nameListener);
+//            notGarbageChangeListeners.add(postalListener);
+//            notGarbageClickListeners.add(forgetListener);
+//
+//            EditTextPreference name = new EditTextPreference(context);
+//            name.setTitle(app.getString(R.string.settings_location_name));
+//            name.setKey(String.format("location_%d_name", location.getId()));
+//            name.setSummary(location.getName());
+//            name.setText(location.getName());
+//            name.setOnPreferenceChangeListener(nameListener);
+//            screen.addPreference(name);
+//
+//            EditTextPreference postal = new EditTextPreference(context);
+//            postal.setTitle(app.getString(R.string.settings_location_address));
+//            postal.setKey(String.format("location_%d_postal", location.getId()));
+//            postal.setSummary(location.getPostal());
+//            postal.setText(location.getPostal());
+//            postal.setOnPreferenceChangeListener(postalListener);
+//            screen.addPreference(postal);
+//
+//            // Forget this location
+//            Preference delLocation = new Preference(context);
+//            delLocation.setTitle(app.getString(R.string.settings_location_forget));
+//            if (canSetIcons) delLocation.setIcon(R.drawable.ic_remove_circle_outline_black_36dp);
+//            delLocation.setOnPreferenceClickListener(forgetListener);
+//            screen.addPreference(delLocation);
+//
+//            locationsCategory.addPreference(screen);
+//        }
+//
+//        // Add a location
+//        Preference addLocation = new Preference(context);
+//        addLocation.setTitle(app.getString(R.string.settings_location_add));
+//        if (canSetIcons) addLocation.setIcon(R.drawable.ic_add_circle_outline_black_36dp);
+//        addLocation.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+//            @Override
+//            public boolean onPreferenceClick(Preference preference) {
+//                Location newLocation = (new Location()).loadDummy();
+//                newLocation.save();
+//                refreshView();
+//                return true;
+//            }
+//        });
+//
+//        locationsCategory.addPreference(addLocation);
 
         // Open the appropriate preference screen
         // This is harder than it seems, and probably harder than it should be.
