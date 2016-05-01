@@ -24,7 +24,7 @@
         android:label="@string/app_name"
         android:theme="@style/Theme.AppCompat"
         >
-        <!-- we should use that ! -->
+        <!-- we should use that ! (probably) -->
         <!--android:allowBackup="true"-->
 
         <!-- Sugar ORM -->
@@ -44,6 +44,7 @@
         <!-- Google API -->
         <!-- Such keys are going to be a problem to handle in a truly open project. -->
         <!-- If you have ideas on how to handle these, I'd like to hear about them. -->
+        <!-- For starters, that key should be provided by the User, using OAuth2.0. -->
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyC9cBthk5qKbc_zW2TtjG9rjRZybzffYqU" />
@@ -51,7 +52,7 @@
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
 
-        <!-- Activities are suffixed by _ for AndroidAnnotations, as it generates subclasses -->
+        <!-- Activities are suffixed by _ for AndroidAnnotations, as it generates subclasses. -->
 
         <!-- Map : the launcher immediately shows the items around the user's location. -->
         <activity
@@ -96,6 +97,7 @@
         </activity>
 
         <!-- App settings -->
+        <!-- This is TOTAL GARBAGE, to be redone from scratch. -->
         <activity
             android:name="org.give2peer.karma.activity.SettingsActivity"
             >
@@ -103,10 +105,10 @@
 
         <!-- Displays a grid of items, from closest to furthest -->
         <!-- NOT USED anymore, might be a good Map fallback when OpenGL 2.0 is unavailable ? -->
-        <activity
-            android:name="org.give2peer.karma.activity.ListAroundActivity"
-            >
-        </activity>
+        <!--<activity-->
+            <!--android:name="org.give2peer.karma.activity.ListAroundActivity"-->
+            <!--&gt;-->
+        <!--</activity>-->
 
     </application>
 
