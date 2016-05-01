@@ -27,6 +27,7 @@ import org.give2peer.karma.entity.Item;
 import org.give2peer.karma.event.AuthoredItemsUpdateEvent;
 import org.give2peer.karma.event.UserUpdateEvent;
 import org.give2peer.karma.exception.CriticalException;
+import org.give2peer.karma.exception.NoInternetException;
 import org.give2peer.karma.response.PrivateProfileResponse;
 import org.give2peer.karma.entity.User;
 import org.greenrobot.eventbus.EventBus;
@@ -411,9 +412,10 @@ public class ProfileActivity extends ActionBarActivity
 
                 } else if (null != e) {
                     String msg = e.toString();
-                    // fixme: this is barbaric, use a global exception handler !
+                    // fixme: this is barbaric, use an exception handler !
                     if (e instanceof HttpHostConnectException ||
-                            e instanceof UnknownHostException) {
+                            e instanceof UnknownHostException ||
+                            e instanceof NoInternetException) {
                         msg = getString(R.string.toast_no_internet_available);
                     } else {
                         app.toasty(msg);
