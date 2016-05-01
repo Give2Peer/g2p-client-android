@@ -258,13 +258,16 @@ public class ProfileActivity extends ActionBarActivity
                 ,"He who cannot be a good follower cannot be a good leader."
                 ,"Where your talents and the needs of the world cross, there lies your vocation."
                 ,"The least deviation from truth will be multiplied later."
-                ,"In girum imus nocte et consumimur igni."
                 ,"..."
                 ,"..."
                 ,"That's all I've got !"
                 ,"Now stop doing that, please !"
                 ,"..."
                 ,"It's starting to hurt !"
+                ,"<meditating to abstract the pain>"
+                ,"..."
+                ,"..."
+                ,"In girum imus nocte et consumimur igni."
                 ,"..."
                 ,"Ouch !"
                 ,"OUCH !"
@@ -275,8 +278,8 @@ public class ProfileActivity extends ActionBarActivity
                 ,"I can't take it anymore..."
                 ,"..."
                 ,"THAT'S IT !"
-                ,"Poke me ONE MORE TIME\nand I'M OUT !"
-                ,"Finally !\nGood riddance."
+                ,"POKE ME ONE MORE TIME\nAND I'M OUT !"
+                ,"<sighing>\nGood riddance."
             )
         );
 

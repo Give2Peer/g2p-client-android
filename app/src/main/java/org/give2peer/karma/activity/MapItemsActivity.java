@@ -19,6 +19,7 @@ import android.view.animation.Interpolator;
 import android.widget.FrameLayout;
 import android.widget.Toast;
 
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -273,8 +274,8 @@ public class      MapItemsActivity
                     findViewById(R.id.noInternetTextView).setVisibility(View.GONE);
                 }
 
+                // Now, either we found items or we didn't (TQ: maybe the app crashed :3)
                 int itemsCount = items.size();
-
                 if (itemsCount == 0) {
                     // There were no items found
                     app.toast("No items were found in this area.", Toast.LENGTH_LONG);
@@ -282,12 +283,30 @@ public class      MapItemsActivity
                     // Collect the LatLngs to zoom and pan the camera ideally
                     LatLngBounds.Builder bc = new LatLngBounds.Builder();
 
-                    // todo : Use our own custom InfoWindowAdapter ?
+                    // todo : Use a custom InfoWindowAdapter to add an image ?
+                    //        ...lots of caveats with this canvas drawing technique !
+
+                    // As we don't want to zoom in to the max when all the items are at the
+                    // exact same position (usually when there is only one item), we also
+                    // include in the builder coordinates around the item, to ensure a minimal
+                    // level of zoom higher than the vendor's minimal level of zoom.
+                    // Note: our method will have artifacts around poles, but WHO CARES ?!
+                    double latPad = 180. / 30000;
+                    double lngPad = 360. / 60000;
 
                     for (int i=0; i<itemsCount; i++) {
                         Item item = items.get(i);
 
+                        // Add coordinates to the boundaries builder
                         bc.include(item.getLatLng());
+
+                        // And coordinates of our padding
+                        double lat = item.getLatitude();
+                        double lng = item.getLongitude();
+                        bc.include(new LatLng(lat+latPad, lng)); // north (or south)
+                        bc.include(new LatLng(lat-latPad, lng)); // south (or north)
+                        bc.include(new LatLng(lat, lng-lngPad)); // east (or west)
+                        bc.include(new LatLng(lat, lng+lngPad)); // west (or east)
 
                         Marker m = googleMap.addMarker(
                                 new MarkerOptions()
@@ -303,7 +322,9 @@ public class      MapItemsActivity
                     }
 
                     // Pan and zoom the camera
+                    //CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bc.build(), 55);
                     googleMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bc.build(), 55));
+
 
                     googleMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
                         @Override
