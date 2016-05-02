@@ -48,6 +48,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class      MapItemsActivity
        extends    LocatorActivity
@@ -63,7 +64,10 @@ public class      MapItemsActivity
 
     ArrayList<LatLng> drawingCoordinates = new ArrayList<>();
 
-    HashSet<Item> displayedItems = new HashSet<>();
+    /**
+     * A set of displayed items on the map, to avoid duplicates when you make another request.
+     */
+    Set<Item> displayedItems = new HashSet<>();
 
     int lineColor = 0xFFFF3399;
     int fillColor = 0x33FF3399;
@@ -93,6 +97,15 @@ public class      MapItemsActivity
 
             // todo: show a help view, and/or the "report a bug" button.
         }
+    }
+
+    @Override
+    protected void onResume()
+    {
+        super.onResume();
+        // Empty the cache, because map is emptied sometimes ?
+        // Trying to fix bug #1 https://github.com/Give2Peer/g2p-client-android/issues/1
+        displayedItems = new HashSet<>();
     }
 
     @Override
