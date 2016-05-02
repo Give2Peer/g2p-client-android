@@ -85,20 +85,15 @@ We're very interested in benchmarking these apps against each other.
 
 
 
-1.0.0
+2.0.0
 -----
 
-A version for everybody, working as early as API 10 (Android 3.0 Gingerbread).
+A version for open beta-testing, working as early as API 10 (Android 3.0 Gingerbread).
 
-This version (and all of `1.x.x`) will not have a proper layout for tablets, and will be ugly,
-but it will have a very extensive hardware support, and will be kept published as fallback for
-users that won't be able to run the `2.x.x`.
-
-- [ ] Design:  a launcher icon. _(fake it 'til you make it)_
 - [ ] Feature: a whole activity dedicated to statistics of the server usage.
 - [ ] Feature: propose deletion of items submitted by someone else. (tricky)
 - [ ] Feature: provide a lifespan to items I tag (lifespans depend on the user karmic level)
-- [ ] Translation: french.
+- [ ] Translation: français.
 - [ ] Translation: español.
 - [ ] Feature: add a new Item offline, upload later. (lots of work)
 - [ ] Feature: warn the user that the app is unavailable during server maintenance.
@@ -108,22 +103,22 @@ users that won't be able to run the `2.x.x`.
 - [ ] Feature: edit items I authored in my profile.
 - [ ] Feature: delete items I authored in my profile.
 - [ ] Feature: change your username when level 1, against 9 karma points.
+- [ ] Feature: add your email to your user account
+- [ ] Feature: log in with existing user account
+- [ ] Feature: ask for new credentials with email
 
 
 
-1.0.0-alpha1 (01-05-16)
------------------------
+1.0.0 (01-05-16)
+----------------
 
-A version for the alpha community, released on Google Play.
+A version for the alpha community, released privately on Google Play.
 
 This version will be available by invitation only.
 
 - [x] Feature: see item details
 - [x] Bugfix: support for images shared through browser downloads and others
-- [ ] Feature: add your email to your user account
-- [ ] Feature: log in with existing user account
-- [ ] Feature: ask for new credentials with email
-
+- [x] Design:  a launcher icon. _(Kiouze FTW)_
 
 
 0.4.0 (28-04-16)
