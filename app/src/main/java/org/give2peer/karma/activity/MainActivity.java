@@ -96,7 +96,7 @@ public class MainActivity extends ActionBarActivity
     public void onMapItems(View view)
     {
         // Start the "map items" activity
-        Intent intent = new Intent(this, MapItemsActivity.class);
+        Intent intent = new Intent(this, MapItemsActivity_.class);
         //intent.putExtra("page", 0);
         startActivity(intent);
     }

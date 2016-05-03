@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
@@ -20,6 +21,7 @@ import android.os.Build;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -40,7 +42,7 @@ import com.shamanland.fab.FloatingActionButton;
 import net.danlew.android.joda.JodaTimeAndroid;
 
 import org.give2peer.karma.activity.LoginActivity_;
-import org.give2peer.karma.activity.MapItemsActivity;
+import org.give2peer.karma.activity.MapItemsActivity_;
 import org.give2peer.karma.activity.NewItemActivity_;
 import org.give2peer.karma.activity.ProfileActivity_;
 import org.give2peer.karma.activity.SettingsActivity;
@@ -250,7 +252,7 @@ public class Application extends SugarApp
 
     public void launchMap(Activity activity)
     {
-        launchActivity(activity, MapItemsActivity.class);
+        launchActivity(activity, MapItemsActivity_.class);
     }
 
     public void launchProfile(Activity activity)
@@ -610,6 +612,18 @@ public class Application extends SugarApp
         return PreferenceManager.getDefaultSharedPreferences(this);
     }
 
+    /**
+     * Converts dpi to pixels, because Android's API is stupid. See `PopupWindow`.
+     * Seriously, Google ! I suck, but you shouldn't !
+     */
+    public int dpi2pix(int dpi)
+    {
+        return (int) TypedValue.applyDimension(
+                TypedValue.COMPLEX_UNIT_DIP,  dpi,
+                getResources().getDisplayMetrics()
+        );
+    }
+
 
     // SERVICES ////////////////////////////////////////////////////////////////////////////////////
 
@@ -664,7 +678,16 @@ public class Application extends SugarApp
             // Create a 300px width and 485px height PopupWindow
             // It's BAD to set the dimensions like that ! Wow ! No !
             // pw = new PopupWindow(layout); // but ... nope,
-            pw = new PopupWindow(layout, 300, 485, true);
+            int widthDpi = 200;
+            int heightDpi = 324; // ~= width * 1.618
+
+            Resources r = getResources();
+            int widthPix = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, widthDpi, r.getDisplayMetrics());
+            int heightPix = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, heightDpi, r.getDisplayMetrics());
+
+            Log.d("G2P", String.format("Popup %dx%d", widthPix, heightPix));
+
+            pw = new PopupWindow(layout, widthPix, heightPix, true);
             pw.setFocusable(true);
             // pw.setAnimationStyle(R.anim.abc_popup_enter); // good try, does nothing
 

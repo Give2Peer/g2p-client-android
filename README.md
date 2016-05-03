@@ -114,6 +114,7 @@ A version for open beta-testing, working as early as API 10 (Android 3.0 Gingerb
 ----------------
 
 - [x] Bugfix: switching from map to profile and map again launches a new instance of the map
+- [x] Bugfix: item popup window of the wrong size on high dpi screens
 
 
 1.0.0 (01-05-16)
