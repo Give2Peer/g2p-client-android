@@ -115,6 +115,7 @@ A version for open beta-testing, working as early as API 10 (Android 3.0 Gingerb
 
 - [x] Bugfix: switching from map to profile and map again launches a new instance of the map
 - [x] Bugfix: item popup window of the wrong size on high dpi screens
+- [x] Bugfix: issue #1 : items sometimes disappear from the map
 
 
 1.0.0 (01-05-16)
@@ -122,7 +123,7 @@ A version for open beta-testing, working as early as API 10 (Android 3.0 Gingerb
 
 A version for the alpha community, released privately on Google Play.
 
-This version will be available by invitation only.
+This version (and all of 1.x) will be available by invitation only.
 
 - [x] Feature: see item details
 - [x] Bugfix: support for images shared through browser downloads and others

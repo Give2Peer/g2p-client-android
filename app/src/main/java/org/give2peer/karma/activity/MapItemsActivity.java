@@ -76,7 +76,7 @@ public class      MapItemsActivity
     /**
      * A set of displayed items on the map, to avoid duplicates when you make another request.
      */
-    Set<Item> displayedItems = new HashSet<>();
+    List<Item> displayedItems = new ArrayList<>();
 
     int lineColor = 0x88FF3399;
     int fillColor = 0x33FF3399;
@@ -105,7 +105,7 @@ public class      MapItemsActivity
     }
 
     @Subscribe
-    protected void loadMap(AuthenticationEvent authenticationEvent)
+    public void loadMap(AuthenticationEvent authenticationEvent)
     {
         if (authenticationEvent.isFailure()) {
             hideLoader();
@@ -145,9 +145,10 @@ public class      MapItemsActivity
     {
         super.onResume();
 
-        // Empty the cache, because map is emptied sometimes ?
-        // Trying to fix bug #1 https://github.com/Give2Peer/g2p-client-android/issues/1
-        //displayedItems = new HashSet<>();
+        if ( ! displayedItems.isEmpty() && null != googleMap) {
+            Log.d("G2P", "Zooming in on items when resuming map activity.");
+            zoomOnItems(googleMap, displayedItems);
+        }
     }
 
     @Override
@@ -294,6 +295,7 @@ public class      MapItemsActivity
                 }
 
                 // Add to the cache
+                displayedItems.clear();
                 displayedItems.addAll(filteredItems);
 
                 return filteredItems;
@@ -324,33 +326,13 @@ public class      MapItemsActivity
                     // There were no items found
                     app.toast("No items were found in this area.", Toast.LENGTH_LONG);
                 } else {
-                    // Collect the LatLngs to zoom and pan the camera ideally
-                    LatLngBounds.Builder bc = new LatLngBounds.Builder();
 
                     // todo : Use a custom InfoWindowAdapter to add an image ?
                     //        but there are lots of caveats with this canvas drawing technique !
 
-                    // As we don't want to zoom in to the max when all the items are at the
-                    // exact same position (usually when there is only one item), we also
-                    // include in the builder coordinates around the item, to ensure a minimal
-                    // level of zoom higher than the vendor's minimal level of zoom.
-                    // Note: our method will have artifacts around poles, but WHO CARES ?!
-                    double latPad = 180. / 30000;
-                    double lngPad = 360. / 60000;
-
+                    // Add markers to the map
                     for (int i=0; i<itemsCount; i++) {
                         Item item = items.get(i);
-
-                        // Add coordinates to the boundaries builder
-                        bc.include(item.getLatLng());
-
-                        // And coordinates of our padding
-                        double lat = item.getLatitude();
-                        double lng = item.getLongitude();
-                        bc.include(new LatLng(lat+latPad, lng)); // north (or south)
-                        bc.include(new LatLng(lat-latPad, lng)); // south (or north)
-                        bc.include(new LatLng(lat, lng-lngPad)); // east (or west)
-                        bc.include(new LatLng(lat, lng+lngPad)); // west (or east)
 
                         Marker m = googleMap.addMarker(
                                 new MarkerOptions()
@@ -365,10 +347,8 @@ public class      MapItemsActivity
                         markerItemHashMap.put(m, item);
                     }
 
-                    // Pan and zoom the camera
-                    //CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bc.build(), 55);
-                    googleMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bc.build(), 55));
-
+                    // Zoom on items
+                    zoomOnItems(googleMap, items);
 
                     googleMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
                         @Override
@@ -506,6 +486,41 @@ public class      MapItemsActivity
         );
 
     }
+
+    protected void zoomOnItems(GoogleMap googleMap, List<Item> items)
+    {
+        // Collect the LatLngs to zoom and pan the camera ideally
+        LatLngBounds.Builder bc = new LatLngBounds.Builder();
+
+        // As we don't want to zoom in to the max when all the items are at the
+        // exact same position (usually when there is only one item), we also
+        // include in the builder coordinates around the item, to ensure a minimal
+        // level of zoom higher than the vendor's minimal level of zoom.
+        // Note: our method will have artifacts around poles, but WHO CARES ?!
+        double latPad = 180. / 30000;
+        double lngPad = 360. / 60000;
+
+        int itemsCount = items.size();
+        for (int i=0; i<itemsCount; i++) {
+            Item item = items.get(i);
+
+            // Add coordinates to the boundaries builder
+            bc.include(item.getLatLng());
+
+            // And coordinates of our padding
+            double lat = item.getLatitude();
+            double lng = item.getLongitude();
+            bc.include(new LatLng(lat+latPad, lng)); // north (or south)
+            bc.include(new LatLng(lat-latPad, lng)); // south (or north)
+            bc.include(new LatLng(lat, lng-lngPad)); // east (or west)
+            bc.include(new LatLng(lat, lng+lngPad)); // west (or east)
+        }
+
+        // Pan and zoom the camera
+        //CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bc.build(), 55);
+        googleMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bc.build(), 55));
+    }
+
 
     private void showLoader()
     {

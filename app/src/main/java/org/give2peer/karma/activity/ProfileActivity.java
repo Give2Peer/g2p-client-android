@@ -294,7 +294,7 @@ public class ProfileActivity extends ActionBarActivity
             titleScenarioToast.cancel();
         }
 
-        String msg = scenario.get(titleScenarioProgress);
+        String msg = scenario.get(titleScenarioProgress % scenario.size());
 
         titleScenarioToast = Toast.makeText(this, msg, Toast.LENGTH_SHORT);
         titleScenarioToast.show();
