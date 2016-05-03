@@ -106,7 +106,14 @@ A version for open beta-testing, working as early as API 10 (Android 3.0 Gingerb
 - [ ] Feature: add your email to your user account
 - [ ] Feature: log in with existing user account
 - [ ] Feature: ask for new credentials with email
+- [ ] Feature: show items around as a list from closest to furthest
 
+
+
+1.0.1 (03-05-16)
+----------------
+
+- [x] Bugfix: switching from map to profile and map again launches a new instance of the map
 
 
 1.0.0 (01-05-16)
