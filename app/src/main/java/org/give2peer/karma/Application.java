@@ -49,11 +49,13 @@ import org.give2peer.karma.activity.SettingsActivity;
 import org.give2peer.karma.entity.Location;
 import org.give2peer.karma.entity.Server;
 import org.give2peer.karma.entity.Item;
+import org.give2peer.karma.event.AuthenticationEvent;
 import org.give2peer.karma.exception.GeocodingException;
 import org.give2peer.karma.exception.NoInternetException;
 import org.give2peer.karma.listener.GoogleApiClientListener;
 import org.give2peer.karma.response.RegistrationResponse;
 import org.give2peer.karma.service.RestService;
+import org.greenrobot.eventbus.EventBus;
 import org.ocpsoft.prettytime.PrettyTime;
 
 import java.io.IOException;
@@ -210,6 +212,7 @@ public class Application extends SugarApp
                     if (null != response) {
                         Log.d("G2P", "Pre-registered successfully.");
                         toasty(String.format(getString(R.string.toast_preregistration_welcome), response.getUser().getPrettyUsername()));
+                        EventBus.getDefault().post(new AuthenticationEvent(true));
                     } else if (null != exception) {
                         // fixme : ExceptionHandler OOOOOPS what to do here ?
                         if (exception instanceof NoInternetException) {
@@ -218,6 +221,7 @@ public class Application extends SugarApp
                             Log.d("G2P", "Failed to pre-register.");
                             exception.printStackTrace();
                         }
+                        EventBus.getDefault().post(new AuthenticationEvent(false));
 
                     } else {
                         // Should never EVER happen, right ?
@@ -226,6 +230,8 @@ public class Application extends SugarApp
                 }
             }.execute();
 
+        } else {
+            EventBus.getDefault().post(new AuthenticationEvent(true));
         }
     }
 

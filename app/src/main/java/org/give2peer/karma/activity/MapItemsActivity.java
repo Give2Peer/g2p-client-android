@@ -38,12 +38,17 @@ import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.shamanland.fab.FloatingActionButton;
 
+import org.androidannotations.annotations.AfterExtras;
+import org.androidannotations.annotations.AfterInject;
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.EActivity;
 import org.give2peer.karma.Application;
 import org.give2peer.karma.entity.Item;
 import org.give2peer.karma.R;
+import org.give2peer.karma.event.AuthenticationEvent;
 import org.give2peer.karma.response.FindItemsResponse;
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -73,9 +78,9 @@ public class      MapItemsActivity
      */
     Set<Item> displayedItems = new HashSet<>();
 
-    int lineColor = 0x00FF3399;
-    int fillColor = 0x00FF3399;
-    int fillAlpha = 0x88000000;
+    int lineColor = 0x88FF3399;
+    int fillColor = 0x33FF3399;
+    int fillAlpha = 0x55000000;
 
 
     @Override
@@ -84,14 +89,33 @@ public class      MapItemsActivity
         super.onCreate(savedInstanceState);
     }
 
-    @AfterViews
-    protected void loadMap()
+    @Override
+    public void onStart()
     {
-        // If the user is not authenticated, take care of it
-        app.requireAuthentication(this);
+        super.onStart();
+        if ( ! EventBus.getDefault().isRegistered(this))
+            EventBus.getDefault().register(this);
+    }
+
+    @Override
+    public void onStop()
+    {
+        EventBus.getDefault().unregister(this);
+        super.onStop();
+    }
+
+    @Subscribe
+    protected void loadMap(AuthenticationEvent authenticationEvent)
+    {
+        if (authenticationEvent.isFailure()) {
+            hideLoader();
+            findViewById(R.id.noInternetTextView).setVisibility(View.VISIBLE);
+            return;
+        }
 
         // I never had a failure there, but better safe than sorry !
         try {
+            Log.d("G2P", "Loading the map fragment...");
             SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                     .findFragmentById(R.id.mapItemsFragment);
             mapFragment.getMapAsync(this);
@@ -101,9 +125,19 @@ public class      MapItemsActivity
             e.printStackTrace();
 
             app.toast("Failed to load the map on this device. Sorry!\nPlease report this !");
-
-            // todo: show a help view, and/or the "report a bug" button.
         }
+    }
+
+    @AfterViews
+    protected void authenticate()
+    {
+        // This is not good.
+        // onStart() is called AFTER this method, and so nobody listens to AuthenticationEvent
+        if ( ! EventBus.getDefault().isRegistered(this))
+            EventBus.getDefault().register(this);
+
+        // If the user is not authenticated, take care of it
+        app.requireAuthentication(this);
     }
 
     @Override
@@ -229,38 +263,40 @@ public class      MapItemsActivity
                     Collections.addAll(items, itemsResponse.getItems());
                 }
 
+                ArrayList<Item> filteredItems = new ArrayList<Item>();
+                filteredItems.addAll(items);
+
                 // Remove duplicates (comparing getId)
                 // This logic should probably reside in an ItemsCache or some such
                 // pretty sure this does work but causes bugs
-                ArrayList<Item> newItems = new ArrayList<Item>();
-                for (Item newItem : items) {
-                    boolean alreadyThere = false;
-                    for (Item oldItem: displayedItems) {
-                        Log.d("G2P", String.format("Comparing %d and %d", newItem.getId(), oldItem.getId()));
-                        if (newItem.getId() == oldItem.getId()) {
-                            alreadyThere = true;
-                            Log.d("G2P", "Item already fetched, and subsequently ignored.");
-                            break;
-                        }
-                    }
-                    if (!alreadyThere) newItems.add(newItem);
-                }
+//                for (Item newItem : items) {
+//                    boolean alreadyThere = false;
+//                    for (Item oldItem: displayedItems) {
+//                        Log.d("G2P", String.format("Comparing %d and %d", newItem.getId(), oldItem.getId()));
+//                        if (newItem.getId() == oldItem.getId()) {
+//                            alreadyThere = true;
+//                            Log.d("G2P", "Item already fetched, and subsequently ignored.");
+//                            break;
+//                        }
+//                    }
+//                    if (!alreadyThere) filteredItems.add(newItem);
+//                }
 
                 // Remove items outside of container polygon (if specified)
                 if (container != null) {
-                    items = newItems;
-                    newItems = new ArrayList<Item>();
+                    items = filteredItems;
+                    filteredItems = new ArrayList<Item>();
                     for (Item item : items) {
                         if (pointInPolygon(item.getLatLng(), container)) {
-                            newItems.add(item);
+                            filteredItems.add(item);
                         }
                     }
                 }
 
                 // Add to the cache
-                displayedItems.addAll(newItems);
+                displayedItems.addAll(filteredItems);
 
-                return newItems;
+                return filteredItems;
             }
 
             @Override
@@ -292,7 +328,7 @@ public class      MapItemsActivity
                     LatLngBounds.Builder bc = new LatLngBounds.Builder();
 
                     // todo : Use a custom InfoWindowAdapter to add an image ?
-                    //        ...lots of caveats with this canvas drawing technique !
+                    //        but there are lots of caveats with this canvas drawing technique !
 
                     // As we don't want to zoom in to the max when all the items are at the
                     // exact same position (usually when there is only one item), we also
@@ -436,10 +472,13 @@ public class      MapItemsActivity
                             case MotionEvent.ACTION_DOWN: // the finger touches the screen
                                 drawingCoordinates.clear();
                                 drawingCoordinates.add(latLng);
+
                                 drawPolylineOnMap(googleMap, drawingCoordinates);
                                 break;
 
                             case MotionEvent.ACTION_UP:   // the finger leaves the screen
+
+                                googleMap.clear();
                                 drawPolygonOnMap(googleMap, drawingCoordinates);
 
                                 isDrawing = false;
