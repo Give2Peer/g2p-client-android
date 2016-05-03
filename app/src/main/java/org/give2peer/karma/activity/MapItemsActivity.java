@@ -38,6 +38,8 @@ import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.shamanland.fab.FloatingActionButton;
 
+import org.androidannotations.annotations.AfterViews;
+import org.androidannotations.annotations.EActivity;
 import org.give2peer.karma.Application;
 import org.give2peer.karma.entity.Item;
 import org.give2peer.karma.R;
@@ -50,6 +52,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+
+@EActivity(R.layout.activity_map_items)
 public class      MapItemsActivity
        extends    LocatorActivity
        implements OnMapReadyCallback
@@ -69,17 +73,20 @@ public class      MapItemsActivity
      */
     Set<Item> displayedItems = new HashSet<>();
 
-    int lineColor = 0xFFFF3399;
-    int fillColor = 0x33FF3399;
-    int fillAlpha = 0x55000000;
+    int lineColor = 0x00FF3399;
+    int fillColor = 0x00FF3399;
+    int fillAlpha = 0x88000000;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_map_items);
+    }
 
+    @AfterViews
+    protected void loadMap()
+    {
         // If the user is not authenticated, take care of it
         app.requireAuthentication(this);
 
@@ -93,7 +100,7 @@ public class      MapItemsActivity
             Log.e("G2P", e.getMessage());
             e.printStackTrace();
 
-            app.toast("Failed to load the map on this device. Sorry!");
+            app.toast("Failed to load the map on this device. Sorry!\nPlease report this !");
 
             // todo: show a help view, and/or the "report a bug" button.
         }
@@ -103,9 +110,10 @@ public class      MapItemsActivity
     protected void onResume()
     {
         super.onResume();
+
         // Empty the cache, because map is emptied sometimes ?
         // Trying to fix bug #1 https://github.com/Give2Peer/g2p-client-android/issues/1
-        displayedItems = new HashSet<>();
+        //displayedItems = new HashSet<>();
     }
 
     @Override
@@ -133,19 +141,6 @@ public class      MapItemsActivity
     }
 
     //// ACTIONS ///////////////////////////////////////////////////////////////////////////////////
-
-    public void launchBugReport()
-    {
-        Intent i = new Intent(Intent.ACTION_VIEW);
-        i.setData(Uri.parse(Application.REPORT_BUG_URL));
-        startActivity(i);
-    }
-
-    public void launchSettings()
-    {
-        Intent intent = new Intent(this, SettingsActivity.class);
-        startActivity(intent);
-    }
 
     public void onDrawButton(View button)
     {
