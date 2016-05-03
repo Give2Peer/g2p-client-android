@@ -236,7 +236,7 @@ public class      MapItemsActivity
 
                 // Remove duplicates (comparing getId)
                 // This logic should probably reside in an ItemsCache or some such
-                // pretty sure this does NOT work right now fixme
+                // pretty sure this does work but causes bugs
                 ArrayList<Item> newItems = new ArrayList<Item>();
                 for (Item newItem : items) {
                     boolean alreadyThere = false;

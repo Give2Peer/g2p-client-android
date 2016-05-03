@@ -250,19 +250,25 @@ public class Application extends SugarApp
 
     public void launchMap(Activity activity)
     {
-        Intent intent = new Intent(this, MapItemsActivity.class);
-        activity.startActivity(intent);
+        launchActivity(activity, MapItemsActivity.class);
     }
 
     public void launchProfile(Activity activity)
     {
-        Intent intent = new Intent(this, ProfileActivity_.class);
-        activity.startActivity(intent);
+        launchActivity(activity, ProfileActivity_.class);
     }
 
     public void launchSettings(Activity activity)
     {
-        Intent intent = new Intent(this, SettingsActivity.class);
+        launchActivity(activity, SettingsActivity.class);
+    }
+
+    public void launchActivity(Activity activity, Class<?> activityClass )
+    {
+        // Unsure why we use `this` (the Application) as context for the Intent and not `activity`.
+        Intent intent = new Intent(this, activityClass);
+        // Make sure we don't re-create a new activity if we already have one running
+        intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
         activity.startActivity(intent);
     }
 
