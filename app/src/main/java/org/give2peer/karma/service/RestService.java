@@ -12,7 +12,6 @@ import org.apache.http.HttpEntity;
 import org.apache.http.HttpRequest;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
-import org.apache.http.auth.AuthenticationException;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
@@ -31,6 +30,7 @@ import org.apache.http.util.EntityUtils;
 import org.apache.http.util.ExceptionUtils;
 import org.give2peer.karma.entity.Item;
 import org.give2peer.karma.adapter.DateTimeTypeAdapter;
+import org.give2peer.karma.exception.AuthenticationException;
 import org.give2peer.karma.exception.BadConfigException;
 import org.give2peer.karma.exception.CriticalException;
 import org.give2peer.karma.exception.NoInternetException;
@@ -81,6 +81,7 @@ public class RestService
      */
     static int ITEMS_PER_PAGE = 64;
 
+    // See the routes at http://g2p.give2peer.org
     static String ROUTE_HELLO        = "/hello";
     static String ROUTE_CHECK        = "/check";
     static String ROUTE_USER         = "/user";
@@ -139,14 +140,14 @@ public class RestService
     // HTTP QUERIES : ITEMS ////////////////////////////////////////////////////////////////////////
 
     public FindItemsResponse findAroundPaginated(double latitude, double longitude, int page)
-            throws AuthorizationException, MaintenanceException,
+            throws AuthorizationException, MaintenanceException, AuthenticationException,
             QuotaException, BadConfigException, ErrorResponseException,
             CriticalException, NoInternetException {
         return findAround(latitude, longitude, page * ITEMS_PER_PAGE);
     }
 
     public FindItemsResponse findAround(double latitude, double longitude)
-            throws AuthorizationException, MaintenanceException,
+            throws AuthorizationException, MaintenanceException, AuthenticationException,
             QuotaException, BadConfigException, ErrorResponseException,
             CriticalException, NoInternetException {
         return findAround(latitude, longitude, 0);
@@ -157,7 +158,7 @@ public class RestService
      * Pages start at 0, and hold `ITEMS_PER_PAGE` items per page.
      */
     public FindItemsResponse findAround(double latitude, double longitude, int offset)
-            throws AuthorizationException, MaintenanceException,
+            throws AuthorizationException, MaintenanceException, AuthenticationException,
             QuotaException, BadConfigException, ErrorResponseException,
             CriticalException, NoInternetException {
         String route = ROUTE_ITEMS_AROUND.replaceAll("\\{latitude\\}",  String.valueOf(latitude))
@@ -186,7 +187,7 @@ public class RestService
             throws
             AuthorizationException, QuotaException, MaintenanceException,
             ErrorResponseException, NoInternetException, BadConfigException,
-            CriticalException
+            CriticalException, AuthenticationException
     {
         HashMap<String, String> params = new HashMap<String, String>();
         params.put("location", item.getLocation());
@@ -217,7 +218,7 @@ public class RestService
     public PictureItemResponse pictureItem(Item item, File picture)
             throws
             CriticalException, AuthorizationException, QuotaException, MaintenanceException,
-            NoInternetException, BadConfigException, ErrorResponseException
+            NoInternetException, BadConfigException, ErrorResponseException, AuthenticationException
     {
         String route = ROUTE_ITEM_PICTURE.replaceAll("\\{id\\}", item.getId().toString());
 
@@ -245,7 +246,7 @@ public class RestService
                     // see method below for more details
                     ErrorResponseException, UnavailableUsernameException, UnavailableEmailException,
                     AuthorizationException, MaintenanceException, QuotaException, CriticalException,
-                    BadConfigException, NoInternetException
+                    BadConfigException, NoInternetException, AuthenticationException
     {
         return register("", "", "");
     }
@@ -253,12 +254,13 @@ public class RestService
     public RegistrationResponse register(String username, String password, String email)
             throws
                 UnavailableUsernameException, UnavailableEmailException // obvious
-                , ErrorResponseException // never if we implement everything the server responds
-                , AuthorizationException // server credentials don't check out -> BadConfigError
-                , MaintenanceException   // such pro, very maintain wow
-                , CriticalException      // we want to know when they happen
+                , ErrorResponseException  // never if we implement everything the server responds
+                , AuthorizationException  // user is not allowed to so that
+                , AuthenticationException // server credentials don't check out
+                , MaintenanceException    // such pro, very maintain wow
+                , CriticalException       // we want to know when they happen
                 , QuotaException
-                , BadConfigException     // something is badly configured ! User's fault, 99.99%
+                , BadConfigException      // something is badly configured ! User's fault, 99.99%
                 , NoInternetException
 
     {
@@ -288,7 +290,7 @@ public class RestService
      */
     public PrivateProfileResponse getProfile()
             throws
-            AuthorizationException, QuotaException, MaintenanceException,
+            AuthorizationException, AuthenticationException, QuotaException, MaintenanceException,
             NoInternetException, ErrorResponseException, BadConfigException, CriticalException
     {
         String json = getJson(ROUTE_USER);
@@ -325,7 +327,7 @@ public class RestService
      */
     public boolean checkServer()
             throws
-            AuthorizationException, MaintenanceException, QuotaException,
+            AuthorizationException, AuthenticationException, MaintenanceException, QuotaException,
             NoInternetException, ErrorResponseException, BadConfigException, CriticalException {
         String json = getJson(ROUTE_HELLO, new HashMap<String, String>(), false);
         return json.equals("\"pong\"");
@@ -344,7 +346,7 @@ public class RestService
      */
     public boolean checkServerAndAuthentication()
             throws
-            AuthorizationException, MaintenanceException, QuotaException,
+            AuthorizationException, AuthenticationException, MaintenanceException, QuotaException,
             NoInternetException, ErrorResponseException, BadConfigException, CriticalException {
         String json = getJson(ROUTE_CHECK);
         return json.equals("\"pong\"");
@@ -370,26 +372,33 @@ public class RestService
      *
      * @param request The request to authenticate
      */
-    protected void authenticate(HttpRequest request) throws AuthenticationException
+    protected void authenticate(HttpRequest request) throws CriticalException
     {
-        BasicScheme scheme = new BasicScheme();
-        Header authorizationHeader = scheme.authenticate(getCredentials(), request);
-        request.addHeader(authorizationHeader);
+        try {
+            BasicScheme scheme = new BasicScheme();
+            Header authorizationHeader = scheme.authenticate(getCredentials(), request);
+            request.addHeader(authorizationHeader);
+        } catch (org.apache.http.auth.AuthenticationException e) {
+            // This AuthenticationException is when apache fails to set HTTPAuth headers.
+            // If this happens, the app is useless. So, very much critical. Never happened yet.
+            // This is NOT our AuthenticationException that happens when credentials don't check out
+            // This is much more dire than that: the app has failed before even asking.
+            String msg = "Apache failed to set headers for `%s`.";
+            throw new CriticalException(String.format(msg, request.getRequestLine().getUri()), e);
+        }
     }
 
     public String getJson(String route)
             throws
             CriticalException, MaintenanceException, QuotaException, ErrorResponseException,
-            NoInternetException, BadConfigException, AuthorizationException
-    {
+            NoInternetException, BadConfigException, AuthorizationException, AuthenticationException {
         return this.getJson(route, new HashMap<String, String>(), true);
     }
 
     public String getJson(String route, HashMap<String, String> parameters)
             throws
             AuthorizationException, QuotaException, MaintenanceException, ErrorResponseException,
-            CriticalException, BadConfigException, NoInternetException
-    {
+            CriticalException, BadConfigException, NoInternetException, AuthenticationException {
         return getJson(route, parameters, true);
     }
 
@@ -403,24 +412,23 @@ public class RestService
     public String getJson(String route, HashMap<String, String> parameters, boolean authenticated)
             throws
             AuthorizationException, QuotaException, MaintenanceException, ErrorResponseException,
-            CriticalException, BadConfigException, NoInternetException
-    {
+            CriticalException, BadConfigException, NoInternetException, AuthenticationException {
         return requestJson(METHOD_GET, route, parameters, authenticated, null);
     }
 
 
-    public String postJson(String route, HashMap<String, String> parameters) throws CriticalException, AuthorizationException, QuotaException, MaintenanceException, NoInternetException, BadConfigException, ErrorResponseException {
+    public String postJson(String route, HashMap<String, String> parameters) throws CriticalException, AuthorizationException, QuotaException, MaintenanceException, NoInternetException, BadConfigException, ErrorResponseException, AuthenticationException {
         return postJson(route, parameters, true);
     }
 
 
-    public String postJson(String route, HashMap<String, String> parameters, boolean authenticated) throws CriticalException, AuthorizationException, QuotaException, MaintenanceException, NoInternetException, BadConfigException, ErrorResponseException {
+    public String postJson(String route, HashMap<String, String> parameters, boolean authenticated) throws CriticalException, AuthorizationException, QuotaException, MaintenanceException, NoInternetException, BadConfigException, ErrorResponseException, AuthenticationException {
         return requestJson(METHOD_POST, route, parameters, authenticated, null);
     }
 
     /**
      * This is the heart of darkness.
-     * Pretty much every HTTP request goes through here.
+     * Pretty much every HTTP request to the API goes through here.
      *
      * => Retrofit, please !
      *
@@ -445,7 +453,8 @@ public class RestService
             throws
             UnavailableUsernameException, UnavailableEmailException // obvious
             , ErrorResponseException // never if we implement everything the server responds
-            , AuthorizationException // server credentials don't check out -> BadConfigError
+            , AuthenticationException // server credentials don't check out
+            , AuthorizationException // user is not allowed to do that
             , MaintenanceException   // such pro, very maintain wow
             , CriticalException      // we want to know when they happen
             , QuotaException         // (daily) quotas were exceeded
@@ -527,20 +536,69 @@ public class RestService
             json = EntityUtils.toString(response.getEntity(), "UTF-8");
 
             // Inspect the response and throw accordingly
-            inspectResponseForErrors(response);
+//            inspectResponseForErrors(response);
+
+
+            // A lot of things can go wrong with each request
+            int code = response.getStatusLine().getStatusCode();
+
+            if (code >= 400) {
+                if (code == 401) {
+                     throw new AuthenticationException(); // unsure if the response is valid JSON
+                }
+                if (code == 403) {
+                     throw new AuthorizationException(); // we could also use the JSON response
+                }
+                if (code == 404) {
+                    // 1. when you badly configured the server URL
+                    throw new BadConfigException(currentServer);
+                    // 2. when querying a deleted entity (it WILL happen someday)
+//                throw new OutOfSyncException();
+                    // which should not be decided here, this should simply throw a NotFoundException
+                    // and let the parent decide.
+                }
+                if (code == 429) {
+                    throw new QuotaException(); // we could also use the JSON response
+                }
+                if (code >= 500) {
+                    throw new MaintenanceException(); // there's no json response right now I think
+                }
+
+                // ... fixme: what about other codes ?
+
+                ErrorResponse errorResponse = null;
+
+                try {
+                    Gson gson = createGson();
+                    errorResponse = gson.fromJson(json, ErrorResponse.class);
+                } catch (JsonSyntaxException e) {
+                    String m = "No JSON on a %d on %s :\n%s";
+                    throw new CriticalException(String.format(m, code, request.getURI(), json), e);
+                }
+
+                if (null == errorResponse) {
+                    // This can happen only if you change the code above, which might happen out of
+                    // annoyance because the critical above may happen a lot until the server is OK.
+                    throw new CriticalException("NEIN ! ... NEIN !");
+                } else {
+                    if (errorResponse.isBadEmail()) {
+                        throw new UnavailableEmailException(errorResponse);
+                    }
+                    if (errorResponse.isBadUsername()) {
+                        throw new UnavailableUsernameException(errorResponse);
+                    }
+                }
+
+                // The default, for what we don't yet explicitely support
+                throw new ErrorResponseException(errorResponse);
+            }
+
+
+
 
         } catch (URISyntaxException e) {
             // That's on the user ; probably entered a wrong URI in the server config.
-            throw new BadConfigException(BadConfigException.URL, url, e);
-
-        } catch (AuthenticationException e) {
-            // AuthenticationException is when apache fails to set HTTPAuth headers
-            // If this happens, the app is useless. So, very much critical. Never happened yet.
-            // This is NOT AuthorizationException that therefore happens both (i know, bad) when
-            // credentials don't check out and user is not authorized by level.
-            // This is much more dire than that: the app has failed before even asking.
-            String msg = "Apache failed to set headers for `%s`.";
-            throw new CriticalException(String.format(msg, url), e);
+            throw new BadConfigException(currentServer, e);
 
         } catch (ClientProtocolException e) {
             // ProtocolException: Signals that an HTTP protocol violation has occurred.
@@ -579,82 +637,6 @@ public class RestService
         }
 
         return json;
-    }
-
-    /**
-     * Throw related Exceptions if some specific HTTP Status Codes are returned in the `response`.
-     *
-     * @param response to inspect for errors.
-     * @throws AuthorizationException
-     * @throws QuotaException
-     * @throws MaintenanceException
-     */
-    protected void inspectResponseForErrors(HttpResponse response)
-            throws
-            AuthorizationException, QuotaException, MaintenanceException, CriticalException,
-            BadConfigException, UnavailableUsernameException, UnavailableEmailException,
-            ErrorResponseException
-    {
-        // A lot of things can go wrong with each request
-        int code = response.getStatusLine().getStatusCode();
-
-        if (code >= 400) {
-            if (code == 401) {
-                throw new AuthorizationException();
-            }
-            if (code == 404) {
-                // when you badly configured the server URL
-                throw new BadConfigException();
-                // when querying a deleted entity (it WILL happen someday)
-//                throw new OutOfSyncException();
-                // which should not be decided here, this should simply throw a NotFoundException
-                // and let the parent decide.
-            }
-            if (code == 429) {
-                throw new QuotaException(); // instead maybe we could use the JSON response ?
-            }
-            if (code >= 500) {
-                throw new MaintenanceException();
-            }
-
-            // ... fixme what about other codes ?
-
-            String json = "";
-
-            try {
-                json = EntityUtils.toString(response.getEntity(), "UTF-8");
-            } catch (IOException e) {
-                String msg = "Trouble with UTF-8 on %d response.";
-                throw new CriticalException(String.format(msg, code), e);
-            }
-
-            ErrorResponse er = null;
-
-            try {
-                Gson gson = createGson();
-                er = gson.fromJson(json, ErrorResponse.class);
-            } catch (JsonSyntaxException e) {
-                String msg = "The server probably chip-farted.\n" +
-                             "Failed to parse json into an ErrorReponse on a %d :\n%s";
-                throw new CriticalException(String.format(msg, code, json), e);
-            }
-
-            if (null == er) {
-                // This can happen only if you change the code above, which might happen out of
-                // annoyance because the critical above may happen a lot until the server is OK.
-                throw new CriticalException("NEIN ! ... NEIN !");
-            } else {
-                if (er.isBadEmail()) {
-                    throw new UnavailableEmailException(er);
-                }
-                if (er.isBadUsername()) {
-                    throw new UnavailableUsernameException(er);
-                }
-            }
-
-            // The default, for what we don't yet explicitely support
-            throw new ErrorResponseException(er);
-        }
     }
 
 }

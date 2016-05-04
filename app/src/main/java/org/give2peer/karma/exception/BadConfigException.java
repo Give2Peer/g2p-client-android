@@ -1,26 +1,29 @@
 package org.give2peer.karma.exception;
 
+import android.content.Context;
+
+import org.give2peer.karma.R;
+import org.give2peer.karma.entity.Server;
+
 /**
  * The user probably screwed up the configuration ; or maybe we did, with upgrades ?
  */
 public class BadConfigException extends Exception
 {
+    Server config;
 
-    public static final String URL = "The server url you provided is probably wrong : `%s`.";
-    public static final String CREDENTIALS = "The credentials you provided are probably wrong : `%s`.";
+    public Server getConfig() { return config; }
 
-    public BadConfigException() {}
+    static String MSG = "Server `%s` URL `%s` is probably invalid.";
 
-    public BadConfigException(String detailMessage, String value) {
-        super(String.format(detailMessage, value));
+    public BadConfigException(Server config) {
+        super(String.format(MSG, config.getName(), config.getUrl()));
+        this.config = config;
     }
 
-    public BadConfigException(String detailMessage, String value, Throwable throwable) {
-        super(String.format(detailMessage, value), throwable);
-    }
-
-    public BadConfigException(Throwable throwable) {
-        super(throwable);
+    public BadConfigException(Server config, Throwable throwable) {
+        super(String.format(MSG, config.getName(), config.getUrl()), throwable);
+        this.config = config;
     }
 
 }

@@ -26,9 +26,11 @@ import org.give2peer.karma.Application;
 import org.give2peer.karma.FileUtils;
 import org.give2peer.karma.entity.Item;
 import org.give2peer.karma.R;
+import org.give2peer.karma.exception.CriticalException;
 import org.give2peer.karma.exception.NoInternetException;
 import org.give2peer.karma.exception.QuotaException;
 import org.give2peer.karma.factory.BitmapFactory;
+import org.give2peer.karma.service.ExceptionHandler;
 import org.give2peer.karma.task.NewItemTask;
 
 import java.io.File;
@@ -139,7 +141,7 @@ public class NewItemActivity extends LocatorActivity
                 //processImages();
             } else {
                 // The intent filter in the manifest should ensure that we never EVER throw this.
-                throw new RuntimeException("You shared something that is not an image. Nooope.");
+                throw new CriticalException("You shared something that is not an image. Nooope.");
             }
 //        } else if (Intent.ACTION_SEND_MULTIPLE.equals(action) && type != null) {
 //            if (type.startsWith("image/")) {
@@ -159,10 +161,10 @@ public class NewItemActivity extends LocatorActivity
                     }
                     // Launch the camera to add a new picture
                     requestNewPicture();
-                } catch (IOException ex) {
+                } catch (CriticalException ex) {
                     Log.e("G2P", "Failed to add a new picture.");
                     ex.printStackTrace();
-                    app.toast(getString(R.string.toast_new_item_file_error), Toast.LENGTH_LONG);
+                    app.toasty(getString(R.string.toast_new_item_file_error));
                     finish();
                 }
             } else {
@@ -280,7 +282,7 @@ public class NewItemActivity extends LocatorActivity
      *
      * todo: enable choosing from gallery or camera ? I thought ACTION_IMAGE_CAPTURE would suffice ?
      */
-    protected void requestNewPicture() throws IOException
+    protected void requestNewPicture() throws CriticalException
     {
         // Create an new image capture intent
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
@@ -293,7 +295,12 @@ public class NewItemActivity extends LocatorActivity
         }
 
         // Create the File where the picture should go
-        File imageFile = createImageFile();
+        File imageFile = null;
+        try {
+            imageFile = createImageFile();
+        } catch (IOException e) {
+            throw new CriticalException("Failed to create an image file.", e);
+        }
         Uri imageUri = Uri.fromFile(imageFile);
 
         if (null != imageFile) {
@@ -303,7 +310,7 @@ public class NewItemActivity extends LocatorActivity
             startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
         } else {
             // Unsure if this can even happen. If it happens, well... meh.
-            throw new IOException("Created image file is NULL. This should NEVER happen.");
+            throw new CriticalException("Created image file is NULL. This should NEVER happen.");
         }
     }
 
@@ -358,7 +365,7 @@ public class NewItemActivity extends LocatorActivity
         (new NewItemTask(app, this, item, imageFiles) {
             @Override
             protected void onPostExecute(Item item) {
-                if (!hasException()) {
+                if ( ! hasException()) {
                     app.toast(getString(R.string.toast_new_item_uploaded, item.getTitle()), Toast.LENGTH_LONG);
                     // Continue to the profile
                     Intent intent = new Intent(this.activity, ProfileActivity_.class);
@@ -367,20 +374,40 @@ public class NewItemActivity extends LocatorActivity
                     finish();
                 } else {
                     Exception e = getException();
-                    String toast;
-                    if (e instanceof IOException || e instanceof NoInternetException) {
-                        toast = getString(R.string.toast_no_internet_available);
-                    } else if (e instanceof QuotaException) {
-                        toast = getString(R.string.toast_new_item_error_quota_reached);
-                    } else {
-                        toast = getString(R.string.toast_new_item_upload_failed);
+
+                    // Handle the exception
+                    ExceptionHandler handler = new ExceptionHandler(activity){
+                        @Override
+                        protected void on(QuotaException exception) {
+                            toast(R.string.toast_new_item_error_quota_reached);
+                        }
+                    };
+                    boolean handled = handler.handleException(e);
+
+                    if ( ! handled) {
+                        app.toasty(getString(R.string.toast_willingly_uncaught_error));
+                        throw new CriticalException(String.format(
+                                "Unhandled %s when adding items.", e.toString()
+                        ), e);
                     }
-                    app.toast(toast, Toast.LENGTH_LONG);
+
+//                    if (e instanceof IOException || e instanceof NoInternetException) {
+//                        toast = getString(R.string.toast_no_internet_available);
+//                    } else if (e instanceof QuotaException) {
+//                        toast = getString(R.string.toast_new_item_error_quota_reached);
+//                    } else {
+//                        toast = getString(R.string.toast_new_item_upload_failed);
+//                    }
+//                    app.toast(toast, Toast.LENGTH_LONG);
+
+                    // Log
                     String loggedMsg = e.getMessage();
                     if ( ! (null == loggedMsg || loggedMsg.isEmpty()))  {
                         Log.e("G2P", e.getMessage());
                     }
                     e.printStackTrace();
+
+                    // And enable sending again
                     enableSending();
                 }
             }

@@ -50,9 +50,7 @@
     <string name="toast_server_maintenance">The server is undergoing maintenance.\nTry again later.</string>
     <string name="toast_quota_reached">You reached your quota.\nTry again later!</string>
     <string name="toast_authentication_failure">You are not authenticated, or your credentials don\'t check out.</string>
-    <string name="toast_bad_config">Your configuration is wrong.\nEither the server URL or the credentials don\'t check out.</string>
-    <string name="toast_bad_config_url">The server URL in your configuration is probably wrong : `%s`.</string>
-    <string name="toast_bad_config_credentials">The credentials you provided are probably wrong : `%s`.</string>
+    <string name="toast_bad_config">Server `%1$s` URL `%2$s` is probably invalid.</string>
 
     <string name="title_current_location">Current location</string>
     <string name="title_set_up_location">Set up a location</string>
@@ -93,5 +91,6 @@
     <string name="preregistration_dialog">Signing in…</string>
     <string name="new_item_checkbox_gift">Gift (I legally own this item)</string>
     <string name="toast_willingly_uncaught_error">Something went wrong with your device and we let the app crash so you can report a bug.</string>
+    <string name="toast_authorization_failure">You are not authorized to do that.</string>
 
 </resources>
