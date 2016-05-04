@@ -10,7 +10,7 @@ android {
         applicationId "org.give2peer.karma"
         minSdkVersion 10
         targetSdkVersion 21
-        versionCode 3
+        versionCode 4
         versionName "1.0.1"
 
         testInstrumentationRunner "cucumber.api.android.CucumberInstrumentation"

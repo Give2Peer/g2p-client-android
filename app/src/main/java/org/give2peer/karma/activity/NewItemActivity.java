@@ -375,6 +375,13 @@ public class NewItemActivity extends LocatorActivity
                 } else {
                     Exception e = getException();
 
+                    // Log
+                    String loggedMsg = e.getMessage();
+                    if ( ! (null == loggedMsg || loggedMsg.isEmpty()))  {
+                        Log.e("G2P", e.getMessage());
+                    }
+                    e.printStackTrace();
+
                     // Handle the exception
                     ExceptionHandler handler = new ExceptionHandler(activity){
                         @Override
@@ -399,13 +406,6 @@ public class NewItemActivity extends LocatorActivity
 //                        toast = getString(R.string.toast_new_item_upload_failed);
 //                    }
 //                    app.toast(toast, Toast.LENGTH_LONG);
-
-                    // Log
-                    String loggedMsg = e.getMessage();
-                    if ( ! (null == loggedMsg || loggedMsg.isEmpty()))  {
-                        Log.e("G2P", e.getMessage());
-                    }
-                    e.printStackTrace();
 
                     // And enable sending again
                     enableSending();
