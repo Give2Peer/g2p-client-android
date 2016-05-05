@@ -398,15 +398,6 @@ public class NewItemActivity extends LocatorActivity
                         ), e);
                     }
 
-//                    if (e instanceof IOException || e instanceof NoInternetException) {
-//                        toast = getString(R.string.toast_no_internet_available);
-//                    } else if (e instanceof QuotaException) {
-//                        toast = getString(R.string.toast_new_item_error_quota_reached);
-//                    } else {
-//                        toast = getString(R.string.toast_new_item_upload_failed);
-//                    }
-//                    app.toast(toast, Toast.LENGTH_LONG);
-
                     // And enable sending again
                     enableSending();
                 }
