@@ -97,7 +97,7 @@ A version for open beta-testing, working as early as API 10 (Android 3.0 Gingerb
 - [ ] Translation: español.
 - [ ] Feature: add a new Item offline, upload later. (lots of work)
 - [ ] Feature: warn the user that the app is unavailable during server maintenance.
-- [ ] Feature: easily send a bug report to developers on caught error.
+- [ ] Feature: easily send a bug report to developers on caught error. (we use the OS)
 - [ ] Feature: some form of OAuth2 as fallback for Maps (we are subjected to quotas)
 - [ ] Setting: enable `https` protocol.
 - [ ] Feature: edit items I authored in my profile.
@@ -113,6 +113,10 @@ A version for open beta-testing, working as early as API 10 (Android 3.0 Gingerb
 -----
 
 - [x] Bugfix: issue #2 : uploading a picture fails silently
+- [ ] Feature: a simple tutorial
+- [ ] Feature: thanking someone for an item
+- [ ] Feature: notifications
+- [ ] Feature: all-time world leaderboard
 
 
 
