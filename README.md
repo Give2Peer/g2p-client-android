@@ -36,12 +36,9 @@ menus, and overall material design suitable for phones, glasses, watches and tab
 
 There might even be a third (very light) version, using a `WebView` to load an HTML-based web app.
 
-All list items followed by parenthesis are optional, and the parenthesis should explain why.
 
-
-
-Major versions
---------------
+Overview of the major versions
+------------------------------
 
 They will be handled in different git repositories.
 
@@ -90,6 +87,8 @@ We're very interested in benchmarking these apps against each other.
 
 A version for open beta-testing, working as early as API 10 (Android 3.0 Gingerbread).
 
+All list items followed by parenthesis are optional, and the parenthesis should explain why.
+
 - [ ] Feature: a whole activity dedicated to statistics of the server usage.
 - [ ] Feature: propose deletion of items submitted by someone else. (tricky)
 - [ ] Feature: provide a lifespan to items I tag (lifespans depend on the user karmic level)
@@ -102,23 +101,30 @@ A version for open beta-testing, working as early as API 10 (Android 3.0 Gingerb
 - [ ] Setting: enable `https` protocol.
 - [ ] Feature: edit items I authored in my profile.
 - [ ] Feature: delete items I authored in my profile.
-- [ ] Feature: change your username when level 1, against 9 karma points.
+- [ ] Feature: change your username when level 1, against some (9?) karma points.
 - [ ] Feature: add your email to your user account
 - [ ] Feature: log in with existing user account
 - [ ] Feature: ask for new credentials with email
 - [ ] Feature: show items around as a list from closest to furthest
 - [ ] Feature: rotate images when submitting a new item
+- [ ] Bugfix:  make sure temporary picture files are removed
 
 
-1.0.2
+1.2.0
 -----
 
-- [x] Bugfix:  issue #2 : uploading a picture fails silently
-- [ ] Feature: a simple tutorial
 - [ ] Feature: thanking someone for an item
 - [ ] Feature: notifications
-- [ ] Feature: all-time world leaderboard
 
+
+1.1.0
+-----
+
+- [x] Setting: allow bigger pictures
+- [ ] Feature: a simple tutorial for adding an item
+- [ ] Feature: a simple tutorial for searching on the map
+- [ ] Feature: a simple tutorial for the profile
+- [ ] Feature: all-time world leaderboard
 
 
 1.0.1 (03-05-16)
@@ -127,6 +133,7 @@ A version for open beta-testing, working as early as API 10 (Android 3.0 Gingerb
 - [x] Bugfix: switching from map to profile and map again launches a new instance of the map
 - [x] Bugfix: item popup window of the wrong size on high dpi screens
 - [x] Bugfix: issue #1 : items sometimes disappear from the map
+- [x] Bugfix: issue #2 : uploading a picture fails silently
 
 
 1.0.0 (01-05-16)
@@ -362,6 +369,7 @@ Credits
 - The ioth, because they can read between the books.
 - Our other friends, for not killing us when we pester them about this.
 - Our families, for their unwavering support.
+
 
 
 [MOOP]: http://burningman.org/event/preparation/leaving-no-trace/moop/
