@@ -15,7 +15,7 @@ class Error
     int code;
     String message;
 
-    /** @return the custom (not http) error code that the server sent back, one of `self::` */
+    /** @return the custom (not http) error code that the server sent back, one of below */
     public int getCode()                   { return code;                                          }
     public void setCode(int code)          { this.code = code;                                     }
     /** @return a message (in english) the server may have provided */
@@ -73,23 +73,12 @@ public class ErrorResponse
         }
     }
 
-    public boolean isBadUsername()
-    {
-        if (hasError()) {
-            return getErrorCode() == BAD_USERNAME ||
-                   getErrorCode() == UNAVAILABLE_USERNAME;
-        } else {
-            return false;
-        }
+    public boolean isBadUsername() {
+        return hasError() && (getErrorCode() == BAD_USERNAME || getErrorCode() == UNAVAILABLE_USERNAME);
     }
 
-    public boolean isBadEmail()
-    {
-        if (hasError()) {
-            return getErrorCode() == UNAVAILABLE_EMAIL;
-        } else {
-            return false;
-        }
+    public boolean isBadEmail() {
+        return hasError() && getErrorCode() == UNAVAILABLE_EMAIL;
     }
 
 }

@@ -107,12 +107,13 @@ A version for open beta-testing, working as early as API 10 (Android 3.0 Gingerb
 - [ ] Feature: log in with existing user account
 - [ ] Feature: ask for new credentials with email
 - [ ] Feature: show items around as a list from closest to furthest
+- [ ] Feature: rotate images when submitting a new item
 
 
 1.0.2
 -----
 
-- [x] Bugfix: issue #2 : uploading a picture fails silently
+- [x] Bugfix:  issue #2 : uploading a picture fails silently
 - [ ] Feature: a simple tutorial
 - [ ] Feature: thanking someone for an item
 - [ ] Feature: notifications
