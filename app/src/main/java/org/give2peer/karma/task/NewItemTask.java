@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.os.AsyncTask;
 
 import org.give2peer.karma.Application;
+import org.give2peer.karma.FileUtils;
 import org.give2peer.karma.entity.Item;
 import org.give2peer.karma.exception.AuthorizationException;
 import org.give2peer.karma.exception.ErrorResponseException;
@@ -24,15 +25,18 @@ public class NewItemTask extends AsyncTask<Void, Void, Item>
     public Activity activity;
     private final Item item;
     private final List<File> pictures;
+    private final List<Integer> pictureRotations;
 
     Exception exception;
 
-    public NewItemTask(Application app, Activity activity, Item item, List<File> pictures)
+    public NewItemTask(Application app, Activity activity, Item item,
+                       List<File> pictures, List<Integer> pictureRotations)
     {
         this.app = app;
         this.activity = activity;
         this.item = item;
         this.pictures = pictures;
+        this.pictureRotations = pictureRotations;
     }
 
     protected Item doInBackground(Void... nope)
@@ -47,11 +51,15 @@ public class NewItemTask extends AsyncTask<Void, Void, Item>
             return null;
         }
 
-        // And if successful then upload the picture
+        // And if successful then rotate and upload the picture
         // We only upload the first one for now, but ideally we should try to upload all of them
         try {
             if ( ! pictures.isEmpty()) {
                 File picture = pictures.get(0);
+                Integer rotationInDegrees = pictureRotations.get(0);
+                // rotate
+                FileUtils.rotateImageFile(picture.getPath(), rotationInDegrees);
+                // and upload
                 item = app.getRestService().pictureItem(item, picture).getItem();
             }
         } catch (Exception e) {

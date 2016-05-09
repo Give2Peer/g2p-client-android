@@ -23,6 +23,8 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.database.DatabaseUtils;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
@@ -33,8 +35,13 @@ import android.webkit.MimeTypeMap;
 
 //import com.ianhanniballake.localstorage.LocalStorageProvider;
 
+import org.give2peer.karma.exception.CriticalException;
+
 import java.io.File;
 import java.io.FileFilter;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.Comparator;
 
@@ -42,6 +49,7 @@ import java.util.Comparator;
  * Copied from https://github.com/iPaulPro/aFileChooser/
  * And hacked around :
  * - commented out the LocalStorageProvider business, maybe add it back ?
+ * - added rotateImageFile
  *
  * @version 2009-07-03
  * @author Peli
@@ -62,6 +70,38 @@ public class FileUtils {
     public static final String MIME_TYPE_APP = "application/*";
 
     public static final String HIDDEN_PREFIX = ".";
+
+
+    /**
+     * @param path of the image file
+     * @param degrees of rotation, increase to rotate clockwise
+     */
+    public static void rotateImageFile(String path, int degrees)
+    {
+        Bitmap bmp = BitmapFactory.decodeFile(path);
+
+        if (null == bmp) {
+            throw new CriticalException(String.format("Could not decode the file at `%s`.", path));
+        }
+
+        Matrix matrix = new Matrix();
+        matrix.postRotate(degrees);
+        bmp = Bitmap.createBitmap(bmp, 0, 0, bmp.getWidth(), bmp.getHeight(), matrix, true);
+
+        FileOutputStream fOut;
+        try {
+            fOut = new FileOutputStream(path);
+            bmp.compress(Bitmap.CompressFormat.JPEG, 85, fOut);
+            fOut.flush();
+            fOut.close();
+
+        } catch (FileNotFoundException e) {
+            throw new CriticalException("I should not happen.", e);
+
+        } catch (IOException e) {
+            throw new CriticalException("Disk is probably full or unwriteable.", e);
+        }
+    }
 
     /**
      * Gets the extension of a file name, like ".png" or ".jpg".

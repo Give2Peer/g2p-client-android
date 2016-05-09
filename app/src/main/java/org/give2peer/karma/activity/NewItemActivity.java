@@ -5,6 +5,7 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.location.Location;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
@@ -15,11 +16,13 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.ScrollView;
 import android.widget.Toast;
 
 import com.shamanland.fab.FloatingActionButton;
 
 import org.androidannotations.annotations.AfterViews;
+import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.ViewById;
 import org.give2peer.karma.Application;
@@ -44,8 +47,10 @@ import java.util.Locale;
 
 /**
  * Handles :
- * - Receiving an image from another activity's share intent, launching the camera otherwise
+ * - Receiving an image from another activity's share intent
+ * - (deprecated) launching the camera otherwise
  * - A form to add a new item, with a nice Floating Action Button to send.
+ * - (todo) Rotating the received image before sending it
  *
  * This is where the user adds new items in the database.
  * It should handle the three main moop intents :
@@ -66,8 +71,23 @@ public class NewItemActivity extends LocatorActivity
     static final int REQUEST_IMAGE_CAPTURE = 1;
     static final String BUNDLE_IMAGE_PATHS = "imagePaths";
 
-    protected ArrayList<String> imagePaths; // stores the image files paths, and is saved
+    /**
+     * Stores the image files paths, and is bundled. (may cause issues, now that I think of it)
+     * We only support ONE image for now.
+     */
+    protected ArrayList<String> imagePaths;
 
+    /**
+     * Amount of rotation in degrees the user wants to apply to its image before sending it.
+     * Increasing this value results in a clockwise rotation.
+     * This will become an array when we'll have multiple images.
+     */
+    protected int imageRotation = 0;
+
+    //// VIEWS /////////////////////////////////////////////////////////////////////////////////////
+
+    @ViewById
+    ScrollView           newItemFormScrollView;
     @ViewById
     FloatingActionButton newItemSendButton;
     @ViewById
@@ -80,6 +100,8 @@ public class NewItemActivity extends LocatorActivity
     EditText             newItemLocationEditText;
     @ViewById
     CheckBox             newItemGiftCheckBox;
+
+    //// LISTENERS ///
 
     @Override
     public void onCreate(Bundle savedInstanceState)
@@ -106,14 +128,14 @@ public class NewItemActivity extends LocatorActivity
      * This is to recover the image from the Intent, or launch the Camera to pick one if we
      * arrived on this activity by other means (ie: the Intent is empty).
      * We shouldn't use the second use case, it's not very stable and I'd like to remove it
-     * to de-clutter the code. Right now we disabled any way to come here but users may inspect and
+     * to de-clutter the code. Right now we disabled any way to go there but users may inspect and
      * launch activities of their choice from the OS, if they so choose to, I believe.
      * Instead, we could warn the user and suggest to either launch the camera or return to the map.
      * Not sure when happens in the "back" history in that case.
      * I'd love a tool to inspect in real-time that information. There's probably one already.
      *
      * Note that this is in AfterViews because we're using Android Annotations.
-     * todo: make it lazy
+     * todo: make it lazy because we're not sure when @AfterViews is triggered in the lifecycle
      */
     @AfterViews
     public void recoverImage()
@@ -160,6 +182,7 @@ public class NewItemActivity extends LocatorActivity
                         return;
                     }
                     // Launch the camera to add a new picture
+                    // /!\ we try not to do that anymore, it's too unreliable.
                     requestNewPicture();
                 } catch (CriticalException ex) {
                     Log.e("G2P", "Failed to add a new picture.");
@@ -177,7 +200,7 @@ public class NewItemActivity extends LocatorActivity
     protected void onResume()
     {
         super.onResume();
-        // If the user is not preregistered, let's do this dudez !
+        // If the user is not preregistered, let's do this dudeez !
         app.requireAuthentication(this);
     }
 
@@ -195,11 +218,14 @@ public class NewItemActivity extends LocatorActivity
         super.onSaveInstanceState(outState);
         // On some devices, the Camera activity destroys this activity, so we need to save the
         // paths of the files we created.
+        // This happens only when we launched the camera by ourselves, which we don't anymore.
         outState.putStringArrayList(BUNDLE_IMAGE_PATHS, imagePaths);
     }
 
     /**
-     * The Camera and Gallery activities will provide the images to this activity in this method.
+     * The Camera and Gallery activities will provide the images to this activity in this method,
+     * if we use requestNewPicture().
+     * We try not to do that anymore.
      */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent intent)
@@ -218,38 +244,6 @@ public class NewItemActivity extends LocatorActivity
         }
     }
 
-    /**
-     * Convert the image URI to the direct file system path of the image file.
-     * This is prety crappy too.
-     * @param contentUri
-     * @return the system path of the file described by the Uri.
-     */
-    public String getPathFromImageURI(Uri contentUri)
-    {
-        String path = null;
-
-        // Support for Urls of type content://com.android.providers.downloads.documents/document/4
-        // todo: don't assume it's local ?
-        path = FileUtils.getPath(this, contentUri);
-
-
-        // Fallback support for Camera URLs such as content://media/external/images/media/78
-        if (null == path) {
-            Log.d("G2P", "We tried to use the fallback path finder method for that image.");
-            String [] proj={MediaStore.Images.Media.DATA};
-            Cursor cursor = managedQuery( contentUri,
-                    proj,  // Which columns to return
-                    null,  // WHERE clause; which rows to return (all rows)
-                    null,  // WHERE clause selection arguments (none)
-                    null); // Order-by clause (ascending by name)
-            int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
-
-            cursor.moveToFirst();
-            path = cursor.getString(column_index);
-        }
-
-        return path;
-    }
 
     //// ACTIONS ///////////////////////////////////////////////////////////////////////////////////
 
@@ -280,8 +274,9 @@ public class NewItemActivity extends LocatorActivity
     /**
      * Launch the Camera activity to grab a picture, which will get back to `onActivityResult`.
      *
-     * todo: enable choosing from gallery or camera ? I thought ACTION_IMAGE_CAPTURE would suffice ?
+     * @deprecated
      */
+    @Deprecated
     protected void requestNewPicture() throws CriticalException
     {
         // Create an new image capture intent
@@ -315,7 +310,7 @@ public class NewItemActivity extends LocatorActivity
     }
 
     /**
-     * Send the new item data to the server, in a async task.
+     * Send the new item data to the server, in an async task.
      */
     public void send()
     {
@@ -361,8 +356,13 @@ public class NewItemActivity extends LocatorActivity
 
 //        item.setPictures(imageFiles);
 
+        // In the future we'll have more than one image...
+        List<Integer> pictureRotations = new ArrayList<Integer>();
+        // ... but we only support one for now.
+        pictureRotations.add(imageRotation);
+
         // Try to upload it, along with its image(s).
-        (new NewItemTask(app, this, item, imageFiles) {
+        (new NewItemTask(app, this, item, imageFiles, pictureRotations) {
             @Override
             protected void onPostExecute(Item item) {
                 if ( ! hasException()) {
@@ -425,17 +425,70 @@ public class NewItemActivity extends LocatorActivity
         newItemProgressBar.setVisibility(View.VISIBLE);
     }
 
+    /**
+     * Rotate the image clockwise per steps of 90° when clicked.
+     * It's only since API 11, so the feature will not be available to API 10 and lower.
+     */
+    @Click
+    public void newItemImageViewClicked()
+    {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+            imageRotation = (imageRotation + 90) % 360;
+            newItemImageView.setPivotX(newItemImageView.getWidth()/2);
+            newItemImageView.setPivotY(newItemImageView.getHeight()/2);
+            newItemImageView.setRotation(imageRotation);
+        }
+    }
+
 
     //// UTILS /////////////////////////////////////////////////////////////////////////////////////
 
     /**
+     * Convert the image URI to the direct file system path of the image file.
+     * @param contentUri
+     * @return the system path of the file described by the Uri.
+     */
+    public String getPathFromImageURI(Uri contentUri)
+    {
+        String path = null;
+
+        // Support for Urls of type content://com.android.providers.downloads.documents/document/4
+        // todo: don't assume it's local ? But what happens when it's not ?
+        path = FileUtils.getPath(this, contentUri);
+
+        // Fallback support for Camera URLs such as content://media/external/images/media/78
+        if (null == path) {
+            // I'm not sure we even go through here anymore ?
+            // We toast for now, but we may well throw a CriticalException here in the future
+            app.toasty("If you see this message, tell us about it !\nThe code is BLUE KOALA.");
+
+            Log.d("G2P", String.format(
+                    "Used the fallback path finder method for that url : `%s`.",
+                    contentUri.toString()
+            ));
+            String [] proj={MediaStore.Images.Media.DATA};
+            Cursor cursor = managedQuery( contentUri,
+                    proj,  // Which columns to return
+                    null,  // WHERE clause; which rows to return (all rows)
+                    null,  // WHERE clause selection arguments (none)
+                    null); // Order-by clause (ascending by name)
+            int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+
+            cursor.moveToFirst();
+            path = cursor.getString(column_index);
+        }
+
+        return path;
+    }
+
+    /**
      * Ok, this is trouble. We do NOT delete the image files after sending them. We should. Yup.
-     * todo: delete the image file once it is sent.
-     * Also, maybe move this utility method to the `Application`.
+     * todo: delete the image file once it is sent. NO. Remove usage of this altogether.
      *
      * @return the File that was created.
      * @throws IOException
      */
+    @Deprecated
     private File createImageFile() throws IOException
     {
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(new Date());

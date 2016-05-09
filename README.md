@@ -106,7 +106,7 @@ All list items followed by parenthesis are optional, and the parenthesis should 
 - [ ] Feature: log in with existing user account
 - [ ] Feature: ask for new credentials with email
 - [ ] Feature: show items around as a list from closest to furthest
-- [ ] Feature: rotate images when submitting a new item
+
 - [ ] Bugfix:  make sure temporary picture files are removed
 
 
@@ -115,16 +115,17 @@ All list items followed by parenthesis are optional, and the parenthesis should 
 
 - [ ] Feature: thanking someone for an item
 - [ ] Feature: notifications
+- [ ] Feature: all-time world leaderboard
 
 
 1.1.0
 -----
 
 - [x] Setting: allow bigger pictures
+- [x] Feature: rotate pictures when submitting a new item
 - [ ] Feature: a simple tutorial for adding an item
 - [ ] Feature: a simple tutorial for searching on the map
 - [ ] Feature: a simple tutorial for the profile
-- [ ] Feature: all-time world leaderboard
 
 
 1.0.1 (03-05-16)
