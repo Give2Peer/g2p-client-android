@@ -131,10 +131,9 @@ public class      MapItemsActivity
     @AfterViews
     protected void authenticate()
     {
-        // This is not good.
-        // onStart() is called AFTER this method, and so nobody listens to AuthenticationEvent
-        if ( ! EventBus.getDefault().isRegistered(this))
-            EventBus.getDefault().register(this);
+        // onStart() is called AFTER this method, and so nobody listens to AuthenticationEvent yet,
+        // so we need to register to the EventBus here and not in the onStart.
+        if ( ! EventBus.getDefault().isRegistered(this)) EventBus.getDefault().register(this);
 
         // If the user is not authenticated, take care of it
         app.requireAuthentication(this);
@@ -158,6 +157,7 @@ public class      MapItemsActivity
         if (isMapReady()) executeFinderTask(new LatLng(loc.getLatitude(), loc.getLongitude()));
     }
 
+
     // OPTIONS MENU ////////////////////////////////////////////////////////////////////////////////
 
     @Override
@@ -175,8 +175,10 @@ public class      MapItemsActivity
         return found || super.onOptionsItemSelected(item);
     }
 
-    //// ACTIONS ///////////////////////////////////////////////////////////////////////////////////
 
+    //// UI LISTENERS //////////////////////////////////////////////////////////////////////////////
+
+    // todo: use @Click annotation
     public void onDrawButton(View button)
     {
         // 1. We are currently finding items, and this button is a CANCEL button.
@@ -198,6 +200,18 @@ public class      MapItemsActivity
         updateDrawButton();
     }
 
+
+    //// ACTIONS ///////////////////////////////////////////////////////////////////////////////////
+
+//    public void loadTutorial()
+//    {
+//        Intent tutorialIntent = new Intent(this, MaterialTutorialActivity.class);
+//        tutorialIntent.putParcelableArrayListExtra(
+//                MaterialTutorialActivity.MATERIAL_TUTORIAL_ARG_TUTORIAL_ITEMS,
+//                app.getTutorialItems()
+//        );
+//        startActivityForResult(tutorialIntent, 42);
+//    }
 
     protected void updateDrawButton()
     {
