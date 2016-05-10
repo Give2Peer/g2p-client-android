@@ -106,7 +106,7 @@ All list items followed by parenthesis are optional, and the parenthesis should 
 - [ ] Feature: log in with existing user account
 - [ ] Feature: ask for new credentials with email
 - [ ] Feature: show items around as a list from closest to furthest
-
+- [ ] Feature: report an offensive item
 - [ ] Bugfix:  make sure temporary picture files are removed
 
 
