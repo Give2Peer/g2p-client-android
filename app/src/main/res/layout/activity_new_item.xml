@@ -90,18 +90,7 @@
         app:floatingActionButtonSize="normal"
         />
 
-    <!--<im.delight.android.keyvaluespinner.KeyValueSpinner-->
-        <!--android:id="@+id/newItemLocationSpinner"-->
-        <!--android:layout_width="fill_parent"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:layout_weight="1"-->
-        <!--/>-->
-
-    <!--<fragment android:name="org.give2peer.karma.fragment.LocationChooserFragment"-->
-              <!--android:id="@+id/newItemLocationChooserFragment"-->
-              <!--android:layout_width="match_parent"-->
-              <!--android:layout_height="wrap_content" />-->
-
+    <!-- Shown when the form was submitted and the item is currently being uploaded -->
     <ProgressBar
         style="?android:attr/progressBarStyleLarge"
         android:layout_width="wrap_content"

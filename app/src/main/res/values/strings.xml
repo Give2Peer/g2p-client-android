@@ -97,7 +97,7 @@
     <string name="tutorial_slide_2_title">Lost something ?</string>
     <string name="tutorial_slide_2_description">Search for it on the map !</string>
     <string name="tutorial_slide_3_title">Found something ?</string>
-    <string name="tutorial_slide_3_description">Snap a picture with your camera,\nshare it to Karma,\nand win some karma points !</string>
+    <string name="tutorial_slide_3_description">Snap a picture with your camera\nand share it to Karma !</string>
     <string name="tutorial_slide_4_title">Level up !</string>
     <string name="tutorial_slide_4_description">By contributing, you\'ll win karma,\nprivileges, and boasting rights !</string>
 
