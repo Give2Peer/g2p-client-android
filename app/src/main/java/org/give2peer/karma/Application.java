@@ -427,6 +427,20 @@ public class Application extends SugarApp
 //            .show();
 //    }
 
+
+    // ONBOARDING //////////////////////////////////////////////////////////////////////////////////
+
+    public boolean isUserOnBoard()
+    {
+        return getPrefs().getBoolean("is_on_board", false);
+    }
+
+    public void isUserOnBoard(boolean onBoard)
+    {
+        getPrefs().edit().putBoolean("is_on_board", onBoard).apply();
+    }
+
+
     // PROPER LOCATION /////////////////////////////////////////////////////////////////////////////
 
     public synchronized GoogleApiClient buildGoogleLocator(

@@ -1,10 +1,9 @@
 package org.give2peer.karma.activity;
 
 import android.app.Activity;
-import android.content.Intent;
+import android.content.Context;
 import android.graphics.Point;
 import android.location.Location;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -19,7 +18,6 @@ import android.view.animation.Interpolator;
 import android.widget.FrameLayout;
 import android.widget.Toast;
 
-import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -36,13 +34,12 @@ import com.google.android.gms.maps.model.Polygon;
 import com.google.android.gms.maps.model.PolygonOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.rubengees.introduction.IntroductionBuilder;
+import com.rubengees.introduction.entity.Slide;
 import com.shamanland.fab.FloatingActionButton;
 
-import org.androidannotations.annotations.AfterExtras;
-import org.androidannotations.annotations.AfterInject;
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.EActivity;
-import org.give2peer.karma.Application;
 import org.give2peer.karma.entity.Item;
 import org.give2peer.karma.R;
 import org.give2peer.karma.event.AuthenticationEvent;
@@ -53,9 +50,7 @@ import org.greenrobot.eventbus.Subscribe;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 
 @EActivity(R.layout.activity_map_items)
@@ -87,14 +82,15 @@ public class      MapItemsActivity
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
+
+        loadTutorialIfNeeded();
     }
 
     @Override
     public void onStart()
     {
         super.onStart();
-        if ( ! EventBus.getDefault().isRegistered(this))
-            EventBus.getDefault().register(this);
+        if ( ! EventBus.getDefault().isRegistered(this)) EventBus.getDefault().register(this);
     }
 
     @Override
@@ -102,6 +98,17 @@ public class      MapItemsActivity
     {
         EventBus.getDefault().unregister(this);
         super.onStop();
+    }
+
+    @AfterViews
+    protected void authenticate()
+    {
+        // onStart() is called AFTER this method, and so nobody listens to AuthenticationEvent yet,
+        // so we need to register to the EventBus here and not in the onStart.
+        if ( ! EventBus.getDefault().isRegistered(this)) EventBus.getDefault().register(this);
+
+        // If the user is not authenticated, take care of it
+        app.requireAuthentication(this);
     }
 
     @Subscribe
@@ -126,17 +133,6 @@ public class      MapItemsActivity
 
             app.toast("Failed to load the map on this device. Sorry!\nPlease report this !");
         }
-    }
-
-    @AfterViews
-    protected void authenticate()
-    {
-        // onStart() is called AFTER this method, and so nobody listens to AuthenticationEvent yet,
-        // so we need to register to the EventBus here and not in the onStart.
-        if ( ! EventBus.getDefault().isRegistered(this)) EventBus.getDefault().register(this);
-
-        // If the user is not authenticated, take care of it
-        app.requireAuthentication(this);
     }
 
     @Override
@@ -203,15 +199,53 @@ public class      MapItemsActivity
 
     //// ACTIONS ///////////////////////////////////////////////////////////////////////////////////
 
-//    public void loadTutorial()
-//    {
-//        Intent tutorialIntent = new Intent(this, MaterialTutorialActivity.class);
-//        tutorialIntent.putParcelableArrayListExtra(
-//                MaterialTutorialActivity.MATERIAL_TUTORIAL_ARG_TUTORIAL_ITEMS,
-//                app.getTutorialItems()
-//        );
-//        startActivityForResult(tutorialIntent, 42);
-//    }
+    public void loadTutorialIfNeeded()
+    {
+        if ( ! app.isUserOnBoard()) {
+            loadTutorial();
+            app.isUserOnBoard(true);
+        }
+    }
+
+    public void loadTutorial()
+    {
+        new IntroductionBuilder(this).withSlides(getOnboardingSlides(this)).introduceMyself();
+    }
+
+    protected List<Slide> getOnboardingSlides(Context ctx)
+    {
+        List<Slide> slides = new ArrayList<>();
+
+        slides.add(new Slide()
+                .withTitle(R.string.tutorial_slide_1_title)
+                .withDescription(R.string.tutorial_slide_1_description)
+                .withColorResource(R.color.tutorial_slide_1_background)
+                .withImage(R.drawable.tutorial_slide_1)
+        );
+
+        slides.add(new Slide()
+                .withTitle(R.string.tutorial_slide_2_title)
+                .withDescription(R.string.tutorial_slide_2_description)
+                .withColorResource(R.color.tutorial_slide_2_background)
+                .withImage(R.drawable.tutorial_slide_2)
+        );
+
+        slides.add(new Slide()
+                .withTitle(R.string.tutorial_slide_3_title)
+                .withDescription(R.string.tutorial_slide_3_description)
+                .withColorResource(R.color.tutorial_slide_3_background)
+                .withImage(R.drawable.tutorial_slide_3)
+        );
+
+        slides.add(new Slide()
+                .withTitle(R.string.tutorial_slide_4_title)
+                .withDescription(R.string.tutorial_slide_4_description)
+                .withColorResource(R.color.tutorial_slide_4_background)
+                .withImage(R.drawable.tutorial_slide_4)
+        );
+
+        return slides;
+    }
 
     protected void updateDrawButton()
     {

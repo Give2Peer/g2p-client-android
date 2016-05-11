@@ -89,14 +89,14 @@ A version for open beta-testing, working as early as API 10 (Android 3.0 Gingerb
 
 All list items followed by parenthesis are optional, and the parenthesis should explain why.
 
-- [ ] Feature: a whole activity dedicated to statistics of the server usage.
+- [ ] Feature: display basic statistics of the app.
 - [ ] Feature: propose deletion of items submitted by someone else. (tricky)
 - [ ] Feature: provide a lifespan to items I tag (lifespans depend on the user karmic level)
 - [ ] Translation: français.
 - [ ] Translation: español.
 - [ ] Feature: add a new Item offline, upload later. (lots of work)
-- [ ] Feature: warn the user that the app is unavailable during server maintenance.
 - [ ] Feature: easily send a bug report to developers on caught error. (we use the OS)
+- [ ] Feature: warn the user that the app is unavailable during server maintenance. (to be tested)
 - [ ] Feature: some form of OAuth2 as fallback for Maps (we are subjected to quotas)
 - [ ] Setting: enable `https` protocol.
 - [ ] Feature: edit items I authored in my profile.
@@ -107,29 +107,34 @@ All list items followed by parenthesis are optional, and the parenthesis should 
 - [ ] Feature: ask for new credentials with email
 - [ ] Feature: show items around as a list from closest to furthest
 - [ ] Feature: report an offensive item
-- [ ] Bugfix:  make sure temporary picture files are removed
 
 
 1.2.0
 -----
 
+- [ ] Bugfix:  make sure temporary picture files are removed
 - [ ] Feature: thanking someone for an item
 - [ ] Feature: notifications
 - [ ] Feature: all-time world leaderboard
 
 
-1.1.0
------
+
+CHANGELOG
+=========
+
+
+1.1.0 (11-05-2016)
+------------------
+
+Still in closed alpha...
 
 - [x] Setting: allow bigger pictures
 - [x] Feature: rotate pictures when submitting a new item
-- [ ] Feature: a simple tutorial for adding an item
-- [ ] Feature: a simple tutorial for searching on the map
-- [ ] Feature: a simple tutorial for the profile
+- [x] Feature: a simple onboarding activity
 
 
-1.0.1 (03-05-16)
-----------------
+1.0.1 (03-05-2016)
+------------------
 
 - [x] Bugfix: switching from map to profile and map again launches a new instance of the map
 - [x] Bugfix: item popup window of the wrong size on high dpi screens
@@ -137,20 +142,20 @@ All list items followed by parenthesis are optional, and the parenthesis should 
 - [x] Bugfix: issue #2 : uploading a picture fails silently
 
 
-1.0.0 (01-05-16)
-----------------
+1.0.0 (01-05-2016)
+------------------
 
 A version for the alpha community, released privately on Google Play.
 
-This version (and all of 1.x) will be available by invitation only.
+This version was available by invitation only.
 
 - [x] Feature: see item details
 - [x] Bugfix: support for images shared through browser downloads and others
 - [x] Design:  a launcher icon. _(Kiouze FTW)_
 
 
-0.4.0 (28-04-16)
-----------------
+0.4.0 (28-04-2016)
+------------------
 
 A marathon of code !
 
@@ -164,10 +169,6 @@ A marathon of code !
 - [x] Feature: gain one karma point when launching the map, once per day.
 - [x] Feature: automatic pre-registration.
 
-
-
-CHANGELOG
-=========
 
 0.3.0
 -----

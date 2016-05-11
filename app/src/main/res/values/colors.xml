@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<resources>
+    <drawable name="blue_not_used">#770000ff</drawable>
+
+    <color name="tutorial_slide_1_background">#eaa42c</color>
+    <color name="tutorial_slide_2_background">#2cc8df</color>
+    <color name="tutorial_slide_3_background">#eaa42c</color>
+    <color name="tutorial_slide_4_background">#aa48b7</color>
+</resources>

@@ -2,24 +2,31 @@ apply plugin: 'com.android.application'
 apply plugin: 'android-apt'
 
 android {
+
+    // What is this ?
 //    signingConfigs {
 //    }
+
     compileSdkVersion 23
     buildToolsVersion "21.1.2"
+
     defaultConfig {
         applicationId "org.give2peer.karma"
+
         minSdkVersion 10
         targetSdkVersion 23
-        versionCode 5
+
+        versionCode 6
         versionName "1.1.0"
 
         testInstrumentationRunner "cucumber.api.android.CucumberInstrumentation"
     }
 
+
     // Because we're using Apache legacy, removed from SDK 23
     useLibrary 'org.apache.http.legacy'
 
-
+    // What is this ?
 //    buildTypes {
 //        release {
 //            minifyEnabled false
