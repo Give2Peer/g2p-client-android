@@ -366,11 +366,12 @@ Credits
 - The community, without you there'd be nothing. You know who you are.
 - Ilane, for feeding us and putting up with our code-related ramblings.
 - Misha, for picking the name _give2peer_, and his general enthusiasm and advice.
-- Willou, for his mumbled advice.
+- Willou, for his mumbled advice and ruthless testing.
 - Kiouze, for his awesome æsthetics.
 - The ioth, because they can read between the books.
 - Our other friends, for not killing us when we pester them about this.
 - Our families, for their unwavering support.
+- And of course everyone that told us that this was useless and could not be done.
 
 
 

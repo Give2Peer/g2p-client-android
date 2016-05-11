@@ -45,7 +45,6 @@
     <string name="toast_no_internet_available">Internet is unavailable.\nPlease connect and try again.</string>
     <string name="toast_no_location_available">You must provide a location.</string>
     <string name="toast_invalid_location">Provided location is invalid.\nPlease set up a postal address.</string>
-    <string name="toast_new_item_upload_failed">Failed to upload the item.</string>
     <string name="toast_no_image_paths">No image paths were provided.</string>
     <string name="toast_draw_on_map">Draw the approximate region where you want to find items.</string>
     <string name="toast_wtf_bug">How did you even manage to do that?\nReport a bug!</string>
@@ -103,6 +102,7 @@
     <string name="tutorial_slide_4_description">By contributing, you\'ll win karma,\nprivileges, and boasting rights !</string>
 
     <!-- DEPRECATED -->
+    <string name="toast_new_item_upload_failed">Failed to upload the item.</string>
     <string name="tutorial_top_message">Welcome! With this app, you can give an item you possess, spot an item that was lost or thrown away, and find items around a location.</string>
 
 </resources>
