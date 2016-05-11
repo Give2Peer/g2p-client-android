@@ -202,8 +202,8 @@ public class      MapItemsActivity
     public void loadTutorialIfNeeded()
     {
         if ( ! app.isUserOnBoard()) {
-            loadTutorial();
             app.isUserOnBoard(true);
+            loadTutorial();
         }
     }
 

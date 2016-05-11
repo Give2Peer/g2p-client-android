@@ -264,7 +264,7 @@ Apache HttpComponents
 File upload requires `org.apache.httpcomponents:httpmime:4.3`
 and `org.apache.httpcomponents:httpclient-android:4.3.5`.
 
-There are duplication shenanigans with the `httpclient`.
+These libs were removed from SDK 23, but we still use them.
 
 
 KeyValue Spinner
