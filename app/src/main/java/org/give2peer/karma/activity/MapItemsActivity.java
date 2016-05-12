@@ -84,6 +84,9 @@ public class      MapItemsActivity
     @ViewById
     TextView noInternetTextView; // time to start refactoring the "no internet" flow for activities!
 
+    @ViewById
+    FloatingActionButton mapItemsDrawButton;
+
 
     //// LIFECYCLE /////////////////////////////////////////////////////////////////////////////////
 
@@ -258,8 +261,6 @@ public class      MapItemsActivity
 
     protected void updateDrawButton()
     {
-        FloatingActionButton mapItemsDrawButton = (FloatingActionButton) findViewById(R.id.mapItemsDrawButton);
-
         // 1. We are currently finding items, and this button is a CANCEL button.
         if (isFinding()) {
             mapItemsDrawButton.setImageResource(R.drawable.ic_clear_white_24dp);
