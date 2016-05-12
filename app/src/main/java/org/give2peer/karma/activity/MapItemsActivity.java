@@ -16,6 +16,7 @@ import android.view.View;
 import android.view.animation.BounceInterpolator;
 import android.view.animation.Interpolator;
 import android.widget.FrameLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -40,6 +41,7 @@ import com.shamanland.fab.FloatingActionButton;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.EActivity;
+import org.androidannotations.annotations.ViewById;
 import org.give2peer.karma.entity.Item;
 import org.give2peer.karma.R;
 import org.give2peer.karma.event.AuthenticationEvent;
@@ -77,6 +79,13 @@ public class      MapItemsActivity
     int fillColor = 0x33FF3399;
     int fillAlpha = 0x55000000;
 
+    //// VIEWS /////////////////////////////////////////////////////////////////////////////////////
+
+    @ViewById
+    TextView noInternetTextView; // time to start refactoring the "no internet" flow for activities!
+
+
+    //// LIFECYCLE /////////////////////////////////////////////////////////////////////////////////
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -116,7 +125,7 @@ public class      MapItemsActivity
     {
         if (authenticationEvent.isFailure()) {
             hideLoader();
-            findViewById(R.id.noInternetTextView).setVisibility(View.VISIBLE);
+            noInternetTextView.setVisibility(View.VISIBLE);
             return;
         }
 
@@ -361,11 +370,11 @@ public class      MapItemsActivity
                 if (null != exception) {
                     Log.e("G2P", "Something went wrong while finding items !");
                     exception.printStackTrace();
-                    findViewById(R.id.noInternetTextView).setVisibility(View.VISIBLE);
+                    noInternetTextView.setVisibility(View.VISIBLE);
                     updateDrawButtonDelayed();
                     return;
                 } else {
-                    findViewById(R.id.noInternetTextView).setVisibility(View.GONE);
+                    noInternetTextView.setVisibility(View.GONE);
                 }
 
                 // Now, either we found items or we didn't (TQ: maybe the app crashed :3)
