@@ -16,6 +16,7 @@ import android.view.View;
 import android.view.animation.BounceInterpolator;
 import android.view.animation.Interpolator;
 import android.widget.FrameLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -83,6 +84,9 @@ public class      MapItemsActivity
 
     @ViewById
     TextView noInternetTextView; // time to start refactoring the "no internet" flow for activities!
+
+    @ViewById
+    ProgressBar mapItemsProgressBar;
 
     @ViewById
     FloatingActionButton mapItemsDrawButton;
@@ -582,12 +586,12 @@ public class      MapItemsActivity
 
     private void showLoader()
     {
-        findViewById(R.id.mapItemsProgressBar).setVisibility(View.VISIBLE);
+        mapItemsProgressBar.setVisibility(View.VISIBLE);
     }
 
     private void hideLoader()
     {
-        findViewById(R.id.mapItemsProgressBar).setVisibility(View.GONE);
+        mapItemsProgressBar.setVisibility(View.GONE);
     }
 
     private void dropPinEffect(final Marker marker, long delay)
