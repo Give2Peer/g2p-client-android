@@ -66,7 +66,6 @@ public class      MapItemsActivity
 
     GoogleMap googleMap;
 
-    FrameLayout mapItemsDrawFrame;
     Boolean     isDrawing = false; // whether or not the user is drawing
 
     ArrayList<LatLng> drawingCoordinates = new ArrayList<>();
@@ -90,6 +89,9 @@ public class      MapItemsActivity
 
     @ViewById
     FloatingActionButton mapItemsDrawButton;
+
+    @ViewById
+    FrameLayout mapItemsDrawFrame;
 
 
     //// LIFECYCLE /////////////////////////////////////////////////////////////////////////////////
@@ -477,7 +479,6 @@ public class      MapItemsActivity
             hideLoader();
         }
 
-        mapItemsDrawFrame  = (FrameLayout) findViewById(R.id.mapItemsDrawFrame);
         mapItemsDrawFrame.setOnTouchListener(
                 new View.OnTouchListener()
                 {
