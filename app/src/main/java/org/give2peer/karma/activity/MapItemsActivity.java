@@ -56,6 +56,13 @@ import java.util.HashMap;
 import java.util.List;
 
 
+/**
+ *
+ *
+ * Events :
+ * - MapReadyEvent
+ * - AuthenticationEvent
+ */
 @EActivity(R.layout.activity_map_items)
 public class      MapItemsActivity
        extends    LocatorActivity
@@ -78,6 +85,7 @@ public class      MapItemsActivity
     int lineColor = 0x88FF3399;
     int fillColor = 0x33FF3399;
     int fillAlpha = 0x55000000;
+
 
     //// VIEWS /////////////////////////////////////////////////////////////////////////////////////
 
@@ -119,14 +127,20 @@ public class      MapItemsActivity
     }
 
     @AfterViews
-    protected void authenticate()
+    public void authenticate()
     {
-        // onStart() is called AFTER this method, and so nobody listens to AuthenticationEvent yet,
-        // so we need to register to the EventBus here and not in the onStart.
+        // onStart() is sometimes called AFTER this method, and so nobody listens to
+        // AuthenticationEvent yet, so we need to register to the EventBus here too.
         if ( ! EventBus.getDefault().isRegistered(this)) EventBus.getDefault().register(this);
 
         // If the user is not authenticated, take care of it
         app.requireAuthentication(this);
+    }
+
+    @AfterViews
+    public void requestGpsEnabled()
+    {
+        super.requestGpsEnabled();
     }
 
     @Subscribe

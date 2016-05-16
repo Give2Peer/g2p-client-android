@@ -36,6 +36,10 @@
     <string name="login_register_button">Register</string>
     <string name="login_top_text">Log on the server %s.</string>
 
+    <string name="dialog_gps_disabled_msg">Karma works best with GPS.\nEnable the GPS now ?</string>
+    <string name="dialog_gps_disabled_oui">Yes</string>
+    <string name="dialog_gps_disabled_non">No</string>
+
     <string name="toast_new_item_uploading">Uploading new item…</string>
     <string name="toast_new_item_uploaded">Item %s was uploaded.\nWell done!</string>
     <string name="toast_new_item_file_error">Could not create a file to store the picture.\nMaybe you\'re out of disk space?</string>

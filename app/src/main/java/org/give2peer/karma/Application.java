@@ -241,7 +241,7 @@ public class Application extends SugarApp
     {
         Intent i = new Intent(Intent.ACTION_VIEW);
         i.setData(Uri.parse(Application.REPORT_BUG_URL));
-        startActivity(i);
+        activity.startActivity(i);
     }
 
     public void launchNewItem(Activity activity)

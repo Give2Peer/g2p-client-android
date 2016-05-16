@@ -196,6 +196,12 @@ public class NewItemActivity extends LocatorActivity
         }
     }
 
+    @AfterViews
+    public void requestGpsEnabled()
+    {
+        super.requestGpsEnabled();
+    }
+
     @Override
     protected void onResume()
     {

@@ -1,15 +1,21 @@
 package org.give2peer.karma.activity;
 
+import android.Manifest;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
+import android.content.pm.PackageManager;
 import android.location.Location;
+import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AlertDialog;
 import android.util.Log;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -19,6 +25,7 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
 
 import org.give2peer.karma.Application;
+import org.give2peer.karma.R;
 import org.give2peer.karma.listener.GoogleApiClientListener;
 
 /**
@@ -28,16 +35,14 @@ import org.give2peer.karma.listener.GoogleApiClientListener;
  * But it was accessible to a beginner, so here it is.
  */
 abstract public class LocatorActivity
-       extends    ActionBarActivity
-       implements GoogleApiClientListener
-{
+        extends ActionBarActivity
+        implements GoogleApiClientListener {
     Application app;
 
     GoogleApiClient googleLocator;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState)
-    {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         app = (Application) getApplication();
@@ -77,8 +82,7 @@ abstract public class LocatorActivity
     private static final String STATE_RESOLVING_ERROR = "resolving_error";
 
     @Override
-    protected void onStart()
-    {
+    protected void onStart() {
         super.onStart();
         if (!isResolvingError) {
             googleLocator.connect();
@@ -86,15 +90,13 @@ abstract public class LocatorActivity
     }
 
     @Override
-    protected void onStop()
-    {
+    protected void onStop() {
         googleLocator.disconnect();
         super.onStop();
     }
 
     @Override
-    public void onConnected(Bundle bundle)
-    {
+    public void onConnected(Bundle bundle) {
         Log.d("G2P", "Connection to Google Location API established.");
         Location lastLocation = LocationServices.FusedLocationApi.getLastLocation(googleLocator);
         if (lastLocation == null) {
@@ -121,24 +123,24 @@ abstract public class LocatorActivity
     }
 
     @Override
-    public void onConnectionFailed(ConnectionResult connectionResult)
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult)
     {
         Log.e("G2P", "Connection to Google API services failed.");
-        if (isResolvingError) {
-            // Already attempting to resolve an error.
-            return;
-        } else if (connectionResult.hasResolution()) {
-            try {
+        // If we're not already attempting to resolve an error...
+        if ( ! isResolvingError) {
+            if (connectionResult.hasResolution()) {
+                try {
+                    isResolvingError = true;
+                    connectionResult.startResolutionForResult(this, REQUEST_RESOLVE_ERROR);
+                } catch (IntentSender.SendIntentException e) {
+                    // There was an error with the resolution intent. Try again.
+                    googleLocator.connect();
+                }
+            } else {
+                // Show dialog using GooglePlayServicesUtil.getErrorDialog()
+                showErrorDialog(connectionResult.getErrorCode());
                 isResolvingError = true;
-                connectionResult.startResolutionForResult(this, REQUEST_RESOLVE_ERROR);
-            } catch (IntentSender.SendIntentException e) {
-                // There was an error with the resolution intent. Try again.
-                googleLocator.connect();
             }
-        } else {
-            // Show dialog using GooglePlayServicesUtil.getErrorDialog()
-            showErrorDialog(connectionResult.getErrorCode());
-            isResolvingError = true;
         }
     }
 
@@ -164,7 +166,7 @@ abstract public class LocatorActivity
     }
 
 
-    //// ERROR DIALOG //////////////////////////////////////////////////////////////////////////////
+    //// GOOGLE API ERROR DIALOG ///////////////////////////////////////////////////////////////////
 
     /* Creates a dialog for an error message */
     private void showErrorDialog(int errorCode)
@@ -206,19 +208,30 @@ abstract public class LocatorActivity
         }
     }
 
-    //// ACTIONS ///////////////////////////////////////////////////////////////////////////////////
 
-    public void launchBugReport()
-    {
-        Intent i = new Intent(Intent.ACTION_VIEW);
-        i.setData(Uri.parse(Application.REPORT_BUG_URL));
-        startActivity(i);
-    }
+    //// GPS DISABLED ERROR DIALOG ///////////////////////////////////////////////////////////////////////
 
-    public void launchSettings()
+    public void requestGpsEnabled()
     {
-        Intent intent = new Intent(this, SettingsActivity.class);
-        startActivity(intent);
+        LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+        if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setMessage(R.string.dialog_gps_disabled_msg)
+                    .setCancelable(false)
+                    .setPositiveButton(R.string.dialog_gps_disabled_oui, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                            startActivity(intent);
+                        }
+                    })
+                    .setNegativeButton(R.string.dialog_gps_disabled_non, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            dialog.cancel();
+                        }
+                    });
+            AlertDialog alert = builder.create();
+            alert.show();
+        }
     }
 
 }
