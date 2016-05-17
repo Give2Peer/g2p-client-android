@@ -83,7 +83,8 @@ abstract public class LocatorActivity
     private static final String STATE_RESOLVING_ERROR = "resolving_error";
 
     @Override
-    protected void onStart() {
+    protected void onStart()
+    {
         super.onStart();
         if (!isResolvingError) {
             googleLocator.connect();
@@ -91,13 +92,24 @@ abstract public class LocatorActivity
     }
 
     @Override
-    protected void onStop() {
+    protected void onStop()
+    {
         googleLocator.disconnect();
         super.onStop();
     }
 
+    /**
+     * Override this in child classes
+     * @param location The Location fetched from google api services
+     */
+    public void onLocated(Location location)
+    {
+        app.setGeoLocation(location);
+    }
+
     @Override
-    public void onConnected(Bundle bundle) {
+    public void onConnected(Bundle bundle)
+    {
         Log.d("G2P", "Connection to Google Location API established.");
         Location lastLocation = LocationServices.FusedLocationApi.getLastLocation(googleLocator);
         if (lastLocation == null) {
@@ -108,17 +120,12 @@ abstract public class LocatorActivity
         }
     }
 
-    /**
-     * Override this in child classes
-     * @param location The Location fetched from google api services
-     */
-    public void onLocated(Location location) {
-        app.setGeoLocation(location);
-    }
-
     @Override
-    public void onConnectionSuspended(int i)
+    public void onConnectionSuspended(int reason)
     {
+        // `reason` can have the following values
+        // GoogleApiClient.ConnectionCallbacks.CAUSE_NETWORK_LOST
+        // GoogleApiClient.ConnectionCallbacks.CAUSE_SERVICE_DISCONNECTED
         Log.i("G2P", "Connection to Google API suspended.");
         // I don't know what else to do here. Ideas ?
     }
@@ -215,9 +222,11 @@ abstract public class LocatorActivity
     //// GPS DISABLED ERROR DIALOG ///////////////////////////////////////////////////////////////////////
 
     /**
-     *
+     * Show a dialog suggesting to enable the GPS when it is not.
+     * It will redirect the user to its system location settings.
+     * Note: context should probably be an Activity, not an Application.
      */
-    public void requestGpsEnabled(Context context)
+    public void requestGpsEnabled(final Context context)
     {
         LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
         if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
@@ -227,7 +236,7 @@ abstract public class LocatorActivity
                     .setPositiveButton(R.string.dialog_gps_disabled_oui, new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int id) {
                             Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-                            startActivity(intent);
+                            context.startActivity(intent);
                         }
                     })
                     .setNegativeButton(R.string.dialog_gps_disabled_non, new DialogInterface.OnClickListener() {

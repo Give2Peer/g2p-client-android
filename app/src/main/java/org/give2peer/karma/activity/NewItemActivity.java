@@ -89,21 +89,21 @@ public class NewItemActivity extends LocatorActivity
     //// VIEWS /////////////////////////////////////////////////////////////////////////////////////
 
     @ViewById
-    ScrollView           newItemFormScrollView;
+    android.support.v4.widget.NestedScrollView newItemFormScrollView;
     @ViewById
-    FloatingActionButton newItemSendButton;
+    FloatingActionButton  newItemSendButton;
     @ViewById
-    ProgressBar          newItemProgressBar;
+    ProgressBar           newItemProgressBar;
     @ViewById
-    ImageView            newItemImageView;
+    ImageView             newItemImageView;
     @ViewById
-    EditText             newItemTitleEditText;
+    EditText              newItemTitleEditText;
     @ViewById
-    EditText             newItemDescriptionEditText;
+    EditText              newItemDescriptionEditText;
     @ViewById
-    EditText             newItemLocationEditText;
+    EditText              newItemLocationEditText;
     @ViewById
-    CheckBox             newItemGiftCheckBox;
+    CheckBox              newItemGiftCheckBox;
 
     //// LIFECYCLE LISTENERS ///////////////////////////////////////////////////////////////////////
 
@@ -193,7 +193,7 @@ public class NewItemActivity extends LocatorActivity
     public void onLocated(Location loc)
     {
         super.onLocated(loc); // parent saves the location Application-wise
-        // Sucessfully located device : we hint to the user that the Location field is optional.
+        // Successfully located device : we hint to the user that the Location field is optional.
         newItemLocationEditText.setHint(R.string.new_item_label_location_optional);
     }
 

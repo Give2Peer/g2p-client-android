@@ -1,22 +1,24 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<android.support.design.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     tools:context=".NewItemActivity_"
     >
 
-    <ScrollView
-        android:id="@+id/newItemFormScrollView"
+    <android.support.design.widget.AppBarLayout
+        android:id="@+id/newItemAppBarLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         >
 
-        <LinearLayout
+        <android.support.design.widget.CollapsingToolbarLayout
+            android:id="@+id/newItemCollapsingToolbarLayout"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
+            android:layout_height="match_parent"
+            app:layout_scrollFlags="scroll|exitUntilCollapsed"
+            app:contentScrim="?attr/colorPrimary"
             >
 
             <!-- The src of this is overwritten by the picture provided in the Intent -->
@@ -24,11 +26,32 @@
                 android:id="@+id/newItemImageView"
                 android:layout_width="match_parent"
                 android:layout_height="240dp"
-                android:layout_marginBottom="13dp"
                 android:layout_gravity="center_horizontal"
                 android:contentDescription="@string/new_item_image_description"
                 android:src="@drawable/item_thumbnail"
+
+                android:scaleType="centerCrop"
+                app:layout_collapseMode="parallax"
+                app:layout_collapseParallaxMultiplier="0.7"
                 />
+
+        </android.support.design.widget.CollapsingToolbarLayout>
+
+    </android.support.design.widget.AppBarLayout>
+
+    <android.support.v4.widget.NestedScrollView
+        android:id="@+id/newItemFormScrollView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        >
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            >
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -86,7 +109,8 @@
 
         </LinearLayout>
 
-    </ScrollView>
+    </android.support.v4.widget.NestedScrollView>
+
 
     <com.shamanland.fab.FloatingActionButton
         android:id="@+id/newItemSendButton"
@@ -115,4 +139,5 @@
         android:visibility="invisible"
         />
 
-</RelativeLayout>
+
+</android.support.design.widget.CoordinatorLayout>

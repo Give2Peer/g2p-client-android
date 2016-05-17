@@ -22,7 +22,6 @@ android {
         testInstrumentationRunner "cucumber.api.android.CucumberInstrumentation"
     }
 
-
     // Because we're using Apache legacy, removed from SDK 23
     useLibrary 'org.apache.http.legacy'
 
@@ -70,6 +69,8 @@ dependencies {
     // BACKWARDS COMPATIBILITY (http://developer.android.com/tools/support-library/features.html)
     compile 'com.android.support:appcompat-v7:23.3.0'
     compile 'com.github.machinarius:preferencefragment:0.1.1' // we'll probably remove this
+
+    compile 'com.android.support:design:23.3.0'
 
     // ANDROID ANNOTATIONS (unsure why we have both apt and compile directives)
     apt 'org.androidannotations:androidannotations:3.3.2'
