@@ -133,19 +133,19 @@ public class NewItemActivity extends LocatorActivity
         }
     }
 
-    @Override
-    public void onStart()
-    {
-        super.onStart();
-        if ( ! EventBus.getDefault().isRegistered(this)) EventBus.getDefault().register(this);
-    }
-
-    @Override
-    public void onStop()
-    {
-        EventBus.getDefault().unregister(this);
-        super.onStop();
-    }
+//    @Override
+//    public void onStart()
+//    {
+//        super.onStart();
+//        if ( ! EventBus.getDefault().isRegistered(this)) EventBus.getDefault().register(this);
+//    }
+//
+//    @Override
+//    public void onStop()
+//    {
+//        EventBus.getDefault().unregister(this);
+//        super.onStop();
+//    }
 
     @Override
     protected void onResume()
