@@ -27,6 +27,20 @@ _"Who wants the old computer taking up space in my office ?"_
 
 
 
+Google
+------
+
+If you're Google and you read this, please help us make that happen :
+
+_"Ok google, please add these old shoes to my MOOP bag."_
+
+Snaps picture, prefills fields, I'm done in a matter of seconds.
+It's easier said than done, of course.
+
+Then again, Google should make a lost&found app altogether. Any big player should.
+Karma is and will stay forever free and libre.
+
+
 ROADMAP
 =======
 
@@ -89,6 +103,7 @@ A version for open beta-testing, working as early as API 10 (Android 3.0 Gingerb
 
 All list items followed by parenthesis are optional, and the parenthesis should explain why.
 
+- [ ] Feature: MOOP bags, to regroup items and handle another recycling bin at home
 - [ ] Feature: display basic statistics of the app.
 - [ ] Feature: propose deletion of items submitted by someone else. (tricky)
 - [ ] Feature: provide a lifespan to items I tag. (lifespans depend on the user karmic level)
@@ -105,6 +120,7 @@ All list items followed by parenthesis are optional, and the parenthesis should 
 - [ ] Feature: ask for new credentials with email.
 - [ ] Feature: show items around as a list from closest to furthest.
 - [ ] Feature: report an offensive item.
+- [ ] Feature: display a count of available characters under the title input field
 - [ ] Translation: español.
 - [ ] Translation: français.
 

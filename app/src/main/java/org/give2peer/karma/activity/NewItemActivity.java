@@ -35,11 +35,13 @@ import org.give2peer.karma.exception.QuotaException;
 import org.give2peer.karma.factory.BitmapFactory;
 import org.give2peer.karma.service.ExceptionHandler;
 import org.give2peer.karma.task.NewItemTask;
+import org.greenrobot.eventbus.EventBus;
 
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -97,11 +99,13 @@ public class NewItemActivity extends LocatorActivity
     @ViewById
     EditText             newItemTitleEditText;
     @ViewById
+    EditText             newItemDescriptionEditText;
+    @ViewById
     EditText             newItemLocationEditText;
     @ViewById
     CheckBox             newItemGiftCheckBox;
 
-    //// LISTENERS ///
+    //// LIFECYCLE LISTENERS ///////////////////////////////////////////////////////////////////////
 
     @Override
     public void onCreate(Bundle savedInstanceState)
@@ -120,9 +124,80 @@ public class NewItemActivity extends LocatorActivity
         // what happens when we have a savedinstancestate but the picture comes from the share ?
         if (null != savedInstanceState) {
             imagePaths = savedInstanceState.getStringArrayList(BUNDLE_IMAGE_PATHS);
+            if (imagePaths != null) {
+                Log.d("G2P", String.format(
+                        "Restored image paths %s from bundle.",
+                        Arrays.toString(imagePaths.toArray()))
+                );
+            }
         }
-
     }
+
+    @Override
+    public void onStart()
+    {
+        super.onStart();
+        if ( ! EventBus.getDefault().isRegistered(this)) EventBus.getDefault().register(this);
+    }
+
+    @Override
+    public void onStop()
+    {
+        EventBus.getDefault().unregister(this);
+        super.onStop();
+    }
+
+    @Override
+    protected void onResume()
+    {
+        super.onResume();
+        // If the user is not preregistered, let's do this dudeez !
+        app.requireAuthentication(this);
+        // Suggest to enable the GPS if it is not enabled already
+        requestGpsEnabled(this);
+    }
+
+    @Override
+    protected void onSaveInstanceState(@NonNull Bundle outState)
+    {
+        super.onSaveInstanceState(outState);
+        // On some devices, the Camera activity destroys this activity, so we need to save the
+        // paths of the files we created.
+        // This happens only when we launched the camera by ourselves, which we don't anymore.
+        outState.putStringArrayList(BUNDLE_IMAGE_PATHS, imagePaths);
+    }
+
+    /**
+     * The Camera and Gallery activities will provide the images to this activity in this method,
+     * if we use requestNewPicture().
+     * We try not to do that anymore.
+     */
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent intent)
+    {
+        super.onActivityResult(requestCode, resultCode, intent);
+        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
+            //processImages();
+            // Put the bitmap in the View to show the user
+            fillThumbnail();
+        } else if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_CANCELED) {
+            // If the user cancelled the capture of a picture, we GTFO.
+            // It may be nice to allow a user to add a picture from a gallery instead of taking one.
+            // see http://stackoverflow.com/questions/20021431/android-how-to-take-a-picture-from-camera-or-gallery
+            Log.d("G2P", "User cancelled the image capture.");
+            finish();
+        }
+    }
+
+    @Override
+    public void onLocated(Location loc)
+    {
+        super.onLocated(loc); // parent saves the location Application-wise
+        // Sucessfully located device : we hint to the user that the Location field is optional.
+        newItemLocationEditText.setHint(R.string.new_item_label_location_optional);
+    }
+
+    //// AFTER VIEWS ///////////////////////////////////////////////////////////////////////////////
 
     /**
      * This is to recover the image from the Intent, or launch the Camera to pick one if we
@@ -135,7 +210,6 @@ public class NewItemActivity extends LocatorActivity
      * I'd love a tool to inspect in real-time that information. There's probably one already.
      *
      * Note that this is in AfterViews because we're using Android Annotations.
-     * todo: make it lazy because we're not sure when @AfterViews is triggered in the lifecycle
      */
     @AfterViews
     public void recoverImage()
@@ -170,8 +244,9 @@ public class NewItemActivity extends LocatorActivity
 //                handleSendMultipleImages(intent); // Handle multiple images being sent
 //            }
         } else {
-            // Directly try to grab a new image if and only if there are no files paths stored
-            // Otherwise, it means that `onActivityResult` will be called.
+            // /!\ we try not to do that anymore, it's too unreliable.
+            // Directly try to grab a new image if and only if there are no files paths stored.
+            // Otherwise, it means that `onActivityResult` will be called..
             if (imagePaths.size() == 0) {
                 try {
                     // Check if there's a camera available
@@ -182,7 +257,6 @@ public class NewItemActivity extends LocatorActivity
                         return;
                     }
                     // Launch the camera to add a new picture
-                    // /!\ we try not to do that anymore, it's too unreliable.
                     requestNewPicture();
                 } catch (CriticalException ex) {
                     Log.e("G2P", "Failed to add a new picture.");
@@ -193,60 +267,6 @@ public class NewItemActivity extends LocatorActivity
             } else {
                 fillThumbnail();
             }
-        }
-    }
-
-    @AfterViews
-    public void requestGpsEnabled()
-    {
-        super.requestGpsEnabled();
-    }
-
-    @Override
-    protected void onResume()
-    {
-        super.onResume();
-        // If the user is not preregistered, let's do this dudeez !
-        app.requireAuthentication(this);
-    }
-
-    @Override
-    public void onLocated(Location loc)
-    {
-        super.onLocated(loc); // parent saves the location Application-wise
-        // Sucessfully located device : we hint to the user that the Location field is optional.
-        newItemLocationEditText.setHint(R.string.new_item_label_location_optional);
-    }
-
-    @Override
-    protected void onSaveInstanceState(@NonNull Bundle outState)
-    {
-        super.onSaveInstanceState(outState);
-        // On some devices, the Camera activity destroys this activity, so we need to save the
-        // paths of the files we created.
-        // This happens only when we launched the camera by ourselves, which we don't anymore.
-        outState.putStringArrayList(BUNDLE_IMAGE_PATHS, imagePaths);
-    }
-
-    /**
-     * The Camera and Gallery activities will provide the images to this activity in this method,
-     * if we use requestNewPicture().
-     * We try not to do that anymore.
-     */
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent intent)
-    {
-        super.onActivityResult(requestCode, resultCode, intent);
-        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
-            //processImages();
-            // Put the bitmap in the View to show the user
-            fillThumbnail();
-        } else if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_CANCELED) {
-            // If the user cancelled the capture of a picture, we GTFO.
-            // It may be nice to allow a user to add a picture from a gallery instead of taking one.
-            // see http://stackoverflow.com/questions/20021431/android-how-to-take-a-picture-from-camera-or-gallery
-            Log.d("G2P", "User cancelled the image capture.");
-            finish();
         }
     }
 
@@ -352,6 +372,7 @@ public class NewItemActivity extends LocatorActivity
         Item item = new Item();
         item.setLocation(locationInputValue);
         item.setTitle(newItemTitleEditText.getText().toString());
+        item.setDescription(newItemDescriptionEditText.getText().toString());
 
         if (newItemGiftCheckBox.isChecked()) {
             item.setType(Item.TYPE_GIFT);

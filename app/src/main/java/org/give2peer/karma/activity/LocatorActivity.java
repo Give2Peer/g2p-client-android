@@ -2,6 +2,7 @@ package org.give2peer.karma.activity;
 
 import android.Manifest;
 import android.app.Dialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
@@ -209,13 +210,18 @@ abstract public class LocatorActivity
     }
 
 
+
+
     //// GPS DISABLED ERROR DIALOG ///////////////////////////////////////////////////////////////////////
 
-    public void requestGpsEnabled()
+    /**
+     *
+     */
+    public void requestGpsEnabled(Context context)
     {
         LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
         if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            AlertDialog.Builder builder = new AlertDialog.Builder(context);
             builder.setMessage(R.string.dialog_gps_disabled_msg)
                     .setCancelable(false)
                     .setPositiveButton(R.string.dialog_gps_disabled_oui, new DialogInterface.OnClickListener() {

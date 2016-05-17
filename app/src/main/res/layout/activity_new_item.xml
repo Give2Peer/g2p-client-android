@@ -49,6 +49,14 @@
                     android:textColorHint="@android:color/darker_gray"
                     />
 
+                <CheckBox
+                    android:id="@+id/newItemGiftCheckBox"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/new_item_checkbox_gift"
+                    android:layout_marginTop="10dp"
+                    />
+
                 <EditText
                     android:id="@+id/newItemTitleEditText"
                     android:layout_width="match_parent"
@@ -60,12 +68,18 @@
                     android:textColorHint="@android:color/darker_gray"
                     />
 
-                <CheckBox
-                    android:id="@+id/newItemGiftCheckBox"
-                    android:layout_width="wrap_content"
+                <EditText
+                    android:id="@+id/newItemDescriptionEditText"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@string/new_item_checkbox_gift"
-                    android:layout_marginTop="10dp"
+                    android:maxLength="32"
+                    android:inputType="textMultiLine|textAutoComplete|textAutoCorrect"
+                    android:lines="6"
+                    android:minLines="1"
+                    android:maxLines="32"
+                    android:hint="@string/new_item_label_description"
+                    android:textColorHint="@android:color/darker_gray"
+                    android:scrollbars="vertical"
                     />
 
             </LinearLayout>

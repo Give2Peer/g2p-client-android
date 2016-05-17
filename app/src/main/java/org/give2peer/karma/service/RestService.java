@@ -192,6 +192,7 @@ public class RestService
         HashMap<String, String> params = new HashMap<String, String>();
         params.put("location", item.getLocation());
         params.put("title", item.getTitle());
+        params.put("description", item.getDescription());
         params.put("type", item.getType());
 
         String jsonResponse = postJson(ROUTE_ITEM, params);

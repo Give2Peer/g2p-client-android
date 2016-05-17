@@ -140,7 +140,7 @@ public class      MapItemsActivity
     @AfterViews
     public void requestGpsEnabled()
     {
-        super.requestGpsEnabled();
+        super.requestGpsEnabled(this);
     }
 
     @Subscribe

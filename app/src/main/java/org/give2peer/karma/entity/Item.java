@@ -21,7 +21,7 @@ public class Item
     String   location;
     Float    latitude;
     Float    longitude;
-    Float    distance; // in meters, and not always provided by server
+    Float    distance; // in meters, not always provided by the server
     DateTime created_at;
     DateTime updated_at;
     String   thumbnail;
