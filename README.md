@@ -222,13 +222,36 @@ A marathon of code !
 CAVEATS
 =======
 
-_They are plenty, in this project._
+This project has a bunch of caveats. We're working to reduce their impact and numbers, but...
 
-Notably, you need at least Gradle `2.12` to be able to build,
-at least until `sugar` makes a release.
+
+Gradle
+------
+
+You need at least Gradle `2.12` to be able to build, at least until `sugar` makes a release.
+This is to be able to use jitpack.io in gradle, because `introduction` needs it.
+Just grab it, unpack it alongside the other, and configure Android Studio.
+
+Otherwise, you'll get a `peer not authenticated` error.
+
+
+API 10
+------
+
+Polyfills, shims, appcompat... You know. Hard to implement, hell to maintain, feature blockers.
+
+This version will have no tablet layout, because there are no fragments (that we know of).
+
+I'm getting scolded hard for choosing API 10. And with reason;
+It's kind of like trying to make a responsive website for IE6.
+
+
+Settings
+--------
 
 We hacked in and around the Settings to handle Servers, and now they're a mess.
 Server configurations should have proper dedicated CRUD activities, instead.
+
 
 
 TROUBLESHOOTING

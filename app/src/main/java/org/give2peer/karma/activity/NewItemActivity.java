@@ -48,11 +48,15 @@ import java.util.Locale;
 
 
 /**
+ *
+ *
+ * HAYLEY 18yth august
+ *
  * Handles :
  * - Receiving an image from another activity's share intent
  * - (deprecated) launching the camera otherwise
  * - A form to add a new item, with a nice Floating Action Button to send.
- * - (todo) Rotating the received image before sending it
+ * - Rotating the received image before sending it
  *
  * This is where the user adds new items in the database.
  * It should handle the three main moop intents :
@@ -268,6 +272,17 @@ public class NewItemActivity extends LocatorActivity
                 fillThumbnail();
             }
         }
+    }
+
+    @AfterViews
+    public void hideActionBar()
+    {
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+//            getActionBar().hide();
+//        } else {
+//        }
+        getSupportActionBar().hide();
+
     }
 
 

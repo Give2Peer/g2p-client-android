@@ -36,7 +36,7 @@ import org.give2peer.karma.listener.GoogleApiClientListener;
  * But it was accessible to a beginner, so here it is.
  */
 abstract public class LocatorActivity
-        extends ActionBarActivity
+        extends android.support.v7.app.AppCompatActivity
         implements GoogleApiClientListener {
     Application app;
 
