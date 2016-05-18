@@ -95,7 +95,7 @@
                     android:id="@+id/newItemDescriptionEditText"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:maxLength="32"
+                    android:maxLength="1024"
                     android:inputType="textMultiLine|textAutoComplete|textAutoCorrect"
                     android:lines="6"
                     android:minLines="1"
@@ -111,7 +111,7 @@
 
     </android.support.v4.widget.NestedScrollView>
 
-
+    <!-- SUBMIT or SEND ? Which is better ? -->
     <com.shamanland.fab.FloatingActionButton
         android:id="@+id/newItemSendButton"
         android:layout_width="wrap_content"
@@ -134,10 +134,14 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/newItemProgressBar"
-        android:layout_centerVertical="true"
-        android:layout_centerHorizontal="true"
+        android:layout_gravity="right|bottom"
+        android:layout_marginBottom="2dp"
+        android:layout_marginRight="2dp"
         android:visibility="invisible"
         />
+        <!-- Since the CoordinatorLayout, this does not center the loader, so we've relocated it -->
+        <!--android:layout_centerVertical="true"-->
+        <!--android:layout_centerHorizontal="true"-->
 
 
 </android.support.design.widget.CoordinatorLayout>

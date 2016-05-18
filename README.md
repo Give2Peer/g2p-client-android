@@ -131,6 +131,7 @@ All list items followed by parenthesis are optional, and the parenthesis should 
 - [ ] Bugfix:  make sure temporary picture files are removed.
 - [x] Feature: suggest enabling the GPS.
 - [x] Feature: parallax the new item picture.
+- [ ] Feature: provide a description to items (50%)
 - [ ] Feature: show new item location on a small map.
 - [ ] Feature: thank someone for an item.
 - [ ] Feature: list notifications in the profile.
