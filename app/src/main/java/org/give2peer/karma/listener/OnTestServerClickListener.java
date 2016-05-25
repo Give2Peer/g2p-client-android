@@ -59,6 +59,7 @@ public class OnTestServerClickListener implements Preference.OnPreferenceClickLi
                         isServerUndergoingMaintenance = true;
                     } catch (Exception e) {
                         Log.d("G2P", String.format("Test of server '%s' failed.", server.getUrl()));
+                        e.printStackTrace();
                     }
                     progress.incrementProgressBy(1);
                 }
