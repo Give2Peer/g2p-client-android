@@ -70,6 +70,7 @@ dependencies {
     compile 'com.android.support:appcompat-v7:23.3.0'
     compile 'com.github.machinarius:preferencefragment:0.1.1' // we'll probably remove this
 
+    // MATERIAL DESIGN
     compile 'com.android.support:design:23.3.0'
 
     // ANDROID ANNOTATIONS (unsure why we have both apt and compile directives)
@@ -85,7 +86,7 @@ dependencies {
     compile 'com.shamanland:fab:0.0.8'
     //compile 'com.android.support:design:23.3.0' // nope
 
-    // HTTP
+    // HTTP /!\ deprecated
     compile 'org.apache.httpcomponents:httpmime:4.3'
     compile 'org.apache.httpcomponents:httpclient-android:4.3.5'
 

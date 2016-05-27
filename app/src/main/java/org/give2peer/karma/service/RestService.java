@@ -14,20 +14,33 @@ import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.CookieStore;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpRequestBase;
+import org.apache.http.conn.ClientConnectionManager;
+import org.apache.http.conn.scheme.PlainSocketFactory;
+import org.apache.http.conn.scheme.Scheme;
+import org.apache.http.conn.scheme.SchemeRegistry;
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
+import org.apache.http.conn.ssl.SSLContextBuilder;
+import org.apache.http.conn.ssl.SSLSocketFactory;
+import org.apache.http.conn.ssl.TrustStrategy;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.impl.auth.BasicScheme;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.params.BasicHttpParams;
+import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
 import org.apache.http.util.EntityUtils;
 import org.apache.http.util.ExceptionUtils;
+import org.give2peer.karma.StringUtils;
 import org.give2peer.karma.entity.Item;
 import org.give2peer.karma.adapter.DateTimeTypeAdapter;
 import org.give2peer.karma.exception.AuthenticationException;
@@ -58,20 +71,24 @@ import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.UnknownHostException;
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
 /**
  * This is our REST client service.
- * This also manages the collections of Items, but should not.
- *
  * It fetches data synchronously, so there's also a bunch of AsyncTasks that use these methods.
  *
  * Responsibilities :
- * - Fetch items from server's HTTP REST API.
- * - Keep fetched items up to date. (meh, no. -- but someone has to !)
- * - Store items locally in a cache for offline use. (don't know how, yet)
+ * - Fetch data from server's HTTP REST API.
+ *
+ * /!\ There are a lot of deprecated classes used in this service. Consider moving to retrofit !
  */
 public class RestService
 {
@@ -112,7 +129,8 @@ public class RestService
     {
         setServer(config);
 
-        client = new DefaultHttpClient();
+//        client = new DefaultHttpClient();
+        client = getHttpClient();
     }
 
     public void setServer(Server config)
@@ -135,6 +153,67 @@ public class RestService
     public void setCredentials(String username, String password)
     {
         setCredentials(new UsernamePasswordCredentials(username, password));
+    }
+
+    // HTTP CLIENT SINGLETON ///////////////////////////////////////////////////////////////////////
+
+    /**
+     * I don't know where to start... This is BAAAAAAAAD.
+     * We accept all certificates, and are very much vulnerable to a MITM attack. :(
+     * But I can't figure out how to handle certificates the right way
+     *
+     *
+     * @return the http client
+     */
+    public synchronized HttpClient getHttpClient()
+    {
+        if (client != null)
+            return client;
+
+        SSLConnectionSocketFactory sslSF = null;
+        try {
+            SSLContextBuilder builder = new SSLContextBuilder();
+            builder.loadTrustMaterial(null, new TrustStrategy() {
+                @Override
+                public boolean isTrusted(X509Certificate[] chain, String authType) throws CertificateException {
+                    // We could match StringUtils.bytesToHex(cert.getTBSCertificate()) against
+                    // String tbs = "30820188020900B36C4DED88CD2BF6300D06092A864886F70D010105050030123110300E0603550403130771726F6B2E6D65301E170D3133303533303032333634335A170D3233303532383032333634335A30123110300E0603550403130771726F6B2E6D6530820122300D06092A864886F70D01010105000382010F003082010A0282010100D05CF4CD16510597A92750D20643D691C05BE51EF892407C2C2434A93659FE6BB11C5E6B039E3E670AE541252970AB1DB4014EC9F5A26C9500FE43D85A8053CD2EA507D6B9BDCD02510A9612EF4BFD145A2465C24061F0EE482935821CA75C06A8931CCD9F7B797A0D05B0ACF6FDA8409972646304B0ADA5034E55FFEB03CF2E410C4016B6D06CBBCCD5CB5B1BFC65A9B4798B751027AEDF2D7CE219E3655DF257BF84958DE417A886BA5E1E54C9F0CBF7B7ED205B9F7AA7E2D963643B20B880D80B4A5BD0AAB9604B99F21AA49602932F2F4DF3A013351E2D919D812C70011D8BAE799D39AAFF59EC269ECD64B0D0591DD215897BCA5FBB0C8F8FC42EEBDE2F0203010001";
+                    // but when our certificate expires it would break the app !
+                    // And what about the certificates of other servers ?
+                    // for (X509Certificate cert : chain) {
+                    //     Log.d("G2P", String.format("Certificate %s", cert.toString()));
+                    // }
+                    return true;
+                }
+            });
+            sslSF = new SSLConnectionSocketFactory(
+                    builder.build(),
+                    SSLConnectionSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER
+            );
+        } catch (NoSuchAlgorithmException | KeyStoreException | KeyManagementException e) {
+            throw new CriticalException(e);
+        }
+
+        client = HttpClients.custom().setSSLSocketFactory(sslSF).build();
+
+//        HttpParams httpParameters = new BasicHttpParams();
+//        HttpConnectionParams.setConnectionTimeout(httpParameters, TIMEOUT_CONNECTION);
+//        HttpConnectionParams.setSoTimeout(httpParameters, TIMEOUT_SOCKET);
+//        HttpProtocolParams.setVersion(httpParameters, HttpVersion.HTTP_1_1);
+
+        // Thread safe in case various AsyncTasks try to access it concurrently
+//        SchemeRegistry schemeRegistry = new SchemeRegistry();
+//        schemeRegistry.register(new Scheme("http", PlainSocketFactory.getSocketFactory(), 80));
+//        schemeRegistry.register(new Scheme("https", SSLSocketFactory.getSocketFactory(), 443));
+//        ClientConnectionManager cm = new ThreadSafeClientConnManager(httpParameters, schemeRegistry);
+
+//        client = new DefaultHttpClient(cm, httpParameters);
+
+//        CookieStore cookieStore = client.getCookieStore();
+//        HttpContext localContext = new BasicHttpContext();
+//        localContext.setAttribute(ClientContext.COOKIE_STORE, cookieStore);
+
+        return client;
     }
 
     // HTTP QUERIES : ITEMS ////////////////////////////////////////////////////////////////////////
@@ -211,7 +290,7 @@ public class RestService
     }
 
     /**
-     * TODO: make a temp file with a smaller picture, upload it, and delete it afterwards
+     * TODO: make a temp file with a capped-size picture, upload it, and delete it afterwards ?
      *
      * @param item to add the picture to.
      * @param picture to add to the item.
@@ -295,7 +374,7 @@ public class RestService
             NoInternetException, ErrorResponseException, BadConfigException, CriticalException
     {
         String json = getJson(ROUTE_USER);
-        Log.d("G2P", "Profile json reponse :\n"+json);
+        // Log.d("G2P", "Profile json reponse :\n"+json);
 
         PrivateProfileResponse privateProfileResponse = new PrivateProfileResponse();
 
@@ -438,7 +517,6 @@ public class RestService
      * @param parameters
      * @param authenticated
      * @param picture
-     * @return
      * @throws UnavailableUsernameException
      * @throws UnavailableEmailException
      * @throws ErrorResponseException
@@ -615,7 +693,8 @@ public class RestService
 
         } catch (IOException e) {
             // Let's assume for now that this can either be a bad server url or no internet
-            throw new NoInternetException();
+//            e.printStackTrace();
+            throw new NoInternetException(e);
 
         } catch (Exception e) {
             // ... just propagate up other errors
