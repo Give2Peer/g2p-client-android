@@ -26,7 +26,6 @@ import com.google.android.gms.location.LocationServices;
 
 import org.give2peer.karma.Application;
 import org.give2peer.karma.R;
-import org.give2peer.karma.exception.CriticalException;
 import org.give2peer.karma.listener.GoogleApiClientListener;
 
 /**
@@ -57,7 +56,7 @@ abstract public class LocatorActivity
         // SERVICE_DISABLED, SERVICE_INVALID
         // Read more: http://developer.android.com/google/play-services/setup.html
 
-        isResolvingError = savedInstanceState != null
+        isResolvingLocatingError = savedInstanceState != null
                 && savedInstanceState.getBoolean(STATE_RESOLVING_ERROR, false);
 
         if (availability != ConnectionResult.SUCCESS) {
@@ -83,18 +82,20 @@ abstract public class LocatorActivity
     // To save the state of the error resolving in case the screen is rotated for example
     protected static final String STATE_RESOLVING_ERROR = "resolving_error";
     // Whether the locator activity is already resolving an error or not
-    protected boolean isResolvingError = false;
+    protected boolean isResolvingLocatingError = false;
 
     @Override
-    protected void onStart() {
+    protected void onStart()
+    {
         super.onStart();
-        if (!isResolvingError) {
+        if ( ! isResolvingLocatingError) {
             googleLocator.connect();
         }
     }
 
     @Override
-    protected void onStop() {
+    protected void onStop()
+    {
         googleLocator.disconnect();
         super.onStop();
     }
@@ -108,11 +109,16 @@ abstract public class LocatorActivity
     }
 
     @Override
-    public void onConnected(Bundle bundle) {
+    public void onConnected(Bundle bundle)
+    {
         locate();
     }
 
-    public void locate() {
+    /**
+     * Fires the `onLocated` method
+     */
+    public void locate()
+    {
         if (null != googleLocator && googleLocator.isConnected()) {
             if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
 
@@ -191,10 +197,10 @@ abstract public class LocatorActivity
     {
         Log.e("G2P", "Connection to Google API services failed.");
         // If we're not already attempting to resolve an error...
-        if ( ! isResolvingError) {
+        if ( !isResolvingLocatingError) {
             if (connectionResult.hasResolution()) {
                 try {
-                    isResolvingError = true;
+                    isResolvingLocatingError = true;
                     connectionResult.startResolutionForResult(this, REQUEST_RESOLVE_ERROR);
                 } catch (IntentSender.SendIntentException e) {
                     // There was an error with the resolution intent. Try again.
@@ -203,7 +209,7 @@ abstract public class LocatorActivity
             } else {
                 // Show dialog using GooglePlayServicesUtil.getErrorDialog()
                 showGoogleApiErrorDialog(connectionResult.getErrorCode());
-                isResolvingError = true;
+                isResolvingLocatingError = true;
             }
         }
     }
@@ -212,7 +218,7 @@ abstract public class LocatorActivity
     protected void onActivityResult(int requestCode, int resultCode, Intent data)
     {
         if (requestCode == REQUEST_RESOLVE_ERROR) {
-            isResolvingError = false;
+            isResolvingLocatingError = false;
             if (resultCode == RESULT_OK) {
                 // Make sure the app is not already connected or attempting to connect
                 if (!googleLocator.isConnecting() && !googleLocator.isConnected()) {
@@ -226,7 +232,7 @@ abstract public class LocatorActivity
     protected void onSaveInstanceState(Bundle outState)
     {
         super.onSaveInstanceState(outState);
-        outState.putBoolean(STATE_RESOLVING_ERROR, isResolvingError);
+        outState.putBoolean(STATE_RESOLVING_ERROR, isResolvingLocatingError);
     }
 
 
@@ -247,7 +253,7 @@ abstract public class LocatorActivity
     /* Called from GoogleApiErrorDialogFragment when the dialog is dismissed. */
     public void onDialogDismissed()
     {
-        isResolvingError = false;
+        isResolvingLocatingError = false;
     }
 
     /* A fragment to display an error dialog */

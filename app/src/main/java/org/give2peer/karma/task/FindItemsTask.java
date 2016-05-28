@@ -21,6 +21,7 @@ import java.util.Collections;
  * An async task to find items around a provided location, by asking the server.
  * Not sure it should be in its own file...
  */
+@Deprecated
 public class FindItemsTask extends AsyncTask<Void, Void, ArrayList<Item>>
 {
     int page;
