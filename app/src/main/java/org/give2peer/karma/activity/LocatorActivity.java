@@ -1,6 +1,7 @@
 package org.give2peer.karma.activity;
 
 import android.Manifest;
+import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -9,13 +10,11 @@ import android.content.IntentSender;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationManager;
-import android.net.Uri;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.DialogFragment;
-import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
 
@@ -27,6 +26,7 @@ import com.google.android.gms.location.LocationServices;
 
 import org.give2peer.karma.Application;
 import org.give2peer.karma.R;
+import org.give2peer.karma.exception.CriticalException;
 import org.give2peer.karma.listener.GoogleApiClientListener;
 
 /**
@@ -37,7 +37,9 @@ import org.give2peer.karma.listener.GoogleApiClientListener;
  */
 abstract public class LocatorActivity
         extends android.support.v7.app.AppCompatActivity
-        implements GoogleApiClientListener {
+        implements GoogleApiClientListener,
+                   ActivityCompat.OnRequestPermissionsResultCallback
+{
     Application app;
 
     GoogleApiClient googleLocator;
@@ -75,16 +77,16 @@ abstract public class LocatorActivity
 
     // Request code to use when launching the resolution activity
     protected static final int REQUEST_RESOLVE_ERROR = 1001;
+    protected static final int REQUEST_CODE_ASK_PERMISSIONS = 1002;
     // Unique tag for the error dialog fragment
     protected static final String DIALOG_ERROR = "dialog_error";
-    // Bool to track whether the app is already resolving an error
-    protected boolean isResolvingError = false;
     // To save the state of the error resolving in case the screen is rotated for example
-    private static final String STATE_RESOLVING_ERROR = "resolving_error";
+    protected static final String STATE_RESOLVING_ERROR = "resolving_error";
+    // Whether the locator activity is already resolving an error or not
+    protected boolean isResolvingError = false;
 
     @Override
-    protected void onStart()
-    {
+    protected void onStart() {
         super.onStart();
         if (!isResolvingError) {
             googleLocator.connect();
@@ -92,8 +94,7 @@ abstract public class LocatorActivity
     }
 
     @Override
-    protected void onStop()
-    {
+    protected void onStop() {
         googleLocator.disconnect();
         super.onStop();
     }
@@ -102,21 +103,76 @@ abstract public class LocatorActivity
      * Override this in child classes
      * @param location The Location fetched from google api services
      */
-    public void onLocated(Location location)
-    {
+    public void onLocated(Location location) {
         app.setGeoLocation(location);
     }
 
     @Override
-    public void onConnected(Bundle bundle)
-    {
-        Log.d("G2P", "Connection to Google Location API established.");
-        Location lastLocation = LocationServices.FusedLocationApi.getLastLocation(googleLocator);
-        if (lastLocation == null) {
-            Log.e("G2P", "Failed to retrieve the last known location.");
+    public void onConnected(Bundle bundle) {
+        locate();
+    }
+
+    public void locate() {
+        if (null != googleLocator && googleLocator.isConnected()) {
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+
+                if (!ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_FINE_LOCATION)) {
+                    final Activity activity = this;
+                    new AlertDialog.Builder(this)
+                            .setTitle("Permissions required")
+                            .setMessage("You need to allow access to the location.")
+                            .setNegativeButton(android.R.string.cancel, null) // dismisses by default
+                            .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                                @Override public void onClick(DialogInterface dialog, int which) {
+                                    // beware, this is run on UI thread
+                                    ActivityCompat.requestPermissions(activity,
+                                            new String[] {Manifest.permission.ACCESS_FINE_LOCATION},
+                                            REQUEST_CODE_ASK_PERMISSIONS);
+                                }
+                            })
+                            .create()
+                            .show();
+                } else {
+                    ActivityCompat.requestPermissions(this,
+                            new String[] {Manifest.permission.ACCESS_FINE_LOCATION},
+                            REQUEST_CODE_ASK_PERMISSIONS);
+                }
+
+            } else {
+                // We got all he right permissions, let's locate !
+                Location location = LocationServices.FusedLocationApi.getLastLocation(googleLocator);
+                if (location == null) {
+                    Log.e("G2P", "Failed to retrieve the last known location.");
+                } else {
+                    this.onLocated(location);
+                }
+            }
         } else {
-            app.setGeoLocation(lastLocation);
-            this.onLocated(lastLocation);
+            Log.d("G2P", "Tried to locate but Google Locator API is not yet available.");
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+                                           @NonNull int[] grantResults)
+    {
+        if (grantResults.length == 0) {
+            // In some rare cases, this might happen ; consider it canceled
+            Log.d("G2P", "onRequestPermissionsResult with no permissions.");
+            return;
+        }
+        switch (requestCode) {
+            case REQUEST_CODE_ASK_PERMISSIONS:
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    // Permission Granted
+                    locate();
+                } else {
+                    // Permission Denied
+                    app.toasty("Permission to locate denied.\nYou are on your own.");
+                }
+                break;
+            default:
+                super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
     }
 
@@ -146,7 +202,7 @@ abstract public class LocatorActivity
                 }
             } else {
                 // Show dialog using GooglePlayServicesUtil.getErrorDialog()
-                showErrorDialog(connectionResult.getErrorCode());
+                showGoogleApiErrorDialog(connectionResult.getErrorCode());
                 isResolvingError = true;
             }
         }
@@ -177,10 +233,10 @@ abstract public class LocatorActivity
     //// GOOGLE API ERROR DIALOG ///////////////////////////////////////////////////////////////////
 
     /* Creates a dialog for an error message */
-    private void showErrorDialog(int errorCode)
+    private void showGoogleApiErrorDialog(int errorCode)
     {
         // Create a fragment for the error dialog
-        ErrorDialogFragment dialogFragment = new ErrorDialogFragment();
+        GoogleApiErrorDialogFragment dialogFragment = new GoogleApiErrorDialogFragment();
         // Pass the error that should be displayed
         Bundle args = new Bundle();
         args.putInt(DIALOG_ERROR, errorCode);
@@ -188,16 +244,16 @@ abstract public class LocatorActivity
         dialogFragment.show(getSupportFragmentManager(), DIALOG_ERROR);
     }
 
-    /* Called from ErrorDialogFragment when the dialog is dismissed. */
+    /* Called from GoogleApiErrorDialogFragment when the dialog is dismissed. */
     public void onDialogDismissed()
     {
         isResolvingError = false;
     }
 
     /* A fragment to display an error dialog */
-    public static class ErrorDialogFragment extends DialogFragment
+    public static class GoogleApiErrorDialogFragment extends DialogFragment
     {
-        public ErrorDialogFragment() {}
+        public GoogleApiErrorDialogFragment() {}
 
         @Override
         @NonNull
