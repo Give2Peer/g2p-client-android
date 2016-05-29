@@ -277,12 +277,11 @@ public class NewItemActivity extends LocatorActivity
     @AfterViews
     public void hideActionBar()
     {
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-//            getActionBar().hide();
-//        } else {
-//        }
-        getSupportActionBar().hide();
-
+        try {
+            getSupportActionBar().hide();
+        } catch (NullPointerException e) {
+            Log.e("G2P", "Failed to hide the action bar.");
+        }
     }
 
 

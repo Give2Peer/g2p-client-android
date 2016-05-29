@@ -41,11 +41,13 @@ import com.rubengees.introduction.entity.Slide;
 import com.shamanland.fab.FloatingActionButton;
 
 import org.androidannotations.annotations.AfterViews;
+import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.ViewById;
 import org.give2peer.karma.entity.Item;
 import org.give2peer.karma.R;
 import org.give2peer.karma.event.AuthenticationEvent;
+import org.give2peer.karma.exception.CriticalException;
 import org.give2peer.karma.response.FindItemsResponse;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -73,14 +75,23 @@ public class      MapItemsActivity
 
     GoogleMap googleMap;
 
-    Boolean     isDrawing = false; // whether or not the user is drawing
+    /**
+     * Whether or not the user is currently drawing a region instead of moving around on the map.
+     */
+    Boolean isDrawing = false;
+
+    Boolean isLayoutReady = false;
 
     ArrayList<LatLng> drawingCoordinates = new ArrayList<>();
 
     /**
      * A set of displayed items on the map, to avoid duplicates when you make another request.
+     * We also use this to avoid making redundant requests.
      */
     List<Item> displayedItems = new ArrayList<>();
+
+
+    //// CONFIGURATION /////////////////////////////////////////////////////////////////////////////
 
     int lineColor = 0x88FF3399;
     int fillColor = 0x33FF3399;
@@ -108,8 +119,7 @@ public class      MapItemsActivity
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-
-        loadTutorialIfNeeded();
+        loadOnboardingIfNeeded();
     }
 
     @Override
@@ -122,29 +132,61 @@ public class      MapItemsActivity
     @Override
     public void onStop()
     {
+        cancelFinderTask();
         EventBus.getDefault().unregister(this);
         super.onStop();
     }
 
-    @AfterViews
-    public void authenticate()
+    @Override
+    protected void onResume()
     {
-        // onStart() is sometimes called AFTER this method, and so nobody listens to
-        // AuthenticationEvent yet, so we need to register to the EventBus here too.
-        if ( ! EventBus.getDefault().isRegistered(this)) EventBus.getDefault().register(this);
+        super.onResume();
 
-        // If the user is not authenticated, take care of it
+        if (isMapReady()) {
+            if (hasMapItemMarkers()) {
+                // Sometimes the map fragment loses the zoom level, let's try to fix that.
+                Log.d("G2P", "Zooming in on items when resuming map activity.");
+                zoomOnItems(googleMap, displayedItems);
+            } else {
+                // Map is empty, maybe we just activated the GPS or Internet, so try again
+                locate();
+            }
+        }
+
+        // If the user is not preregistered, let's do this dudeez !
         app.requireAuthentication(this);
+        // Suggest to enable the GPS if it is not enabled already
+        requestGpsEnabled(this);
     }
 
+    /**
+     * todo: ensure this is necessary (it might very well not be)
+     */
     @AfterViews
-    public void requestGpsEnabled()
+    public void readyLayout()
     {
-        super.requestGpsEnabled(this);
+        isLayoutReady = true;
     }
+
+//    @AfterViews
+//    public void authenticate()
+//    {
+//        // onStart() is sometimes called AFTER this method, and so nobody listens to
+//        // AuthenticationEvent yet, so we need to register to the EventBus here too.
+//        if ( ! EventBus.getDefault().isRegistered(this)) EventBus.getDefault().register(this);
+//
+//        // If the user is not authenticated, take care of it
+//        app.requireAuthentication(this);
+//    }
+//
+//    @AfterViews
+//    public void requestGpsEnabled()
+//    {
+//        super.requestGpsEnabled(this);
+//    }
 
     @Subscribe
-    public void loadMap(AuthenticationEvent authenticationEvent)
+    public void onAuthenticated(AuthenticationEvent authenticationEvent)
     {
         if (authenticationEvent.isFailure()) {
             hideLoader();
@@ -162,19 +204,9 @@ public class      MapItemsActivity
             Log.e("G2P", "There was a problem loading the map fragment.");
             Log.e("G2P", e.getMessage());
             e.printStackTrace();
+            app.toasty("Failed to load the map on this device. Sorry!\nPlease report this !");
 
-            app.toast("Failed to load the map on this device. Sorry!\nPlease report this !");
-        }
-    }
-
-    @Override
-    protected void onResume()
-    {
-        super.onResume();
-
-        if ( ! displayedItems.isEmpty() && null != googleMap) {
-            Log.d("G2P", "Zooming in on items when resuming map activity.");
-            zoomOnItems(googleMap, displayedItems);
+            throw new CriticalException("Failed to load the map fragment.", e);
         }
     }
 
@@ -182,7 +214,9 @@ public class      MapItemsActivity
     public void onLocated(Location loc)
     {
         super.onLocated(loc);
-        if (isMapReady()) executeFinderTask(new LatLng(loc.getLatitude(), loc.getLongitude()));
+        if (isMapReady() && ! hasMapItemMarkers()) {
+            executeFinderTask(new LatLng(loc.getLatitude(), loc.getLongitude()));
+        }
     }
 
 
@@ -206,8 +240,8 @@ public class      MapItemsActivity
 
     //// UI LISTENERS //////////////////////////////////////////////////////////////////////////////
 
-    // todo: use @Click annotation
-    public void onDrawButton(View button)
+    @Click
+    public void mapItemsDrawButtonClicked()
     {
         // 1. We are currently finding items, and this button is a CANCEL button.
         if (isFinding()) {
@@ -216,30 +250,32 @@ public class      MapItemsActivity
             hideRegion();
         }
         // 2. We are on the map, and we want to FIND
-        else if (!isDrawing) {
+        else if ( ! isDrawing) {
             isDrawing = true;
             app.toast(getString(R.string.toast_draw_on_map));
         }
         // 3. We already clicked the button, and should be drawing. Let's cancel !
         else {
             isDrawing = false;
+            hideRegion();
         }
 
         updateDrawButton();
     }
 
 
-    //// ACTIONS ///////////////////////////////////////////////////////////////////////////////////
+    //// ONBOARDING ////////////////////////////////////////////////////////////////////////////////
 
-    public void loadTutorialIfNeeded()
+    public void loadOnboardingIfNeeded()
     {
+        // app.isUserOnBoard(false);
         if ( ! app.isUserOnBoard()) {
             app.isUserOnBoard(true);
-            loadTutorial();
+            loadOnboarding();
         }
     }
 
-    public void loadTutorial()
+    public void loadOnboarding()
     {
         new IntroductionBuilder(this).withSlides(getOnboardingSlides(this)).introduceMyself();
     }
@@ -278,6 +314,8 @@ public class      MapItemsActivity
 
         return slides;
     }
+
+    //// ACTIONS ///////////////////////////////////////////////////////////////////////////////////
 
     protected void updateDrawButton()
     {
@@ -345,22 +383,6 @@ public class      MapItemsActivity
                 ArrayList<Item> filteredItems = new ArrayList<Item>();
                 filteredItems.addAll(items);
 
-                // Remove duplicates (comparing getId)
-                // This logic should probably reside in an ItemsCache or some such
-                // pretty sure this does work but causes bugs
-//                for (Item newItem : items) {
-//                    boolean alreadyThere = false;
-//                    for (Item oldItem: displayedItems) {
-//                        Log.d("G2P", String.format("Comparing %d and %d", newItem.getId(), oldItem.getId()));
-//                        if (newItem.getId() == oldItem.getId()) {
-//                            alreadyThere = true;
-//                            Log.d("G2P", "Item already fetched, and subsequently ignored.");
-//                            break;
-//                        }
-//                    }
-//                    if (!alreadyThere) filteredItems.add(newItem);
-//                }
-
                 // Remove items outside of container polygon (if specified)
                 if (container != null) {
                     items = filteredItems;
@@ -405,18 +427,26 @@ public class      MapItemsActivity
                     app.toast("No items were found in this area.", Toast.LENGTH_LONG);
                 } else {
 
-                    // todo : Use a custom InfoWindowAdapter to add an image ?
+                    // idea : Use a custom InfoWindowAdapter to add an image ?
                     //        but there are lots of caveats with this canvas drawing technique !
 
                     // Add markers to the map
                     for (int i=0; i<itemsCount; i++) {
                         Item item = items.get(i);
 
+                        String title = item.getTitle();
+                        // When the title is empty the marker does not show the info window at all.
+                        // We want it to show up, so let's provide an alternative title !
+                        if (title.isEmpty()) {
+                            title = "MOOP";
+                        }
+                        String snippet = item.getHumanUpdatedAt();
+
                         Marker m = googleMap.addMarker(
                                 new MarkerOptions()
                                         .position(item.getLatLng())
-                                        .title(item.getTitle())
-                                        .snippet(item.getHumanUpdatedAt())
+                                        .title(title)
+                                        .snippet(snippet)
                         );
 
                         dropPinEffect(m, Math.round(i * 222));
@@ -464,8 +494,12 @@ public class      MapItemsActivity
      */
     public void cancelFinderTask()
     {
-        if (finder != null) finder.cancel(true);
-        finder = null;
+        if (finder != null) {
+            finder.cancel(true);
+            finder = null;
+        }
+        hideLoader();
+        updateDrawButton();
     }
 
     protected boolean isFinding()
@@ -475,7 +509,12 @@ public class      MapItemsActivity
 
     protected boolean isMapReady()
     {
-        return googleMap != null;
+        return googleMap != null && isLayoutReady;
+    }
+
+    protected boolean hasMapItemMarkers()
+    {
+        return ! displayedItems.isEmpty();
     }
 
     @Override
@@ -564,6 +603,12 @@ public class      MapItemsActivity
 
     }
 
+    /**
+     * Zooms and pans the `googleMap` to encompass all the `items`.
+     *
+     * @param googleMap to zoom.
+     * @param items that should be visible on the map.
+     */
     protected void zoomOnItems(GoogleMap googleMap, List<Item> items)
     {
         // Collect the LatLngs to zoom and pan the camera ideally
@@ -626,10 +671,8 @@ public class      MapItemsActivity
             {
                 long elapsed = SystemClock.uptimeMillis() - start;
                 float t = Math.max(
-                        1 - interpolator.getInterpolation(
-                                (float) elapsed
-                                        / duration
-                        ), 0
+                        1 - interpolator.getInterpolation( (float) elapsed / duration ),
+                        0
                 );
                 marker.setAnchor(0.5f, 1.0f + 14 * t);
 
@@ -712,7 +755,7 @@ public class      MapItemsActivity
     //// MATH UTILS (SHOULD BE MOVED ELSEWHERE) ////////////////////////////////////////////////////
 
     /**
-     * Ray casting alogrithm, see http://rosettacode.org/wiki/Ray-casting_algorithm
+     * Ray casting algorithm, see http://rosettacode.org/wiki/Ray-casting_algorithm
      *
      * @param point
      * @param polygon The list of the vertices of the polygon, sequential and looping.

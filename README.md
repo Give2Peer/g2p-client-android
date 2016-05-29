@@ -111,7 +111,6 @@ All list items followed by parenthesis are optional, and the parenthesis should 
 - [ ] Feature: easily send a bug report to developers on caught error. (we use the OS)
 - [ ] Feature: warn the user that the app is unavailable during server maintenance. (to be tested)
 - [ ] Feature: some form of OAuth2 as fallback for Maps. (we are subjected to quotas)
-- [ ] Setting: enable `https` protocol.
 - [ ] Feature: edit items I authored in my profile.
 - [ ] Feature: delete items I authored in my profile.
 - [ ] Feature: change your username when level 1, against some (9?) karma points.
@@ -125,17 +124,24 @@ All list items followed by parenthesis are optional, and the parenthesis should 
 - [ ] Translation: français.
 
 
+1.3.0
+-----
+
+- [ ] Feature: thank someone for an item.
+- [ ] Feature: list notifications in the profile.
+- [ ] Feature: all-time world leaderboard.
+
+
 1.2.0
 -----
 
+- [x] Setting: enable `https` protocol.
+- [x] Bugfix:  map loader keeps turning after onboarding activity
 - [ ] Bugfix:  make sure temporary picture files are removed.
 - [x] Feature: suggest enabling the GPS.
 - [x] Feature: parallax the new item picture.
 - [ ] Feature: provide a description to items (50%)
 - [ ] Feature: show new item location on a small map.
-- [ ] Feature: thank someone for an item.
-- [ ] Feature: list notifications in the profile.
-- [ ] Feature: all-time world leaderboard.
 
 
 
