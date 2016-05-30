@@ -130,23 +130,23 @@ All list items followed by parenthesis are optional, and the parenthesis should 
 - [ ] Feature: thank someone for an item.
 - [ ] Feature: list notifications in the profile.
 - [ ] Feature: all-time world leaderboard.
-
-
-1.2.0
------
-
-- [x] Setting: enable `https` protocol.
-- [x] Bugfix:  map loader keeps turning after onboarding activity
-- [ ] Bugfix:  make sure temporary picture files are removed.
-- [x] Feature: suggest enabling the GPS.
-- [x] Feature: parallax the new item picture.
-- [ ] Feature: provide a description to items (50%)
 - [ ] Feature: show new item location on a small map.
+- [ ] Feature: provide a description to items
 
 
 
 CHANGELOG
 =========
+
+
+1.2.0 (30-05-2016)
+------------------
+
+- [x] Setting: enable `https` protocol, like a monkey
+- [x] Bugfix:  map loader keeps turning after onboarding activity
+- [x] Bugfix:  make sure temporary picture files are removed.
+- [x] Feature: suggest enabling the GPS.
+- [x] Feature: parallax the new item picture.
 
 
 1.1.0 (11-05-2016)

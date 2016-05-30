@@ -268,7 +268,7 @@ public class      MapItemsActivity
 
     public void loadOnboardingIfNeeded()
     {
-        // app.isUserOnBoard(false);
+        //app.isUserOnBoard(false);
         if ( ! app.isUserOnBoard()) {
             app.isUserOnBoard(true);
             loadOnboarding();
