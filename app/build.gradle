@@ -1,3 +1,4 @@
+//noinspection GradleCompatible
 apply plugin: 'com.android.application'
 apply plugin: 'android-apt'
 
@@ -19,6 +20,7 @@ android {
         versionCode 6
         versionName "1.1.0"
 
+        // You can also enable it per-file in the test runner configuration of android studio.
         testInstrumentationRunner "cucumber.api.android.CucumberInstrumentation"
     }
 
@@ -67,11 +69,11 @@ repositories {
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     // BACKWARDS COMPATIBILITY (http://developer.android.com/tools/support-library/features.html)
-    compile 'com.android.support:appcompat-v7:23.3.0'
+    compile 'com.android.support:appcompat-v7:23.4.0'
     compile 'com.github.machinarius:preferencefragment:0.1.1' // we'll probably remove this
 
     // MATERIAL DESIGN
-    compile 'com.android.support:design:23.3.0'
+    compile 'com.android.support:design:23.4.0'
 
     // ANDROID ANNOTATIONS (unsure why we have both apt and compile directives)
     apt 'org.androidannotations:androidannotations:3.3.2'
@@ -118,7 +120,7 @@ dependencies {
     // compile 'com.heinrichreimersoftware:material-intro:1.4' // API 15, jitpack.io
     // compile 'com.github.jrejaud:Onboarder:v1.02'            // API 15
     // compile 'com.github.chyrta:AndroidOnboarder:0.6'        // API 14
-    // compile 'za.co.riggaroo:materialhelptutorial:1.1.0'     // API 15 -- wip
+    // compile 'za.co.riggaroo:materialhelptutorial:1.1.0'     // API 15
 
     // FONT ICONS (clever, in case images become not enough)
     // http://zavoloklom.github.io/material-design-iconic-font/icons.html
@@ -140,9 +142,17 @@ dependencies {
     //androidTestCompile 'info.cukes:gherkin:2.12.2'
 
     // UNIT-TESTING
-    testCompile 'org.testng:testng:6.9.6'
-    //    testCompile        'org.mockito:mockito-core:1.10.19'
-    androidTestCompile 'junit:junit:4.12'
+    // We're actually not using mockito yet
+    testCompile 'org.mockito:mockito-core:1.10.19'
+    testCompile 'junit:junit:4.12'
+
+//    compile 'com.android.support:support-annotations:23.4.0'
+//    androidTestCompile 'com.android.support.test:runner:0.4.1'
+//    testCompile 'com.android.support.test:runner:0.4.1'
+
+    // Not sure why we'd use testng over junit4 ?
+    //testCompile 'org.testng:testng:6.9.6'
+
 
     // TRUTH looks nice, but we have enough assertions for our uses
     //androidTestCompile 'com.google.truth:truth:0.26'
