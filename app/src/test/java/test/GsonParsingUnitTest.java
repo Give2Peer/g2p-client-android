@@ -5,7 +5,7 @@ import com.google.gson.Gson;
 import org.give2peer.karma.response.PrivateProfileResponse;
 import org.give2peer.karma.entity.Server;
 import org.give2peer.karma.service.RestService;
-import org.testng.annotations.Test;
+import org.junit.Test;
 
 import static org.junit.Assert.fail;
 import static org.junit.Assert.assertTrue;
