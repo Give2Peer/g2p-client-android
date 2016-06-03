@@ -2,6 +2,7 @@ package org.give2peer.karma.entity;
 
 import com.google.android.gms.maps.model.LatLng;
 
+import org.give2peer.karma.StringUtils;
 import org.joda.time.DateTime;
 import org.ocpsoft.prettytime.PrettyTime;
 
@@ -101,6 +102,15 @@ public class Item
      * @return a `LatLng` object that some third-party applications (notably, Google Maps) use.
      */
     public LatLng getLatLng() { return new LatLng(getLatitude(), getLongitude()); }
+
+    /**
+     * See https://github.com/Polidea/AndroidImageCache/issues/6
+     * @return the thumbnail URL in `http`, not `https`.
+     */
+    public String getThumbnailNoSsl()
+    {
+        return StringUtils.httpsToHttp(getThumbnail());
+    }
 
 
     // VANILLA ACCESSORS AND MUTATORS //////////////////////////////////////////////////////////////

@@ -443,6 +443,10 @@ public class Application extends SugarApp
 
     // PROPER LOCATION /////////////////////////////////////////////////////////////////////////////
 
+    /**
+     * Code smell here...
+     * Either move all of location logic out of LocatorActivity or move this to LocatorActivity ?
+     */
     public synchronized GoogleApiClient buildGoogleLocator(
             Context context,
             GoogleApiClientListener listener
@@ -753,7 +757,7 @@ public class Application extends SugarApp
             // Set an image if there's one
             WebImageView image = (WebImageView) layout.findViewById(R.id.popupItemImageView);
             if ( ! item.getThumbnail().isEmpty()) {
-                image.setImageURL(item.getThumbnail());
+                image.setImageURL(item.getThumbnailNoSsl());
 //            } else {
                 // Nah, this screws up the FAB's relative position
                 // image.setVisibility(View.GONE);

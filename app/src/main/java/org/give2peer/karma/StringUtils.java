@@ -23,4 +23,9 @@ public class StringUtils
         }
         return new String(hexChars);
     }
+
+    public static String httpsToHttp(String url)
+    {
+        return url.replaceFirst("^https", "http");
+    }
 }

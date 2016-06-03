@@ -94,7 +94,7 @@ public class ItemsListViewAdapter extends ArrayAdapter
 
             // The WebImageView uses internal LRU caches so we don't have to care about caching.
             // https://github.com/Polidea/AndroidImageCache
-            String thumbUrl = item.getThumbnail();
+            String thumbUrl = item.getThumbnailNoSsl();
             if ( ! thumbUrl.isEmpty()) {
                 thumb.setImageURL(thumbUrl);
             }
