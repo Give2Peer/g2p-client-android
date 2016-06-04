@@ -23,9 +23,8 @@
         android:icon="@drawable/ic_launcher_48dp"
         android:label="@string/app_name"
         android:theme="@style/Theme.AppCompat"
+        android:allowBackup="true"
         >
-        <!-- we should use that ! (probably) -->
-        <!--android:allowBackup="true"-->
 
         <!-- Sugar ORM -->
         <meta-data
@@ -36,7 +35,7 @@
             android:value="9" /> <!-- Every time the database structure changes, increment this -->
         <meta-data
             android:name="QUERY_LOG"
-            android:value="true" /> <!-- todo@prod disable logging -->
+            android:value="false" />
         <meta-data
             android:name="DOMAIN_PACKAGE_NAME"
             android:value="org.give2peer.karma.entity" />
@@ -78,21 +77,21 @@
             </intent-filter>
         </activity>
 
-        <!-- Registration -->
+        <!-- Profile -->
+        <activity
+            android:name="org.give2peer.karma.activity.ProfileActivity_"
+            >
+        </activity>
+
+        <!-- Registration : not used right now -->
         <activity
             android:name="org.give2peer.karma.activity.RegistrationActivity"
             >
         </activity>
 
-        <!-- Login -->
+        <!-- Login : not used right now -->
         <activity
             android:name="org.give2peer.karma.activity.LoginActivity_"
-            >
-        </activity>
-
-        <!-- Profile -->
-        <activity
-            android:name="org.give2peer.karma.activity.ProfileActivity_"
             >
         </activity>
 
@@ -105,6 +104,7 @@
 
         <!-- Displays a grid of items, from closest to furthest -->
         <!-- NOT USED anymore, might be a good Map fallback when OpenGL 2.0 is unavailable ? -->
+        <!-- besides, we should use a list and not a grid, because API 10 grids are HELL -->
         <!--<activity-->
             <!--android:name="org.give2peer.karma.activity.ListAroundActivity"-->
             <!--&gt;-->

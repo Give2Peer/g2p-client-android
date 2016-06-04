@@ -520,6 +520,10 @@ public class      MapItemsActivity
     @Override
     public void onMapReady(GoogleMap _googleMap)
     {
+        if (isMapReady()) {
+            return;
+        }
+
         googleMap = _googleMap;
 
         googleMap.moveCamera(CameraUpdateFactory.zoomTo(1));
@@ -573,7 +577,6 @@ public class      MapItemsActivity
                                 break;
 
                             case MotionEvent.ACTION_UP:   // the finger leaves the screen
-
                                 googleMap.clear();
                                 drawPolygonOnMap(googleMap, drawingCoordinates);
 

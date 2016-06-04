@@ -5,6 +5,7 @@
 
     <!-- 1. You HAVE TO escape apostrophes ' -->
     <!-- 2. You HAVE TO use positional arguments such as %1$s when there are multiple arguments -->
+    <!-- 3. It's best to use positional arguments in ALL cases anyways. -->
 
     <!---->
 
@@ -23,6 +24,8 @@
     <string name="new_item_label_location">Location</string>
     <string name="new_item_label_location_optional">Location (leave blank to use GPS)</string>
     <string name="new_item_image_description">The picture of the item you just took.</string>
+    <string name="new_item_show_picture">Show Picture</string>
+    <string name="new_item_show_map">Show Map</string>
     <string name="new_item_send_button">Send</string><!-- deprecated: we use an icon FAB now -->
 
     <string name="registration_label_username">Username</string>
@@ -109,5 +112,6 @@
     <!-- DEPRECATED -->
     <string name="toast_new_item_upload_failed">Failed to upload the item.</string>
     <string name="tutorial_top_message">Welcome! With this app, you can give an item you possess, spot an item that was lost or thrown away, and find items around a location.</string>
+
 
 </resources>

@@ -115,14 +115,15 @@ abstract public class LocatorActivity
     }
 
     /**
-     * Fires the `onLocated` method
+     * Fires the `onLocated` method with the found location.
      */
     public void locate()
     {
         if (null != googleLocator && googleLocator.isConnected()) {
+            requestGpsEnabled(this);
             if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
 
-                if (!ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_FINE_LOCATION)) {
+                if ( ! ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_FINE_LOCATION)) {
                     final Activity activity = this;
                     new AlertDialog.Builder(this)
                             .setTitle("Permissions required")
@@ -148,12 +149,14 @@ abstract public class LocatorActivity
                 // We got all he right permissions, let's locate !
                 Location location = LocationServices.FusedLocationApi.getLastLocation(googleLocator);
                 if (location == null) {
+                    // If you get this on the emulator, try opening Google Maps first.
                     Log.e("G2P", "Failed to retrieve the last known location.");
                 } else {
                     this.onLocated(location);
                 }
             }
         } else {
+            // I've never seen that happen yet.
             Log.d("G2P", "Tried to locate but Google Locator API is not yet available.");
         }
     }
@@ -281,7 +284,7 @@ abstract public class LocatorActivity
 
 
 
-    //// GPS DISABLED ERROR DIALOG ///////////////////////////////////////////////////////////////////////
+    //// GPS DISABLED ERROR DIALOG /////////////////////////////////////////////////////////////////
 
     /**
      * Show a dialog suggesting to enable the GPS when it is not.
@@ -291,7 +294,7 @@ abstract public class LocatorActivity
     public void requestGpsEnabled(final Context context)
     {
         LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
-        if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+        if ( ! locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
             AlertDialog.Builder builder = new AlertDialog.Builder(context);
             builder.setMessage(R.string.dialog_gps_disabled_msg)
                     .setCancelable(false)

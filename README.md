@@ -124,15 +124,20 @@ All list items followed by parenthesis are optional, and the parenthesis should 
 - [ ] Translation: français.
 
 
+1.4.0
+-----
+
+- [ ] Feature: thank someone for an item.
+- [ ] Feature: list notifications in the profile.
+- [ ] Feature: all-time world leaderboard.
+
+
 1.3.0
 -----
 
 - [x] BugFix:  Disable SSL for item thumbnails
 - [ ] BugFix:  fail gracefully when item image type or size is unsupported.
-- [ ] Feature: show new item location on a small map.
-- [ ] Feature: thank someone for an item.
-- [ ] Feature: list notifications in the profile.
-- [ ] Feature: all-time world leaderboard.
+- [x] Feature: show new item location on a small map.
 - [ ] Feature: provide a description to items
 
 

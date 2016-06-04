@@ -1,6 +1,8 @@
 package org.give2peer.karma.activity;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.location.Location;
@@ -9,16 +11,29 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
+import android.support.design.widget.AppBarLayout;
+import android.support.design.widget.CoordinatorLayout;
+import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.Toast;
 
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.shamanland.fab.FloatingActionButton;
 
 import org.androidannotations.annotations.AfterViews;
@@ -72,8 +87,7 @@ import java.util.Locale;
  * That would reduce the number of actions the app requires of the user.
  */
 @EActivity(R.layout.activity_new_item)
-public class NewItemActivity extends LocatorActivity
-{
+public class NewItemActivity extends LocatorActivity implements OnMapReadyCallback {
     static final int REQUEST_IMAGE_CAPTURE = 1;
     static final String BUNDLE_IMAGE_PATHS = "imagePaths";
 
@@ -95,25 +109,29 @@ public class NewItemActivity extends LocatorActivity
     @ViewById
     android.support.v4.widget.NestedScrollView newItemFormScrollView;
     @ViewById
-    FloatingActionButton  newItemSendButton;
+    FloatingActionButton newItemSendButton;
     @ViewById
-    ProgressBar           newItemProgressBar;
+    ProgressBar newItemProgressBar;
     @ViewById
-    ImageView             newItemImageView;
+    ImageView newItemImageView;
     @ViewById
-    EditText              newItemTitleEditText;
+    EditText newItemTitleEditText;
     @ViewById
-    EditText              newItemDescriptionEditText;
+    EditText newItemDescriptionEditText;
     @ViewById
-    EditText              newItemLocationEditText;
+    EditText newItemLocationEditText;
     @ViewById
-    CheckBox              newItemGiftCheckBox;
+    CheckBox newItemGiftCheckBox;
+
+    @ViewById
+    RelativeLayout newItemMapWrapper;
+    @ViewById
+    RelativeLayout newItemImageWrapper;
 
     //// LIFECYCLE LISTENERS ///////////////////////////////////////////////////////////////////////
 
     @Override
-    public void onCreate(Bundle savedInstanceState)
-    {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         Log.d("G2P", "Starting new item activity.");
@@ -152,18 +170,18 @@ public class NewItemActivity extends LocatorActivity
 //    }
 
     @Override
-    protected void onResume()
-    {
+    protected void onResume() {
         super.onResume();
         // If the user is not preregistered, let's do this dudeez !
         app.requireAuthentication(this);
         // Suggest to enable the GPS if it is not enabled already
         requestGpsEnabled(this);
+        // We never know, maybe the map and location are ready already ? But why would they ?
+        updateMap();
     }
 
     @Override
-    protected void onSaveInstanceState(@NonNull Bundle outState)
-    {
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
         // On some devices, the Camera activity destroys this activity, so we need to save the
         // paths of the files we created.
@@ -177,8 +195,7 @@ public class NewItemActivity extends LocatorActivity
      * We try not to do that anymore.
      */
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent intent)
-    {
+    protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
         super.onActivityResult(requestCode, resultCode, intent);
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
             //processImages();
@@ -194,14 +211,29 @@ public class NewItemActivity extends LocatorActivity
     }
 
     @Override
-    public void onLocated(Location loc)
-    {
+    public void onLocated(Location loc) {
         super.onLocated(loc); // parent saves the location Application-wise
         // Successfully located device : we hint to the user that the Location field is optional.
         newItemLocationEditText.setHint(R.string.new_item_label_location_optional);
+        location = loc;
+        updateMap();
     }
 
     //// AFTER VIEWS ///////////////////////////////////////////////////////////////////////////////
+
+    /**
+     * Hiding the action bar that way works on APi 10 ! \o/
+     */
+    @AfterViews
+    public void hideActionBar() {
+        try {
+            getSupportActionBar().hide();
+        } catch (NullPointerException e) {
+            // It would be interesting here to throw, but only for alpha users.
+            // Maybe in the future google play services will offer this info ?
+            Log.e("G2P", "Failed to hide the action bar.");
+        }
+    }
 
     /**
      * This is to recover the image from the Intent, or launch the Camera to pick one if we
@@ -216,8 +248,7 @@ public class NewItemActivity extends LocatorActivity
      * Note that this is in AfterViews because we're using Android Annotations.
      */
     @AfterViews
-    public void recoverImage()
-    {
+    public void recoverImage() {
         // This activity may have been destroyed by the Camera activity ; if it's the case,
         // the imagePaths is not null, as we saved it.
         if (null == imagePaths) {
@@ -274,13 +305,107 @@ public class NewItemActivity extends LocatorActivity
         }
     }
 
+
+    //// ITEM LOCATION ON MAP //////////////////////////////////////////////////////////////////////
+
+    GoogleMap googleMap;
+    Location  location;
+    Marker    itemLocationMarker;
+
     @AfterViews
-    public void hideActionBar()
-    {
-        try {
-            getSupportActionBar().hide();
-        } catch (NullPointerException e) {
-            Log.e("G2P", "Failed to hide the action bar.");
+    public void loadMapFragment() {
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
+                .findFragmentById(R.id.newItemMapFragment);
+        mapFragment.getMapAsync(this);
+    }
+
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        this.googleMap = googleMap;
+
+        // Make sure we can scroll on the map and not on the scrollable view
+        googleMap.setOnMapLoadedCallback(new GoogleMap.OnMapLoadedCallback() {
+            @Override
+            public void onMapLoaded() {
+                AppBarLayout appBarLayout = (AppBarLayout) findViewById(R.id.newItemAppBarLayout);
+                CoordinatorLayout.LayoutParams params =
+                        (CoordinatorLayout.LayoutParams) appBarLayout.getLayoutParams();
+                AppBarLayout.Behavior behavior = (AppBarLayout.Behavior) params.getBehavior();
+                behavior.setDragCallback(new AppBarLayout.Behavior.DragCallback() {
+                    @Override
+                    public boolean canDrag(@NonNull AppBarLayout appBarLayout) { return false; }
+                });
+            }
+        });
+
+        googleMap.getUiSettings().setMapToolbarEnabled(false);
+
+        updateMap();
+    }
+
+    protected boolean isMapReady() {
+        return null != googleMap;
+    }
+
+    protected boolean isLocated() {
+        return null != location;
+    }
+
+    public Location getLocation() {
+        return location;
+    }
+
+    public LatLng getLatLng() {
+        return new LatLng(location.getLatitude(), location.getLongitude());
+    }
+
+    protected void updateMap() {
+        if ( ! isMapReady() || ! isLocated()) {
+            return;
+        }
+
+        // Even with the check above, the following must be safe to run multiple times,
+        // because I think it happens in some lifecycle cases. I suck at android :|
+        Log.d("G2P", "Updating the new item location map..."); // let's see !
+
+        // Let'sclear the map and zoom on the user position
+        googleMap.clear();
+        googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(getLatLng(), 16));
+
+        // Let's put a marker on the map, so that the user may drag it around if they want
+        itemLocationMarker = googleMap.addMarker(new MarkerOptions()
+                .position(getLatLng())
+                .draggable(true)
+        );
+
+        googleMap.setOnMarkerDragListener(new GoogleMap.OnMarkerDragListener() {
+            @Override
+            public void onMarkerDragStart(Marker marker) {}
+
+            @Override
+            public void onMarkerDrag(Marker marker) {
+                LatLng c = marker.getPosition();
+                newItemLocationEditText.setText(String.format("%f, %f", c.latitude, c.longitude));
+            }
+
+            @Override
+            public void onMarkerDragEnd(Marker marker) {
+                googleMap.animateCamera(CameraUpdateFactory.newLatLng(marker.getPosition()));
+            }
+        });
+
+        // We don't need to ask for permission again, we already did while creating the activity.
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            googleMap.setMyLocationEnabled(true);
+
+            googleMap.setOnMyLocationButtonClickListener(new GoogleMap.OnMyLocationButtonClickListener() {
+                @Override
+                public boolean onMyLocationButtonClick() {
+                    locate();
+                    itemLocationMarker.setPosition(getLatLng());
+                    return false; // don't consume the event, let the camera zoom on my location
+                }
+            });
         }
     }
 
@@ -354,7 +479,6 @@ public class NewItemActivity extends LocatorActivity
      */
     public void send()
     {
-        // Update the UI
         disableSending();
 
         // Grab the Location, from input or GPS. It is MANDATORY.
@@ -370,6 +494,8 @@ public class NewItemActivity extends LocatorActivity
                 );
             } else {
                 app.toast(getString(R.string.toast_no_location_available), Toast.LENGTH_LONG);
+                locate();
+                showMap();
                 enableSending();
                 return;
             }
@@ -448,6 +574,31 @@ public class NewItemActivity extends LocatorActivity
 
 
     //// UI ////////////////////////////////////////////////////////////////////////////////////////
+
+    /**
+     * Shows the picture in the collapsing app bar instead of the map.
+     * Does nothing if the picture is already shown.
+     */
+    protected void showPicture()
+    {
+        newItemMapWrapper.setVisibility(View.GONE);
+        newItemImageWrapper.setVisibility(View.VISIBLE);
+    }
+    /**
+     * Shows the map in the collapsing app bar instead of the picture.
+     * Does nothing if the map is already shown.
+     */
+    protected void showMap()
+    {
+        newItemImageWrapper.setVisibility(View.GONE);
+        newItemMapWrapper.setVisibility(View.VISIBLE);
+    }
+
+    @Click
+    public void newItemShowPicButtonClicked() { showPicture(); }
+
+    @Click
+    public void newItemShowMapButtonClicked() { showMap();     }
 
     public void onSend(View view)
     {

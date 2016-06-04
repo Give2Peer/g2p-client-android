@@ -5,7 +5,8 @@ package org.give2peer.karma.exception;
  * The server has its own geocoding service.
  *
  * These are not even thrown anymore, because the client never tries to geocode itself.
- * todo: throw GeocodingException when the server fails to geocode
+ * But it will in the future ; at least reverse geocoding.
+ * todo: throw GeocodingException when the server fails to geocode ?
  */
 public class GeocodingException extends Exception
 {

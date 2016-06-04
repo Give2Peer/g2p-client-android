@@ -56,7 +56,8 @@ public class MainTest extends ActivityInstrumentationTestCase2<MainActivity>
 
     @Given("I start the activity ([^ ]+)$")
     public void iStartTheActivityClass(String activityClassName) {
-        // fixme: start provided activity (I don't know how to do that?)
+        // WIP: start provided activity (I don't know how to do that?)
+
         // Sanity checks
         assertNotNull("Robotium's Solo is set up.", solo);
         assertNotNull("Instrumentation has been injected", getInstrumentation());
