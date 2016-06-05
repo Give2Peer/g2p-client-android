@@ -115,8 +115,11 @@ All list items followed by parenthesis are optional, and the parenthesis should 
 - [ ] Feature: delete items I authored in my profile.
 - [ ] Feature: change your username when level 1, against some (9?) karma points.
 - [ ] Feature: add your email to your user account.
-- [ ] Feature: log in with existing user account.
-- [ ] Feature: ask for new credentials with email.
+- [ ] Feature: add your facebook to your user account.
+- [ ] Feature: add your google+ to your user account.
+- [ ] Feature: add your twitter to your user account.
+- [ ] Feature: log in with an existing user account.
+- [ ] Feature: request new credentials with email.
 - [ ] Feature: show items around as a list from closest to furthest.
 - [ ] Feature: report an offensive item.
 - [ ] Feature: display a count of available characters under the title input field
@@ -135,10 +138,13 @@ All list items followed by parenthesis are optional, and the parenthesis should 
 1.3.0
 -----
 
-- [x] BugFix:  Disable SSL for item thumbnails
+- [x] BugFix:  Disable SSL for item thumbnails.
 - [ ] BugFix:  fail gracefully when item image type or size is unsupported.
 - [x] Feature: show new item location on a small map.
-- [ ] Feature: provide a description to items
+- [x] Feature: support `png` images for items.
+- [x] Feature: support `gif` images for items.
+- [x] Feature: support `webp` images for items.
+- [ ] Feature: provide a description to items.
 
 
 

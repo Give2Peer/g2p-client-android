@@ -16,6 +16,7 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.widget.NestedScrollView;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -107,8 +108,6 @@ public class NewItemActivity extends LocatorActivity implements OnMapReadyCallba
     //// VIEWS /////////////////////////////////////////////////////////////////////////////////////
 
     @ViewById
-    android.support.v4.widget.NestedScrollView newItemFormScrollView;
-    @ViewById
     FloatingActionButton newItemSendButton;
     @ViewById
     ProgressBar newItemProgressBar;
@@ -124,9 +123,11 @@ public class NewItemActivity extends LocatorActivity implements OnMapReadyCallba
     CheckBox newItemGiftCheckBox;
 
     @ViewById
-    RelativeLayout newItemMapWrapper;
+    NestedScrollView newItemFormScrollView;
     @ViewById
-    RelativeLayout newItemImageWrapper;
+    RelativeLayout   newItemMapWrapper;
+    @ViewById
+    RelativeLayout   newItemImageWrapper;
 
     //// LIFECYCLE LISTENERS ///////////////////////////////////////////////////////////////////////
 
