@@ -65,11 +65,13 @@ buildscript {
 repositories {
     mavenCentral()
     mavenLocal()
-    maven { url "https://jitpack.io" } // to get from github (for sugardb and introduction)
+    maven { url "https://jitpack.io" } // to get from github (for sugardb, introduction & location)
 }
 
 dependencies {
+    // We actually shouldn't have any of those, feels like bad practice
     compile fileTree(dir: 'libs', include: ['*.jar'])
+
     // BACKWARDS COMPATIBILITY (http://developer.android.com/tools/support-library/features.html)
     compile 'com.android.support:appcompat-v7:23.4.0'
     compile 'com.github.machinarius:preferencefragment:0.1.1' // we'll probably remove this
@@ -85,6 +87,10 @@ dependencies {
     compile 'com.google.android.gms:play-services-maps:8.4.0'
     // GOOGLE - LOCATION API
     compile 'com.google.android.gms:play-services-location:8.4.0'
+
+    // LOCATION
+    // We use our own fork because the original lib supports API >= 14
+    compile 'com.github.Give2Peer:LocationManager:1.1.1-api10'
 
     // FAB (Floating Action Button)
     compile 'com.shamanland:fab:0.0.8'
