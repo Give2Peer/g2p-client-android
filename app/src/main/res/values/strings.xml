@@ -41,8 +41,11 @@
     <string name="login_top_text">Log on the server %s.</string>
 
     <string name="dialog_gps_disabled_msg">Karma works best with GPS.\nEnable the GPS now ?</string>
-    <string name="dialog_gps_disabled_oui">Yes</string>
-    <string name="dialog_gps_disabled_non">No</string>
+    <string name="dialog_gps_disabled_oui">Yes</string><!-- unused -->
+    <string name="dialog_gps_disabled_non">No</string><!-- unused -->
+    <string name="dialog_default_location_rationale">Karma is about geolocating items. You need to allow it to access your location. Do so now ?</string>
+    <string name="dialog_find_items_location_rationale">To find items around you, you need to allow Karma to access your location. Do so now ?</string>
+    <string name="dialog_new_item_location_rationale">To locate the item you want to add, you need to allow Karma to access your location. Do so now ?</string>
 
     <string name="toast_new_item_uploading">Uploading new item…</string>
     <string name="toast_new_item_uploaded">Item %s was uploaded.\nWell done!</string>
@@ -111,7 +114,6 @@
 
     <!-- DEPRECATED -->
     <string name="toast_new_item_upload_failed">Failed to upload the item.</string>
-    <string name="tutorial_top_message">Welcome! With this app, you can give an item you possess, spot an item that was lost or thrown away, and find items around a location.</string>
 
 
 </resources>
