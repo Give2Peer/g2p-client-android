@@ -8,7 +8,7 @@ gradle
 /.idea/libraries
 /local.properties
 /build
-app.iml
+#app.iml
 
 # Mac?
 .DS_Store
