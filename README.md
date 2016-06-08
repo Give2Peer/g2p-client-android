@@ -113,19 +113,21 @@ All list items followed by parenthesis are optional, and the parenthesis should 
 - [ ] Feature: some form of OAuth2 as fallback for Maps. (we are subjected to quotas)
 - [ ] Feature: edit items I authored in my profile.
 - [ ] Feature: delete items I authored in my profile.
-- [ ] Feature: change your username when level 1, against some (9?) karma points.
-- [ ] Feature: add your email to your user account.
-- [ ] Feature: add your facebook to your user account.
-- [ ] Feature: add your google+ to your user account.
-- [ ] Feature: add your twitter to your user account.
+- [ ] Feature: change my username when level 1, against some (9?) karma points.
+- [ ] Feature: add my email to my user account.
+- [ ] Feature: add my facebook to my user account.
+- [ ] Feature: add my google+ to my user account.
+- [ ] Feature: add my twitter to my user account.
 - [ ] Feature: log in with an existing user account.
-- [ ] Feature: request new credentials with email.
+- [ ] Feature: request new credentials by email.
 - [ ] Feature: show items around as a list from closest to furthest.
 - [ ] Feature: report an offensive item.
-- [ ] Feature: display a count of available characters under the title input field
+- [ ] Feature: display a count of available characters under the title input field.
+- [ ] Feature: a logging utility that we can more easily disable for production.
+- [ ] Setting: move the map's region drawer FAB to the bottom right.
+- [ ] BugFix:  fail gracefully when item image type or size is unsupported.
 - [ ] Translation: español.
 - [ ] Translation: français.
-
 
 1.4.0
 -----
@@ -138,12 +140,13 @@ All list items followed by parenthesis are optional, and the parenthesis should 
 1.3.0
 -----
 
-- [x] BugFix:  Disable SSL for item thumbnails.
-- [ ] BugFix:  fail gracefully when item image type or size is unsupported.
+- [ ] BugFix:  ask for READ_EXTERNAL_STORAGE permissions.
+- [x] BugFix:  disable SSL for item thumbnails.
 - [x] Feature: show new item location on a small map.
 - [x] Feature: support `png` images for items.
 - [x] Feature: support `gif` images for items.
 - [x] Feature: support `webp` images for items.
+- [ ] Refacto: Use a third-party `LocationManager`.
 - [ ] Feature: provide a description to items.
 
 
@@ -155,8 +158,8 @@ CHANGELOG
 1.2.0 (30-05-2016)
 ------------------
 
-- [x] Setting: enable `https` protocol, like a monkey
-- [x] Bugfix:  map loader keeps turning after onboarding activity
+- [x] Setting: enable `https` protocol, like a monkey.
+- [x] Bugfix:  map loader keeps turning after onboarding activity.
 - [x] Bugfix:  make sure temporary picture files are removed.
 - [x] Feature: suggest enabling the GPS.
 - [x] Feature: parallax the new item picture.

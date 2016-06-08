@@ -44,9 +44,11 @@ import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.ViewById;
+import org.give2peer.karma.Application;
 import org.give2peer.karma.entity.Item;
 import org.give2peer.karma.R;
 import org.give2peer.karma.event.AuthenticationEvent;
+import org.give2peer.karma.event.LocationUpdateEvent;
 import org.give2peer.karma.exception.CriticalException;
 import org.give2peer.karma.response.FindItemsResponse;
 import org.greenrobot.eventbus.EventBus;
@@ -59,25 +61,25 @@ import java.util.List;
 
 
 /**
+ * Handles sequentially the following asynchronous tasks
+ *   1. Authenticating (and pre-registering if needed)
+ *   2. Loading the map
+ *   3. Locating
  *
- *
- * Events :
- * - MapReadyEvent
- * - AuthenticationEvent
+ * I don't know what happens when we launch the Onboarding (it's another activity).
+ * I know the pre-registration is done
  */
 @EActivity(R.layout.activity_map_items)
 public class      MapItemsActivity
-       extends    LocatorActivity
+       extends    LocatorBaseActivity
        implements OnMapReadyCallback
 {
-    // Allows us to find items from their respective markers during map UI events
-    HashMap<Marker, Item> markerItemHashMap = new HashMap<Marker, Item>();
+
+    Application app;
 
     GoogleMap googleMap;
 
-    /**
-     * Whether or not the user is currently drawing a region instead of moving around on the map.
-     */
+    // Whether or not the user is currently drawing a region instead of moving around on the map.
     Boolean isDrawing = false;
 
     Boolean isLayoutReady = false;
@@ -87,8 +89,13 @@ public class      MapItemsActivity
     /**
      * A set of displayed items on the map, to avoid duplicates when you make another request.
      * We also use this to avoid making redundant requests.
+     * Use markerItemHashMap instead.
      */
+    @Deprecated
     List<Item> displayedItems = new ArrayList<>();
+
+    // Allows us to find items from their respective markers during map UI events
+    HashMap<Marker, Item> markerItemHashMap = new HashMap<Marker, Item>();
 
 
     //// CONFIGURATION /////////////////////////////////////////////////////////////////////////////
@@ -96,6 +103,14 @@ public class      MapItemsActivity
     int lineColor = 0x88FF3399;
     int fillColor = 0x33FF3399;
     int fillAlpha = 0x55000000;
+
+    /**
+     * @return the string descriptor of the location rationale message to display.
+     */
+    protected int getLocationRationale()
+    {
+        return R.string.dialog_find_items_location_rationale;
+    }
 
 
     //// VIEWS /////////////////////////////////////////////////////////////////////////////////////
@@ -119,6 +134,7 @@ public class      MapItemsActivity
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
+        app = (Application) getApplication();
         loadOnboardingIfNeeded();
     }
 
@@ -133,7 +149,7 @@ public class      MapItemsActivity
     public void onStop()
     {
         cancelFinderTask();
-        EventBus.getDefault().unregister(this);
+        if (EventBus.getDefault().isRegistered(this))  EventBus.getDefault().unregister(this);
         super.onStop();
     }
 
@@ -142,21 +158,22 @@ public class      MapItemsActivity
     {
         super.onResume();
 
-        if (isMapReady()) {
-            if (hasMapItemMarkers()) {
-                // Sometimes the map fragment loses the zoom level, let's try to fix that.
-                Log.d("G2P", "Zooming in on items when resuming map activity.");
-                zoomOnItems(googleMap, displayedItems);
-            } else {
-                // Map is empty, maybe we just activated the GPS or Internet, so try again
-                locate();
-            }
-        }
-
-        // If the user is not preregistered, let's do this dudeez !
+        // If the user is not preregistered, let's do dis dudeez !
+        // This fires an AuthenticationEvent through the EventBus.
+        // The chain of events starts here ; not very good design, this.
         app.requireAuthentication(this);
-        // Suggest to enable the GPS if it is not enabled already
-        requestGpsEnabled(this);
+
+//        if (isMapReady()) {
+//            if (hasMapItemMarkers()) {
+//                // Sometimes the map fragment loses the zoom level, let's try to fix that.
+//                Log.d("G2P", "Zooming in on items when resuming map activity.");
+//                zoomOnItems(googleMap, displayedItems);
+//            } else {
+//                // Map is empty, maybe we just activated the GPS or Internet, so try again
+//                //getLocation();
+//            }
+//        }
+
     }
 
     /**
@@ -194,28 +211,53 @@ public class      MapItemsActivity
             return;
         }
 
-        // I never had a failure there, but better safe than sorry !
-        try {
-            Log.d("G2P", "Loading the map fragment...");
-            SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                    .findFragmentById(R.id.mapItemsFragment);
-            mapFragment.getMapAsync(this);
-        } catch (Exception e) {
-            Log.e("G2P", "There was a problem loading the map fragment.");
-            Log.e("G2P", e.getMessage());
-            e.printStackTrace();
-            app.toasty("Failed to load the map on this device. Sorry!\nPlease report this !");
-
-            throw new CriticalException("Failed to load the map fragment.", e);
+        if ( ! isMapReady()) {
+            // I never had a failure there, but better safe than sorry !
+            try {
+                Log.i("G2P", "Loading the map...");
+                SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
+                        .findFragmentById(R.id.mapItemsFragment);
+                mapFragment.getMapAsync(this);
+            } catch (Exception e) {
+                // todo: we should GTFO and launch the item list instead,
+                app.toasty("Failed to load the map on this device. Sorry!\nPlease report this !");
+                throw new CriticalException("Failed to load the map fragment.", e);
+            }
         }
     }
 
     @Override
-    public void onLocated(Location loc)
+    public void onMapReady(GoogleMap _googleMap)
     {
-        super.onLocated(loc);
-        if (isMapReady() && ! hasMapItemMarkers()) {
-            executeFinderTask(new LatLng(loc.getLatitude(), loc.getLongitude()));
+        if (isMapReady()) {
+            Log.d("G2P", "Map is ready AGAIN !? When does this ever happen ?");
+            return;
+        }
+
+        googleMap = _googleMap;
+
+        googleMap.moveCamera(CameraUpdateFactory.zoomTo(1));
+
+        if ( ! isLocationReady()) {
+            Log.d("G2P", "Trying to guess the location...");
+            getLocation();
+        }
+
+        setupRegionDrawCanvas(_googleMap);
+    }
+
+    @Subscribe
+    public void findItemsAroundWhenLocatedForTheFirstTime(LocationUpdateEvent locationUpdateEvent)
+    {
+        Location location = locationUpdateEvent.getLocation();
+        // I've got to refactor all these logs...
+        Log.d("G2P", String.format(
+                "Location found : latitude=%f, longitude=%f",
+                location.getLatitude(), location.getLongitude()
+        ));
+        // The map should be ready but it costs almost nothing to check again.
+        if (isMapReady() && ! hasMapItemMarkers() && ! isFinding()) {
+            executeFinderTask(new LatLng(location.getLatitude(), location.getLongitude()));
         }
     }
 
@@ -275,6 +317,8 @@ public class      MapItemsActivity
         }
     }
 
+    // Does startActivityForResult(INTRODUCTION_REQUEST_CODE)
+    // So we may also listen to the end of it.
     public void loadOnboarding()
     {
         new IntroductionBuilder(this).withSlides(getOnboardingSlides(this)).introduceMyself();
@@ -345,6 +389,11 @@ public class      MapItemsActivity
                                 }
                             }, 300);
     }
+
+
+//    protected boolean isReadyToFindItems() {
+//        return isAuthenticated() && isLocationReady() && isMapReady();
+//    }
 
     AsyncTask finder;
 
@@ -517,25 +566,12 @@ public class      MapItemsActivity
         return ! displayedItems.isEmpty();
     }
 
-    @Override
-    public void onMapReady(GoogleMap _googleMap)
+    /**
+     * Sets up the UI listeners for the region-drawing transparent canvas.
+     * @param googleMap A GoogleMap object that should be ready.
+     */
+    private void setupRegionDrawCanvas(final GoogleMap googleMap)
     {
-        if (isMapReady()) {
-            return;
-        }
-
-        googleMap = _googleMap;
-
-        googleMap.moveCamera(CameraUpdateFactory.zoomTo(1));
-
-        if (app.hasGeoLocation()) {
-            executeFinderTask(app.getGeoLocationLatLng());
-        } else {
-            // We cannot find any geo location handy
-            // Let's warn the user that he needs to draw a region
-            hideLoader();
-        }
-
         mapItemsDrawFrame.setOnTouchListener(
                 new View.OnTouchListener()
                 {
