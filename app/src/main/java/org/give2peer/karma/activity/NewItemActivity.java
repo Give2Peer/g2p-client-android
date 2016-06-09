@@ -45,6 +45,7 @@ import org.give2peer.karma.Application;
 import org.give2peer.karma.FileUtils;
 import org.give2peer.karma.entity.Item;
 import org.give2peer.karma.R;
+import org.give2peer.karma.event.LocationUpdateEvent;
 import org.give2peer.karma.exception.CriticalException;
 import org.give2peer.karma.exception.NoInternetException;
 import org.give2peer.karma.exception.QuotaException;
@@ -52,6 +53,7 @@ import org.give2peer.karma.factory.BitmapFactory;
 import org.give2peer.karma.service.ExceptionHandler;
 import org.give2peer.karma.task.NewItemTask;
 import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
 
 import java.io.File;
 import java.io.IOException;
@@ -88,9 +90,13 @@ import java.util.Locale;
  * That would reduce the number of actions the app requires of the user.
  */
 @EActivity(R.layout.activity_new_item)
-public class NewItemActivity extends LocatorActivity implements OnMapReadyCallback {
+public  class      NewItemActivity
+        extends    LocatorBaseActivity
+        implements OnMapReadyCallback {
     static final int REQUEST_IMAGE_CAPTURE = 1;
     static final String BUNDLE_IMAGE_PATHS = "imagePaths";
+
+    Application app;
 
     /**
      * Stores the image files paths, and is bundled. (may cause issues, now that I think of it)
@@ -136,6 +142,7 @@ public class NewItemActivity extends LocatorActivity implements OnMapReadyCallba
         super.onCreate(savedInstanceState);
 
         Log.d("G2P", "Starting new item activity.");
+        app = (Application) getApplication();
 
         // For when we launched the Camera Activity FROM Karma (and are not using the share...),
         // on some devices, the Camera activity destroys this activity, so we need to restore the
@@ -176,7 +183,7 @@ public class NewItemActivity extends LocatorActivity implements OnMapReadyCallba
         // If the user is not preregistered, let's do this dudeez !
         app.requireAuthentication(this);
         // Suggest to enable the GPS if it is not enabled already
-        requestGpsEnabled(this);
+        //requestGpsEnabled(this);
         // We never know, maybe the map and location are ready already ? But why would they ?
         updateMap();
     }
@@ -211,12 +218,13 @@ public class NewItemActivity extends LocatorActivity implements OnMapReadyCallba
         }
     }
 
-    @Override
-    public void onLocated(Location loc) {
-        super.onLocated(loc); // parent saves the location Application-wise
+    @Subscribe
+    public void findItemsAroundWhenLocatedForTheFirstTime(LocationUpdateEvent locationUpdateEvent)
+    {
+        Location location = locationUpdateEvent.getLocation();
         // Successfully located device : we hint to the user that the Location field is optional.
         newItemLocationEditText.setHint(R.string.new_item_label_location_optional);
-        location = loc;
+        this.location = location;
         updateMap();
     }
 
@@ -310,7 +318,6 @@ public class NewItemActivity extends LocatorActivity implements OnMapReadyCallba
     //// ITEM LOCATION ON MAP //////////////////////////////////////////////////////////////////////
 
     GoogleMap googleMap;
-    Location  location;
     Marker    itemLocationMarker;
 
     @AfterViews
@@ -350,10 +357,6 @@ public class NewItemActivity extends LocatorActivity implements OnMapReadyCallba
 
     protected boolean isLocated() {
         return null != location;
-    }
-
-    public Location getLocation() {
-        return location;
     }
 
     public LatLng getLatLng() {
@@ -402,7 +405,7 @@ public class NewItemActivity extends LocatorActivity implements OnMapReadyCallba
             googleMap.setOnMyLocationButtonClickListener(new GoogleMap.OnMyLocationButtonClickListener() {
                 @Override
                 public boolean onMyLocationButtonClick() {
-                    locate();
+                    getLocation();
                     itemLocationMarker.setPosition(getLatLng());
                     return false; // don't consume the event, let the camera zoom on my location
                 }
@@ -495,7 +498,7 @@ public class NewItemActivity extends LocatorActivity implements OnMapReadyCallba
                 );
             } else {
                 app.toast(getString(R.string.toast_no_location_available), Toast.LENGTH_LONG);
-                locate();
+                getLocation();
                 showMap();
                 enableSending();
                 return;
