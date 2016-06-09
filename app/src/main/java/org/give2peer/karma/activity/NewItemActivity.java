@@ -66,10 +66,6 @@ import java.util.Locale;
 
 
 /**
- *
- *
- * HAYLEY 18yth august
- *
  * Handles :
  * - Receiving an image from another activity's share intent
  * - (deprecated) launching the camera otherwise
@@ -135,6 +131,7 @@ public  class      NewItemActivity
     @ViewById
     RelativeLayout   newItemImageWrapper;
 
+
     //// LIFECYCLE LISTENERS ///////////////////////////////////////////////////////////////////////
 
     @Override
@@ -163,19 +160,17 @@ public  class      NewItemActivity
         }
     }
 
-//    @Override
-//    public void onStart()
-//    {
-//        super.onStart();
-//        if ( ! EventBus.getDefault().isRegistered(this)) EventBus.getDefault().register(this);
-//    }
-//
-//    @Override
-//    public void onStop()
-//    {
-//        EventBus.getDefault().unregister(this);
-//        super.onStop();
-//    }
+    @Override
+    public void onStart() {
+        super.onStart();
+        if ( ! EventBus.getDefault().isRegistered(this)) EventBus.getDefault().register(this);
+    }
+
+    @Override
+    public void onStop() {
+        if (EventBus.getDefault().isRegistered(this))  EventBus.getDefault().unregister(this);
+        super.onStop();
+    }
 
     @Override
     protected void onResume() {
@@ -219,12 +214,10 @@ public  class      NewItemActivity
     }
 
     @Subscribe
-    public void findItemsAroundWhenLocatedForTheFirstTime(LocationUpdateEvent locationUpdateEvent)
-    {
+    public void updateMapWhenLocated(LocationUpdateEvent locationUpdateEvent) {
         Location location = locationUpdateEvent.getLocation();
         // Successfully located device : we hint to the user that the Location field is optional.
         newItemLocationEditText.setHint(R.string.new_item_label_location_optional);
-        this.location = location;
         updateMap();
     }
 
@@ -372,7 +365,7 @@ public  class      NewItemActivity
         // because I think it happens in some lifecycle cases. I suck at android :|
         Log.d("G2P", "Updating the new item location map..."); // let's see !
 
-        // Let'sclear the map and zoom on the user position
+        // Let's clear the map and zoom on the user position
         googleMap.clear();
         googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(getLatLng(), 16));
 
@@ -389,12 +382,14 @@ public  class      NewItemActivity
             @Override
             public void onMarkerDrag(Marker marker) {
                 LatLng c = marker.getPosition();
-                newItemLocationEditText.setText(String.format("%f, %f", c.latitude, c.longitude));
+                newItemLocationEditText.setText(String.format(Locale.FRANCE, "%f / %f", c.latitude, c.longitude));
             }
 
             @Override
             public void onMarkerDragEnd(Marker marker) {
-                googleMap.animateCamera(CameraUpdateFactory.newLatLng(marker.getPosition()));
+                LatLng c = marker.getPosition();
+                googleMap.animateCamera(CameraUpdateFactory.newLatLng(c));
+                newItemLocationEditText.setText(String.format(Locale.FRANCE, "%f / %f", c.latitude, c.longitude));
             }
         });
 
@@ -488,13 +483,13 @@ public  class      NewItemActivity
         // Grab the Location, from input or GPS. It is MANDATORY.
         String locationInputValue = newItemLocationEditText.getText().toString();
         if (locationInputValue.isEmpty()) {
-            android.location.Location location = app.getGeoLocation();
-            if (null != location) {
+            if (null != itemLocationMarker) {
+                LatLng latlng = itemLocationMarker.getPosition();
                 locationInputValue = String.format(
                         Locale.US,
                         "%f / %f",
-                        location.getLatitude(),
-                        location.getLongitude()
+                        latlng.latitude,
+                        latlng.longitude
                 );
             } else {
                 app.toast(getString(R.string.toast_no_location_available), Toast.LENGTH_LONG);

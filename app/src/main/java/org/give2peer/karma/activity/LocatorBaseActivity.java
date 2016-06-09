@@ -19,7 +19,7 @@ import org.greenrobot.eventbus.EventBus;
 
 abstract public class LocatorBaseActivity extends LocationBaseActivity
 {
-    Location location;
+    protected Location location;
 
     /**
      * Override this in child classes.
