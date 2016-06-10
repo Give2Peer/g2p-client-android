@@ -73,6 +73,10 @@ public class FileUtils {
 
 
     /**
+     * This has to go in the next refacto !
+     * /!\ IT WRITES A PROJECTION TO JPEG INTO THE FILE AT PATH /!\
+     * /!\ BAD DESIGN AWARD /!\
+     *
      * @param path of the image file
      * @param degrees of rotation, increase to rotate clockwise
      */
@@ -96,7 +100,7 @@ public class FileUtils {
             fOut.close();
 
         } catch (FileNotFoundException e) {
-            throw new CriticalException("I should not happen.", e);
+            throw new CriticalException(String.format("`%s` not found. Permissions ?", path), e);
 
         } catch (IOException e) {
             throw new CriticalException("Disk is probably full or unwriteable.", e);
@@ -311,10 +315,9 @@ public class FileUtils {
                             ", Segments: " + uri.getPathSegments().toString()
                     );
 
-        final boolean isKitKat = Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT;
-
         // DocumentProvider
-        if (isKitKat && DocumentsContract.isDocumentUri(context, uri)) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT
+                && DocumentsContract.isDocumentUri(context, uri)) {
             // LocalStorageProvider
 //            if (isLocalStorageDocument(uri)) {
 //                // The path is the id
