@@ -7,9 +7,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
-import android.graphics.drawable.Drawable;
 import android.location.Address;
 import android.location.Criteria;
 import android.location.Geocoder;
@@ -27,7 +24,6 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -201,7 +197,7 @@ public class Application extends SugarApp
 
                 protected void onPreExecute() {
                     this.dialog.setCancelable(false);
-                    this.dialog.setMessage(getString(R.string.preregistration_dialog));
+                    this.dialog.setMessage(getString(R.string.dialog_preregistration));
                     this.dialog.show();
                 }
 

@@ -1,6 +1,8 @@
 package org.give2peer.karma.activity;
 
 import android.Manifest;
+import android.app.Activity;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
@@ -11,21 +13,19 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
-import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.widget.NestedScrollView;
+import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
-import android.widget.ScrollView;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -47,7 +47,6 @@ import org.give2peer.karma.entity.Item;
 import org.give2peer.karma.R;
 import org.give2peer.karma.event.LocationUpdateEvent;
 import org.give2peer.karma.exception.CriticalException;
-import org.give2peer.karma.exception.NoInternetException;
 import org.give2peer.karma.exception.QuotaException;
 import org.give2peer.karma.factory.BitmapFactory;
 import org.give2peer.karma.service.ExceptionHandler;
@@ -88,7 +87,7 @@ import java.util.Locale;
 @EActivity(R.layout.activity_new_item)
 public  class      NewItemActivity
         extends    LocatorBaseActivity
-        implements OnMapReadyCallback {
+        implements OnMapReadyCallback, ActivityCompat.OnRequestPermissionsResultCallback {
     static final int REQUEST_IMAGE_CAPTURE = 1;
     static final String BUNDLE_IMAGE_PATHS = "imagePaths";
 
@@ -172,16 +171,95 @@ public  class      NewItemActivity
         super.onStop();
     }
 
+    protected static final int REQUEST_CODE_ASK_EXTERNAL_STORAGE_PERMISSION = 1003;
+
     @Override
     protected void onResume() {
         super.onResume();
         // If the user is not preregistered, let's do this dudeez !
         app.requireAuthentication(this);
-        // Suggest to enable the GPS if it is not enabled already
-        //requestGpsEnabled(this);
         // We never know, maybe the map and location are ready already ? But why would they ?
         updateMap();
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M &&
+                (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED ||
+                ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED)) {
+
+            Log.d("G2P", String.format("Not enough permissions ! %d %d", ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE), ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)));
+
+
+            // This is true when the user has denied the permissions once
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+                    Manifest.permission.READ_EXTERNAL_STORAGE)
+                    || ActivityCompat.shouldShowRequestPermissionRationale(this,
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+
+                final Activity activity = this;
+                new AlertDialog.Builder(this)
+                        .setCancelable(false)
+                        .setTitle("Permissions required")
+                        .setMessage("Pictures are usually stored on the external storage, so we need your permission to access them.")
+                        .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                            @Override public void onClick(DialogInterface dialog, int which) {
+                                // beware, this is run on UI thread
+                                ActivityCompat.requestPermissions(
+                                    activity,
+                                    new String[] {
+                                            Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                                            Manifest.permission.READ_EXTERNAL_STORAGE
+                                    },
+                                    REQUEST_CODE_ASK_EXTERNAL_STORAGE_PERMISSION
+                                );
+                            }
+                        })
+                        .create()
+                        .show();
+
+            } else {
+                ActivityCompat.requestPermissions(
+                    this,
+                    new String[] {
+                            Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                            Manifest.permission.READ_EXTERNAL_STORAGE
+                    },
+                    REQUEST_CODE_ASK_EXTERNAL_STORAGE_PERMISSION
+                );
+            }
+        }
     }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+                                           @NonNull int[] grantResults)
+    {
+        if (grantResults.length == 0) {
+            // In some rare cases, this might happen ; consider it canceled
+            Log.d("G2P", "onRequestPermissionsResult with no permissions.");
+            onAccessPermissionsDenied();
+            return;
+        }
+        switch (requestCode) {
+            case REQUEST_CODE_ASK_EXTERNAL_STORAGE_PERMISSION:
+                Log.d("G2P", String.format("Grants: %d %d", grantResults[0], grantResults[1]));
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    fillThumbnail();
+                } else {
+                    onAccessPermissionsDenied();
+                }
+                break;
+            default:
+                super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        }
+    }
+
+    protected void onAccessPermissionsDenied() {
+        Log.d("G2P", "Permission to access external storage denied... Why, you paranoid clod ?");
+        app.toasty(getString(R.string.toast_permission_read_denied));
+        finish();
+    }
+
 
     @Override
     protected void onSaveInstanceState(@NonNull Bundle outState) {
@@ -201,7 +279,6 @@ public  class      NewItemActivity
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
         super.onActivityResult(requestCode, resultCode, intent);
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
-            //processImages();
             // Put the bitmap in the View to show the user
             fillThumbnail();
         } else if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_CANCELED) {
@@ -271,7 +348,6 @@ public  class      NewItemActivity
                 Log.d("G2P", "... which translates into path `" + imagePath + "`.");
                 imagePaths.add(imagePath);
                 fillThumbnail();
-                //processImages();
             } else {
                 // The intent filter in the manifest should ensure that we never EVER throw this.
                 throw new CriticalException("You shared something that is not an image. Nooope.");
@@ -429,6 +505,7 @@ public  class      NewItemActivity
                 newItemImageView.setImageBitmap(imageBitmap);
             } catch (Exception e) {
                 Log.e("G2P", "Failed to create a thumbnail.\n" +
+                             "Permissions were denied, or\n" +
                              "Image '"+imagePath+"' probably has no bitmap data.");
                 e.printStackTrace();
             }
