@@ -105,7 +105,7 @@ All list items followed by parenthesis are optional, and the parenthesis should 
 
 - [ ] Feature: MOOP bags, to regroup items and handle another recycling bin at home
 - [ ] Feature: display basic statistics of the app.
-- [ ] Feature: propose deletion of items submitted by someone else. (tricky)
+- [ ] Feature: suggest deletion of items submitted by someone else. (tricky)
 - [ ] Feature: provide a lifespan to items I tag. (lifespans depend on the user karmic level)
 - [ ] Feature: add a new Item offline, upload later. (lots of work)
 - [ ] Feature: easily send a bug report to developers on caught error. (we use the OS)
@@ -114,12 +114,9 @@ All list items followed by parenthesis are optional, and the parenthesis should 
 - [ ] Feature: edit items I authored in my profile.
 - [ ] Feature: delete items I authored in my profile.
 - [ ] Feature: change my username when level 1, against some (9?) karma points.
-- [ ] Feature: add my email to my user account.
 - [ ] Feature: add my facebook to my user account.
 - [ ] Feature: add my google+ to my user account.
 - [ ] Feature: add my twitter to my user account.
-- [ ] Feature: log in with an existing user account.
-- [ ] Feature: request new credentials by email.
 - [ ] Feature: show items around as a list from closest to furthest.
 - [ ] Feature: report an offensive item.
 - [ ] Feature: display a count of available characters under the title input field.
@@ -129,30 +126,39 @@ All list items followed by parenthesis are optional, and the parenthesis should 
 - [ ] Translation: español.
 - [ ] Translation: français.
 
-1.4.0
+
+1.5.0
 -----
 
 - [ ] Feature: thank someone for an item.
 - [ ] Feature: list notifications in the profile.
-- [ ] Feature: all-time world leaderboard.
 
 
-1.3.0
+1.4.0
 -----
 
-- [ ] BugFix:  ask for READ_EXTERNAL_STORAGE permissions.
-- [x] BugFix:  disable SSL for item thumbnails.
-- [x] Feature: show new item location on a small map.
-- [x] Feature: support `png` images for items.
-- [x] Feature: support `gif` images for items.
-- [x] Feature: support `webp` images for items.
-- [ ] Refacto: Use a third-party `LocationManager`.
+- [ ] Feature: add my email to my user account.
+- [ ] Feature: log in with an existing user account.
+- [ ] Feature: request new credentials by email.
+- [ ] Feature: all-time world leaderboard.
 - [ ] Feature: provide a description to items.
+- [ ] BugFix:  issue #2.
 
 
 
 CHANGELOG
 =========
+
+1.3.0 (12-06-2016)
+------------------
+
+- [x] BugFix:  android M and external storage permissions.
+- [x] BugFix:  disable SSL for item thumbnails.
+- [x] Feature: show new item location on a small map.
+- [x] Feature: support `png` images for items.
+- [x] Feature: support `gif` images for items.
+- [x] Feature: support `webp` images for items.
+- [x] Refacto: Use a third-party `LocationManager`.
 
 
 1.2.0 (30-05-2016)

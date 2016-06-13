@@ -23,6 +23,7 @@ import java.util.List;
  * An async task to send a new item and its picture in two requests to the server.
  * Not sure it should be in its own file...
  */
+@Deprecated
 public class NewItemTask extends AsyncTask<Void, Void, Item>
 {
     public Application app;
