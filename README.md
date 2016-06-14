@@ -121,26 +121,32 @@ All list items followed by parenthesis are optional, and the parenthesis should 
 - [ ] Feature: report an offensive item.
 - [ ] Feature: display a count of available characters under the title input field.
 - [ ] Feature: a logging utility that we can more easily disable for production.
-- [ ] Setting: move the map's region drawer FAB to the bottom right.
 - [ ] BugFix:  fail gracefully when item image type or size is unsupported.
 - [ ] Translation: español.
 - [ ] Translation: français.
 
 
+1.6.0
+-----
+
+- [ ] Feature: list notifications in the profile.
+- [ ] Feature: thank someone for an item.
+
+
 1.5.0
 -----
 
-- [ ] Feature: thank someone for an item.
-- [ ] Feature: list notifications in the profile.
+- [ ] Feature: a navigation drawer. \o/
+- [ ] Feature: all-time world leaderboard.
+- [ ] Feature: add my email to my user account.
 
 
 1.4.0
 -----
 
-- [ ] Feature: add my email to my user account.
+- [ ] Setting: move the map's region drawer FAB to the bottom right.
 - [ ] Feature: log in with an existing user account.
 - [ ] Feature: request new credentials by email.
-- [ ] Feature: all-time world leaderboard.
 - [ ] Feature: provide a description to items.
 - [ ] BugFix:  issue #2.
 
