@@ -62,9 +62,9 @@ import java.util.List;
 
 /**
  * Handles sequentially the following asynchronous tasks
- *   1. Authenticating (and pre-registering if needed)
- *   2. Loading the map
- *   3. Locating
+ * 1. Authenticating (and pre-registering if needed)
+ * 2. Loading the map
+ * 3. Locating
  *
  * I don't know what happens when we launch the Onboarding (it's another activity).
  * I know the pre-registration is done
@@ -74,7 +74,6 @@ public class      MapItemsActivity
        extends    LocatorBaseActivity
        implements OnMapReadyCallback
 {
-
     Application app;
 
     GoogleMap googleMap;
@@ -107,8 +106,7 @@ public class      MapItemsActivity
     /**
      * @return the string descriptor of the location rationale message to display.
      */
-    protected int getLocationRationale()
-    {
+    protected int getLocationRationale() {
         return R.string.dialog_find_items_location_rationale;
     }
 
@@ -122,7 +120,7 @@ public class      MapItemsActivity
     ProgressBar mapItemsProgressBar;
 
     @ViewById
-    FloatingActionButton mapItemsDrawButton;
+    FloatingActionButton mapItemsFloatingActionButton;
 
     @ViewById
     FrameLayout mapItemsDrawFrame;
@@ -131,31 +129,27 @@ public class      MapItemsActivity
     //// LIFECYCLE /////////////////////////////////////////////////////////////////////////////////
 
     @Override
-    protected void onCreate(Bundle savedInstanceState)
-    {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         app = (Application) getApplication();
         loadOnboardingIfNeeded();
     }
 
     @Override
-    public void onStart()
-    {
+    public void onStart() {
         super.onStart();
         if ( ! EventBus.getDefault().isRegistered(this)) EventBus.getDefault().register(this);
     }
 
     @Override
-    public void onStop()
-    {
+    public void onStop() {
         cancelFinderTask();
         if (EventBus.getDefault().isRegistered(this))  EventBus.getDefault().unregister(this);
         super.onStop();
     }
 
     @Override
-    protected void onResume()
-    {
+    protected void onResume() {
         super.onResume();
 
         // If the user is not preregistered, let's do dis dudeez !
@@ -180,8 +174,7 @@ public class      MapItemsActivity
      * todo: ensure this is necessary (it might very well not be)
      */
     @AfterViews
-    public void readyLayout()
-    {
+    public void readyLayout() {
         isLayoutReady = true;
     }
 
@@ -203,8 +196,7 @@ public class      MapItemsActivity
 //    }
 
     @Subscribe
-    public void onAuthenticated(AuthenticationEvent authenticationEvent)
-    {
+    public void onAuthenticated(AuthenticationEvent authenticationEvent) {
         if (authenticationEvent.isFailure()) {
             hideLoader();
             noInternetTextView.setVisibility(View.VISIBLE);
@@ -227,8 +219,7 @@ public class      MapItemsActivity
     }
 
     @Override
-    public void onMapReady(GoogleMap _googleMap)
-    {
+    public void onMapReady(GoogleMap _googleMap) {
         if (isMapReady()) {
             Log.d("G2P", "Map is ready AGAIN !? When does this ever happen ?");
             return;
@@ -247,8 +238,7 @@ public class      MapItemsActivity
     }
 
     @Subscribe
-    public void findItemsAroundWhenLocatedForTheFirstTime(LocationUpdateEvent locationUpdateEvent)
-    {
+    public void findItemsAroundWhenLocatedForTheFirstTime(LocationUpdateEvent locationUpdateEvent) {
         Location location = locationUpdateEvent.getLocation();
         // I've got to refactor all these logs...
         Log.d("G2P", String.format(
@@ -265,16 +255,14 @@ public class      MapItemsActivity
     // OPTIONS MENU ////////////////////////////////////////////////////////////////////////////////
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu)
-    {
+    public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_map_items, menu);
         return true;
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item)
-    {
+    public boolean onOptionsItemSelected(MenuItem item) {
         boolean found = app.onOptionsItemSelected(item, this);
         return found || super.onOptionsItemSelected(item);
     }
@@ -283,8 +271,7 @@ public class      MapItemsActivity
     //// UI LISTENERS //////////////////////////////////////////////////////////////////////////////
 
     @Click
-    public void mapItemsDrawButtonClicked()
-    {
+    public void mapItemsFloatingActionButtonClicked() {
         // 1. We are currently finding items, and this button is a CANCEL button.
         if (isFinding()) {
             cancelFinderTask();
@@ -292,7 +279,7 @@ public class      MapItemsActivity
             hideRegion();
         }
         // 2. We are on the map, and we want to FIND
-        else if ( ! isDrawing) {
+        else if (!isDrawing) {
             isDrawing = true;
             app.toast(getString(R.string.toast_draw_on_map));
         }
@@ -308,10 +295,9 @@ public class      MapItemsActivity
 
     //// ONBOARDING ////////////////////////////////////////////////////////////////////////////////
 
-    public void loadOnboardingIfNeeded()
-    {
+    public void loadOnboardingIfNeeded() {
         //app.isUserOnBoard(false);
-        if ( ! app.isUserOnBoard()) {
+        if (!app.isUserOnBoard()) {
             app.isUserOnBoard(true);
             loadOnboarding();
         }
@@ -319,13 +305,11 @@ public class      MapItemsActivity
 
     // Does startActivityForResult(INTRODUCTION_REQUEST_CODE)
     // So we may also listen to the end of it.
-    public void loadOnboarding()
-    {
+    public void loadOnboarding() {
         new IntroductionBuilder(this).withSlides(getOnboardingSlides(this)).introduceMyself();
     }
 
-    protected List<Slide> getOnboardingSlides(Context ctx)
-    {
+    protected List<Slide> getOnboardingSlides(Context ctx) {
         List<Slide> slides = new ArrayList<>();
 
         slides.add(new Slide()
@@ -361,33 +345,29 @@ public class      MapItemsActivity
 
     //// ACTIONS ///////////////////////////////////////////////////////////////////////////////////
 
-    protected void updateDrawButton()
-    {
+    protected void updateDrawButton() {
         // 1. We are currently finding items, and this button is a CANCEL button.
         if (isFinding()) {
-            mapItemsDrawButton.setImageResource(R.drawable.ic_clear_white_24dp);
+            mapItemsFloatingActionButton.setImageResource(R.drawable.ic_clear_white_24dp);
         }
         // 2. We are on the map, and we want to FIND
         else if (!isDrawing) {
-            mapItemsDrawButton.setImageResource(R.drawable.ic_search_white_24dp);
+            mapItemsFloatingActionButton.setImageResource(R.drawable.ic_search_white_24dp);
         }
         // 3. We just clicked on it and are drawing, show CANCEL
         else {
-            mapItemsDrawButton.setImageResource(R.drawable.ic_clear_white_24dp);
+            mapItemsFloatingActionButton.setImageResource(R.drawable.ic_clear_white_24dp);
         }
     }
 
-    protected void updateDrawButtonDelayed()
-    {
+    protected void updateDrawButtonDelayed() {
         final Handler handler = new Handler();
-        handler.postDelayed(new Runnable()
-                            {
-                                @Override
-                                public void run()
-                                {
-                                    updateDrawButton();
-                                }
-                            }, 300);
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                updateDrawButton();
+            }
+        }, 300);
     }
 
 
@@ -397,25 +377,21 @@ public class      MapItemsActivity
 
     AsyncTask finder;
 
-    public AsyncTask executeFinderTask(final LatLng where)
-    {
+    public AsyncTask executeFinderTask(final LatLng where) {
         return executeFinderTask(where, null);
     }
 
-    public AsyncTask executeFinderTask(final LatLng where, final List<LatLng> container)
-    {
+    public AsyncTask executeFinderTask(final LatLng where, final List<LatLng> container) {
         cancelFinderTask();
         showLoader();
 
         final Activity activity = this;
 
-        finder = new AsyncTask<Void, Void, ArrayList<Item>>()
-        {
+        finder = new AsyncTask<Void, Void, ArrayList<Item>>() {
             Exception exception;
 
             @Override
-            protected ArrayList<Item> doInBackground(Void... params)
-            {
+            protected ArrayList<Item> doInBackground(Void... params) {
                 FindItemsResponse itemsResponse = new FindItemsResponse();
                 try {
                     itemsResponse = app.getRestService().findAround(where.latitude, where.longitude);
@@ -424,8 +400,7 @@ public class      MapItemsActivity
                 }
 
                 ArrayList<Item> items = new ArrayList<Item>();
-                if (null != itemsResponse.getItems())
-                {
+                if (null != itemsResponse.getItems()) {
                     Collections.addAll(items, itemsResponse.getItems());
                 }
 
@@ -451,8 +426,7 @@ public class      MapItemsActivity
             }
 
             @Override
-            protected void onPostExecute(ArrayList<Item> items)
-            {
+            protected void onPostExecute(ArrayList<Item> items) {
                 super.onPostExecute(items);
 
                 // Hide the loader, whether there was an exception or not.
@@ -480,7 +454,7 @@ public class      MapItemsActivity
                     //        but there are lots of caveats with this canvas drawing technique !
 
                     // Add markers to the map
-                    for (int i=0; i<itemsCount; i++) {
+                    for (int i = 0; i < itemsCount; i++) {
                         Item item = items.get(i);
 
                         String title = item.getTitle();
@@ -541,8 +515,7 @@ public class      MapItemsActivity
     /**
      * Cancel the current subtask of finding items.
      */
-    public void cancelFinderTask()
-    {
+    public void cancelFinderTask() {
         if (finder != null) {
             finder.cancel(true);
             finder = null;
@@ -551,33 +524,28 @@ public class      MapItemsActivity
         updateDrawButton();
     }
 
-    protected boolean isFinding()
-    {
+    protected boolean isFinding() {
         return finder != null && finder.getStatus() != AsyncTask.Status.FINISHED;
     }
 
-    protected boolean isMapReady()
-    {
+    protected boolean isMapReady() {
         return googleMap != null && isLayoutReady;
     }
 
-    protected boolean hasMapItemMarkers()
-    {
-        return ! displayedItems.isEmpty();
+    protected boolean hasMapItemMarkers() {
+        return !displayedItems.isEmpty();
     }
 
     /**
      * Sets up the UI listeners for the region-drawing transparent canvas.
+     *
      * @param googleMap A GoogleMap object that should be ready.
      */
-    private void setupRegionDrawCanvas(final GoogleMap googleMap)
-    {
+    private void setupRegionDrawCanvas(final GoogleMap googleMap) {
         mapItemsDrawFrame.setOnTouchListener(
-                new View.OnTouchListener()
-                {
+                new View.OnTouchListener() {
                     @Override
-                    public boolean onTouch(View v, MotionEvent event)
-                    {
+                    public boolean onTouch(View v, MotionEvent event) {
                         if (!isDrawing) return false;
 
                         int x = Math.round(event.getX());
@@ -646,10 +614,9 @@ public class      MapItemsActivity
      * Zooms and pans the `googleMap` to encompass all the `items`.
      *
      * @param googleMap to zoom.
-     * @param items that should be visible on the map.
+     * @param items     that should be visible on the map.
      */
-    protected void zoomOnItems(GoogleMap googleMap, List<Item> items)
-    {
+    protected void zoomOnItems(GoogleMap googleMap, List<Item> items) {
         // Collect the LatLngs to zoom and pan the camera ideally
         LatLngBounds.Builder bc = new LatLngBounds.Builder();
 
@@ -662,7 +629,7 @@ public class      MapItemsActivity
         double lngPad = 360. / 60000;
 
         int itemsCount = items.size();
-        for (int i=0; i<itemsCount; i++) {
+        for (int i = 0; i < itemsCount; i++) {
             Item item = items.get(i);
 
             // Add coordinates to the boundaries builder
@@ -671,10 +638,10 @@ public class      MapItemsActivity
             // And coordinates of our padding
             double lat = item.getLatitude();
             double lng = item.getLongitude();
-            bc.include(new LatLng(lat+latPad, lng)); // north (or south)
-            bc.include(new LatLng(lat-latPad, lng)); // south (or north)
-            bc.include(new LatLng(lat, lng-lngPad)); // east (or west)
-            bc.include(new LatLng(lat, lng+lngPad)); // west (or east)
+            bc.include(new LatLng(lat + latPad, lng)); // north (or south)
+            bc.include(new LatLng(lat - latPad, lng)); // south (or north)
+            bc.include(new LatLng(lat, lng - lngPad)); // east (or west)
+            bc.include(new LatLng(lat, lng + lngPad)); // west (or east)
         }
 
         // Pan and zoom the camera
@@ -683,18 +650,15 @@ public class      MapItemsActivity
     }
 
 
-    private void showLoader()
-    {
+    private void showLoader() {
         mapItemsProgressBar.setVisibility(View.VISIBLE);
     }
 
-    private void hideLoader()
-    {
+    private void hideLoader() {
         mapItemsProgressBar.setVisibility(View.GONE);
     }
 
-    private void dropPinEffect(final Marker marker, long delay)
-    {
+    private void dropPinEffect(final Marker marker, long delay) {
         final Handler handler = new Handler();
         final long start = SystemClock.uptimeMillis() + delay;
         final long duration = 1500;
@@ -726,19 +690,17 @@ public class      MapItemsActivity
         }
         ,delay);
     }
-    
+
     Polygon  drawnPolygon;
     Polyline drawnPolyline;
     Circle   drawnCircle;
 
-    public void hideRegion()
-    {
-        if (drawnPolygon != null)  drawnPolygon.remove();
+    public void hideRegion() {
+        if (drawnPolygon != null) drawnPolygon.remove();
     }
 
-    public void drawPolygonOnMap(GoogleMap googleMap, Iterable<LatLng> polygonLatLngs)
-    {
-        if (drawnPolygon != null)  drawnPolygon.remove();
+    public void drawPolygonOnMap(GoogleMap googleMap, Iterable<LatLng> polygonLatLngs) {
+        if (drawnPolygon != null) drawnPolygon.remove();
         if (drawnPolyline != null) drawnPolyline.remove();
 
         PolygonOptions options = new PolygonOptions();
@@ -750,8 +712,7 @@ public class      MapItemsActivity
         drawnPolygon = googleMap.addPolygon(options);
     }
 
-    public void drawPolylineOnMap(GoogleMap googleMap, Iterable<LatLng> lineLatLngs)
-    {
+    public void drawPolylineOnMap(GoogleMap googleMap, Iterable<LatLng> lineLatLngs) {
         if (drawnPolyline != null) drawnPolyline.remove();
 
         PolylineOptions options = new PolylineOptions();
@@ -762,8 +723,7 @@ public class      MapItemsActivity
         drawnPolyline = googleMap.addPolyline(options);
     }
 
-    public void drawCircleOnMap(GoogleMap googleMap, LatLng center, double radius)
-    {
+    public void drawCircleOnMap(GoogleMap googleMap, LatLng center, double radius) {
         if (drawnCircle != null) drawnCircle.remove();
 
         CircleOptions options = new CircleOptions();
@@ -776,16 +736,14 @@ public class      MapItemsActivity
         drawnCircle = googleMap.addCircle(options);
     }
 
-    protected LatLngBounds getLatLngBounds(List<LatLng> latLngs)
-    {
+    protected LatLngBounds getLatLngBounds(List<LatLng> latLngs) {
         LatLngBounds.Builder bc = new LatLngBounds.Builder();
         for (LatLng latLng : latLngs) { bc.include(latLng); }
 
         return bc.build();
     }
 
-    protected LatLng getLatLngCentroid(List<LatLng> latLngs)
-    {
+    protected LatLng getLatLngCentroid(List<LatLng> latLngs) {
         if (latLngs.size() == 0) return null;
 
         return getLatLngBounds(latLngs).getCenter();
@@ -800,8 +758,7 @@ public class      MapItemsActivity
      * @param polygon The list of the vertices of the polygon, sequential and looping.
      * @return whether the point is inside the polygon
      */
-    public boolean pointInPolygon(LatLng point, List<LatLng> polygon)
-    {
+    public boolean pointInPolygon(LatLng point, List<LatLng> polygon) {
         int crossings = 0;
         int verticesCount = polygon.size();
 
@@ -820,15 +777,14 @@ public class      MapItemsActivity
     /**
      * Ray Casting algorithm checks, for each segment AB,
      * Returns true if the point is
-     *   1) to the left of the segment and
-     *   2) not above nor below the segment.
+     * 1) to the left of the segment and
+     * 2) not above nor below the segment.
      *
      * @param point
      * @param a
      * @param b
      */
-    public boolean rayCrossesSegment(LatLng point, LatLng a, LatLng b)
-    {
+    public boolean rayCrossesSegment(LatLng point, LatLng a, LatLng b) {
         double px = point.longitude,
                py = point.latitude,
                ax = a.longitude,
