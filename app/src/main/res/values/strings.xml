@@ -9,7 +9,7 @@
 
     <!---->
 
-    <string name="app_name">Karma ∝</string>
+    <string name="app_name">Karma</string>
 
     <string name="menu_action_map">Map</string>
     <string name="menu_action_settings">Settings</string>
@@ -114,7 +114,8 @@
     <!-- DEPRECATED -->
     <string name="toast_new_item_upload_failed">Failed to upload the item.</string>
     <string name="dialog_gps_disabled_oui">Yes</string><!-- unused -->
-    <string name="dialog_gps_disabled_non">No</string><!-- unused -->
+    <string name="dialog_gps_disabled_non">No</string>
+    <!-- unused -->
 
 
 </resources>

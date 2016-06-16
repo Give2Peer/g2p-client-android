@@ -3,6 +3,13 @@
 <resources>
     <drawable name="blue_not_used">#770000ff</drawable>
 
+    <color name="accent">#ff9800</color>
+    <color name="colorAccent">#ff9800</color>
+
+    <color name="colorPrimary">#ab47bc</color>
+    <color name="colorPrimaryDark">#7b1fa2</color>
+    <color name="colorPrimaryLight">#ce93d8</color>
+
     <color name="tutorial_slide_1_background">#eaa42c</color>
     <color name="tutorial_slide_2_background">#2cc8df</color>
     <color name="tutorial_slide_3_background">#eaa42c</color>

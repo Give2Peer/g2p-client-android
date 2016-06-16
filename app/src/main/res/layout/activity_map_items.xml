@@ -7,14 +7,29 @@
     tools:context="org.give2peer.karma.activity.MapItemsActivity_"
     >
 
-    <fragment
-        class="com.google.android.gms.maps.SupportMapFragment"
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        android:name="com.google.android.gms.maps.SupportMapFragment"
-        android:id="@+id/mapItemsFragment"
+    <!-- MAP ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
+
+    <!-- Wrapped in a frame with a transparent view on top to avoid a bug on gingerbread -->
+    <!-- http://stackoverflow.com/questions/17733723/navigation-drawer-google-maps-v2-map-blocking-drawer -->
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        />
+        android:layout_height="match_parent">
+
+        <fragment
+            class="com.google.android.gms.maps.SupportMapFragment"
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            android:name="com.google.android.gms.maps.SupportMapFragment"
+            android:id="@+id/mapItemsFragment"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            />
+
+        <!-- Transparent view to ensure gingerbread does not black-choke on the map -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            />
+    </FrameLayout>
 
     <FrameLayout
         android:id="@+id/mapItemsDrawFrame"
@@ -28,14 +43,13 @@
         <!-- to make it put its controls on the left to allow our FAB on the right. -->
         <!-- Also, we cannot (easily) animate that FAB, because of API 11 support.  -->
         <com.shamanland.fab.FloatingActionButton
-            android:id="@+id/mapItemsDrawButton"
+            android:id="@+id/mapItemsFloatingActionButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/ic_search_white_24dp"
-            android:layout_gravity="left|bottom"
+            android:layout_gravity="center|bottom"
             android:layout_marginBottom="5dp"
-            android:layout_marginLeft="5dp"
-            app:floatingActionButtonColor="@color/background_floating_material_dark"
+            app:floatingActionButtonColor="@color/colorPrimaryDark"
             app:floatingActionButtonSize="normal"
             />
 
@@ -55,6 +69,8 @@
 
     </FrameLayout>
 
+    <!-- WIDGETS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
+
     <ProgressBar
         style="?android:attr/progressBarStyleLarge"
         android:layout_width="wrap_content"
@@ -65,5 +81,12 @@
         android:layout_centerHorizontal="true"
         />
 
+
+    <!-- TOOLBAR ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
+
+    <include
+        android:id="@+id/mapItemsToolbar"
+        layout="@layout/toolbar"
+        />
 
 </RelativeLayout>
