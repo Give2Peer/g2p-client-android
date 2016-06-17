@@ -96,6 +96,9 @@ dependencies {
     compile 'com.shamanland:fab:0.0.8'
     //compile 'com.android.support:design:23.3.0' // nope
 
+    // NAVIGATION DRAWER
+    compile('com.mikepenz:materialdrawer:5.3.0@aar') { transitive = true }
+
     // HTTP /!\ deprecated
     compile 'org.apache.httpcomponents:httpmime:4.3'
     compile 'org.apache.httpcomponents:httpclient-android:4.3.5'

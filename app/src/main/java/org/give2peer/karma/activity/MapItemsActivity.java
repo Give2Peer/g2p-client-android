@@ -5,9 +5,12 @@ import android.content.Context;
 import android.graphics.Point;
 import android.location.Location;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.SystemClock;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -36,6 +39,13 @@ import com.google.android.gms.maps.model.Polygon;
 import com.google.android.gms.maps.model.PolygonOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.mikepenz.materialdrawer.Drawer;
+import com.mikepenz.materialdrawer.DrawerBuilder;
+import com.mikepenz.materialdrawer.holder.BadgeStyle;
+import com.mikepenz.materialdrawer.model.DividerDrawerItem;
+import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
+import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
+import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.rubengees.introduction.IntroductionBuilder;
 import com.rubengees.introduction.entity.Slide;
 import com.shamanland.fab.FloatingActionButton;
@@ -125,6 +135,9 @@ public class      MapItemsActivity
     @ViewById
     FrameLayout mapItemsDrawFrame;
 
+    @ViewById
+    Toolbar mapItemsToolbar;
+
 
     //// LIFECYCLE /////////////////////////////////////////////////////////////////////////////////
 
@@ -176,6 +189,72 @@ public class      MapItemsActivity
     @AfterViews
     public void readyLayout() {
         isLayoutReady = true;
+    }
+
+    Drawer drawer;
+
+    /**
+     * MAP
+     * ADD
+     * PROFILE
+     * LEADERBOARD
+     */
+    @AfterViews
+    public void setUpNavigationDrawer() {
+
+        final Activity activity = this;
+
+        setSupportActionBar(mapItemsToolbar);
+
+        PrimaryDrawerItem mapDrawerItem = new PrimaryDrawerItem()
+                .withName(R.string.menu_action_map)
+                .withIcon(R.drawable.ic_map_black_36dp)
+                .withIconTintingEnabled(true)
+                ;
+
+        PrimaryDrawerItem profileDrawerItem = new PrimaryDrawerItem()
+                .withName(R.string.menu_action_profile)
+                .withIcon(R.drawable.ic_perm_identity_black_36dp)
+                .withIconTintingEnabled(true);
+
+        SecondaryDrawerItem addDrawerItem = (SecondaryDrawerItem) new SecondaryDrawerItem()
+                .withName(R.string.menu_action_add_item);
+
+        SecondaryDrawerItem settingsDrawerItem = (SecondaryDrawerItem) new SecondaryDrawerItem()
+                .withName(R.string.menu_action_settings);
+
+
+
+        DrawerBuilder drawerBuilder = new DrawerBuilder().withActivity(this)
+                .withToolbar(mapItemsToolbar)
+                .addDrawerItems(
+                        mapDrawerItem,
+                        profileDrawerItem,
+                        addDrawerItem,
+                        new DividerDrawerItem(),
+                        new SecondaryDrawerItem().withName(R.string.menu_action_settings).withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
+                            @Override
+                            public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
+                                app.launchSettings(activity);
+                                return true;
+                            }
+                        })
+                )
+                .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
+                    @Override
+                    public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
+                        // do something with the clicked item :D
+                        return false; // consumed the event ?
+                    }
+                })
+//                .inflateMenu(R.menu.drawer)
+                ;
+
+
+
+        drawer = drawerBuilder.build();
+
+
     }
 
 //    @AfterViews
