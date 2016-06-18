@@ -112,7 +112,6 @@ All list items followed by parenthesis are optional, and the parenthesis should 
 - [ ] Feature: warn the user that the app is unavailable during server maintenance. (to be tested)
 - [ ] Feature: some form of OAuth2 as fallback for Maps. (we are subjected to quotas)
 - [ ] Feature: edit items I authored in my profile.
-- [ ] Feature: delete items I authored in my profile.
 - [ ] Feature: change my username when level 1, against some (9?) karma points.
 - [ ] Feature: add my facebook to my user account.
 - [ ] Feature: add my google+ to my user account.
@@ -123,12 +122,19 @@ All list items followed by parenthesis are optional, and the parenthesis should 
 - [ ] Feature: a logging utility that we can more easily disable for production.
 - [ ] BugFix:  fail gracefully when item image type or size is unsupported.
 - [ ] Translation: español.
+
+
+1.7.0
+-----
+
 - [ ] Translation: français.
+- [ ] BugFix:      issue #2.
 
 
 1.6.0
 -----
 
+- [ ] Feature: delete items I authored in my profile.
 - [ ] Feature: list notifications in the profile.
 - [ ] Feature: thank someone for an item.
 
@@ -136,19 +142,18 @@ All list items followed by parenthesis are optional, and the parenthesis should 
 1.5.0
 -----
 
-- [ ] Feature: a navigation drawer. \o/
 - [ ] Feature: all-time world leaderboard.
 - [ ] Feature: add my email to my user account.
+- [ ] Feature: log in with an existing user account.
+- [ ] Feature: request new credentials by email.
+- [ ] Feature: provide a description to items.
 
 
 1.4.0
 -----
 
-- [ ] Setting: move the map's region drawer FAB to the bottom right.
-- [ ] Feature: log in with an existing user account.
-- [ ] Feature: request new credentials by email.
-- [ ] Feature: provide a description to items.
-- [ ] BugFix:  issue #2.
+- [x] Feature: a navigation drawer. \o/
+- [x] Setting: move the map's region drawer FAB to the bottom center.
 
 
 
