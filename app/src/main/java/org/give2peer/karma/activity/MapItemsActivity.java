@@ -194,6 +194,7 @@ public class      MapItemsActivity
     Drawer drawer;
 
     /**
+     * Move this method to the Application
      * MAP
      * ADD
      * PROFILE
@@ -210,19 +211,53 @@ public class      MapItemsActivity
                 .withName(R.string.menu_action_map)
                 .withIcon(R.drawable.ic_map_black_36dp)
                 .withIconTintingEnabled(true)
+                .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
+                    @Override
+                    public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
+                        app.launchMap(activity);
+                        return true;
+                    }
+                })
                 ;
 
         PrimaryDrawerItem profileDrawerItem = new PrimaryDrawerItem()
                 .withName(R.string.menu_action_profile)
                 .withIcon(R.drawable.ic_perm_identity_black_36dp)
-                .withIconTintingEnabled(true);
+                .withIconTintingEnabled(true)
+                .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
+                    @Override
+                    public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
+                        app.launchProfile(activity);
+                        return true;
+                    }
+                })
+                ;
 
-        SecondaryDrawerItem addDrawerItem = (SecondaryDrawerItem) new SecondaryDrawerItem()
-                .withName(R.string.menu_action_add_item);
+        PrimaryDrawerItem addDrawerItem = new PrimaryDrawerItem()
+                .withName(R.string.menu_action_add_item)
+                .withIcon(R.drawable.ic_camera_alt_black_36dp)
+                .withIconTintingEnabled(true)
+                .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
+                    @Override
+                    public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
+                        app.launchNewItem(activity);
+                        return true;
+                    }
+                })
+                ;
 
-        SecondaryDrawerItem settingsDrawerItem = (SecondaryDrawerItem) new SecondaryDrawerItem()
-                .withName(R.string.menu_action_settings);
-
+        PrimaryDrawerItem settingsDrawerItem = new PrimaryDrawerItem()
+                .withName(R.string.menu_action_settings)
+                .withIcon(R.drawable.ic_settings_black_36dp)
+                .withIconTintingEnabled(true)
+                .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
+                    @Override
+                    public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
+                        app.launchSettings(activity);
+                        return true;
+                    }
+                })
+                ;
 
 
         DrawerBuilder drawerBuilder = new DrawerBuilder().withActivity(this)
@@ -232,29 +267,11 @@ public class      MapItemsActivity
                         profileDrawerItem,
                         addDrawerItem,
                         new DividerDrawerItem(),
-                        new SecondaryDrawerItem().withName(R.string.menu_action_settings).withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
-                            @Override
-                            public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
-                                app.launchSettings(activity);
-                                return true;
-                            }
-                        })
+                        settingsDrawerItem
                 )
-                .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
-                    @Override
-                    public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
-                        // do something with the clicked item :D
-                        return false; // consumed the event ?
-                    }
-                })
-//                .inflateMenu(R.menu.drawer)
                 ;
 
-
-
         drawer = drawerBuilder.build();
-
-
     }
 
 //    @AfterViews

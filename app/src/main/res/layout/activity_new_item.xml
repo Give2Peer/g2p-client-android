@@ -67,14 +67,25 @@
                 app:layout_collapseParallaxMultiplier="0.618"
                 >
 
-                <fragment
-                    class="com.google.android.gms.maps.SupportMapFragment"
-                    xmlns:android="http://schemas.android.com/apk/res/android"
-                    android:name="com.google.android.gms.maps.SupportMapFragment"
-                    android:id="@+id/newItemMapFragment"
+                <!-- Wrapped in a frame with a transparent view on top to avoid a bug on gingerbread -->
+                <!-- http://stackoverflow.com/questions/17733723/navigation-drawer-google-maps-v2-map-blocking-drawer -->
+                <FrameLayout
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    />
+                    android:layout_height="match_parent">
+                    <fragment
+                        class="com.google.android.gms.maps.SupportMapFragment"
+                        xmlns:android="http://schemas.android.com/apk/res/android"
+                        android:name="com.google.android.gms.maps.SupportMapFragment"
+                        android:id="@+id/newItemMapFragment"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        />
+                    <!-- Transparent view to ensure gingerbread does not black-choke on the map -->
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        />
+                </FrameLayout>
 
                 <ImageButton
                     android:id="@+id/newItemShowPicButton"

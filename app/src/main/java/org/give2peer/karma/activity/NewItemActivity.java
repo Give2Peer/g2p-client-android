@@ -339,7 +339,7 @@ public  class      NewItemActivity
         Intent intent = getIntent();
         String action = intent.getAction();
         String type = intent.getType();
-        if (action.equals(Intent.ACTION_SEND) && type != null) {
+        if (action != null && action.equals(Intent.ACTION_SEND) && type != null) {
             if (type.startsWith("image/")) {
                 // Handle a single image being sent
                 Uri imageUri = (Uri) intent.getParcelableExtra(Intent.EXTRA_STREAM);
