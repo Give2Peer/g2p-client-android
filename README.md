@@ -16,14 +16,21 @@ Goal
 **Photograph** and **geotag lost items** in public spaces (eg: a glove, a shoe, ~~a 500€ bill~~),
 recyclable **MOOP** (eg: planks of wood), and just plain **gifts**.
 
+_MOOP: Matter Out Of Place._
+
 Adding a new item should not take more than a handful of seconds.
 
 The app should display items on a map around your position.
 
-The client should be able to **connect to multiple servers**.
+The app should be able to **connect to multiple servers**.
 Big organizations should be able to use it privately for their internal item transfers.
 
-_"Who wants the old computer taking up space in my office ?"_
+Karma aims to help in the following situations, for example :
+
+- _"I need wood scraps to fix that chair."_
+- _"I need worms to kickstart my compost."_
+- _"I lost my left glove last night."_
+- _"Who wants the old computer taking up space in my office ?"_
 
 
 
@@ -37,8 +44,7 @@ _"Ok google, please add these old shoes to my MOOP bag."_
 Snaps picture, prefills fields, I'm done in a matter of seconds.
 It's easier said than done, of course.
 
-Then again, Google should make a lost&found app altogether. Any big player should.
-Karma is and will stay forever free and libre.
+Then again, Google should make a lost&found/ownership app altogether. Any big player should.
 
 
 ROADMAP
@@ -95,9 +101,8 @@ The native Android code should handle receiving picture intents, but the rest sh
 We're very interested in benchmarking these apps against each other.
 
 
-
-2.0.0
------
+Future
+------
 
 A version for open beta-testing, working as early as API 10 (Android 3.0 Gingerbread).
 
@@ -118,6 +123,7 @@ All list items followed by parenthesis are optional, and the parenthesis should 
 - [ ] Feature: add my twitter to my user account.
 - [ ] Feature: show items around as a list from closest to furthest.
 - [ ] Feature: report an offensive item.
+- [ ] Feature: communities.
 - [ ] Feature: display a count of available characters under the title input field.
 - [ ] Feature: a logging utility that we can more easily disable for production.
 - [ ] BugFix:  fail gracefully when item image type or size is unsupported.
