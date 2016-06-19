@@ -17,6 +17,8 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
@@ -32,6 +34,11 @@ import android.widget.Toast;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.model.LatLng;
+import com.mikepenz.materialdrawer.Drawer;
+import com.mikepenz.materialdrawer.DrawerBuilder;
+import com.mikepenz.materialdrawer.model.DividerDrawerItem;
+import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
+import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.orm.SugarApp;
 import com.shamanland.fab.FloatingActionButton;
 
@@ -796,6 +803,109 @@ public class Application extends SugarApp
     {
         return getCurrentServer().getUsername().equals(item.getAuthor().getUsername());
     }
+
+    // NAVIGATION DRAWER ///////////////////////////////////////////////////////////////////////////
+
+    Drawer navigationDrawer;
+
+    public Drawer getNavigationDrawer() {
+        return navigationDrawer;
+    }
+
+    public static long NAVIGATION_DRAWER_ITEM_MAP = 1;
+    public static long NAVIGATION_DRAWER_ITEM_PROFILE = 2;
+
+    /**
+     *
+     * @param activity
+     * @param toolbar the Toolbar to replace the default Appbar
+     * @param selectedDrawerItem One of NAVIGATION_DRAWER_ITEM_XXXXX
+     */
+    public void setUpNavigationDrawer(final AppCompatActivity activity, Toolbar toolbar,
+                                      long selectedDrawerItem) {
+
+        activity.setSupportActionBar(toolbar);
+
+        PrimaryDrawerItem mapDrawerItem = new PrimaryDrawerItem()
+                .withName(R.string.menu_action_map)
+                .withIcon(R.drawable.ic_map_black_36dp)
+                .withIconTintingEnabled(true)
+//                .withSelectable(false) // Nope, we want the color to change.
+                .withIdentifier(NAVIGATION_DRAWER_ITEM_MAP)
+                .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
+                    @Override
+                    public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
+                        launchMap(activity);
+                        return true;
+                    }
+                })
+                ;
+
+        PrimaryDrawerItem profileDrawerItem = new PrimaryDrawerItem()
+                .withName(R.string.menu_action_profile)
+                .withIcon(R.drawable.ic_perm_identity_black_36dp)
+                .withIconTintingEnabled(true)
+                .withIdentifier(NAVIGATION_DRAWER_ITEM_PROFILE)
+                .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
+                    @Override
+                    public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
+                        launchProfile(activity);
+                        return true;
+                    }
+                })
+                ;
+
+        PrimaryDrawerItem addDrawerItem = new PrimaryDrawerItem()
+                .withName(R.string.menu_action_add_item)
+                .withIcon(R.drawable.ic_camera_alt_black_36dp)
+                .withIconTintingEnabled(true)
+                .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
+                    @Override
+                    public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
+                        launchNewItem(activity);
+                        return true;
+                    }
+                })
+                ;
+
+        PrimaryDrawerItem settingsDrawerItem = new PrimaryDrawerItem()
+                .withName(R.string.menu_action_settings)
+                .withIcon(R.drawable.ic_settings_black_36dp)
+                .withIconTintingEnabled(true)
+                .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
+                    @Override
+                    public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
+                        launchSettings(activity);
+                        return true;
+                    }
+                })
+                ;
+
+        DrawerBuilder drawerBuilder = new DrawerBuilder().withActivity(activity)
+                .withToolbar(toolbar)
+                .addDrawerItems(
+                        mapDrawerItem,
+                        profileDrawerItem,
+                        addDrawerItem,
+                        new DividerDrawerItem(),
+                        settingsDrawerItem
+                )
+                .withSelectedItem(selectedDrawerItem)
+                ;
+
+        navigationDrawer = drawerBuilder.build();
+    }
+
+    /**
+     * Does nothing if the navigation drawer is not ready yet.
+     * @param selectedDrawerItem One of NAVIGATION_DRAWER_ITEM_XXXXX
+     */
+    public void selectNavigationDrawerItem(long selectedDrawerItem) {
+        if (null != navigationDrawer) {
+            navigationDrawer.setSelection(selectedDrawerItem);
+        }
+    }
+
 
     /**
      * This is a great hack !

@@ -170,6 +170,11 @@ public class      MapItemsActivity
         // The chain of events starts here ; not very good design, this.
         app.requireAuthentication(this);
 
+        // The navigation drawers selects the last item that was clicked on, and maybe this
+        // activity was not destroyed, so we need to select the MAP item back.
+        // We could use .withSelected(false) but we'd lose the color-change click responsiveness.
+        app.selectNavigationDrawerItem(Application.NAVIGATION_DRAWER_ITEM_MAP);
+
 //        if (isMapReady()) {
 //            if (hasMapItemMarkers()) {
 //                // Sometimes the map fragment loses the zoom level, let's try to fix that.
@@ -191,87 +196,9 @@ public class      MapItemsActivity
         isLayoutReady = true;
     }
 
-    Drawer drawer;
-
-    /**
-     * Move this method to the Application
-     * MAP
-     * ADD
-     * PROFILE
-     * LEADERBOARD
-     */
     @AfterViews
     public void setUpNavigationDrawer() {
-
-        final Activity activity = this;
-
-        setSupportActionBar(mapItemsToolbar);
-
-        PrimaryDrawerItem mapDrawerItem = new PrimaryDrawerItem()
-                .withName(R.string.menu_action_map)
-                .withIcon(R.drawable.ic_map_black_36dp)
-                .withIconTintingEnabled(true)
-                .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
-                    @Override
-                    public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
-                        app.launchMap(activity);
-                        return true;
-                    }
-                })
-                ;
-
-        PrimaryDrawerItem profileDrawerItem = new PrimaryDrawerItem()
-                .withName(R.string.menu_action_profile)
-                .withIcon(R.drawable.ic_perm_identity_black_36dp)
-                .withIconTintingEnabled(true)
-                .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
-                    @Override
-                    public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
-                        app.launchProfile(activity);
-                        return true;
-                    }
-                })
-                ;
-
-        PrimaryDrawerItem addDrawerItem = new PrimaryDrawerItem()
-                .withName(R.string.menu_action_add_item)
-                .withIcon(R.drawable.ic_camera_alt_black_36dp)
-                .withIconTintingEnabled(true)
-                .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
-                    @Override
-                    public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
-                        app.launchNewItem(activity);
-                        return true;
-                    }
-                })
-                ;
-
-        PrimaryDrawerItem settingsDrawerItem = new PrimaryDrawerItem()
-                .withName(R.string.menu_action_settings)
-                .withIcon(R.drawable.ic_settings_black_36dp)
-                .withIconTintingEnabled(true)
-                .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
-                    @Override
-                    public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
-                        app.launchSettings(activity);
-                        return true;
-                    }
-                })
-                ;
-
-
-        DrawerBuilder drawerBuilder = new DrawerBuilder().withActivity(this)
-                .withToolbar(mapItemsToolbar)
-                .addDrawerItems(
-                        mapDrawerItem,
-                        profileDrawerItem,
-                        addDrawerItem,
-                        new DividerDrawerItem(),
-                        settingsDrawerItem
-                )
-                ;
-
-        drawer = drawerBuilder.build();
+        app.setUpNavigationDrawer(this, mapItemsToolbar, Application.NAVIGATION_DRAWER_ITEM_MAP);
     }
 
 //    @AfterViews
