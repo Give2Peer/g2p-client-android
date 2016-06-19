@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <resources>
-    <drawable name="blue_not_used">#770000ff</drawable>
+    <color name="white">#efefef</color>
 
     <color name="accent">#ff9800</color>
     <color name="colorAccent">#ff9800</color>
@@ -11,7 +11,7 @@
     <color name="colorPrimaryLight">#ce93d8</color>
 
     <color name="tutorial_slide_1_background">#eaa42c</color>
-    <color name="tutorial_slide_2_background">#2cc8df</color>
+    <color name="tutorial_slide_2_background">#28b6ca</color>
     <color name="tutorial_slide_3_background">#eaa42c</color>
     <color name="tutorial_slide_4_background">#aa48b7</color>
 </resources>
