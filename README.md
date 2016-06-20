@@ -108,6 +108,11 @@ A version for open beta-testing, working as early as API 10 (Android 3.0 Gingerb
 
 All list items followed by parenthesis are optional, and the parenthesis should explain why.
 
+Ideas
+-----
+
+In no particular order, these ideas have no release milestone set yet. Some may even never yield.
+
 - [ ] Feature: MOOP bags, to regroup items and handle another recycling bin at home
 - [ ] Feature: display basic statistics of the app.
 - [ ] Feature: suggest deletion of items submitted by someone else. (tricky)
@@ -115,7 +120,7 @@ All list items followed by parenthesis are optional, and the parenthesis should 
 - [ ] Feature: add a new Item offline, upload later. (lots of work)
 - [ ] Feature: easily send a bug report to developers on caught error. (we use the OS)
 - [ ] Feature: warn the user that the app is unavailable during server maintenance. (to be tested)
-- [ ] Feature: some form of OAuth2 as fallback for Maps. (we are subjected to quotas)
+- [ ] Feature: some form of OAuth2 as fallback for Maps, as we are subjected to quotas.
 - [ ] Feature: edit items I authored in my profile.
 - [ ] Feature: change my username when level 1, against some (9?) karma points.
 - [ ] Feature: add my facebook to my user account.
@@ -124,23 +129,23 @@ All list items followed by parenthesis are optional, and the parenthesis should 
 - [ ] Feature: show items around as a list from closest to furthest.
 - [ ] Feature: report an offensive item.
 - [ ] Feature: communities.
-- [ ] Feature: display a count of available characters under the title input field.
 - [ ] Feature: a logging utility that we can more easily disable for production.
-- [ ] BugFix:  fail gracefully when item image type or size is unsupported.
-- [ ] Translation: español.
+- [ ] BugHunt: fail gracefully when item image type or size is unsupported.
+- [ ] L10N:    español.
 
 
 1.7.0
 -----
 
-- [ ] Translation: français.
-- [ ] BugFix:      issue #2.
+- [ ] Feature: full I18N (Interplanetarization)
+- [ ] L10N:    français.
+- [ ] BugHunt: issue #2.
 
 
 1.6.0
 -----
 
-- [ ] Feature: delete items I authored in my profile.
+- [ ] Feature: delete items I authored.
 - [ ] Feature: list notifications in the profile.
 - [ ] Feature: thank someone for an item.
 
@@ -152,6 +157,7 @@ All list items followed by parenthesis are optional, and the parenthesis should 
 - [ ] Feature: add my email to my user account.
 - [ ] Feature: log in with an existing user account.
 - [ ] Feature: request new credentials by email.
+- [ ] Feature: an activity for the details of an item.
 - [ ] Feature: provide a description to items.
 
 
@@ -159,7 +165,10 @@ All list items followed by parenthesis are optional, and the parenthesis should 
 -----
 
 - [x] Feature: a navigation drawer. \o/
+- [x] Feature: re-enable taking a picture from the app.
 - [x] Setting: move the map's region drawer FAB to the bottom center.
+- [x] Feature: display a count of available characters when appropriate.
+- [ ] BugHunt: automatic geolocation when adding an item
 
 
 
@@ -169,8 +178,8 @@ CHANGELOG
 1.3.0 (12-06-2016)
 ------------------
 
-- [x] BugFix:  android M and external storage permissions.
-- [x] BugFix:  disable SSL for item thumbnails.
+- [x] BugHunt: android M and external storage permissions.
+- [x] BugHunt: disable SSL for item thumbnails.
 - [x] Feature: show new item location on a small map.
 - [x] Feature: support `png` images for items.
 - [x] Feature: support `gif` images for items.
@@ -182,8 +191,8 @@ CHANGELOG
 ------------------
 
 - [x] Setting: enable `https` protocol, like a monkey.
-- [x] Bugfix:  map loader keeps turning after onboarding activity.
-- [x] Bugfix:  make sure temporary picture files are removed.
+- [x] BugHunt:  map loader keeps turning after onboarding activity.
+- [x] BugHunt:  make sure temporary picture files are removed.
 - [x] Feature: suggest enabling the GPS.
 - [x] Feature: parallax the new item picture.
 
@@ -201,10 +210,10 @@ Still in closed alpha...
 1.0.1 (03-05-2016)
 ------------------
 
-- [x] Bugfix: switching from map to profile and map again launches a new instance of the map.
-- [x] Bugfix: item popup window of the wrong size on high dpi screens.
-- [x] Bugfix: issue #1 : items sometimes disappear from the map.
-- [x] Bugfix: issue #2 : uploading a picture fails silently.
+- [x] BugHunt: switching from map to profile and map again launches a new instance of the map.
+- [x] BugHunt: item popup window of the wrong size on high dpi screens.
+- [x] BugHunt: issue #1 : items sometimes disappear from the map.
+- [x] BugHunt: issue #2 : uploading a picture fails silently.
 
 
 1.0.0 (01-05-2016)
@@ -215,7 +224,7 @@ A version for the alpha community, released privately on Google Play.
 This version was available by invitation only.
 
 - [x] Feature: display item details in a crude popup window.
-- [x] Bugfix: support for images shared through browser downloads and others.
+- [x] BugHunt: support for images shared through browser downloads and others.
 - [x] Design:  a launcher icon. _(Kiouze FTW)_
 
 
@@ -230,7 +239,7 @@ A marathon of code !
 - [x] Setting: move to the versioned API `v1/`.
 - [x] Design:  Floating Action Button.
 - [x] Feature: list items I tagged in my profile.
-- [x] Bugfix:  crash upon manual registration.
+- [x] BugHunt:  crash upon manual registration.
 - [x] Feature: gain one karma point when launching the map, once per day.
 - [x] Feature: automatic pre-registration.
 
@@ -425,7 +434,7 @@ Of course, all these statistics will be published publicly.
 Transparency is the key. If you know about good software suites / practices to that effect, we are
 interested.
 
-This will be yet another experiment in algorithms towards self-sustenance.
+This will be yet another experiment in self-sustaining algorithms.
 
 New features and maintenance will be provided by the
 [FLOSS](http://en.wikipedia.org/wiki/Free_and_open-source_software#FLOSS) community
@@ -460,6 +469,7 @@ Credits
 - Our other friends, for not killing us when we pester them about this.
 - Our families, for their unwavering support.
 - And of course everyone that told us that this was useless and could not be done.
+- And you, because you read this whole inane page up to the end !
 
 
 
