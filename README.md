@@ -113,7 +113,7 @@ Ideas
 
 In no particular order, these ideas have no release milestone set yet. Some may even never yield.
 
-- [ ] Feature: MOOP bags, to regroup items and handle another recycling bin at home
+- [ ] Feature: MOOP bags, to regroup items and handle another recycling bin at home.
 - [ ] Feature: display basic statistics of the app.
 - [ ] Feature: suggest deletion of items submitted by someone else. (tricky)
 - [ ] Feature: provide a lifespan to items I tag. (lifespans depend on the user karmic level)
@@ -127,11 +127,19 @@ In no particular order, these ideas have no release milestone set yet. Some may 
 - [ ] Feature: add my google+ to my user account.
 - [ ] Feature: add my twitter to my user account.
 - [ ] Feature: show items around as a list from closest to furthest.
-- [ ] Feature: report an offensive item.
 - [ ] Feature: communities.
 - [ ] Feature: a logging utility that we can more easily disable for production.
 - [ ] BugHunt: fail gracefully when item image type or size is unsupported.
 - [ ] L10N:    español.
+
+
+2.0.0
+-----
+
+A version for the beta community.
+
+- [ ] Feature: report an offensive item.
+
 
 
 1.7.0
@@ -167,8 +175,9 @@ In no particular order, these ideas have no release milestone set yet. Some may 
 - [x] Feature: a navigation drawer. \o/
 - [x] Feature: re-enable taking a picture from the app.
 - [x] Setting: move the map's region drawer FAB to the bottom center.
-- [x] Feature: display a count of available characters when appropriate.
-- [ ] BugHunt: automatic geolocation when adding an item
+- [x] Feature: display a count of available characters when relevant.
+- [x] BugHunt: automatic geolocation when adding an item.
+- [x] Design:  a splash of color.
 
 
 
@@ -221,7 +230,7 @@ Still in closed alpha...
 
 A version for the alpha community, released privately on Google Play.
 
-This version was available by invitation only.
+This major version is available by invitation only.
 
 - [x] Feature: display item details in a crude popup window.
 - [x] BugHunt: support for images shared through browser downloads and others.

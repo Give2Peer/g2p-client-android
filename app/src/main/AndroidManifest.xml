@@ -70,7 +70,6 @@
         <!-- Uses a system intent to capture an image and provides a form to add a new item. -->
         <activity
             android:name="org.give2peer.karma.activity.NewItemActivity_"
-            android:theme="@style/Theme.AppCompat"
             android:windowSoftInputMode="adjustPan|stateHidden"
             >
             <intent-filter>

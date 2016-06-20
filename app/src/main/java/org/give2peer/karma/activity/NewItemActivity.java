@@ -18,6 +18,7 @@ import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.widget.NestedScrollView;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.View;
@@ -87,7 +88,8 @@ import java.util.Locale;
 @EActivity(R.layout.activity_new_item)
 public  class      NewItemActivity
         extends    LocatorBaseActivity
-        implements OnMapReadyCallback, ActivityCompat.OnRequestPermissionsResultCallback {
+        implements OnMapReadyCallback, ActivityCompat.OnRequestPermissionsResultCallback
+{
     static final int REQUEST_IMAGE_CAPTURE = 1;
     static final String BUNDLE_IMAGE_PATHS = "imagePaths";
 
@@ -305,13 +307,8 @@ public  class      NewItemActivity
      */
     @AfterViews
     public void hideActionBar() {
-        try {
-            getSupportActionBar().hide();
-        } catch (NullPointerException e) {
-            // It would be interesting here to throw, but only for alpha users.
-            // Maybe in the future google play services will offer this info ?
-            Log.e("G2P", "Failed to hide the action bar.");
-        }
+        ActionBar ab = getSupportActionBar();
+        if (null != ab) ab.hide();
     }
 
     /**
@@ -400,6 +397,11 @@ public  class      NewItemActivity
     public void onMapReady(GoogleMap googleMap) {
         this.googleMap = googleMap;
 
+        if ( ! isLocationReady()) {
+            Log.d("G2P", "Trying to guess the location...");
+            getLocation();
+        }
+
         // Make sure we can scroll on the map and not on the scrollable view
         googleMap.setOnMapLoadedCallback(new GoogleMap.OnMapLoadedCallback() {
             @Override
@@ -416,6 +418,8 @@ public  class      NewItemActivity
         });
 
         googleMap.getUiSettings().setMapToolbarEnabled(false);
+        googleMap.getUiSettings().setRotateGesturesEnabled(false);
+        googleMap.getUiSettings().setCompassEnabled(false);
 
         updateMap();
     }
