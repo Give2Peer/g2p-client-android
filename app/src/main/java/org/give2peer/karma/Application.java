@@ -274,48 +274,53 @@ public class Application extends SugarApp
         launchActivity(activity, SettingsActivity.class);
     }
 
+    /**
+     * Launch activity described by its `activityClass`, from provided `activity`.
+     * Make sure we don't re-create a new activity if we already have one running.
+     *
+     * @param activity Our current activity, mostly used as Context
+     * @param activityClass The activity we want to launch.
+     */
     public void launchActivity(Activity activity, Class<?> activityClass )
     {
-        // Unsure why we use `this` (the Application) as context for the Intent and not `activity`.
-        Intent intent = new Intent(this, activityClass);
-        // Make sure we don't re-create a new activity if we already have one running
+        Intent intent = new Intent(activity, activityClass);
         intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
         activity.startActivity(intent);
     }
 
 
-    public boolean onOptionsItemSelected(MenuItem item, Activity activity)
-    {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        if (id == R.id.menu_action_settings) {
-            launchSettings(activity);
-            return true;
-        }
-        if (id == R.id.menu_action_map) {
-            launchMap(activity);
-            return true;
-        }
-        if (id == R.id.menu_action_profile) {
-            launchProfile(activity);
-            return true;
-        }
-        // Nah, use the "Share Via..."
-//        if (id == R.id.menu_action_add_item) {
-//            launchNewItem();
+//    public boolean onOptionsItemSelected(MenuItem item, Activity activity)
+//    {
+//        // Handle action bar item clicks here. The action bar will
+//        // automatically handle clicks on the Home/Up button, so long
+//        // as you specify a parent activity in AndroidManifest.xml.
+//        int id = item.getItemId();
+//
+//        if (id == R.id.menu_action_settings) {
+//            launchSettings(activity);
 //            return true;
 //        }
-        // Froyo has its own bug reporting system.
-//        if (id == R.id.menu_action_report_bug) {
-//            launchBugReport(activity);
+//        if (id == R.id.menu_action_map) {
+//            launchMap(activity);
 //            return true;
 //        }
-
-        return false;
-    }
+////        if (id == R.id.menu_action_profile) {
+////            launchProfile(activity);
+////            return true;
+////        }
+//        // Nah, use the "Share Via..."
+////        if (id == R.id.menu_action_add_item) {
+////            launchNewItem();
+////            return true;
+////        }
+//        // Froyo has its own bug reporting system.
+////        if (id == R.id.menu_action_report_bug) {
+////            launchBugReport(activity);
+////            return true;
+////        }
+//
+//        return false;
+//    }
 
     // SERVERS /////////////////////////////////////////////////////////////////////////////////////
 
@@ -806,22 +811,16 @@ public class Application extends SugarApp
 
     // NAVIGATION DRAWER ///////////////////////////////////////////////////////////////////////////
 
-    Drawer navigationDrawer;
-
-    public Drawer getNavigationDrawer() {
-        return navigationDrawer;
-    }
-
-    public static long NAVIGATION_DRAWER_ITEM_MAP = 1;
-    public static long NAVIGATION_DRAWER_ITEM_PROFILE = 2;
+    public static long NAVIGATION_DRAWER_ITEM_MAP = 2;
+    public static long NAVIGATION_DRAWER_ITEM_PROFILE = 3;
 
     /**
      *
      * @param activity
      * @param toolbar the Toolbar to replace the default Appbar
-     * @param selectedDrawerItem One of NAVIGATION_DRAWER_ITEM_XXXXX
+     * @param selectedDrawerItem One of NAVIGATION_DRAWER_ITEM_XXXXX, provide -1 to select nothing.
      */
-    public void setUpNavigationDrawer(final AppCompatActivity activity, Toolbar toolbar,
+    public Drawer setUpNavigationDrawer(final AppCompatActivity activity, Toolbar toolbar,
                                       long selectedDrawerItem) {
 
         activity.setSupportActionBar(toolbar);
@@ -893,18 +892,18 @@ public class Application extends SugarApp
                 .withSelectedItem(selectedDrawerItem)
                 ;
 
-        navigationDrawer = drawerBuilder.build();
+        return drawerBuilder.build();
     }
 
-    /**
-     * Does nothing if the navigation drawer is not ready yet.
-     * @param selectedDrawerItem One of NAVIGATION_DRAWER_ITEM_XXXXX
-     */
-    public void selectNavigationDrawerItem(long selectedDrawerItem) {
-        if (null != navigationDrawer) {
-            navigationDrawer.setSelection(selectedDrawerItem);
-        }
-    }
+//    /**
+//     * Does nothing if the navigation drawer is not ready yet.
+//     * @param selectedDrawerItem One of NAVIGATION_DRAWER_ITEM_XXXXX
+//     */
+//    public void selectNavigationDrawerItem(long selectedDrawerItem) {
+//        if (null != navigationDrawer) {
+//            navigationDrawer.setSelection(selectedDrawerItem);
+//        }
+//    }
 
 
     /**

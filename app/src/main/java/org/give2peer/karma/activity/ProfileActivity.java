@@ -3,6 +3,8 @@ package org.give2peer.karma.activity;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -15,6 +17,9 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.mikepenz.materialdrawer.Drawer;
+
+import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.EApplication;
@@ -44,12 +49,9 @@ import java.util.List;
  * It requires the user to be registered.
  * - User informations
  * - Items added by the user
- *
- * ActionBarActivity is deprecated, so we should use something else. We failed to. Maybe YOU won't ?
- *
  */
 @EActivity(R.layout.activity_profile)
-public class ProfileActivity extends ActionBarActivity
+public class ProfileActivity extends AppCompatActivity
 {
     Application app;
 
@@ -75,6 +77,8 @@ public class ProfileActivity extends ActionBarActivity
     Button         profileRetryButton;
     @ViewById
     ListView       profileItemsListView;
+    @ViewById
+    Toolbar        profileToolbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -95,6 +99,11 @@ public class ProfileActivity extends ActionBarActivity
         // If the user is not authenticated, take care of it
         app.requireAuthentication(this);
 
+        // The navigation drawers selects the last item that was clicked on, and maybe this
+        // activity was not destroyed, so we need to select the MAP item back.
+        // We could use .withSelected(false) but we'd lose the color-change click responsiveness.
+        selectNavigationDrawerItem(Application.NAVIGATION_DRAWER_ITEM_PROFILE);
+
         // Request data and then fill up the profile views
         synchronize();
     }
@@ -111,22 +120,47 @@ public class ProfileActivity extends ActionBarActivity
         super.onStop();
     }
 
+    @AfterViews
+    public void setUpNavigationDrawer() {
+        navigationDrawer = app.setUpNavigationDrawer(this, profileToolbar,
+                Application.NAVIGATION_DRAWER_ITEM_PROFILE
+        );
+    }
+
+    // NAVIGATION DRAWER ///////////////////////////////////////////////////////////////////////////
+
+    Drawer navigationDrawer;
+
+    public Drawer getNavigationDrawer() {
+        return navigationDrawer;
+    }
+
+    /**
+     * Does nothing if the navigation drawer is not ready yet.
+     * @param selectedDrawerItem One of Application.NAVIGATION_DRAWER_ITEM_XXXXX
+     */
+    public void selectNavigationDrawerItem(long selectedDrawerItem) {
+        if (null != navigationDrawer) {
+            navigationDrawer.setSelection(selectedDrawerItem);
+        }
+    }
+
     // OPTIONS MENU ////////////////////////////////////////////////////////////////////////////////
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu)
-    {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_profile, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item)
-    {
-        boolean found = app.onOptionsItemSelected(item, this);
-        return found || super.onOptionsItemSelected(item);
-    }
+//    @Override
+//    public boolean onCreateOptionsMenu(Menu menu)
+//    {
+//        // Inflate the menu; this adds items to the action bar if it is present.
+//        getMenuInflater().inflate(R.menu.menu_profile, menu);
+//        return true;
+//    }
+//
+//    @Override
+//    public boolean onOptionsItemSelected(MenuItem item)
+//    {
+//        boolean found = app.onOptionsItemSelected(item, this);
+//        return found || super.onOptionsItemSelected(item);
+//    }
 
     // INTERFACE LISTENERS /////////////////////////////////////////////////////////////////////////
 

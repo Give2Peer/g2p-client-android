@@ -77,7 +77,7 @@ import java.util.List;
  * 3. Locating
  *
  * I don't know what happens when we launch the Onboarding (it's another activity).
- * I know the pre-registration is done
+ * I know the pre-registration is done.
  */
 @EActivity(R.layout.activity_map_items)
 public class      MapItemsActivity
@@ -124,19 +124,15 @@ public class      MapItemsActivity
     //// VIEWS /////////////////////////////////////////////////////////////////////////////////////
 
     @ViewById
-    TextView noInternetTextView; // time to start refactoring the "no internet" flow for activities!
-
+    TextView             noInternetTextView;
     @ViewById
-    ProgressBar mapItemsProgressBar;
-
+    ProgressBar          mapItemsProgressBar;
     @ViewById
     FloatingActionButton mapItemsFloatingActionButton;
-
     @ViewById
-    FrameLayout mapItemsDrawFrame;
-
+    FrameLayout          mapItemsDrawFrame;
     @ViewById
-    Toolbar mapItemsToolbar;
+    Toolbar              mapItemsToolbar;
 
 
     //// LIFECYCLE /////////////////////////////////////////////////////////////////////////////////
@@ -173,7 +169,7 @@ public class      MapItemsActivity
         // The navigation drawers selects the last item that was clicked on, and maybe this
         // activity was not destroyed, so we need to select the MAP item back.
         // We could use .withSelected(false) but we'd lose the color-change click responsiveness.
-        app.selectNavigationDrawerItem(Application.NAVIGATION_DRAWER_ITEM_MAP);
+        selectNavigationDrawerItem(Application.NAVIGATION_DRAWER_ITEM_MAP);
 
 //        if (isMapReady()) {
 //            if (hasMapItemMarkers()) {
@@ -198,7 +194,9 @@ public class      MapItemsActivity
 
     @AfterViews
     public void setUpNavigationDrawer() {
-        app.setUpNavigationDrawer(this, mapItemsToolbar, Application.NAVIGATION_DRAWER_ITEM_MAP);
+        navigationDrawer = app.setUpNavigationDrawer(this, mapItemsToolbar,
+                Application.NAVIGATION_DRAWER_ITEM_MAP
+        );
     }
 
 //    @AfterViews
@@ -275,20 +273,38 @@ public class      MapItemsActivity
     }
 
 
+    // NAVIGATION DRAWER ///////////////////////////////////////////////////////////////////////////
+
+    Drawer navigationDrawer;
+
+    public Drawer getNavigationDrawer() {
+        return navigationDrawer;
+    }
+
+    /**
+     * Does nothing if the navigation drawer is not ready yet.
+     * @param selectedDrawerItem One of Application.NAVIGATION_DRAWER_ITEM_XXXXX
+     */
+    public void selectNavigationDrawerItem(long selectedDrawerItem) {
+        if (null != navigationDrawer) {
+            navigationDrawer.setSelection(selectedDrawerItem);
+        }
+    }
+
     // OPTIONS MENU ////////////////////////////////////////////////////////////////////////////////
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_map_items, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        boolean found = app.onOptionsItemSelected(item, this);
-        return found || super.onOptionsItemSelected(item);
-    }
+//    @Override
+//    public boolean onCreateOptionsMenu(Menu menu) {
+//        // Inflate the menu; this adds items to the action bar if it is present.
+//        getMenuInflater().inflate(R.menu.menu_map_items, menu);
+//        return true;
+//    }
+//
+//    @Override
+//    public boolean onOptionsItemSelected(MenuItem item) {
+//        boolean found = app.onOptionsItemSelected(item, this);
+//        return found || super.onOptionsItemSelected(item);
+//    }
 
 
     //// UI LISTENERS //////////////////////////////////////////////////////////////////////////////

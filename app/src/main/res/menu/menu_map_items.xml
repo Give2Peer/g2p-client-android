@@ -5,13 +5,13 @@
     tools:context=".MapItemsActivity_"
     >
 
-    <item
-        android:id="@+id/menu_action_profile"
-        android:title="@string/menu_action_profile"
-        android:icon="@drawable/ic_perm_identity_white_36dp"
-        android:orderInCategory="40"
-        app:showAsAction="ifRoom"
-        />
+    <!--<item-->
+        <!--android:id="@+id/menu_action_profile"-->
+        <!--android:title="@string/menu_action_profile"-->
+        <!--android:icon="@drawable/ic_perm_identity_white_36dp"-->
+        <!--android:orderInCategory="40"-->
+        <!--app:showAsAction="ifRoom"-->
+        <!--/>-->
 
     <!--<item-->
         <!--android:id="@+id/menu_action_add_item"-->
