@@ -139,7 +139,8 @@ In no particular order, these ideas have no release milestone set yet. Some may 
 A version for the beta community.
 
 - [ ] Feature: report an offensive item.
-
+- [ ] Feature: all-time world leaderboard.
+- [ ] Feature: thank someone for an item.
 
 
 1.7.0
@@ -147,7 +148,7 @@ A version for the beta community.
 
 - [ ] Feature: full I18N (Interplanetarization)
 - [ ] L10N:    français.
-- [ ] BugHunt: issue #2.
+- [ ] BugHunt: issue #2: item images are mishandled.
 
 
 1.6.0
@@ -155,13 +156,12 @@ A version for the beta community.
 
 - [ ] Feature: delete items I authored.
 - [ ] Feature: list notifications in the profile.
-- [ ] Feature: thank someone for an item.
+
 
 
 1.5.0
 -----
 
-- [ ] Feature: all-time world leaderboard.
 - [ ] Feature: add my email to my user account.
 - [ ] Feature: log in with an existing user account.
 - [ ] Feature: request new credentials by email.
@@ -178,6 +178,7 @@ A version for the beta community.
 - [x] Feature: display a count of available characters when relevant.
 - [x] BugHunt: automatic geolocation when adding an item.
 - [x] Design:  a splash of color.
+- [ ] Feature: thumbnail image in the map's item marker's info window.
 
 
 
