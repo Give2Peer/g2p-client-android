@@ -120,7 +120,8 @@ dependencies {
     compile 'com.google.code.gson:gson:2.4'
 
     // IMAGE CACHE (provides WebImageView, pretty awesome)
-    compile 'pl.polidea:android-image-cache-library:2.0'
+    compile 'pl.polidea:android-image-cache-library:2.0'  // buggy !? So we use the one below.
+    compile 'com.github.rooseve:WebImageView:master-SNAPSHOT'
 
     // STRING UTILS (Capitalize, etc.)
     compile 'org.apache.commons:commons-lang3:3.4'

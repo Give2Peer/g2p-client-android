@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    >
+
+    <com.rsv.widget.WebImageView
+        android:id="@+id/mapMarkerInfoContentImage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:layout_marginBottom="3dp"
+        android:visibility="gone"
+        />
+
+    <TextView
+        android:id="@+id/mapMarkerInfoContentTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ellipsize="end"
+        android:maxLines="2"
+        />
+
+    <!-- Known bug : this disappears if the above text spans over two lines. -->
+    <TextView
+        android:id="@+id/mapMarkerInfoContentSnippet"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textStyle="italic"
+        android:textColor="@color/md_grey_400"
+        />
+
+</LinearLayout>

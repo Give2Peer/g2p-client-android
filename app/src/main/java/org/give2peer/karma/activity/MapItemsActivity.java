@@ -55,11 +55,13 @@ import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.ViewById;
 import org.give2peer.karma.Application;
+import org.give2peer.karma.adapter.ItemInfoWindowAdapter;
 import org.give2peer.karma.entity.Item;
 import org.give2peer.karma.R;
 import org.give2peer.karma.event.AuthenticationEvent;
 import org.give2peer.karma.event.LocationUpdateEvent;
 import org.give2peer.karma.exception.CriticalException;
+import org.give2peer.karma.listener.MarkerInfoWebImageListener;
 import org.give2peer.karma.response.FindItemsResponse;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -68,6 +70,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+
+import pl.polidea.webimageview.WebImageListener;
+import pl.polidea.webimageview.WebImageView;
 
 
 /**
@@ -520,6 +525,11 @@ public class      MapItemsActivity
                     // Zoom on items
                     zoomOnItems(googleMap, items);
 
+                    /////////////
+                    // Anything that needs an up-to-date markerItemHashMap needs to be set AGAIN
+                    // below. Don't try to be clever and move this code to the mapReady listener.
+                    // Also, we may or may not be leaking memory, the way things are implemented.
+
                     googleMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
                         @Override
                         public void onInfoWindowClick(Marker marker) {
@@ -527,6 +537,10 @@ public class      MapItemsActivity
                             app.showItemPopup(activity, item);
                         }
                     });
+
+                    googleMap.setInfoWindowAdapter(new ItemInfoWindowAdapter(activity, markerItemHashMap));
+
+                    /////////////
 
                     // Hide the drawn region, and draw a circle instead
                     // This is a cheap solution to the problem of performance, as users may draw BIG regions
@@ -585,7 +599,7 @@ public class      MapItemsActivity
                 new View.OnTouchListener() {
                     @Override
                     public boolean onTouch(View v, MotionEvent event) {
-                        if (!isDrawing) return false;
+                        if ( ! isDrawing) return false;
 
                         int x = Math.round(event.getX());
                         int y = Math.round(event.getY());
