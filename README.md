@@ -1,13 +1,11 @@
 Karma
 =====
 
-This is the source of the Android client application [Karma ∝](http://give2peer.org).
+This is the source of the Android client application [Karma](http://give2peer.org).
 
 It is made to be a client to the [Give2Peer REST API](http://g2p.give2peer.org/),
 run by another FLOSS [server](https://github.com/Give2Peer/g2p-server-symfony) written in PHP,
 and [heavily featured](https://github.com/Give2Peer/g2p-server-symfony/tree/master/features#what).
-
-
 
 
 Goal
@@ -18,20 +16,29 @@ recyclable **MOOP** (eg: planks of wood), and just plain **gifts**.
 
 _MOOP: Matter Out Of Place._
 
-Adding a new item should not take more than a handful of seconds.
 
-The app should display items on a map around your position.
-
-The app should be able to **connect to multiple servers**.
-Big organizations should be able to use it privately for their internal item transfers.
+### Examples
 
 Karma aims to help in the following situations, for example :
 
 - _"I need wood scraps to fix that chair."_
 - _"I need worms to kickstart my compost."_
-- _"I lost my left glove last night."_
+- _"I lost my left glove last night !"_
 - _"Who wants the old computer taking up space in my office ?"_
 
+
+### Features
+
+- Adding a new item requires less than a handful of seconds.
+- Displays items on a map around your position.
+- Supports 99,9% of android devices.
+- Supports multiple servers so that you can make your own.
+
+
+### Open-source
+
+Free, libre, open-source software is in most aspects the best kind of software.
+Karma is and always will be _free_ as both in _free beer_ and _free speech_.
 
 
 Google
@@ -41,72 +48,14 @@ If you're Google and you read this, please help us make that happen :
 
 _"Ok google, please add these old shoes to my MOOP bag."_
 
-Snaps picture, prefills fields, I'm done in a matter of seconds.
 It's easier said than done, of course.
 
 Then again, Google should make a lost&found/ownership app altogether. Any big player should.
 
 
-ROADMAP
+
+Roadmap
 =======
-
-We plan to make at least two Android clients. One (this one, the first one) should support old
-phones (since API 10, Gingerbread), and the other should be coded properly, with partials, sliding
-menus, and overall material design suitable for phones, glasses, watches and tablets.
-
-There might even be a third (very light) version, using a `WebView` to load an HTML-based web app.
-
-
-Overview of the major versions
-------------------------------
-
-They will be handled in different git repositories.
-
-
-### Karma ∝ (Karma Unfinity)
-
-This is the initial version, the version of this git repository.
-It is messy, buggy, with little to no tablet layout support.
-
-It should be made bug-free, but at some point we'll need to feature-freeze it.
-
-It should work on almost all Android devices, but should only be offered as fallback when Karma ∞ is
-unavailable.
-
-
-### Karma ∞ (Karma Infinity)
-
-Will be in repo `g2p-client-android-modern`.
-
-Another native app, but well-coded this time.
-A version with support for more modern hardware only, since API 21. (probably even higher)
-This version leverages the full power of Material design, and provides tablet layouts as well as
-phone layouts.
-It will be kickstarted during a hackathon sometime this year or next, if enough people are interested.
-Write hackathon@give2peer.org to be added to the hackathon mailing list.
-
-Karma ∞, when released, should become the mainstream app.
-(unless KarmaWeb proves more efficient, but why would it ?)
-Karma ∝(the app in this repository) will be considered as fallback for older devices.
-
-
-### Karma @ (Karma Web)
-
-Will be in repo `g2p-client-android-web`.
-
-Another (concurrent) app named "Karma Web" (or something) will possibly be made for Android at this
-point, as an HTML webapp within a `WebView`. Favorably in [Dart], if it can be done.
-
-The native Android code should handle receiving picture intents, but the rest should be mostly config.
-We're very interested in benchmarking these apps against each other.
-
-
-Future
-------
-
-A version for open beta-testing, working as early as API 10 (Android 3.0 Gingerbread).
-
-All list items followed by parenthesis are optional, and the parenthesis should explain why.
 
 Ideas
 -----
@@ -136,16 +85,17 @@ In no particular order, these ideas have no release milestone set yet. Some may 
 2.0.0
 -----
 
-A version for the beta community.
+A version for the open beta community.
 
 - [ ] Feature: report an offensive item.
-- [ ] Feature: all-time world leaderboard.
 - [ ] Feature: thank someone for an item.
+- [ ] Refacto: remove all deprecated code.
 
 
 1.7.0
 -----
 
+- [ ] Feature: all-time world leaderboard.
 - [ ] Feature: full I18N (Interplanetarization)
 - [ ] L10N:    français.
 - [ ] BugHunt: issue #2: item images are mishandled.
@@ -156,7 +106,7 @@ A version for the beta community.
 
 - [ ] Feature: delete items I authored.
 - [ ] Feature: list notifications in the profile.
-
+- [ ] Feature: an _About_ page
 
 
 1.5.0
@@ -169,8 +119,12 @@ A version for the beta community.
 - [ ] Feature: provide a description to items.
 
 
-1.4.0
------
+
+CHANGELOG
+=========
+
+1.4.0 (22-06-2016)
+------------------
 
 - [x] Feature: a navigation drawer. \o/
 - [x] Feature: re-enable taking a picture from the app.
@@ -178,12 +132,8 @@ A version for the beta community.
 - [x] Feature: display a count of available characters when relevant.
 - [x] BugHunt: automatic geolocation when adding an item.
 - [x] Design:  a splash of color.
-- [ ] Feature: thumbnail image in the map's item marker's info window.
+- [x] Feature: thumbnail image in the map's item marker's info window.
 
-
-
-CHANGELOG
-=========
 
 1.3.0 (12-06-2016)
 ------------------
@@ -283,123 +233,6 @@ A marathon of code !
 - [x] Feature: open github.com from the menus to manually report a bug.
 
 
-CAVEATS
-=======
-
-This project has a bunch of caveats. We're working to reduce their impact and numbers, but...
-
-
-Gradle
-------
-
-You need at least Gradle `2.12` to be able to build, at least until `sugar` makes a release.
-This is to be able to use jitpack.io in gradle, because `introduction` needs it.
-Just grab it, unpack it alongside the other, and configure Android Studio.
-
-Otherwise, you'll get a `peer not authenticated` error.
-
-
-API 10
-------
-
-Polyfills, shims, appcompat... You know. Hard to implement, hell to maintain, feature blockers.
-
-This version will have no tablet layout, because there are no fragments (that we know of).
-
-I'm getting scolded hard for choosing API 10. And with reason;
-It's kind of like trying to make a responsive website for IE6.
-
-
-Settings
---------
-
-We hacked in and around the Settings to handle Servers, and now they're a mess.
-Server configurations should have proper dedicated CRUD activities, instead.
-
-
-
-TROUBLESHOOTING
-===============
-
-`peer not authenticated` : this is because of the caveat above.
-install Gradle `2.12` and configure Android Studio to use it.
-
-Note: sometimes, Android Studio will _forget_ which gradle version to use and revert to `2.10` ?
-
-
-TESTS AND SPECS
-===============
-
-We are big believers in behavior-driven development.
-
-We (tried to) use [Cucumber] and [Robotium] to set up a [Gherkin]-based feature suite than spans
-multiple activities and tests application flows.
-
-Simply run `app/src/androidTest/java/org/give2peer/give2peer/test/MainTest.java` in Android Studio.
-
-Sadly, our current feature suite does not pass because _steps are too hard to implement_.
-The mandatory usage of the Camera or Gallery picker when adding a new Item is tricky.
-Robotium simply cannot control another application without some serious and delicate apk re-signing
-(which [requires rooting](https://code.google.com/p/robotium/wiki/RobotiumForPreInstalledApps)), or
-[clever mocking](https://github.com/bryanl/FakeCamera).
-
-Mocking sounds nice, but we never could manage to set it up properly.
-And never mind about automatizing the setup of mocks on the emulator !
-
-Advice would be warmly welcome !
-
-We really want a feature suite for the native Android app. It would make this project great.
-We'll make one for the HTML/JS web app in the future, 'cause it is easy, and the Gherkin should be
-almost the same.
-
-
-[Cucumber]: https://cucumber.io
-[Robotium]: https://robotium.org
-[Gherkin]:  https://github.com/cucumber/cucumber/wiki/Gherkin
-
-
-
-LIBS
-====
-
-Here's a breakdown of the third-party libs we use, or looked at.
-
-
-Apache HttpComponents
----------------------
-
-File upload requires `org.apache.httpcomponents:httpmime:4.3`
-and `org.apache.httpcomponents:httpclient-android:4.3.5`.
-
-These libs were removed from SDK 23, but we still use them.
-
-
-KeyValue Spinner
-----------------
-
-https://github.com/delight-im/Android-KeyValueSpinner
-
-This is pretty useful, and should probably be part of Android's core, somehow.
-That lib is added as a JAR file. This is bad. It should be added through gradle.
-It is not used anymore, since the recent refactorization, but will probably be again in the future.
-
-
-RetroFit
---------
-
-https://square.github.io/retrofit/
-
-We do not use that lib right now because the default adapters choked on our JSON.
-I suspect this would not be the case anymore, so a refactorization implementing support for this
-(or an even better REST lib) would be welcome.
-
-
-Real-time Database Inspection
------------------------------
-
-Not used right now, but may be very useful some day.
-
-http://www.idescout.com/wiki/index.php/Main/ConnectToAndroidDbs
 
 
 OTHERS
@@ -413,10 +246,9 @@ If you know Android and/or Java, we need some technical expertise :
 
 - Refactor this learner's code into a beautiful codebase.
 - Suggest good third-party libraries to DRY the code.
-- Give advice on how to give the emulator a default `geo fix`.
 - Give advice on how to handle the release `keystore` of an open-source project.
 - Enrich and give advice for the feature suite.
-- Write good code guidelines for Android / Java.
+- Write or recommend good code guidelines for Android / Java.
 
 If not, you can still help in a number of ways :
 
@@ -431,26 +263,12 @@ If not, you can still help in a number of ways :
 Donate
 ------
 
-_"When it's free, you're the product."_
-
 Hosting a server costs money. We can pay for a couple years from our own pocket, but eventually the
 service must be able to pay for its own running costs, or it will shut down.
 
-You'll be the product for a while, as the server will measure its costs for a year and show
-you (exactly!) how much life expectancy (in minutes) you add to the service when you donate.
-
-Of course, all these statistics will be published publicly.
-
-Transparency is the key. If you know about good software suites / practices to that effect, we are
-interested.
-
 This will be yet another experiment in self-sustaining algorithms.
 
-New features and maintenance will be provided by the
-[FLOSS](http://en.wikipedia.org/wiki/Free_and_open-source_software#FLOSS) community
-(aka: everybody), with the possible use of [bounties](https://www.bountysource.com).
-
-Besides, all the code being open-source, anyone knowledgeable can host their own server.
+A donation process will be set up someday.
 
 
 License

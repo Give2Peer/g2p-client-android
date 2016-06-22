@@ -2,13 +2,17 @@
 
 <resources>
     <color name="white">#efefef</color>
+    <color name="purple">#ab47bc</color>
+    <color name="purpleDark">#7b1fa2</color>
+    <color name="purpleLight">#ce93d8</color>
+    <color name="orange">#ff9800</color>
 
-    <color name="accent">#ff9800</color>
-    <color name="colorAccent">#ff9800</color>
+    <color name="accent">@color/orange</color>
+    <color name="colorAccent">@color/orange</color>
 
-    <color name="colorPrimary">#ab47bc</color>
-    <color name="colorPrimaryDark">#7b1fa2</color>
-    <color name="colorPrimaryLight">#ce93d8</color>
+    <color name="colorPrimary">@color/purple</color>
+    <color name="colorPrimaryDark">@color/purpleDark</color>
+    <color name="colorPrimaryLight">@color/purpleLight</color>
 
     <color name="tutorial_slide_1_background">#eaa42c</color>
     <color name="tutorial_slide_2_background">#28b6ca</color>

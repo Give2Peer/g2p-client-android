@@ -14,6 +14,8 @@ android {
     defaultConfig {
         applicationId "org.give2peer.karma"
 
+        // Yes, we are supporting API 10. It is the root of most of our trouble and bad code.
+        // We'll dump support for it eventually, say when it drops below 0.01% of all users.
         minSdkVersion 10
         targetSdkVersion 23
 
@@ -76,9 +78,6 @@ dependencies {
     compile 'com.android.support:appcompat-v7:23.4.0'
     compile 'com.github.machinarius:preferencefragment:0.1.1' // we'll probably remove this
 
-    // MATERIAL DESIGN
-    compile 'com.android.support:design:23.4.0'
-
     // ANDROID ANNOTATIONS (unsure why we have both apt and compile directives)
     apt 'org.androidannotations:androidannotations:3.3.2'
     compile 'org.androidannotations:androidannotations-api:3.3.2'
@@ -92,9 +91,11 @@ dependencies {
     // We use our own fork because the original lib supports API >= 14
     compile 'com.github.Give2Peer:LocationManager:1.1.1-api10'
 
+    // MATERIAL DESIGN
+    compile 'com.android.support:design:23.4.0'
+
     // FAB (Floating Action Button)
     compile 'com.shamanland:fab:0.0.8'
-    //compile 'com.android.support:design:23.3.0' // nope
 
     // NAVIGATION DRAWER
     compile('com.mikepenz:materialdrawer:5.3.0@aar') { transitive = true }
