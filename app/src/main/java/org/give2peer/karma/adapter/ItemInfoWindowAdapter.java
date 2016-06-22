@@ -41,7 +41,7 @@ public class ItemInfoWindowAdapter implements GoogleMap.InfoWindowAdapter {
     }
 
     public View getInfoWindow(Marker marker) {
-        return null; // use the default info window bubble, it's fine.
+        return null; // use the default info window bubble, but it seems to have a limited height.
     }
 
     public View getInfoContents(Marker marker) {

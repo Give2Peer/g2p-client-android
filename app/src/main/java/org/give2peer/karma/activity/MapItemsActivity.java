@@ -114,9 +114,8 @@ public class      MapItemsActivity
 
     //// CONFIGURATION /////////////////////////////////////////////////////////////////////////////
 
-    int lineColor = 0x88FF3399;
-    int fillColor = 0x33FF3399;
-    int fillAlpha = 0x55000000;
+    int lineColor = 0x88FF9800;
+    int fillColor = 0x55FF9800;
 
     /**
      * @return the string descriptor of the location rationale message to display.
@@ -254,6 +253,21 @@ public class      MapItemsActivity
         googleMap = _googleMap;
 
         googleMap.moveCamera(CameraUpdateFactory.zoomTo(1));
+
+        googleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+            @Override
+            public boolean onMarkerClick(Marker marker) {
+                mapItemsFloatingActionButton.setVisibility(View.GONE);
+                return false;
+            }
+        });
+
+        googleMap.setOnInfoWindowCloseListener(new GoogleMap.OnInfoWindowCloseListener() {
+            @Override
+            public void onInfoWindowClose(Marker marker) {
+                mapItemsFloatingActionButton.setVisibility(View.VISIBLE);
+            }
+        });
 
         if ( ! isLocationReady()) {
             Log.d("G2P", "Trying to guess the location...");
@@ -530,13 +544,13 @@ public class      MapItemsActivity
                     // below. Don't try to be clever and move this code to the mapReady listener.
                     // Also, we may or may not be leaking memory, the way things are implemented.
 
-                    googleMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
-                        @Override
-                        public void onInfoWindowClick(Marker marker) {
-                            Item item = markerItemHashMap.get(marker);
-                            app.showItemPopup(activity, item);
-                        }
-                    });
+//                    googleMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
+//                        @Override
+//                        public void onInfoWindowClick(Marker marker) {
+//                            Item item = markerItemHashMap.get(marker);
+//                            app.showItemPopup(activity, item);
+//                        }
+//                    });
 
                     googleMap.setInfoWindowAdapter(new ItemInfoWindowAdapter(activity, markerItemHashMap));
 
@@ -770,7 +784,7 @@ public class      MapItemsActivity
 
         PolylineOptions options = new PolylineOptions();
         options.addAll(lineLatLngs);
-        options.color((lineColor & 0x00FFFFFF) + fillAlpha);
+        options.color(lineColor);
         options.width(7);
 
         drawnPolyline = googleMap.addPolyline(options);
@@ -783,7 +797,7 @@ public class      MapItemsActivity
         options.center(center);
         options.radius(radius);
         options.strokeColor(lineColor);
-        options.fillColor((lineColor & 0x00FFFFFF) + fillAlpha);
+        options.fillColor(fillColor);
         options.strokeWidth(7);
 
         drawnCircle = googleMap.addCircle(options);
