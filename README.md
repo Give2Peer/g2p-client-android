@@ -106,7 +106,8 @@ A version for the open beta community.
 
 - [ ] Feature: delete items I authored.
 - [ ] Feature: list notifications in the profile.
-- [ ] Feature: an _About_ page
+- [ ] Feature: an _About_ activity.
+- [ ] Feature: a _Licences_ activity.
 
 
 1.5.0
@@ -117,7 +118,9 @@ A version for the open beta community.
 - [ ] Feature: request new credentials by email.
 - [ ] Feature: an activity for the details of an item.
 - [ ] Feature: provide a description to items.
-
+- [ ] Feature: try to fetch the user's location if not done already when showing the new item map.
+- [x] Feature: choose item type with iconified radio buttons.
+- [x] Design:  swindle, paint and hack some icons for item types.
 
 
 CHANGELOG

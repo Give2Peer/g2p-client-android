@@ -26,6 +26,7 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.RadioButton;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
@@ -68,7 +69,11 @@ import java.util.Locale;
 /**
  * Handles :
  * - Receiving an image from another activity's share intent
- * - (deprecated) launching the camera otherwise
+ * - (deprecated, but yet enabled back) launching the camera otherwise
+ *   I deprecated this because the code around this hack is REALLY smelly.
+ *   I disabled it and it was just too confusing for my alpha testers.
+ *   So I enabled it back, and we'll just have to carry on until we ditch API 10 support.
+ *   This can be cleaned up and un-deprecated
  * - A form to add a new item, with a nice Floating Action Button to send.
  * - Rotating the received image before sending it
  *
@@ -123,7 +128,14 @@ public  class      NewItemActivity
     @ViewById
     EditText newItemLocationEditText;
     @ViewById
-    CheckBox newItemGiftCheckBox;
+    RadioButton newItemGiftRadioButton;
+    @ViewById
+    RadioButton newItemLostRadioButton;
+    @ViewById
+    RadioButton newItemMoopRadioButton;
+
+//    @ViewById
+//    CheckBox newItemGiftCheckBox;
 
     @ViewById
     NestedScrollView newItemFormScrollView;
@@ -594,14 +606,15 @@ public  class      NewItemActivity
         item.setTitle(newItemTitleEditText.getText().toString());
         item.setDescription(newItemDescriptionEditText.getText().toString());
 
-        if (newItemGiftCheckBox.isChecked()) {
+        if (newItemGiftRadioButton.isChecked()) {
             item.setType(Item.TYPE_GIFT);
-        } else {
+        } else if (newItemLostRadioButton.isChecked()) {
             item.setType(Item.TYPE_LOST);
-        } // todo: handle type MOOP with radio icons ? (find or make a lib for that !)
+        } else {
+            item.setType(Item.TYPE_MOOP);
+        }
+        // fixme:
           // or not : http://stackoverflow.com/questions/29411752/custom-icon-for-a-radio-button
-
-//        item.setPictures(imageFiles);
 
         // In the future we'll have more than one image...
         List<Integer> pictureRotations = new ArrayList<Integer>();

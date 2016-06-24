@@ -134,13 +134,52 @@
                 android:visibility="gone"
                 />
 
-            <CheckBox
-                android:id="@+id/newItemGiftCheckBox"
-                android:layout_width="wrap_content"
+            <!--
+            layout_marginLeft is required for API 10.
+            I wonder if Karma will ever be translated into a right-to-left language ?
+            -->
+            <RadioGroup xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/new_item_checkbox_gift"
+                android:orientation="horizontal"
                 android:layout_marginTop="10dp"
-                />
+                android:layout_marginBottom="10dp"
+                android:layout_marginStart="15dp"
+                android:layout_marginLeft="15dp"
+                >
+                <!-- Using a width of 0dp is a common android practice, and pretty poor design -->
+                <RadioButton android:id="@+id/newItemGiftRadioButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:button="@drawable/radio_gift"
+                    android:text="@string/new_item_type_gift"
+                    />
+                <RadioButton android:id="@+id/newItemLostRadioButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:button="@drawable/radio_lost"
+                    android:text="@string/new_item_type_lost"
+                    />
+                <RadioButton android:id="@+id/newItemMoopRadioButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:button="@drawable/radio_moop"
+                    android:checked="true"
+                    android:text="@string/new_item_type_moop"
+                    />
+            </RadioGroup>
+
+
+            <!--<CheckBox-->
+                <!--android:id="@+id/newItemGiftCheckBox"-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:text="@string/new_item_checkbox_gift"-->
+                <!--android:layout_marginTop="10dp"-->
+                <!--/>-->
 
             <android.support.design.widget.TextInputLayout
                 android:layout_width="match_parent"

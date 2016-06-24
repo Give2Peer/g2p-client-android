@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- It is possible to dynamically colorize the icon, but under API 10 it is messy. -->
+    <!-- But if you're reading this that's probably because we changed the theme color. -->
+    <item android:drawable="@drawable/ic_atom_orange_24dp" android:state_checked="true" />
+    <item android:drawable="@drawable/ic_atom_black_24dp" android:state_checked="false" />
+</selector>
