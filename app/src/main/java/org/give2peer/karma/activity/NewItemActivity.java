@@ -192,7 +192,7 @@ public  class      NewItemActivity
         super.onResume();
         // If the user is not preregistered, let's do this dudeez !
         app.requireAuthentication(this);
-        // We never know, maybe the map and location are ready already ? But why would they ?
+        // We never know, maybe the map and location are ready already ?
         updateMap();
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M &&
@@ -440,16 +440,16 @@ public  class      NewItemActivity
         return null != googleMap;
     }
 
-    protected boolean isLocated() {
-        return null != location;
-    }
+//    protected boolean isLocated() {
+//        return null != location;
+//    }
 
     public LatLng getLatLng() {
         return new LatLng(location.getLatitude(), location.getLongitude());
     }
 
     protected void updateMap() {
-        if ( ! isMapReady() || ! isLocated()) {
+        if ( ! isMapReady() || ! isLocationReady()) {
             return;
         }
 
@@ -474,14 +474,18 @@ public  class      NewItemActivity
             @Override
             public void onMarkerDrag(Marker marker) {
                 LatLng c = marker.getPosition();
-                newItemLocationEditText.setText(String.format(Locale.FRANCE, "%f / %f", c.latitude, c.longitude));
+                newItemLocationEditText.setText(String.format(
+                        Locale.FRANCE, "%f / %f", c.latitude, c.longitude
+                ));
             }
 
             @Override
             public void onMarkerDragEnd(Marker marker) {
                 LatLng c = marker.getPosition();
                 googleMap.animateCamera(CameraUpdateFactory.newLatLng(c));
-                newItemLocationEditText.setText(String.format(Locale.FRANCE, "%f / %f", c.latitude, c.longitude));
+                newItemLocationEditText.setText(String.format(
+                        Locale.FRANCE, "%f / %f", c.latitude, c.longitude
+                ));
             }
         });
 
@@ -691,7 +695,10 @@ public  class      NewItemActivity
     public void newItemShowPicButtonClicked() { showPicture(); }
 
     @Click
-    public void newItemShowMapButtonClicked() { showMap();     }
+    public void newItemShowMapButtonClicked() {
+        if ( ! isLocationReady()) { getLocation(); }
+        showMap();
+    }
 
     public void onSend(View view)
     {
