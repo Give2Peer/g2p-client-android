@@ -470,21 +470,14 @@ public  class      NewItemActivity
         googleMap.setOnMarkerDragListener(new GoogleMap.OnMarkerDragListener() {
             @Override
             public void onMarkerDragStart(Marker marker) {}
-
             @Override
-            public void onMarkerDrag(Marker marker) {
-                LatLng c = marker.getPosition();
-                newItemLocationEditText.setText(String.format(
-                        Locale.FRANCE, "%f / %f", c.latitude, c.longitude
-                ));
-            }
-
+            public void onMarkerDrag(Marker marker) {}
             @Override
             public void onMarkerDragEnd(Marker marker) {
                 LatLng c = marker.getPosition();
                 googleMap.animateCamera(CameraUpdateFactory.newLatLng(c));
                 newItemLocationEditText.setText(String.format(
-                        Locale.FRANCE, "%f / %f", c.latitude, c.longitude
+                        Locale.US, "%.8f / %.8f", c.latitude, c.longitude
                 ));
             }
         });
