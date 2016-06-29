@@ -53,16 +53,23 @@ public class ItemInfoWindowAdapter implements GoogleMap.InfoWindowAdapter {
 
             markerViewHashMap.put(marker, v);
 
-            TextView title = (TextView) v.findViewById(R.id.mapMarkerInfoContentTitle);
-            title.setText(marker.getTitle());
-
-            TextView snippet = (TextView) v.findViewById(R.id.mapMarkerInfoContentSnippet);
-            snippet.setText(marker.getSnippet());
-
             Item item = markerItemHashMap.get(marker);
             if (null == item) {
                 // Ruthlessly trying to prove to myself it won't happen.
                 throw new CriticalException("Map Marker has no Item mapped to.");
+            }
+
+            TextView title = (TextView) v.findViewById(R.id.mapMarkerInfoContentTitle);
+            title.setText(marker.getTitle());
+
+            TextView when = (TextView) v.findViewById(R.id.mapMarkerInfoContentWhen);
+            when.setText(marker.getSnippet());
+
+            TextView excerpt = (TextView) v.findViewById(R.id.mapMarkerInfoContentExcerpt);
+            if (item.hasDescription()) {
+                excerpt.setText(item.getDescription());
+            } else {
+                excerpt.setVisibility(View.GONE);
             }
 
             WebImageView thumb = (WebImageView) v.findViewById(R.id.mapMarkerInfoContentImage);

@@ -127,6 +127,8 @@ public class Item
 
     public void setTitle(String title)               { this.title = title;                         }
 
+    public boolean hasDescription()                  { return ! description.isEmpty();             }
+
     public String getDescription()                   { return description;                         }
 
     public void setDescription(String description)   { this.description = description;             }

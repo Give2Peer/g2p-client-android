@@ -8,11 +8,15 @@
     android:paddingBottom="4dp"
     >
 
+    <!--
+    wrap_content:
+    image is pixel-perfect, but not all phones will have the same space for the text.
+    -->
     <com.rsv.widget.WebImageView
         android:id="@+id/mapMarkerInfoContentImage"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginRight="4dp"
+        android:layout_width="72dp"
+        android:layout_height="72dp"
+        android:layout_marginRight="6dp"
         android:visibility="gone"
         />
 
@@ -28,15 +32,28 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:ellipsize="end"
+            android:textSize="16sp"
+            android:maxLines="1"
+            android:layout_marginBottom="2dp"
+            />
+
+        <TextView
+            android:id="@+id/mapMarkerInfoContentExcerpt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="12sp"
+            android:ellipsize="end"
             android:maxLines="2"
             />
 
-        <!-- Known bug : this disappears if the above text spans over two lines. -->
         <TextView
-            android:id="@+id/mapMarkerInfoContentSnippet"
+            android:id="@+id/mapMarkerInfoContentWhen"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textStyle="italic"
+            android:textSize="12sp"
+            android:layout_gravity="end"
+            android:textAlignment="textEnd"
             android:textColor="@color/md_grey_400"
             />
 

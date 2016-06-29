@@ -312,6 +312,8 @@ public class      MapItemsActivity
 
     // OPTIONS MENU ////////////////////////////////////////////////////////////////////////////////
 
+    // We'll have map filters over here.
+
 //    @Override
 //    public boolean onCreateOptionsMenu(Menu menu) {
 //        // Inflate the menu; this adds items to the action bar if it is present.
