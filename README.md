@@ -117,7 +117,7 @@ A version for the open beta community.
 - [ ] Feature: log in with an existing user account.
 - [ ] Feature: request new credentials by email.
 - [ ] Feature: an activity for the details of an item.
-- [ ] Feature: provide a description to items.
+- [x] Feature: provide a description to items.
 - [x] Feature: try to fetch the user's location if not done already when showing the new item map.
 - [x] Feature: choose item type with iconified radio buttons.
 - [x] Design:  swindle, paint and hack some icons for item types.

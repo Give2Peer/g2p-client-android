@@ -1,8 +1,12 @@
 package org.give2peer.karma.entity;
 
+import android.content.Context;
+
 import com.google.android.gms.maps.model.LatLng;
 
+import org.give2peer.karma.R;
 import org.give2peer.karma.StringUtils;
+import org.give2peer.karma.exception.CriticalException;
 import org.joda.time.DateTime;
 import org.ocpsoft.prettytime.PrettyTime;
 
@@ -11,6 +15,8 @@ import java.util.Locale;
 
 /**
  * GSON-friendly Item.
+ *
+ * Note: why not replace "Human" by "Display" in the helper methods ?
  */
 public class Item
 {
@@ -35,6 +41,8 @@ public class Item
     static public String TYPE_GIFT = "gift";
     static public String TYPE_LOST = "lost";
 
+    static public int TITLE_LENGTH = 32;
+
 
     // CONSTRUCTOR /////////////////////////////////////////////////////////////////////////////////
 
@@ -55,6 +63,70 @@ public class Item
         }
 
         return s;
+    }
+
+    /**
+     * fixme : decide whether or not the type is shown too much.
+     * This is very much a work in progress. I expect to come back on this.
+     *
+     * Order :
+     *     (type) (tags) (title)
+     *       t0     t1     t2
+     *
+     * Priority :
+     *   - title t2
+     *   - type  t0
+     *   - tags  t1
+     * Only show subsequent parts if there's room for them in a TITLE_LENGTH long title.
+     *
+     *
+     * @param context
+     * @return
+     */
+    public String getHumanTitle(Context context)
+    {
+        String t2 = getTitle();
+
+        String t0;
+        if (isGift()) {
+            t0 = context.getString(R.string.new_item_type_gift);
+        } else if (isLost()) {
+            t0 = context.getString(R.string.new_item_type_lost);
+        } else if (isMoop()) {
+            t0 = context.getString(R.string.new_item_type_moop);
+        } else {
+            throw new CriticalException(String.format(
+                    Locale.FRENCH, "There is no title nor type on item #%d.", getId()
+            ));
+        }
+
+        String t1 = "";
+        List<String> tags = getTags();
+        if ( ! tags.isEmpty()) {
+            t1 = org.apache.commons.lang3.StringUtils.join(tags, ' ');
+        }
+
+        String ht = "";
+        if (t2.length() > 0) {
+            ht = t2;
+        }
+        if (ht.length() < TITLE_LENGTH - 4) { // type is 4 chars : 'moop', 'lost', 'gift'
+            if (ht.isEmpty()) {
+                ht = t0;
+            } else {
+                ht = t0 + " " + ht;
+            }
+        }
+        if (ht.length() < TITLE_LENGTH - t1.length()) {
+            ht = t0 + " " + t1 + " " + t2;
+        }
+
+        // Remove duplicate, leading and trailing whitespaces. (regex4life)
+        ht = org.apache.commons.lang3.StringUtils.replacePattern(ht, "\\s{2,}", " ");
+        ht = org.apache.commons.lang3.StringUtils.replacePattern(ht, "^\\s+", "");
+        ht = org.apache.commons.lang3.StringUtils.replacePattern(ht, "\\s+$", "");
+
+        return ht;
     }
 
     /**
@@ -105,6 +177,7 @@ public class Item
 
     /**
      * See https://github.com/Polidea/AndroidImageCache/issues/6
+     * Note: the other image cache lib we're using is choking on our dirty https too.
      * @return the thumbnail URL in `http`, not `https`.
      */
     public String getThumbnailNoSsl()
@@ -122,6 +195,12 @@ public class Item
     public String getType()                          { return type;                                }
 
     public void setType(String type)                 { this.type = type;                           }
+
+    public boolean isGift()                          { return TYPE_GIFT.equals(this.type);         }
+
+    public boolean isLost()                          { return TYPE_LOST.equals(this.type);         }
+
+    public boolean isMoop()                          { return TYPE_MOOP.equals(this.type);         }
 
     public String getTitle()                         { return title;                               }
 

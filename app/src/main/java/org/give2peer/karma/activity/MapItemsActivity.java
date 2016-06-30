@@ -517,18 +517,19 @@ public class      MapItemsActivity
                     for (int i = 0; i < itemsCount; i++) {
                         Item item = items.get(i);
 
-                        String title = item.getTitle();
+//                        String title = item.getTitle();
                         // When the title is empty the marker does not show the info window at all.
                         // We want it to show up, so let's provide an alternative title !
-                        if (title.isEmpty()) {
-                            title = "MOOP";
-                        }
+//                        if (title.isEmpty()) {
+//                            title = "MOOP";
+//                        }
+
                         String snippet = item.getHumanUpdatedAt();
 
                         Marker m = googleMap.addMarker(
                                 new MarkerOptions()
                                         .position(item.getLatLng())
-                                        .title(title)
+                                        .title(item.getHumanTitle(activity))
                                         .snippet(snippet)
                         );
 
