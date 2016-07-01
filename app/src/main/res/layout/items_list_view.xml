@@ -9,7 +9,7 @@
 
     <!-- wrap_content width takes half the parent width, which is not what we want. -->
     <!-- this width behavior is different from a simple ImageView ? -->
-    <pl.polidea.webimageview.WebImageView
+    <com.rsv.widget.WebImageView
         android:id="@+id/itemsListViewThumb"
         android:layout_width="?android:attr/listPreferredItemHeight"
         android:layout_height="fill_parent"

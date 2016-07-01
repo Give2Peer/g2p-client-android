@@ -90,14 +90,18 @@ A version for the open beta community.
 - [ ] Feature: report an offensive item.
 - [ ] Feature: thank someone for an item.
 - [ ] Refacto: remove all deprecated code.
+- [ ] Feature: add my email to my user account.
+- [ ] Feature: log in with an existing user account.
+- [ ] Feature: request new credentials by email.
 
 
 1.7.0
 -----
 
 - [ ] Feature: all-time world leaderboard.
-- [ ] Feature: I18N (Interplanetarization) for left-to-right languages
+- [ ] Feature: I18N (Interplanetarization) for left-to-right languages.
 - [ ] L10N:    français.
+- [ ] BugHunt: google play services crashes when internet is unavailable.
 - [ ] BugHunt: issue #2: item images are mishandled.
 
 
@@ -113,13 +117,10 @@ A version for the open beta community.
 1.5.0
 -----
 
-- [ ] Feature: add my email to my user account.
-- [ ] Feature: log in with an existing user account.
-- [ ] Feature: request new credentials by email.
 - [ ] Feature: an activity for the details of an item.
 - [x] Feature: provide a description to items.
 - [x] Feature: try to fetch the user's location if not done already when showing the new item map.
-- [x] Feature: choose item type with iconified radio buttons.
+- [x] Feature: iconified radio buttons for item type.
 - [x] Design:  swindle, paint and hack some icons for item types.
 
 

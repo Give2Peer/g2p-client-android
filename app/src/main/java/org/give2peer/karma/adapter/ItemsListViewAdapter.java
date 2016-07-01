@@ -8,7 +8,6 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
-import org.apache.commons.lang3.StringUtils;
 import org.give2peer.karma.Application;
 import org.give2peer.karma.entity.Item;
 import org.give2peer.karma.R;
@@ -16,9 +15,8 @@ import org.give2peer.karma.R;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Locale;
 
-import pl.polidea.webimageview.WebImageView;
+import com.rsv.widget.WebImageView;
 
 
 /**
@@ -75,20 +73,9 @@ public class ItemsListViewAdapter extends ArrayAdapter
             String sl1;
             String sl2;
 
-            List<String> tags = item.getTags();
+            sl1 = item.getHumanTitle(getContext());
+            sl2 = item.getHumanUpdatedAt();
 
-            sl1 = item.getTitle();
-            if (sl1.isEmpty() && ! tags.isEmpty()) {
-                // No title, try tags instead.
-                sl1 = StringUtils.join();
-            }
-            if (sl1.isEmpty()) {
-                // No title and no tags, move the location to the first line
-                sl1 = item.getLocation();
-                sl2 = item.getHumanUpdatedAt();
-            } else {
-                sl2 = String.format(Locale.getDefault(), "%s at %s", item.getHumanUpdatedAt(), item.getLocation());
-            }
             Line1.setText(sl1);
             Line2.setText(sl2);
 
@@ -96,7 +83,7 @@ public class ItemsListViewAdapter extends ArrayAdapter
             // https://github.com/Polidea/AndroidImageCache
             String thumbUrl = item.getThumbnailNoSsl();
             if ( ! thumbUrl.isEmpty()) {
-                thumb.setImageURL(thumbUrl);
+                thumb.setWebImageUrl(thumbUrl);
             }
 
             itemView.setOnClickListener(new View.OnClickListener() {
@@ -114,72 +101,4 @@ public class ItemsListViewAdapter extends ArrayAdapter
 
         return itemView;
     }
-
-    // I'm just keeping this because i still don't understand the Holder business and why it was useful
-    // This is code I cut/pasted from the internet from various sources in the very early stages
-    // This is a curiosity. Soooooo bad. WTFmeter exploded ! :]
-//    static class ItemHolder
-//    {
-//        WebImageView imgThumb;
-//        TextView     txtTitle;
-//    }
-//    @Override
-//    public View getViewOld(int position, View convertView, ViewGroup parent)
-//    {
-//        // We're going to create a View by inflating our item layout and filling its ~fields with
-//        // the item's properties. We'll want to memoize that View because it seems that scrolling
-//        // triggers getView() all the time.
-//
-//        GridView grid = (GridView)parent;
-//        final Item item = items.get(position);
-//        ItemHolder holder = null;
-//        View itemView;
-//
-//        if (!item.hasThumbnailView()) {
-//            LayoutInflater inflater = ((Activity)context).getLayoutInflater();
-//            itemView = inflater.inflate(layout, parent, false);
-//            // we need min SDK to 16 in order to use that
-//            //int size = grid.getRequestedColumnWidth();
-////            itemView.setLayoutParams(new GridView.LayoutParams(GridView.AUTO_FIT, size));
-//
-//            holder = new ItemHolder();
-//            holder.imgThumb = (WebImageView)itemView.findViewById(R.id.itemImageView);
-//            holder.txtTitle = (TextView)itemView.findViewById(R.id.itemTitleTextView);
-//            itemView.setTag(holder);
-//
-//            itemView.setOnClickListener(new View.OnClickListener() {
-//                @Override
-//                public void onClick(View v) {
-//                    // Start the Maps activity
-//                    Uri gmmIntentUri = Uri.parse(String.format("geo:0,0?q=%s,%s(%s)",
-//                            item.getLatitude(), item.getLongitude(), item.getTitle()));
-//                    Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
-//                    Activity activity = (Activity) context;
-//                    if (mapIntent.resolveActivity(activity.getPackageManager()) != null) {
-//                        activity.startActivity(mapIntent);
-//                    } else {
-//                        String msg = context.getString(R.string.toast_no_mapping_activity);
-//                        Toast.makeText(context, msg, Toast.LENGTH_SHORT).show();
-//                    }
-//                }
-//            });
-//
-//        } else {
-////            itemView = item.getThumbnailView();
-//            holder = (ItemHolder) itemView.getTag();
-//        }
-//
-//        // Fill up the View with the item's data
-//        holder.txtTitle.setText(item.getThumbnailTitle());
-//        if (item.hasThumbnail()) {
-//            // The WebImageView uses internal LRU caches so we don't have to care about caching.
-//            // ... I think. Not sure.
-//            holder.imgThumb.setImageURL(item.getThumbnail());
-//        }
-//
-////        item.setThumbnailView(itemView);
-//
-//        return itemView;
-//    }
-
 }

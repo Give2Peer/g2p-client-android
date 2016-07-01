@@ -17,6 +17,7 @@ public class GsonParsingUnitTest
     // These tests were to isolate a bug that happened in the end because our User entities had
     // a View as property :p
 
+
     @Test
     public void parsingPrivateProfileWithNoItems()
     {
