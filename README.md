@@ -80,6 +80,7 @@ In no particular order, these ideas have no release milestone set yet. Some may 
 - [ ] Feature: a logging utility that we can more easily disable for production.
 - [ ] BugHunt: fail gracefully when item image type or size is unsupported.
 - [ ] L10N:    español.
+- [ ] Feature: list notifications in the profile.
 
 
 2.0.0
@@ -109,7 +110,6 @@ A version for the open beta community.
 -----
 
 - [ ] Feature: delete items I authored.
-- [ ] Feature: list notifications in the profile.
 - [ ] Feature: an _About_ activity.
 - [ ] Feature: a _Licences_ activity.
 
