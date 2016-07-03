@@ -46,9 +46,9 @@ import java.util.ArrayList;
  *
  */
 @EActivity(R.layout.activity_view_item)
-public  class ViewItemActivity
-        extends    LocatorBaseActivity
-        implements OnMapReadyCallback
+public      class ViewItemActivity
+          extends LocatorBaseActivity
+       implements OnMapReadyCallback
 {
     Application app;
 
