@@ -9,6 +9,7 @@ import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.ActionBar;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
@@ -46,9 +47,9 @@ import java.util.ArrayList;
  *
  */
 @EActivity(R.layout.activity_view_item)
-public      class ViewItemActivity
-          extends LocatorBaseActivity
-       implements OnMapReadyCallback
+public class ViewItemActivity
+     extends LocatorBaseActivity
+  implements OnMapReadyCallback
 {
     Application app;
 
@@ -147,6 +148,29 @@ public      class ViewItemActivity
         viewItemImageView.setWebImageUrl(item.getThumbnailNoSsl());
         viewItemTitleTextView.setText(item.getHumanTitle(this));
         viewItemDescriptionTextView.setText(item.getDescription());
+    }
+
+
+    @AfterViews
+    public void resizeCollapsingSection() {
+
+        // hmmmmm. experiment ongoings
+
+        DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
+        int pxHeight = displayMetrics.heightPixels;
+        int pxWidth = displayMetrics.widthPixels;
+        float dpHeight = displayMetrics.heightPixels / displayMetrics.density;
+        float dpWidth = displayMetrics.widthPixels / displayMetrics.density;
+
+        Log.i("G2P", String.format("Display Metrics : %.1fdp x %.1fdp", dpWidth, dpHeight));
+        Log.i("G2P", String.format("Display Metrics : %dpx x %dpx", pxWidth, pxHeight));
+        // Nexus S portrait : Display Metrics : 360.0dp x 592.0dp
+
+        int newHeight = pxHeight - app.dpi2pix(106);
+
+        viewItemMapWrapper.getLayoutParams().height = newHeight;
+        viewItemImageWrapper.getLayoutParams().height = newHeight;
+
     }
 
 
