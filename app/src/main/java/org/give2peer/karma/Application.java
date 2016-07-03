@@ -15,6 +15,7 @@ import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
+import android.os.Parcelable;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
@@ -49,6 +50,7 @@ import org.give2peer.karma.activity.MapItemsActivity_;
 import org.give2peer.karma.activity.NewItemActivity_;
 import org.give2peer.karma.activity.ProfileActivity_;
 import org.give2peer.karma.activity.SettingsActivity;
+import org.give2peer.karma.activity.ViewItemActivity_;
 import org.give2peer.karma.entity.Location;
 import org.give2peer.karma.entity.Server;
 import org.give2peer.karma.entity.Item;
@@ -250,6 +252,13 @@ public class Application extends SugarApp
     public void launchNewItem(Activity activity)
     {
         Intent intent = new Intent(this, NewItemActivity_.class);
+        activity.startActivity(intent);
+    }
+
+    public void launchViewItem(Activity activity, Item item)
+    {
+        Intent intent = new Intent(this, ViewItemActivity_.class);
+        intent.putExtra("item", item);
         activity.startActivity(intent);
     }
 

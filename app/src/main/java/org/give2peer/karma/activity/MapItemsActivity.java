@@ -55,6 +55,7 @@ import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.ViewById;
 import org.give2peer.karma.Application;
+import org.give2peer.karma.GeoUtils;
 import org.give2peer.karma.adapter.ItemInfoWindowAdapter;
 import org.give2peer.karma.entity.Item;
 import org.give2peer.karma.R;
@@ -547,13 +548,14 @@ public class      MapItemsActivity
                     // below. Don't try to be clever and move this code to the mapReady listener.
                     // Also, we may or may not be leaking memory, the way things are implemented.
 
-//                    googleMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
-//                        @Override
-//                        public void onInfoWindowClick(Marker marker) {
-//                            Item item = markerItemHashMap.get(marker);
-//                            app.showItemPopup(activity, item);
-//                        }
-//                    });
+                    googleMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
+                        @Override
+                        public void onInfoWindowClick(Marker marker) {
+                            Item item = markerItemHashMap.get(marker);
+                            //app.showItemPopup(activity, item);
+                            app.launchViewItem(activity, item);
+                        }
+                    });
 
                     googleMap.setInfoWindowAdapter(new ItemInfoWindowAdapter(activity, markerItemHashMap));
 
@@ -656,7 +658,7 @@ public class      MapItemsActivity
 
                                 isDrawing = false;
 
-                                LatLng centroid = getLatLngCentroid(drawingCoordinates);
+                                LatLng centroid = GeoUtils.getLatLngCentroid(drawingCoordinates);
                                 if (centroid != null) {
                                     // We need to make a copy of our drawn path, as we may clear it
                                     // at any time. (we're even clearing it right below)
@@ -667,7 +669,7 @@ public class      MapItemsActivity
 
                                 // Zoom and pan the camera ideally around the drawn area
                                 googleMap.animateCamera(CameraUpdateFactory.newLatLngBounds(
-                                        getLatLngBounds(drawingCoordinates), 55
+                                        GeoUtils.getLatLngBounds(drawingCoordinates), 55
                                 ));
 
                                 break;
@@ -804,19 +806,6 @@ public class      MapItemsActivity
         options.strokeWidth(7);
 
         drawnCircle = googleMap.addCircle(options);
-    }
-
-    protected LatLngBounds getLatLngBounds(List<LatLng> latLngs) {
-        LatLngBounds.Builder bc = new LatLngBounds.Builder();
-        for (LatLng latLng : latLngs) { bc.include(latLng); }
-
-        return bc.build();
-    }
-
-    protected LatLng getLatLngCentroid(List<LatLng> latLngs) {
-        if (latLngs.size() == 0) return null;
-
-        return getLatLngBounds(latLngs).getCenter();
     }
 
     //// MATH UTILS (SHOULD BE MOVED ELSEWHERE) ////////////////////////////////////////////////////

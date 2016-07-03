@@ -1,8 +1,11 @@
 package org.give2peer.karma.entity;
 
 import android.content.Context;
+import android.os.Parcel;
+import android.os.Parcelable;
 
 import com.google.android.gms.maps.model.LatLng;
+import com.orm.SugarRecord;
 
 import org.give2peer.karma.R;
 import org.give2peer.karma.StringUtils;
@@ -18,10 +21,10 @@ import java.util.Locale;
  *
  * Note: why not replace "Human" by "Display" in the helper methods ?
  */
-public class Item
+public class Item extends SugarRecord implements Parcelable
 {
 
-    Integer  id;
+//    Long     id;
     String   title;
     String   description;
     String   type = Item.TYPE_MOOP; // server will only accept one of Item.TYPE_****
@@ -48,6 +51,48 @@ public class Item
 
     public Item() {} // maybe needed, maybe not
 
+
+    // PARCELABLE /////////////////////////////////////////////////////////////////////////////////
+
+    protected Item(Parcel in) {
+        title = in.readString();
+        description = in.readString();
+        type = in.readString();
+        location = in.readString();
+        latitude = in.readFloat();
+        longitude = in.readFloat();
+        thumbnail = in.readString();
+        tags = in.createStringArrayList();
+    }
+
+    public static final Creator<Item> CREATOR = new Creator<Item>() {
+        @Override
+        public Item createFromParcel(Parcel in) {
+            return new Item(in);
+        }
+
+        @Override
+        public Item[] newArray(int size) {
+            return new Item[size];
+        }
+    };
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel parcel, int i) {
+        parcel.writeString(title);
+        parcel.writeString(description);
+        parcel.writeString(type);
+        parcel.writeString(location);
+        parcel.writeFloat(latitude);
+        parcel.writeFloat(longitude);
+        parcel.writeString(thumbnail);
+        parcel.writeStringList(tags);
+    }
 
     // DESCRIPTION /////////////////////////////////////////////////////////////////////////////////
 
@@ -85,41 +130,40 @@ public class Item
      */
     public String getHumanTitle(Context context)
     {
-        String t2 = getTitle();
-
-        String t0;
+        String title = getTitle();
+        String tags = "";
+        List<String> tagsList = getTags();
+        if ( ! tagsList.isEmpty()) {
+            tags = org.apache.commons.lang3.StringUtils.join(tagsList, ' ');
+        }
+        String type;
         if (isGift()) {
-            t0 = context.getString(R.string.new_item_type_gift);
+            type = context.getString(R.string.new_item_type_gift);
         } else if (isLost()) {
-            t0 = context.getString(R.string.new_item_type_lost);
+            type = context.getString(R.string.new_item_type_lost);
         } else if (isMoop()) {
-            t0 = context.getString(R.string.new_item_type_moop);
+            type = context.getString(R.string.new_item_type_moop);
         } else {
             throw new CriticalException(String.format(
                     Locale.FRENCH, "There is no title nor type on item #%d.", getId()
             ));
         }
 
-        String t1 = "";
-        List<String> tags = getTags();
-        if ( ! tags.isEmpty()) {
-            t1 = org.apache.commons.lang3.StringUtils.join(tags, ' ');
-        }
+        // --- made with grilvhor (but not BY grilvhor T_T)
 
         String ht = "";
-        if (t2.length() > 0) {
-            ht = t2;
+
+        if (title.length() > 3) {
+            ht = title;
+        } else {
+            ht = type + " " + title;
         }
-        if (ht.length() < TITLE_LENGTH - 4) { // type is 4 chars : 'moop', 'lost', 'gift'
-            if (ht.isEmpty()) {
-                ht = t0;
-            } else {
-                ht = t0 + " " + ht;
-            }
+
+        if (ht.length() + tags.length() + 1 <= TITLE_LENGTH) {
+            ht = tags + " " + ht;
         }
-        if (ht.length() < TITLE_LENGTH - t1.length()) {
-            ht = t0 + " " + t1 + " " + t2;
-        }
+
+        // --- post-processing
 
         // Remove duplicate, leading and trailing whitespaces. (regex4life)
         ht = org.apache.commons.lang3.StringUtils.replacePattern(ht, "\\s{2,}", " ");
@@ -128,6 +172,51 @@ public class Item
 
         return ht;
     }
+//    public String getHumanTitle(Context context)
+//    {
+//        String t2 = getTitle();
+//
+//        String t0;
+//        if (isGift()) {
+//            t0 = context.getString(R.string.new_item_type_gift);
+//        } else if (isLost()) {
+//            t0 = context.getString(R.string.new_item_type_lost);
+//        } else if (isMoop()) {
+//            t0 = context.getString(R.string.new_item_type_moop);
+//        } else {
+//            throw new CriticalException(String.format(
+//                    Locale.FRENCH, "There is no title nor type on item #%d.", getId()
+//            ));
+//        }
+//
+//        String t1 = "";
+//        List<String> tags = getTags();
+//        if ( ! tags.isEmpty()) {
+//            t1 = org.apache.commons.lang3.StringUtils.join(tags, ' ');
+//        }
+//
+//        String ht = "";
+//        if (t2.length() > 0) {
+//            ht = t2;
+//        }
+//        if (ht.length() < 4) {
+//            if (ht.isEmpty()) {
+//                ht = t0;
+//            } else {
+//                ht = t0 + " " + ht;
+//            }
+//        }
+//        if (ht.length() < TITLE_LENGTH - t1.length()) {
+//            ht = t0 + " " + t1 + " " + t2;
+//        }
+//
+//        // Remove duplicate, leading and trailing whitespaces. (regex4life)
+//        ht = org.apache.commons.lang3.StringUtils.replacePattern(ht, "\\s{2,}", " ");
+//        ht = org.apache.commons.lang3.StringUtils.replacePattern(ht, "^\\s+", "");
+//        ht = org.apache.commons.lang3.StringUtils.replacePattern(ht, "\\s+$", "");
+//
+//        return ht;
+//    }
 
     /**
      * Returns a string describing the distance in human-readable format, like :
@@ -188,9 +277,9 @@ public class Item
 
     // VANILLA ACCESSORS AND MUTATORS //////////////////////////////////////////////////////////////
 
-    public Integer getId()                           { return id;                                  }
-
-    public void setId(Integer id)                    { this.id = id;                               }
+//    public Long getId()                              { return id;                                  }
+//
+//    public void setId(Long id)                       { this.id = id;                               }
 
     public String getType()                          { return type;                                }
 

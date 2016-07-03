@@ -1,0 +1,195 @@
+<android.support.design.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="org.give2peer.karma.activity.ViewItemActivity_"
+    >
+
+    <android.support.design.widget.AppBarLayout
+        android:id="@+id/viewItemAppBarLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        >
+
+        <android.support.design.widget.CollapsingToolbarLayout
+            android:id="@+id/viewItemCollapsingToolbarLayout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:layout_scrollFlags="scroll|exitUntilCollapsed"
+            app:contentScrim="?attr/colorPrimary"
+            >
+
+            <!-- We have two different views in the top collapsing part of the scroll view -->
+            <!-- 1. the picture(s) -->
+            <!-- 2. the map showing the item desired location -->
+
+                <!--android:layout_height="match_parent"-->
+            <RelativeLayout
+                android:id="@+id/viewItemImageWrapper"
+                android:layout_width="match_parent"
+                android:layout_height="240dp"
+                app:layout_collapseMode="parallax"
+                app:layout_collapseParallaxMultiplier="0.618"
+                >
+
+                <!-- Contents are set to Item's picture -->
+                <com.rsv.widget.WebImageView
+                    android:id="@+id/viewItemImageView"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center_horizontal"
+                    android:contentDescription="@string/new_item_image_description"
+                    android:src="@drawable/item_thumbnail"
+                    android:scaleType="centerCrop"
+                    />
+
+                <ImageButton
+                    android:id="@+id/viewItemShowMapButton"
+                    android:layout_width="@dimen/map_button_size"
+                    android:layout_height="@dimen/map_button_size"
+                    android:layout_marginTop="@dimen/map_button_margin"
+                    android:layout_marginLeft="@dimen/map_button_margin"
+                    android:background="@drawable/map_button_background"
+                    android:src="@drawable/ic_map_grey_24dp"
+                    android:contentDescription="@string/new_item_show_map"
+                    />
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/viewItemMapWrapper"
+                android:layout_width="match_parent"
+                android:layout_height="240dp"
+
+                android:visibility="gone"
+
+                app:layout_collapseMode="parallax"
+                app:layout_collapseParallaxMultiplier="0.618"
+                >
+
+                <!-- Wrapped in a frame with a transparent view on top to avoid a bug on gingerbread -->
+                <!-- http://stackoverflow.com/questions/17733723/navigation-drawer-google-maps-v2-map-blocking-drawer -->
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+                    <fragment
+                        class="com.google.android.gms.maps.SupportMapFragment"
+                        xmlns:android="http://schemas.android.com/apk/res/android"
+                        android:name="com.google.android.gms.maps.SupportMapFragment"
+                        android:id="@+id/viewItemMapFragment"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        />
+                    <!-- Transparent view to ensure gingerbread does not black-choke on the map -->
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        />
+                </FrameLayout>
+
+                <ImageButton
+                    android:id="@+id/viewItemShowPicButton"
+                    android:src="@drawable/ic_camera_alt_grey_24dp"
+                    android:layout_width="@dimen/map_button_size"
+                    android:layout_height="@dimen/map_button_size"
+                    android:layout_marginTop="@dimen/map_button_margin"
+                    android:layout_marginLeft="@dimen/map_button_margin"
+                    android:background="@drawable/map_button_background"
+                    android:contentDescription="@string/new_item_show_picture"
+                    />
+
+            </RelativeLayout>
+
+        </android.support.design.widget.CollapsingToolbarLayout>
+
+    </android.support.design.widget.AppBarLayout>
+
+    <android.support.v4.widget.NestedScrollView
+        android:id="@+id/viewItemFormScrollView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingLeft="@dimen/activity_horizontal_margin"
+            android:paddingRight="@dimen/activity_horizontal_margin"
+            android:orientation="vertical"
+            >
+
+            <!-- Let's not show this for the time being. -->
+            <!-- We're still using it as a hidden form input field -->
+            <EditText
+                android:id="@+id/viewItemLocationEditText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:maxLength="256"
+                android:maxLines="1"
+                android:inputType="text|textAutoComplete|textAutoCorrect|textPostalAddress"
+                android:hint="@string/new_item_label_location"
+                android:textColorHint="@android:color/darker_gray"
+                android:visibility="gone"
+                />
+
+
+            <TextView
+                android:id="@+id/viewItemTitleTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:textStyle="bold"
+                android:maxLines="1"
+                android:textSize="18sp"
+                />
+
+            <TextView
+                android:id="@+id/viewItemDescriptionTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:maxLines="10"
+                />
+
+        </LinearLayout>
+
+
+    </android.support.v4.widget.NestedScrollView>
+
+    <!-- SUBMIT or SEND ? Which is better ? -->
+    <com.shamanland.fab.FloatingActionButton
+        android:id="@+id/viewItemSendButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_send_white_24dp"
+        android:onClick="onSend"
+        android:layout_gravity="right|bottom"
+        android:layout_marginBottom="12dp"
+        android:layout_marginRight="12dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        app:floatingActionButtonSize="normal"
+        app:floatingActionButtonColor="@color/colorPrimaryDark"
+        />
+
+    <!-- Shown when the form was submitted and the item is currently being uploaded -->
+    <ProgressBar
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/viewItemProgressBar"
+        android:layout_gravity="right|bottom"
+        android:layout_marginBottom="2dp"
+        android:layout_marginRight="2dp"
+        android:visibility="invisible"
+        />
+        <!-- Since the CoordinatorLayout, this does not center the loader, so we've relocated it -->
+        <!--android:layout_centerVertical="true"-->
+        <!--android:layout_centerHorizontal="true"-->
+
+
+</android.support.design.widget.CoordinatorLayout>
