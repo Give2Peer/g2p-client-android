@@ -20,6 +20,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
 import android.widget.CheckBox;
@@ -403,6 +404,15 @@ public  class      NewItemActivity
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.newItemMapFragment);
         mapFragment.getMapAsync(this);
+    }
+
+    @AfterViews
+    public void resizeCollapsingMapSection() {
+        // We want the collapsing section to fit the whole screen height minus a fixed height.
+        // We want it to work on all devices, on both orientations. hence, we set it that way.
+
+        DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
+        newItemMapWrapper.getLayoutParams().height = displayMetrics.heightPixels - app.dpi2pix(108);
     }
 
     @Override

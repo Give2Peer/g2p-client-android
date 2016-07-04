@@ -12,8 +12,6 @@ import android.support.v7.app.ActionBar;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
-import android.widget.EditText;
-import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -25,7 +23,6 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.rsv.widget.WebImageView;
-import com.shamanland.fab.FloatingActionButton;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Click;
@@ -44,7 +41,12 @@ import java.util.ArrayList;
 
 
 /**
- *
+ * Actions :
+ * - Show directions
+ * - Report abuse
+ * - Thank author
+ * - Edit item
+ * - Delete item
  */
 @EActivity(R.layout.activity_view_item)
 public class ViewItemActivity
@@ -52,13 +54,14 @@ public class ViewItemActivity
   implements OnMapReadyCallback
 {
     Application app;
+    Item item;
 
     //// VIEWS /////////////////////////////////////////////////////////////////////////////////////
 
-    @ViewById
-    FloatingActionButton viewItemSendButton;
-    @ViewById
-    ProgressBar viewItemProgressBar;
+    // What would the FAB be ?
+//    @ViewById
+//    FloatingActionButton viewItemSendButton;
+
     @ViewById
     WebImageView viewItemImageView;
     @ViewById
@@ -66,7 +69,7 @@ public class ViewItemActivity
     @ViewById
     TextView viewItemDescriptionTextView;
     @ViewById
-    EditText viewItemLocationEditText;
+    TextView viewItemUpdatedAtTextView;
 
     @ViewById
     NestedScrollView viewItemFormScrollView;
@@ -75,7 +78,7 @@ public class ViewItemActivity
     @ViewById
     RelativeLayout   viewItemImageWrapper;
 
-    Item item;
+
 
 
     //// LIFECYCLE LISTENERS ///////////////////////////////////////////////////////////////////////
@@ -147,14 +150,18 @@ public class ViewItemActivity
     public void fillLayoutWithItem() {
         viewItemImageView.setWebImageUrl(item.getThumbnailNoSsl());
         viewItemTitleTextView.setText(item.getHumanTitle(this));
-        viewItemDescriptionTextView.setText(item.getDescription());
+        if (item.hasDescription()) {
+            viewItemDescriptionTextView.setText(item.getDescription());
+            viewItemDescriptionTextView.setVisibility(View.VISIBLE);
+        }
+        viewItemUpdatedAtTextView.setText(item.getHumanUpdatedAt());
     }
 
 
     @AfterViews
     public void resizeCollapsingSection() {
-
-        // hmmmmm. experiment ongoings
+        // We want the collapsing section to fit the whole screen height minus a fixed height.
+        // We want it to work on all devices, on both orientations. hence, we set it that way.
 
         DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
         int pxHeight = displayMetrics.heightPixels;
@@ -162,15 +169,15 @@ public class ViewItemActivity
         float dpHeight = displayMetrics.heightPixels / displayMetrics.density;
         float dpWidth = displayMetrics.widthPixels / displayMetrics.density;
 
-        Log.i("G2P", String.format("Display Metrics : %.1fdp x %.1fdp", dpWidth, dpHeight));
-        Log.i("G2P", String.format("Display Metrics : %dpx x %dpx", pxWidth, pxHeight));
+        //Log.i("G2P", String.format("Display Metrics : %.1fdp x %.1fdp", dpWidth, dpHeight));
+        //Log.i("G2P", String.format("Display Metrics : %dpx x %dpx", pxWidth, pxHeight));
         // Nexus S portrait : Display Metrics : 360.0dp x 592.0dp
+        //                    Display Metrics : 1080px x 1776px
 
-        int newHeight = pxHeight - app.dpi2pix(106);
+        int newHeight = pxHeight - app.dpi2pix(108);
 
         viewItemMapWrapper.getLayoutParams().height = newHeight;
         viewItemImageWrapper.getLayoutParams().height = newHeight;
-
     }
 
 
@@ -317,20 +324,6 @@ public class ViewItemActivity
         showMap();
     }
 
-    protected void enableSending()
-    {
-        viewItemSendButton.setEnabled(true);
-        viewItemProgressBar.setVisibility(View.GONE);
-    }
-
-    protected void disableSending()
-    {
-        viewItemSendButton.setEnabled(false);
-        viewItemProgressBar.setVisibility(View.VISIBLE);
-    }
-
-
     //// UTILS /////////////////////////////////////////////////////////////////////////////////////
-
 
 }

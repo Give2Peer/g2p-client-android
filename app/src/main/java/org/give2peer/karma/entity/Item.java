@@ -11,6 +11,8 @@ import org.give2peer.karma.R;
 import org.give2peer.karma.StringUtils;
 import org.give2peer.karma.exception.CriticalException;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
+import org.joda.time.tz.DateTimeZoneBuilder;
 import org.ocpsoft.prettytime.PrettyTime;
 
 import java.util.List;
@@ -61,8 +63,26 @@ public class Item extends SugarRecord implements Parcelable
         location = in.readString();
         latitude = in.readFloat();
         longitude = in.readFloat();
+        created_at = new DateTime(in.readLong(), DateTimeZone.forID(in.readString()));
+        updated_at = new DateTime(in.readLong(), DateTimeZone.forID(in.readString()));
         thumbnail = in.readString();
         tags = in.createStringArrayList();
+    }
+
+    @Override
+    public void writeToParcel(Parcel parcel, int i) {
+        parcel.writeString(title);
+        parcel.writeString(description);
+        parcel.writeString(type);
+        parcel.writeString(location);
+        parcel.writeFloat(latitude);
+        parcel.writeFloat(longitude);
+        parcel.writeLong(created_at.getMillis());
+        parcel.writeString(created_at.getZone().getID());
+        parcel.writeLong(updated_at.getMillis());
+        parcel.writeString(updated_at.getZone().getID());
+        parcel.writeString(thumbnail);
+        parcel.writeStringList(tags);
     }
 
     public static final Creator<Item> CREATOR = new Creator<Item>() {
@@ -80,18 +100,6 @@ public class Item extends SugarRecord implements Parcelable
     @Override
     public int describeContents() {
         return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel parcel, int i) {
-        parcel.writeString(title);
-        parcel.writeString(description);
-        parcel.writeString(type);
-        parcel.writeString(location);
-        parcel.writeFloat(latitude);
-        parcel.writeFloat(longitude);
-        parcel.writeString(thumbnail);
-        parcel.writeStringList(tags);
     }
 
     // DESCRIPTION /////////////////////////////////////////////////////////////////////////////////
