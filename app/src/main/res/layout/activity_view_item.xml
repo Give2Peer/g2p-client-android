@@ -152,6 +152,71 @@
                 android:textColor="@color/md_grey_400"
                 />
 
+
+            <android.support.v7.widget.ButtonBarLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="15dp"
+                android:gravity="center"
+                >
+
+                <Button
+                    android:id="@+id/viewItemNavigateButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Navigate"
+                    style="@style/Widget.AppCompat.Button.Colored"
+                    />
+
+                <Button
+                    android:id="@+id/viewItemThankButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Thank"
+                    android:enabled="false"
+                    style="@style/Widget.AppCompat.Button.Borderless.Colored"
+                    />
+
+            </android.support.v7.widget.ButtonBarLayout>
+
+
+            <android.support.v7.widget.ButtonBarLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:gravity="center"
+                >
+
+                <Button
+                    android:id="@+id/viewItemReportButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Report"
+                    android:enabled="false"
+                    style="@style/Widget.AppCompat.Button.Borderless"
+                    />
+
+                <Button
+                    android:id="@+id/viewItemEditButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Edit"
+                    android:visibility="gone"
+                    style="@style/Widget.AppCompat.Button.Borderless"
+                    />
+
+                <Button
+                    android:id="@+id/viewItemDeleteButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Delete"
+                    android:visibility="gone"
+                    style="@style/Widget.AppCompat.Button.Borderless"
+                    />
+
+            </android.support.v7.widget.ButtonBarLayout>
+
+
         </LinearLayout>
 
 

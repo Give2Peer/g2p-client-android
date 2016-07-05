@@ -1,7 +1,9 @@
 package org.give2peer.karma.activity;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.AppBarLayout;
@@ -38,18 +40,19 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
 import java.util.ArrayList;
+import java.util.Locale;
 
 
 /**
  * Actions :
- * - Show directions
+ * - Navigate to
  * - Report abuse
  * - Thank author
  * - Edit item
  * - Delete item
  *
  * FAB ideas :
- * - Walk To (aka "Show directions")
+ * - Navigate To
  */
 @EActivity(R.layout.activity_view_item)
 public class ViewItemActivity
@@ -377,6 +380,17 @@ public class ViewItemActivity
     public void viewItemShowMapButtonClicked() {
         if ( ! isLocationReady()) { getLocation(); }
         showMap();
+    }
+
+    @Click
+    public void viewItemNavigateButtonClicked() {
+        Intent intent = new Intent(android.content.Intent.ACTION_VIEW,
+                Uri.parse(String.format(
+                        Locale.US,
+                        "http://maps.google.com/maps?daddr=%.6f,%.6f",
+                        item.getLatitude(), item.getLongitude()
+                )));
+        startActivity(intent);
     }
 
     //// UTILS /////////////////////////////////////////////////////////////////////////////////////
