@@ -649,6 +649,8 @@ public class      MapItemsActivity
         // include in the builder coordinates around the item, to ensure a minimal
         // level of zoom higher than the vendor's minimal level of zoom.
         // Note: our method will have artifacts around poles, but WHO CARES ?!
+        // This is because multiple items can have the exact same coordinates so
+        // we cannot rely on their numbers alone, which would yield clearer code.
         double latPad = 180. / 30000;
         double lngPad = 360. / 60000;
 
@@ -669,8 +671,7 @@ public class      MapItemsActivity
         }
 
         // Pan and zoom the camera
-        //CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bc.build(), 55);
-        googleMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bc.build(), 55));
+        googleMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bc.build(), 111));
     }
 
 

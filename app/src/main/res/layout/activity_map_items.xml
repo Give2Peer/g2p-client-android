@@ -1,84 +1,12 @@
-<RelativeLayout
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="org.give2peer.karma.activity.MapItemsActivity_"
+    android:orientation="vertical"
     >
-
-    <!-- MAP ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
-
-    <!-- Wrapped in a frame with a transparent view on top to avoid a bug on gingerbread -->
-    <!-- http://stackoverflow.com/questions/17733723/navigation-drawer-google-maps-v2-map-blocking-drawer -->
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-        <fragment
-            class="com.google.android.gms.maps.SupportMapFragment"
-            xmlns:android="http://schemas.android.com/apk/res/android"
-            android:name="com.google.android.gms.maps.SupportMapFragment"
-            android:id="@+id/mapItemsFragment"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            />
-        <!-- Transparent view to ensure gingerbread does not black-choke on the map -->
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            />
-    </FrameLayout>
-
-    <FrameLayout
-        android:id="@+id/mapItemsDrawFrame"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        >
-
-        <!-- We always want this button on the left, not the right, (and not start) -->
-        <!-- because the Maps fragment shows its own controls on the bottom right.  -->
-        <!-- The best solution would be to be able to configure the third-party map -->
-        <!-- to make it put its controls on the left to allow our FAB on the right. -->
-        <!-- Also, we cannot (easily) animate that FAB, because of API 11 support.  -->
-        <com.shamanland.fab.FloatingActionButton
-            android:id="@+id/mapItemsFloatingActionButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/ic_search_white_24dp"
-            android:layout_gravity="right|bottom"
-            android:layout_marginBottom="6dp"
-            android:layout_marginRight="6dp"
-            app:floatingActionButtonColor="@color/colorPrimaryDark"
-            app:floatingActionButtonSize="normal"
-            />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:text="@string/toast_no_internet_available"
-            android:id="@+id/noInternetTextView"
-            android:layout_gravity="center_horizontal|top"
-            android:background="@color/background_material_light"
-            android:textColor="@color/primary_text_default_material_light"
-            android:padding="5dp"
-            android:textAlignment="center"
-            android:visibility="gone"
-            />
-
-    </FrameLayout>
-
-    <!-- WIDGETS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
-
-    <ProgressBar
-        style="?android:attr/progressBarStyleLarge"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/mapItemsProgressBar"
-        android:visibility="gone"
-        android:layout_centerVertical="true"
-        android:layout_centerHorizontal="true"
-        />
 
 
     <!-- TOOLBAR ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
@@ -88,4 +16,85 @@
         layout="@layout/toolbar"
         />
 
-</RelativeLayout>
+
+    <!-- MAP ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <!-- Wrapped in a frame with a transparent view on top to avoid a bug on gingerbread -->
+        <!-- http://stackoverflow.com/questions/17733723/navigation-drawer-google-maps-v2-map-blocking-drawer -->
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <fragment
+                class="com.google.android.gms.maps.SupportMapFragment"
+                xmlns:android="http://schemas.android.com/apk/res/android"
+                android:name="com.google.android.gms.maps.SupportMapFragment"
+                android:id="@+id/mapItemsFragment"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                />
+            <!-- Transparent view to ensure gingerbread does not black-choke on the map -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                />
+        </FrameLayout>
+
+        <FrameLayout
+            android:id="@+id/mapItemsDrawFrame"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            >
+
+            <!-- We always want this button on the left, not the right, (and not start) -->
+            <!-- because the Maps fragment shows its own controls on the bottom right.  -->
+            <!-- The best solution would be to be able to configure the third-party map -->
+            <!-- to make it put its controls on the left to allow our FAB on the right. -->
+            <!-- Also, we cannot (easily) animate that FAB, because of API 11 support.  -->
+            <com.shamanland.fab.FloatingActionButton
+                android:id="@+id/mapItemsFloatingActionButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_search_white_24dp"
+                android:layout_gravity="right|bottom"
+                android:layout_marginBottom="6dp"
+                android:layout_marginRight="6dp"
+                app:floatingActionButtonColor="@color/colorPrimaryDark"
+                app:floatingActionButtonSize="normal"
+                />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="@string/toast_no_internet_available"
+                android:id="@+id/noInternetTextView"
+                android:layout_gravity="center_horizontal|top"
+                android:background="@color/background_material_light"
+                android:textColor="@color/primary_text_default_material_light"
+                android:padding="5dp"
+                android:textAlignment="center"
+                android:visibility="gone"
+                />
+
+        </FrameLayout>
+
+
+        <!-- WIDGETS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
+
+        <ProgressBar
+            style="?android:attr/progressBarStyleLarge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/mapItemsProgressBar"
+            android:visibility="gone"
+            android:layout_centerVertical="true"
+            android:layout_centerHorizontal="true"
+            />
+
+    </RelativeLayout>
+
+</LinearLayout>
