@@ -4,7 +4,10 @@ import android.content.Context;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.orm.SugarRecord;
 
 import org.give2peer.karma.Application;
@@ -43,6 +46,7 @@ public class Item extends SugarRecord implements Parcelable
 
     User author;
 
+    // It would be best for these to be constants.
     static public String TYPE_MOOP = "moop";
     static public String TYPE_GIFT = "gift";
     static public String TYPE_LOST = "lost";
@@ -50,12 +54,12 @@ public class Item extends SugarRecord implements Parcelable
     static public int TITLE_LENGTH = 32;
 
 
-    // CONSTRUCTOR /////////////////////////////////////////////////////////////////////////////////
+    //// CONSTRUCTOR ///////////////////////////////////////////////////////////////////////////////
 
-    public Item() {} // maybe needed, maybe not
+    public Item() {} // maybe needed, maybe not.
 
 
-    // PARCELABLE /////////////////////////////////////////////////////////////////////////////////
+    //// PARCELABLE ////////////////////////////////////////////////////////////////////////////////
 
     protected Item(Parcel in) {
         title = in.readString();
@@ -105,7 +109,8 @@ public class Item extends SugarRecord implements Parcelable
         return 0;
     }
 
-    // DESCRIPTION /////////////////////////////////////////////////////////////////////////////////
+
+    //// DESCRIPTION ///////////////////////////////////////////////////////////////////////////////
 
     /**
      * @return the concatenated title and (humanly displayed) distance.
@@ -183,51 +188,6 @@ public class Item extends SugarRecord implements Parcelable
 
         return ht;
     }
-//    public String getHumanTitle(Context context)
-//    {
-//        String t2 = getTitle();
-//
-//        String t0;
-//        if (isGift()) {
-//            t0 = context.getString(R.string.new_item_type_gift);
-//        } else if (isLost()) {
-//            t0 = context.getString(R.string.new_item_type_lost);
-//        } else if (isMoop()) {
-//            t0 = context.getString(R.string.new_item_type_moop);
-//        } else {
-//            throw new CriticalException(String.format(
-//                    Locale.FRENCH, "There is no title nor type on item #%d.", getId()
-//            ));
-//        }
-//
-//        String t1 = "";
-//        List<String> tags = getTags();
-//        if ( ! tags.isEmpty()) {
-//            t1 = org.apache.commons.lang3.StringUtils.join(tags, ' ');
-//        }
-//
-//        String ht = "";
-//        if (t2.length() > 0) {
-//            ht = t2;
-//        }
-//        if (ht.length() < 4) {
-//            if (ht.isEmpty()) {
-//                ht = t0;
-//            } else {
-//                ht = t0 + " " + ht;
-//            }
-//        }
-//        if (ht.length() < TITLE_LENGTH - t1.length()) {
-//            ht = t0 + " " + t1 + " " + t2;
-//        }
-//
-//        // Remove duplicate, leading and trailing whitespaces. (regex4life)
-//        ht = org.apache.commons.lang3.StringUtils.replacePattern(ht, "\\s{2,}", " ");
-//        ht = org.apache.commons.lang3.StringUtils.replacePattern(ht, "^\\s+", "");
-//        ht = org.apache.commons.lang3.StringUtils.replacePattern(ht, "\\s+$", "");
-//
-//        return ht;
-//    }
 
     /**
      * Returns a string describing the distance in human-readable format, like :
@@ -286,11 +246,34 @@ public class Item extends SugarRecord implements Parcelable
     }
 
 
-    // VANILLA ACCESSORS AND MUTATORS //////////////////////////////////////////////////////////////
+    //// MAP MARKERS ///////////////////////////////////////////////////////////////////////////////
 
-//    public Long getId()                              { return id;                                  }
-//
-//    public void setId(Long id)                       { this.id = id;                               }
+    public int getMapMarkerIconResource() {
+        int i; if (isGift()) {
+            i = R.drawable.ic_marker_gift_48dp;
+        } else if (isLost()) {
+            i = R.drawable.ic_marker_lost_48dp;
+        } else if (isMoop()) {
+            i = R.drawable.ic_marker_moop_48dp;
+        } else  {
+            throw new CriticalException(String.format("Unknown item type '%s'.", getType()));
+        }
+
+        return i;
+    }
+
+    public BitmapDescriptor getMapMarkerIcon() {
+        return BitmapDescriptorFactory.fromResource(getMapMarkerIconResource());
+    }
+
+    public float getMapMarkerU() { return 0.500f; } // derived from `assets/map_marker.xcf`
+    public float getMapMarkerV() { return 0.916f; } // 1018.0 / 1111.0
+
+    //// VANILLA ACCESSORS AND MUTATORS ////////////////////////////////////////////////////////////
+
+//  Id is handled by SugarRecord.
+//  public Long getId()                              { return id;                                  }
+//  public void setId(Long id)                       { this.id = id;                               }
 
     public String getType()                          { return type;                                }
 

@@ -29,7 +29,7 @@ import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.ViewById;
 import org.give2peer.karma.Application;
-import org.give2peer.karma.GeoUtils;
+import org.give2peer.karma.LatLngUtils;
 import org.give2peer.karma.R;
 import org.give2peer.karma.entity.Item;
 import org.give2peer.karma.event.LocationUpdateEvent;
@@ -47,6 +47,9 @@ import java.util.ArrayList;
  * - Thank author
  * - Edit item
  * - Delete item
+ *
+ * FAB ideas :
+ * - Walk To (aka "Show directions")
  */
 @EActivity(R.layout.activity_view_item)
 public class ViewItemActivity
@@ -54,7 +57,13 @@ public class ViewItemActivity
   implements OnMapReadyCallback
 {
     Application app;
+
+    /**
+     * The item this activity is displaying the details of.
+     * It's been Parcel-ed, and our current Parcelable implementation is incomplete. Be wary.
+     */
     Item item;
+
 
     //// VIEWS /////////////////////////////////////////////////////////////////////////////////////
 
@@ -77,8 +86,6 @@ public class ViewItemActivity
     RelativeLayout   viewItemMapWrapper;
     @ViewById
     RelativeLayout   viewItemImageWrapper;
-
-
 
 
     //// LIFECYCLE LISTENERS ///////////////////////////////////////////////////////////////////////
@@ -128,6 +135,9 @@ public class ViewItemActivity
         updateMap();
     }
 
+
+    //// EVENTBUS LISTENERS ////////////////////////////////////////////////////////////////////////
+
     @Subscribe
     public void updateMapWhenLocated(LocationUpdateEvent locationUpdateEvent) {
         //Location location = locationUpdateEvent.getLocation();
@@ -160,10 +170,16 @@ public class ViewItemActivity
     }
 
 
+    /**
+     * We want the top parallax section to fit the whole screen height minus a fixed height.
+     * We want it to work on all devices, on both orientations. Hence, we set it procedurally.
+     * We want a bottom section height of 108dp, and so we resize the top section accordingly.
+     * We want peace in our lives and war in our games. ... Does that seem right to you ?
+     */
     @AfterViews
     public void resizeCollapsingSection() {
-        // We want the collapsing section to fit the whole screen height minus a fixed height.
-        // We want it to work on all devices, on both orientations. hence, we set it that way.
+
+        int bottomSectionHeightDp = 108;
 
         DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
         int pxHeight = displayMetrics.heightPixels;
@@ -176,7 +192,7 @@ public class ViewItemActivity
         // Nexus S portrait : Display Metrics : 360.0dp x 592.0dp
         //                    Display Metrics : 1080px x 1776px
 
-        int newHeight = pxHeight - app.dpi2pix(108);
+        int newHeight = pxHeight - app.dpi2pix(bottomSectionHeightDp);
 
         viewItemMapWrapper.getLayoutParams().height = newHeight;
         viewItemImageWrapper.getLayoutParams().height = newHeight;
@@ -196,6 +212,25 @@ public class ViewItemActivity
         mapFragment.getMapAsync(this);
     }
 
+    private boolean canDrag = true;
+
+    /**
+     * Could not figure out how to name this `canDrag()` without horrible tentacled things.
+     * @return whether or not the user can drag the bottom parallax section up by dragging on the
+     *         top section
+     */
+    public boolean canDragYet() {
+        return canDrag;
+    }
+
+    public void canDragYet(boolean canAille) {
+        canDrag = canAille;
+    }
+
+    /**
+     * Configure the map fragment displaying the item's position with a marker.
+     * It also displays the user's position when available, and zooms to show both.
+     */
     @Override
     public void onMapReady(GoogleMap googleMap) {
         this.googleMap = googleMap;
@@ -208,14 +243,15 @@ public class ViewItemActivity
         googleMap.setOnMapLoadedCallback(new GoogleMap.OnMapLoadedCallback() {
             @Override
             public void onMapLoaded() {
-                // Make sure we can scroll on the map and not on the scrollable view
+                // We need to disable the drag on the top section when the map is showing,
+                // to make sure we can scroll on the map and not in the parallax.
                 AppBarLayout appBarLayout = (AppBarLayout) findViewById(R.id.viewItemAppBarLayout);
                 CoordinatorLayout.LayoutParams params =
                         (CoordinatorLayout.LayoutParams) appBarLayout.getLayoutParams();
                 AppBarLayout.Behavior behavior = (AppBarLayout.Behavior) params.getBehavior();
                 behavior.setDragCallback(new AppBarLayout.Behavior.DragCallback() {
                     @Override
-                    public boolean canDrag(@NonNull AppBarLayout appBarLayout) { return false; }
+                    public boolean canDrag(@NonNull AppBarLayout appBarLayout) { return canDragYet(); }
                 });
                 // ... and also flag the map as loaded
                 mapLoaded = true;
@@ -231,6 +267,14 @@ public class ViewItemActivity
         updateMap();
     }
 
+    /**
+     * Note that this is faillible.
+     * Sometimes, it's true, but layout has not yet occurred for the map and its dimensions or
+     * zooming methods are unavailable and will raise errors. This is because the map starts with
+     * no visibility and we display it only when the user presses the map button.
+     * Therefore, we complement this with `isMapLoaded()`.
+     * @return
+     */
     protected boolean isMapReady() {
         return null != googleMap;
     }
@@ -238,7 +282,8 @@ public class ViewItemActivity
     boolean mapLoaded = false;
 
     /**
-     * If we don't check this, `newLatLngBounds` will fail.
+     * If we don't check this, `CameraUpdateFactory.newLatLngBounds` will fail.
+     * This becomes true when our `GoogleMap.OnMapLoadedCallback` has been called.
      */
     protected boolean isMapLoaded() {
         return mapLoaded;
@@ -249,7 +294,8 @@ public class ViewItemActivity
     }
 
     protected void updateMap() {
-        if ( ! isMapReady() || ! isLocationReady() || ! isMapLoaded()) {
+
+        if ( ! isMapReady() || ! isMapLoaded()) {
             return;
         }
 
@@ -260,20 +306,25 @@ public class ViewItemActivity
         // Let's clear the map
         googleMap.clear();
 
-        // and zoom on the user position and item
-        ArrayList<LatLng> latlngs = new ArrayList<>();
 
-        latlngs.add(GeoUtils.locationToLatLng(location));
-        latlngs.add(item.getLatLng());
+        // Zoom and pan the camera ideally around the item alone.
+        if ( ! isLocationReady()) {
+            googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(item.getLatLng(), 10));
 
-        // Zoom and pan the camera ideally around the drawn area
-        googleMap.animateCamera(CameraUpdateFactory.newLatLngBounds(
-                GeoUtils.getLatLngBounds(latlngs), 56
-        ));
+        } else {  // Zoom and pan the camera ideally around the item and user.
+            ArrayList<LatLng> latlngs = new ArrayList<>();
+            latlngs.add(getLatLng());
+            latlngs.add(item.getLatLng());
+            googleMap.animateCamera(CameraUpdateFactory.newLatLngBounds(
+                    LatLngUtils.getLatLngBounds(latlngs), 56
+            ));
+        }
 
-        // Let's put a marker on the map where the item is
+        // Put a marker on the map where the item is. The marker depends on the type.
         itemLocationMarker = googleMap.addMarker(new MarkerOptions()
                 .position(item.getLatLng())
+                .icon(item.getMapMarkerIcon())
+                .anchor(item.getMapMarkerU(), item.getMapMarkerV())
         );
 
         // We don't need to ask for permission again, we already did while creating the activity.
@@ -306,6 +357,7 @@ public class ViewItemActivity
     {
         viewItemMapWrapper.setVisibility(View.GONE);
         viewItemImageWrapper.setVisibility(View.VISIBLE);
+        canDragYet(true);
     }
     /**
      * Shows the map in the collapsing app bar instead of the picture.
@@ -315,6 +367,7 @@ public class ViewItemActivity
     {
         viewItemImageWrapper.setVisibility(View.GONE);
         viewItemMapWrapper.setVisibility(View.VISIBLE);
+        canDragYet(false);
     }
 
     @Click

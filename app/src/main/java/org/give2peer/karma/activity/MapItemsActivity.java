@@ -5,15 +5,11 @@ import android.content.Context;
 import android.graphics.Point;
 import android.location.Location;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.SystemClock;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.BounceInterpolator;
@@ -40,12 +36,6 @@ import com.google.android.gms.maps.model.PolygonOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.mikepenz.materialdrawer.Drawer;
-import com.mikepenz.materialdrawer.DrawerBuilder;
-import com.mikepenz.materialdrawer.holder.BadgeStyle;
-import com.mikepenz.materialdrawer.model.DividerDrawerItem;
-import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
-import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
-import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.rubengees.introduction.IntroductionBuilder;
 import com.rubengees.introduction.entity.Slide;
 import com.shamanland.fab.FloatingActionButton;
@@ -55,14 +45,13 @@ import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.ViewById;
 import org.give2peer.karma.Application;
-import org.give2peer.karma.GeoUtils;
+import org.give2peer.karma.LatLngUtils;
 import org.give2peer.karma.adapter.ItemInfoWindowAdapter;
 import org.give2peer.karma.entity.Item;
 import org.give2peer.karma.R;
 import org.give2peer.karma.event.AuthenticationEvent;
 import org.give2peer.karma.event.LocationUpdateEvent;
 import org.give2peer.karma.exception.CriticalException;
-import org.give2peer.karma.listener.MarkerInfoWebImageListener;
 import org.give2peer.karma.response.FindItemsResponse;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -71,9 +60,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
-
-import pl.polidea.webimageview.WebImageListener;
-import pl.polidea.webimageview.WebImageView;
 
 
 /**
@@ -104,9 +90,7 @@ public class      MapItemsActivity
     /**
      * A set of displayed items on the map, to avoid duplicates when you make another request.
      * We also use this to avoid making redundant requests.
-     * Use markerItemHashMap instead.
      */
-    @Deprecated
     List<Item> displayedItems = new ArrayList<>();
 
     // Allows us to find items from their respective markers during map UI events
@@ -176,17 +160,6 @@ public class      MapItemsActivity
         // We could use .withSelected(false) but we'd lose the color-change click responsiveness.
         selectNavigationDrawerItem(Application.NAVIGATION_DRAWER_ITEM_MAP);
 
-//        if (isMapReady()) {
-//            if (hasMapItemMarkers()) {
-//                // Sometimes the map fragment loses the zoom level, let's try to fix that.
-//                Log.d("G2P", "Zooming in on items when resuming map activity.");
-//                zoomOnItems(googleMap, displayedItems);
-//            } else {
-//                // Map is empty, maybe we just activated the GPS or Internet, so try again
-//                //getLocation();
-//            }
-//        }
-
     }
 
     /**
@@ -203,23 +176,6 @@ public class      MapItemsActivity
                 Application.NAVIGATION_DRAWER_ITEM_MAP
         );
     }
-
-//    @AfterViews
-//    public void authenticate()
-//    {
-//        // onStart() is sometimes called AFTER this method, and so nobody listens to
-//        // AuthenticationEvent yet, so we need to register to the EventBus here too.
-//        if ( ! EventBus.getDefault().isRegistered(this)) EventBus.getDefault().register(this);
-//
-//        // If the user is not authenticated, take care of it
-//        app.requireAuthentication(this);
-//    }
-//
-//    @AfterViews
-//    public void requestGpsEnabled()
-//    {
-//        super.requestGpsEnabled(this);
-//    }
 
     @Subscribe
     public void onAuthenticated(AuthenticationEvent authenticationEvent) {
@@ -329,7 +285,7 @@ public class      MapItemsActivity
 //    }
 
 
-    //// UI LISTENERS //////////////////////////////////////////////////////////////////////////////
+    //// FAB ///////////////////////////////////////////////////////////////////////////////////////
 
     @Click
     public void mapItemsFloatingActionButtonClicked() {
@@ -518,23 +474,19 @@ public class      MapItemsActivity
                     for (int i = 0; i < itemsCount; i++) {
                         Item item = items.get(i);
 
-//                        String title = item.getTitle();
-                        // When the title is empty the marker does not show the info window at all.
-                        // We want it to show up, so let's provide an alternative title !
-//                        if (title.isEmpty()) {
-//                            title = "MOOP";
-//                        }
-
-                        String snippet = item.getHumanUpdatedAt();
-
                         Marker m = googleMap.addMarker(
                                 new MarkerOptions()
                                         .position(item.getLatLng())
                                         .title(item.getHumanTitle(activity))
-                                        .snippet(snippet)
+                                        .snippet(item.getHumanUpdatedAt())
+                                        .icon(item.getMapMarkerIcon())
+                                        .anchor(item.getMapMarkerU(), item.getMapMarkerV())
                         );
 
-                        dropPinEffect(m, Math.round(i * 222));
+                        // todo: make the drop pin effect an opt-out option
+                        dropPinEffect(m, Math.round(i * 222),
+                                item.getMapMarkerU(), item.getMapMarkerV()
+                        );
 
                         // We also map the markers to the items for the click callback
                         markerItemHashMap.put(m, item);
@@ -552,7 +504,6 @@ public class      MapItemsActivity
                         @Override
                         public void onInfoWindowClick(Marker marker) {
                             Item item = markerItemHashMap.get(marker);
-                            //app.showItemPopup(activity, item);
                             app.launchViewItem(activity, item);
                         }
                     });
@@ -634,6 +585,7 @@ public class      MapItemsActivity
                                 drawingCoordinates.add(latLng);
                                 drawPolylineOnMap(googleMap, drawingCoordinates);
 
+                                // distanceBetween snippet, interesting. Also, circles ?
 //                                LatLng center = drawingCoordinates.get(0);
 //                                float[] results = new float[3];
 //                                android.location.Location.distanceBetween(
@@ -658,10 +610,10 @@ public class      MapItemsActivity
 
                                 isDrawing = false;
 
-                                LatLng centroid = GeoUtils.getLatLngCentroid(drawingCoordinates);
+                                LatLng centroid = LatLngUtils.getLatLngCentroid(drawingCoordinates);
                                 if (centroid != null) {
                                     // We need to make a copy of our drawn path, as we may clear it
-                                    // at any time. (we're even clearing it right below)
+                                    // at any time.
                                     List<LatLng> container = new ArrayList<LatLng>();
                                     container.addAll(drawingCoordinates);
                                     executeFinderTask(centroid, container);
@@ -669,7 +621,7 @@ public class      MapItemsActivity
 
                                 // Zoom and pan the camera ideally around the drawn area
                                 googleMap.animateCamera(CameraUpdateFactory.newLatLngBounds(
-                                        GeoUtils.getLatLngBounds(drawingCoordinates), 55
+                                        LatLngUtils.getLatLngBounds(drawingCoordinates), 55
                                 ));
 
                                 break;
@@ -730,7 +682,16 @@ public class      MapItemsActivity
         mapItemsProgressBar.setVisibility(View.GONE);
     }
 
-    private void dropPinEffect(final Marker marker, long delay) {
+    /**
+     * BUGGY WITH CUSTOM ANCHORS
+     *
+     *
+     * @param marker
+     * @param delay
+     * @param u Anchor U (between 0 and 1, origin is top left)
+     * @param v Anchor V (between 0 and 1, origin is top left)
+     */
+    private void dropPinEffect(final Marker marker, long delay, final float u, final float v) {
         final Handler handler = new Handler();
         final long start = SystemClock.uptimeMillis() + delay;
         final long duration = 1500;
@@ -749,7 +710,7 @@ public class      MapItemsActivity
                         1 - interpolator.getInterpolation( (float) elapsed / duration ),
                         0
                 );
-                marker.setAnchor(0.5f, 1.0f + 14 * t);
+                marker.setAnchor(u, v + 14 * t);
 
                 if (t > 0.0) {
                     // The animation continues, post again 15ms later

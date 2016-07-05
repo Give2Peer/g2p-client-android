@@ -90,7 +90,7 @@ public class ItemsListViewAdapter extends ArrayAdapter
                 @Override
                 public void onClick(View view) {
                     Activity a = (Activity) getContext();
-                    ((Application) a.getApplication()).showItemPopup(a, item);
+                    ((Application) a.getApplication()).launchViewItem(a, item);
                 }
             });
 
