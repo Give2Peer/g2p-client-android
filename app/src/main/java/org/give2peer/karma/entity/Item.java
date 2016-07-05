@@ -7,6 +7,7 @@ import android.os.Parcelable;
 import com.google.android.gms.maps.model.LatLng;
 import com.orm.SugarRecord;
 
+import org.give2peer.karma.Application;
 import org.give2peer.karma.R;
 import org.give2peer.karma.StringUtils;
 import org.give2peer.karma.exception.CriticalException;
@@ -26,7 +27,7 @@ import java.util.Locale;
 public class Item extends SugarRecord implements Parcelable
 {
 
-//    Long     id;
+    // Long  id; // provided by SugarRecord
     String   title;
     String   description;
     String   type = Item.TYPE_MOOP; // server will only accept one of Item.TYPE_****
@@ -66,11 +67,12 @@ public class Item extends SugarRecord implements Parcelable
         created_at = new DateTime(in.readLong(), DateTimeZone.forID(in.readString()));
         updated_at = new DateTime(in.readLong(), DateTimeZone.forID(in.readString()));
         thumbnail = in.readString();
+        author = in.readParcelable(User.class.getClassLoader());
         tags = in.createStringArrayList();
     }
 
     @Override
-    public void writeToParcel(Parcel parcel, int i) {
+    public void writeToParcel(Parcel parcel, int flags) {
         parcel.writeString(title);
         parcel.writeString(description);
         parcel.writeString(type);
@@ -82,6 +84,7 @@ public class Item extends SugarRecord implements Parcelable
         parcel.writeLong(updated_at.getMillis());
         parcel.writeString(updated_at.getZone().getID());
         parcel.writeString(thumbnail);
+        parcel.writeParcelable(author, flags);
         parcel.writeStringList(tags);
     }
 
@@ -242,7 +245,7 @@ public class Item extends SugarRecord implements Parcelable
      */
     public String getHumanDistance()
     {
-        Locale locale = Locale.getDefault();
+        Locale locale = Application.getLocale();
         String humanDistance = "";
         if (null != distance) {
             int meters = Math.round(distance);

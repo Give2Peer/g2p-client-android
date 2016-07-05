@@ -1,6 +1,9 @@
 package org.give2peer.karma.entity;
 
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import org.apache.commons.lang3.text.WordUtils;
 
 /**
@@ -9,8 +12,11 @@ import org.apache.commons.lang3.text.WordUtils;
  * This class should closely mirror the user model returned by the API.
  * We use GSON to populate instances of this, usually.
  */
-public class User
+public class User implements Parcelable
 {
+    /**
+     * This username can hold pretty much any UTF-8 character.
+     */
     String username;
 
     /**
@@ -35,6 +41,37 @@ public class User
      * Used as a constant in the formulas for levelling up.
      */
     public static final int EXP_LVL_1    = 10;
+
+
+    //// PARCELABLE ////////////////////////////////////////////////////////////////////////////////
+
+    protected User(Parcel in) {
+        username = in.readString();
+        level = in.readInt();
+        karma = in.readInt();
+    }
+
+    @Override
+    public void writeToParcel(Parcel parcel, int i) {
+        parcel.writeString(username);
+        parcel.writeInt(level);
+        parcel.writeInt(karma);
+    }
+
+    @Override
+    public int describeContents() { return 0; }
+
+    public static final Creator<User> CREATOR = new Creator<User>() {
+        @Override
+        public User createFromParcel(Parcel in) {
+            return new User(in);
+        }
+
+        @Override
+        public User[] newArray(int size) {
+            return new User[size];
+        }
+    };
 
 
     //// HUMANIZATION //////////////////////////////////////////////////////////////////////////////
@@ -127,4 +164,5 @@ public class User
     public void setLevel(int level)           { this.level = level;                                }
     public int getKarma()                     { return karma;                                      }
     public void setKarma(int karma)           { this.karma = karma;                                }
+
 }

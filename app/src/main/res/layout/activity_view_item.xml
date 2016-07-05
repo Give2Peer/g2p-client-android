@@ -141,14 +141,14 @@
                 />
 
             <TextView
-                android:id="@+id/viewItemUpdatedAtTextView"
+                android:id="@+id/viewItemAuthorshipTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
                 android:layout_gravity="end"
+                android:textAlignment="textEnd"
                 android:textStyle="italic"
                 android:textSize="12sp"
-                android:textAlignment="textEnd"
                 android:textColor="@color/md_grey_400"
                 />
 

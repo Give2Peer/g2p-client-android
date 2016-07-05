@@ -66,6 +66,7 @@ import org.ocpsoft.prettytime.PrettyTime;
 import java.io.IOException;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import pl.polidea.webimageview.WebImageView;
 
@@ -153,6 +154,12 @@ public class Application extends SugarApp
         return isFirstTime;
     }
 
+    // I18N ////////////////////////////////////////////////////////////////////////////////////////
+
+    public static Locale getLocale() {
+        return Locale.getDefault();
+    }
+
     // USER ////////////////////////////////////////////////////////////////////////////////////////
 
     /**
@@ -190,7 +197,7 @@ public class Application extends SugarApp
                     RegistrationResponse response = null;
 
                     try {
-                        response = restService.preregister();
+                        response = restService.preregister(); // <-- async is for this line
                         config.setUsername(response.getUser().getUsername());
                         if ( ! response.getPassword().isEmpty()) {
                             config.setPassword(response.getPassword());
@@ -297,39 +304,6 @@ public class Application extends SugarApp
         activity.startActivity(intent);
     }
 
-
-//    public boolean onOptionsItemSelected(MenuItem item, Activity activity)
-//    {
-//        // Handle action bar item clicks here. The action bar will
-//        // automatically handle clicks on the Home/Up button, so long
-//        // as you specify a parent activity in AndroidManifest.xml.
-//        int id = item.getItemId();
-//
-//        if (id == R.id.menu_action_settings) {
-//            launchSettings(activity);
-//            return true;
-//        }
-//        if (id == R.id.menu_action_map) {
-//            launchMap(activity);
-//            return true;
-//        }
-////        if (id == R.id.menu_action_profile) {
-////            launchProfile(activity);
-////            return true;
-////        }
-//        // Nah, use the "Share Via..."
-////        if (id == R.id.menu_action_add_item) {
-////            launchNewItem();
-////            return true;
-////        }
-//        // Froyo has its own bug reporting system.
-////        if (id == R.id.menu_action_report_bug) {
-////            launchBugReport(activity);
-////            return true;
-////        }
-//
-//        return false;
-//    }
 
     // SERVERS /////////////////////////////////////////////////////////////////////////////////////
 

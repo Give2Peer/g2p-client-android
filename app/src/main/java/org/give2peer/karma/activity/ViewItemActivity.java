@@ -69,7 +69,7 @@ public class ViewItemActivity
     @ViewById
     TextView viewItemDescriptionTextView;
     @ViewById
-    TextView viewItemUpdatedAtTextView;
+    TextView viewItemAuthorshipTextView;
 
     @ViewById
     NestedScrollView viewItemFormScrollView;
@@ -154,7 +154,9 @@ public class ViewItemActivity
             viewItemDescriptionTextView.setText(item.getDescription());
             viewItemDescriptionTextView.setVisibility(View.VISIBLE);
         }
-        viewItemUpdatedAtTextView.setText(item.getHumanUpdatedAt());
+        viewItemAuthorshipTextView.setText(getString(R.string.time_ago_by_someone,
+                item.getHumanUpdatedAt(), item.getAuthor().getPrettyUsername()
+        ));
     }
 
 

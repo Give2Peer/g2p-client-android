@@ -105,6 +105,9 @@
     <string name="settings_location_forget">Forget this location</string>
     <string name="settings_location_add">Add a location</string>
 
+    <!-- MISC -->
+    <string name="time_ago_by_someone">%1$s by %2$s</string>
+
 
     <!-- TUTORIAL -->
     <string name="tutorial_slide_1_title">Welcome !</string>

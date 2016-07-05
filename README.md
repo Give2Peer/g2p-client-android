@@ -114,18 +114,19 @@ A version for the open beta community.
 - [ ] Feature: a _Licences_ activity.
 
 
-1.5.0
------
+CHANGELOG
+=========
 
-- [ ] Feature: an activity for the details of an item.
+
+1.5.0 (05-07-2016)
+------------------
+
+- [x] Feature: an activity for the details of an item.
 - [x] Feature: provide a description to items.
 - [x] Feature: try to fetch the user's location if not done already when showing the new item map.
 - [x] Feature: iconified radio buttons for item type.
 - [x] Design:  swindle, paint and hack some icons for item types.
 
-
-CHANGELOG
-=========
 
 1.4.0 (22-06-2016)
 ------------------
