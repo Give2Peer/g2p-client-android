@@ -19,8 +19,8 @@ android {
         minSdkVersion 10
         targetSdkVersion 23
 
-        versionCode 9
-        versionName "1.4.0"
+        versionCode 10
+        versionName "1.5.0"
 
         // You can also enable it per-file in the test runner configuration of android studio.
         //testInstrumentationRunner "cucumber.api.android.CucumberInstrumentation"

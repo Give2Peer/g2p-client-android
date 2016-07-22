@@ -88,12 +88,13 @@ In no particular order, these ideas have no release milestone set yet. Some may 
 
 A version for the open beta community.
 
-- [ ] Feature: report an offensive item.
 - [ ] Feature: thank someone for an item.
-- [ ] Refacto: remove all deprecated code.
+- [ ] Cleanup: remove all deprecated code.
 - [ ] Feature: add my email to my user account.
 - [ ] Feature: log in with an existing user account.
 - [ ] Feature: request new credentials by email.
+- [ ] Feature: an _About_ activity.
+- [ ] Feature: a _Licences_ activity.
 
 
 1.7.0
@@ -110,15 +111,14 @@ A version for the open beta community.
 -----
 
 - [ ] Feature: delete items I authored.
-- [ ] Feature: an _About_ activity.
-- [ ] Feature: a _Licences_ activity.
+- [ ] Feature: report an abusive item, since level 1.
 
 
 CHANGELOG
 =========
 
 
-1.5.0 (??-07-2016)
+1.5.0 (05-07-2016)
 ------------------
 
 - [x] Design:  custom map marker icons, version GIMP noob
