@@ -15,6 +15,7 @@ import pl.polidea.webimageview.WebImageListener;
  * When we'll switch to Picasso, this class should be pretty similar.
  * Note: Picasso uses onError and onSuccess, which feels wrong too. To err...or not to err...or not
  */
+@Deprecated
 public class MarkerInfoPolideaWebImageListener implements WebImageListener {
 
     Marker marker;
