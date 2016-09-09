@@ -2,6 +2,9 @@ package org.give2peer.karma.activity;
 
 import android.app.ProgressDialog;
 import android.location.Location;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -55,7 +58,7 @@ abstract public class LocatorBaseActivity extends LocationBaseActivity
 
     @Override
     public LocationConfiguration getLocationConfiguration() {
-        return new LocationConfiguration()
+        LocationConfiguration lc = new LocationConfiguration()
                 .keepTracking(false)
                 .askForGooglePlayServices(false) // 'true' is flaky on API 10, surprise surprise !
                 .setMinAccuracy(50.0f)
@@ -64,6 +67,32 @@ abstract public class LocatorBaseActivity extends LocationBaseActivity
                 .setWaitPeriod(ProviderType.NETWORK, 5 * 1000)
                 .setGPSMessage(getString(R.string.dialog_gps_disabled_msg))
                 .setRationalMessage(getString(getLocationRationale()));
+
+        // There is a bug with Google Play Services on API 10 phones that make it crash when
+        // Internet is not available. We cannot catch other applications crashes, so we skip it.
+        if (! isOnline() && Build.VERSION.SDK_INT <= Build.VERSION_CODES.GINGERBREAD_MR1) {
+            lc.doNotUseGooglePlayServices(true);
+        }
+
+        return lc;
+    }
+
+    /**
+     * Use our ACCESS_NETWORK_STATE to guess if Internet is available.
+     *
+     * People say that this may return false negatives in some edge cases.
+     * It's best to also provide a way for the user to try to connect anyway, which is why we also
+     * have a `/ping` API on the server, that simply answers with "pong" and a 200 HTTP status.
+     * Note : that ping API requires authentication to the server, whereas this method does not.
+     *
+     * @return whether internet is available or not.
+     */
+    public boolean isOnline()
+    {
+        ConnectivityManager cm = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+
+        return activeNetwork != null && activeNetwork.isConnectedOrConnecting();
     }
 
     @Override
