@@ -5,10 +5,12 @@ import android.widget.Toast;
 
 import org.apache.http.auth.AuthenticationException;
 import org.give2peer.karma.R;
+import org.give2peer.karma.exception.AlreadyDoneException;
 import org.give2peer.karma.exception.AuthorizationException;
 import org.give2peer.karma.exception.BadConfigException;
 import org.give2peer.karma.exception.CriticalException;
 import org.give2peer.karma.exception.GeocodingException;
+import org.give2peer.karma.exception.LevelTooLowException;
 import org.give2peer.karma.exception.MaintenanceException;
 import org.give2peer.karma.exception.NoInternetException;
 import org.give2peer.karma.exception.QuotaException;
@@ -64,6 +66,14 @@ public class ExceptionHandler
             on((GeocodingException)exception);
             return true;
         }
+        if (exception instanceof AlreadyDoneException) {
+            on((AlreadyDoneException)exception);
+            return true;
+        }
+        if (exception instanceof LevelTooLowException) {
+            on((LevelTooLowException)exception);
+            return true;
+        }
         if (exception instanceof CriticalException) {
             on((CriticalException)exception);
             return true;
@@ -71,6 +81,25 @@ public class ExceptionHandler
 
         return false;
     }
+
+    /**
+     * @param exception to handle
+     */
+    public void handleExceptionOrFail(Exception exception) {
+        boolean handled = handleException(exception);
+
+        if ( ! handled) {
+            Toast.makeText(activity,
+                    activity.getString(R.string.toast_willingly_uncaught_error),
+                    Toast.LENGTH_LONG
+            ).show();
+            throw new CriticalException(String.format(
+                    "Unhandled %s when reporting an item.", exception.toString()
+            ), exception);
+        }
+    }
+
+
 
     /**
      * A toaster that do not want to take over the world.
@@ -106,6 +135,16 @@ public class ExceptionHandler
     protected void on(AuthorizationException exception)
     {
         toast(R.string.toast_authorization_failure);
+    }
+
+    protected void on(AlreadyDoneException exception)
+    {
+        toast(R.string.toast_already_done);
+    }
+
+    protected void on(LevelTooLowException exception)
+    {
+        toast(R.string.toast_level_too_low);
     }
 
     protected void on(MaintenanceException exception)

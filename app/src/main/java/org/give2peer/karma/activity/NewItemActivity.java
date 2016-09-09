@@ -656,14 +656,7 @@ public  class      NewItemActivity
                             toast(R.string.toast_new_item_error_quota_reached);
                         }
                     };
-                    boolean handled = handler.handleException(e);
-
-                    if ( ! handled) {
-                        app.toasty(getString(R.string.toast_willingly_uncaught_error));
-                        throw new CriticalException(String.format(
-                                "Unhandled %s when adding items.", e.toString()
-                        ), e);
-                    }
+                    handler.handleExceptionOrFail(e);
 
                     // And enable sending again
                     enableSending();

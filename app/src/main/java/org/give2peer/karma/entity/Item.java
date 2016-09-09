@@ -62,6 +62,7 @@ public class Item extends SugarRecord implements Parcelable
     //// PARCELABLE ////////////////////////////////////////////////////////////////////////////////
 
     protected Item(Parcel in) {
+        setId(in.readLong());
         title = in.readString();
         description = in.readString();
         type = in.readString();
@@ -77,6 +78,7 @@ public class Item extends SugarRecord implements Parcelable
 
     @Override
     public void writeToParcel(Parcel parcel, int flags) {
+        parcel.writeLong(getId());
         parcel.writeString(title);
         parcel.writeString(description);
         parcel.writeString(type);

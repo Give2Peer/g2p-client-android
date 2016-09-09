@@ -13,6 +13,7 @@ public class ErrorResponseException extends Exception
 {
 
     ErrorResponse errorResponse;
+
     public ErrorResponseException(ErrorResponse errorResponse) {
         super(errorResponse.getMessage());
         this.errorResponse = errorResponse;

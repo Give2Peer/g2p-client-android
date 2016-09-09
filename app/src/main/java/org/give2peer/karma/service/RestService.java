@@ -43,9 +43,11 @@ import org.apache.http.util.ExceptionUtils;
 import org.give2peer.karma.StringUtils;
 import org.give2peer.karma.entity.Item;
 import org.give2peer.karma.adapter.DateTimeTypeAdapter;
+import org.give2peer.karma.exception.AlreadyDoneException;
 import org.give2peer.karma.exception.AuthenticationException;
 import org.give2peer.karma.exception.BadConfigException;
 import org.give2peer.karma.exception.CriticalException;
+import org.give2peer.karma.exception.LevelTooLowException;
 import org.give2peer.karma.exception.NoInternetException;
 import org.give2peer.karma.response.CreateItemResponse;
 import org.give2peer.karma.response.ErrorResponse;
@@ -60,6 +62,7 @@ import org.give2peer.karma.exception.QuotaException;
 import org.give2peer.karma.exception.UnavailableEmailException;
 import org.give2peer.karma.exception.UnavailableUsernameException;
 import org.give2peer.karma.response.RegistrationResponse;
+import org.give2peer.karma.response.ReportItemResponse;
 import org.joda.time.DateTime;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -103,6 +106,7 @@ public class RestService
     static String ROUTE_CHECK        = "/check";
     static String ROUTE_USER         = "/user";
     static String ROUTE_ITEM         = "/item";
+    static String ROUTE_ITEM_REPORT  = "/item/{id}/report";
     static String ROUTE_ITEM_PICTURE = "/item/{id}/picture";
     static String ROUTE_ITEMS_AROUND = "/items/around/{latitude}/{longitude}";
 
@@ -221,14 +225,14 @@ public class RestService
     public FindItemsResponse findAroundPaginated(double latitude, double longitude, int page)
             throws AuthorizationException, MaintenanceException, AuthenticationException,
             QuotaException, BadConfigException, ErrorResponseException,
-            CriticalException, NoInternetException {
+            CriticalException, NoInternetException, LevelTooLowException, AlreadyDoneException {
         return findAround(latitude, longitude, page * ITEMS_PER_PAGE);
     }
 
     public FindItemsResponse findAround(double latitude, double longitude)
             throws AuthorizationException, MaintenanceException, AuthenticationException,
             QuotaException, BadConfigException, ErrorResponseException,
-            CriticalException, NoInternetException {
+            CriticalException, NoInternetException, LevelTooLowException, AlreadyDoneException {
         return findAround(latitude, longitude, 0);
     }
 
@@ -239,7 +243,7 @@ public class RestService
     public FindItemsResponse findAround(double latitude, double longitude, int offset)
             throws AuthorizationException, MaintenanceException, AuthenticationException,
             QuotaException, BadConfigException, ErrorResponseException,
-            CriticalException, NoInternetException {
+            CriticalException, NoInternetException, AlreadyDoneException, LevelTooLowException {
         String route = ROUTE_ITEMS_AROUND.replaceAll("\\{latitude\\}",  String.valueOf(latitude))
                                          .replaceAll("\\{longitude\\}", String.valueOf(longitude));
 
@@ -266,8 +270,7 @@ public class RestService
             throws
             AuthorizationException, QuotaException, MaintenanceException,
             ErrorResponseException, NoInternetException, BadConfigException,
-            CriticalException, AuthenticationException
-    {
+            CriticalException, AuthenticationException, AlreadyDoneException, LevelTooLowException {
         HashMap<String, String> params = new HashMap<String, String>();
         params.put("location", item.getLocation());
         params.put("title", item.getTitle());
@@ -298,8 +301,7 @@ public class RestService
     public PictureItemResponse pictureItem(Item item, File picture)
             throws
             CriticalException, AuthorizationException, QuotaException, MaintenanceException,
-            NoInternetException, BadConfigException, ErrorResponseException, AuthenticationException
-    {
+            NoInternetException, BadConfigException, ErrorResponseException, AuthenticationException, AlreadyDoneException, LevelTooLowException {
         String route = ROUTE_ITEM_PICTURE.replaceAll("\\{id\\}", item.getId().toString());
 
         HashMap<String, String> params = new HashMap<String, String>();
@@ -323,25 +325,24 @@ public class RestService
 
     public RegistrationResponse preregister()
             throws
-                    // see method below for more details
-                    ErrorResponseException, UnavailableUsernameException, UnavailableEmailException,
-                    AuthorizationException, MaintenanceException, QuotaException, CriticalException,
-                    BadConfigException, NoInternetException, AuthenticationException
-    {
+            // see method below for more details
+            ErrorResponseException, UnavailableUsernameException, UnavailableEmailException,
+            AuthorizationException, MaintenanceException, QuotaException, CriticalException,
+            BadConfigException, NoInternetException, AuthenticationException, AlreadyDoneException, LevelTooLowException {
         return register("", "", "");
     }
 
     public RegistrationResponse register(String username, String password, String email)
             throws
-                UnavailableUsernameException, UnavailableEmailException // obvious
-                , ErrorResponseException  // never if we implement everything the server responds
-                , AuthorizationException  // user is not allowed to so that
-                , AuthenticationException // server credentials don't check out
-                , MaintenanceException    // such pro, very maintain wow
-                , CriticalException       // we want to know when they happen
-                , QuotaException
-                , BadConfigException      // something is badly configured ! User's fault, 99.99%
-                , NoInternetException
+            UnavailableUsernameException, UnavailableEmailException // obvious
+            , ErrorResponseException  // never if we implement everything the server responds
+            , AuthorizationException  // user is not allowed to so that
+            , AuthenticationException // server credentials don't check out
+            , MaintenanceException    // such pro, very maintain wow
+            , CriticalException       // we want to know when they happen
+            , QuotaException
+            , BadConfigException      // something is badly configured ! User's fault, 99.99%
+            , NoInternetException, LevelTooLowException, AlreadyDoneException
 
     {
         HashMap<String, String> params = new HashMap<String, String>();
@@ -371,8 +372,7 @@ public class RestService
     public PrivateProfileResponse getProfile()
             throws
             AuthorizationException, AuthenticationException, QuotaException, MaintenanceException,
-            NoInternetException, ErrorResponseException, BadConfigException, CriticalException
-    {
+            NoInternetException, ErrorResponseException, BadConfigException, CriticalException, AlreadyDoneException, LevelTooLowException {
         String json = getJson(ROUTE_USER);
         // Log.d("G2P", "Profile json reponse :\n"+json);
 
@@ -387,6 +387,30 @@ public class RestService
         }
 
         return privateProfileResponse;
+    }
+
+    /**
+     * fixme
+     */
+    public ReportItemResponse reportItem(Item item)
+            throws
+            AuthorizationException, AuthenticationException, QuotaException, MaintenanceException,
+            NoInternetException, ErrorResponseException, BadConfigException, CriticalException, AlreadyDoneException, LevelTooLowException {
+        String route = ROUTE_ITEM_REPORT.replaceAll("\\{id\\}", item.getId().toString());
+        String json = postJson(route);
+        Log.d("G2P", "REPORT ITEM json reponse :\n"+json);
+
+        ReportItemResponse reportItemResponse = new ReportItemResponse();
+
+        try {
+            Gson gson = createGson();
+            reportItemResponse = gson.fromJson(json, ReportItemResponse.class);
+        } catch (JsonSyntaxException e) {
+            String msg = "Failed to parse report item response :\n%s";
+            throw new CriticalException(String.format(msg, json), e);
+        }
+
+        return reportItemResponse;
     }
 
     // HTTP QUERIES : TESTS ////////////////////////////////////////////////////////////////////////
@@ -408,7 +432,7 @@ public class RestService
     public boolean checkServer()
             throws
             AuthorizationException, AuthenticationException, MaintenanceException, QuotaException,
-            NoInternetException, ErrorResponseException, BadConfigException, CriticalException {
+            NoInternetException, ErrorResponseException, BadConfigException, CriticalException, LevelTooLowException, AlreadyDoneException {
         String json = getJson(ROUTE_HELLO, new HashMap<String, String>(), false);
         return json.equals("\"pong\"");
     }
@@ -427,7 +451,7 @@ public class RestService
     public boolean checkServerAndAuthentication()
             throws
             AuthorizationException, AuthenticationException, MaintenanceException, QuotaException,
-            NoInternetException, ErrorResponseException, BadConfigException, CriticalException {
+            NoInternetException, ErrorResponseException, BadConfigException, CriticalException, AlreadyDoneException, LevelTooLowException {
         String json = getJson(ROUTE_CHECK);
         return json.equals("\"pong\"");
     }
@@ -471,14 +495,14 @@ public class RestService
     public String getJson(String route)
             throws
             CriticalException, MaintenanceException, QuotaException, ErrorResponseException,
-            NoInternetException, BadConfigException, AuthorizationException, AuthenticationException {
-        return this.getJson(route, new HashMap<String, String>(), true);
+            NoInternetException, BadConfigException, AuthorizationException, AuthenticationException, LevelTooLowException, AlreadyDoneException {
+        return getJson(route, new HashMap<String, String>(), true);
     }
 
     public String getJson(String route, HashMap<String, String> parameters)
             throws
             AuthorizationException, QuotaException, MaintenanceException, ErrorResponseException,
-            CriticalException, BadConfigException, NoInternetException, AuthenticationException {
+            CriticalException, BadConfigException, NoInternetException, AuthenticationException, LevelTooLowException, AlreadyDoneException {
         return getJson(route, parameters, true);
     }
 
@@ -492,17 +516,36 @@ public class RestService
     public String getJson(String route, HashMap<String, String> parameters, boolean authenticated)
             throws
             AuthorizationException, QuotaException, MaintenanceException, ErrorResponseException,
-            CriticalException, BadConfigException, NoInternetException, AuthenticationException {
+            CriticalException, BadConfigException, NoInternetException, AuthenticationException, AlreadyDoneException, LevelTooLowException {
         return requestJson(METHOD_GET, route, parameters, authenticated, null);
     }
 
 
-    public String postJson(String route, HashMap<String, String> parameters) throws CriticalException, AuthorizationException, QuotaException, MaintenanceException, NoInternetException, BadConfigException, ErrorResponseException, AuthenticationException {
+    public String postJson(String route, HashMap<String, String> parameters) throws CriticalException, AuthorizationException, QuotaException, MaintenanceException, NoInternetException, BadConfigException, ErrorResponseException, AuthenticationException, LevelTooLowException, AlreadyDoneException {
         return postJson(route, parameters, true);
     }
 
 
-    public String postJson(String route, HashMap<String, String> parameters, boolean authenticated) throws CriticalException, AuthorizationException, QuotaException, MaintenanceException, NoInternetException, BadConfigException, ErrorResponseException, AuthenticationException {
+    public String postJson(String route) throws CriticalException, AuthorizationException, QuotaException, MaintenanceException, NoInternetException, BadConfigException, ErrorResponseException, AuthenticationException, LevelTooLowException, AlreadyDoneException {
+        return postJson(route, new HashMap<String, String>(), true);
+    }
+
+
+    /**
+     * @param route
+     * @param parameters
+     * @param authenticated
+     * @return The JSON as string.
+     * @throws CriticalException
+     * @throws AuthorizationException
+     * @throws QuotaException
+     * @throws MaintenanceException
+     * @throws NoInternetException
+     * @throws BadConfigException
+     * @throws ErrorResponseException
+     * @throws AuthenticationException
+     */
+    public String postJson(String route, HashMap<String, String> parameters, boolean authenticated) throws CriticalException, AuthorizationException, QuotaException, MaintenanceException, NoInternetException, BadConfigException, ErrorResponseException, AuthenticationException, AlreadyDoneException, LevelTooLowException {
         return requestJson(METHOD_POST, route, parameters, authenticated, null);
     }
 
@@ -538,9 +581,7 @@ public class RestService
             , CriticalException      // we want to know when they happen
             , QuotaException         // (daily) quotas were exceeded
             , BadConfigException     // something is badly configured ! User's fault, 99.99%
-            , NoInternetException
-
-    {
+            , NoInternetException, LevelTooLowException, AlreadyDoneException {
         String url = makeUrl(route);
 
         HttpResponse response = null;
@@ -665,6 +706,12 @@ public class RestService
                     }
                     if (errorResponse.isBadUsername()) {
                         throw new UnavailableUsernameException(errorResponse);
+                    }
+                    if (errorResponse.isAlreadyDone()) {
+                        throw new AlreadyDoneException();
+                    }
+                    if (errorResponse.isLevelTooLow()) {
+                        throw new LevelTooLowException();
                     }
                 }
 

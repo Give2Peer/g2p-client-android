@@ -1,9 +1,12 @@
 package org.give2peer.karma.activity;
 
 import android.Manifest;
+import android.app.Activity;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.AppBarLayout;
@@ -11,9 +14,11 @@ import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AlertDialog;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -36,6 +41,9 @@ import org.give2peer.karma.R;
 import org.give2peer.karma.entity.Item;
 import org.give2peer.karma.event.LocationUpdateEvent;
 import org.give2peer.karma.exception.CriticalException;
+import org.give2peer.karma.exception.QuotaException;
+import org.give2peer.karma.response.ReportItemResponse;
+import org.give2peer.karma.service.ExceptionHandler;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
@@ -53,6 +61,7 @@ import java.util.Locale;
  *
  * FAB ideas :
  * - Navigate To
+ * - Edit, when you're the author
  */
 @EActivity(R.layout.activity_view_item)
 public class ViewItemActivity
@@ -82,6 +91,8 @@ public class ViewItemActivity
     TextView viewItemDescriptionTextView;
     @ViewById
     TextView viewItemAuthorshipTextView;
+    @ViewById
+    Button   viewItemReportButton;
 
     @ViewById
     NestedScrollView viewItemFormScrollView;
@@ -131,7 +142,6 @@ public class ViewItemActivity
     protected void onResume() {
         super.onResume();
         // If the user is not preregistered, let's do this dudeez !
-        // fixme: move auth to a base class ?
         app.requireAuthentication(this);
 
         // We never know, maybe the map and location are ready already ?
@@ -139,7 +149,7 @@ public class ViewItemActivity
     }
 
 
-    //// EVENTBUS LISTENERS ////////////////////////////////////////////////////////////////////////
+    //// EVENT BUS LISTENERS ///////////////////////////////////////////////////////////////////////
 
     @Subscribe
     public void updateMapWhenLocated(LocationUpdateEvent locationUpdateEvent) {
@@ -393,6 +403,85 @@ public class ViewItemActivity
         startActivity(intent);
     }
 
-    //// UTILS /////////////////////////////////////////////////////////////////////////////////////
+    @Click
+    public void viewItemReportButtonClicked() {
+        final Application app = this.app;
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage("Are you sure you want to report this item as abusive ? This operation cannot be cancelled !")
+                .setPositiveButton(R.string.dialog_item_report_positive, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        doItemReport();
+                    }
+                })
+                .setNegativeButton(R.string.dialog_item_report_negative, null);
+        builder.create().show();
+    }
+
+    protected void doItemReport() {
+        final Application app = this.app;
+        final Activity activity = this;
+
+        viewItemReportButton.setEnabled(false);
+
+        new AsyncTask<Void, Void, Void>()
+        {
+            ReportItemResponse report;
+            Exception e;
+
+            @Override
+            protected Void doInBackground(Void... nope)
+            {
+                try {
+                    report = app.getRestService().reportItem(item);
+                } catch (Exception oops) {
+                    e = oops;
+                }
+
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Void nope)
+            {
+                super.onPostExecute(nope);
+
+                //profileLoadingProgressBar.setVisibility(View.GONE);
+
+                if (null != report) {
+
+                    if (report.wasItemDeleted()) {
+                        app.toasty("Item successfully reported as abusive, and subsequently deleted.");
+                    } else {
+                        app.toasty("Item successfully reported as abusive !");
+                    }
+
+
+                } else if (null != e) {
+
+                    // Log
+                    String loggedMsg = e.getMessage();
+                    if ( ! (null == loggedMsg || loggedMsg.isEmpty()))  {
+                        Log.e("G2P", e.getMessage());
+                    }
+                    e.printStackTrace();
+
+                    // Handle the exception
+                    ExceptionHandler handler = new ExceptionHandler(activity);
+                    boolean handled = handler.handleException(e);
+                    if (! handled) {
+                         app.toasty(e.getMessage());
+                    }
+
+                    // Restore the UI
+                    viewItemReportButton.setEnabled(true);
+
+                } else {
+                    Log.e("G2P", "You broke the matrix. Happy?");
+                    //throw new CriticalException("You broke the code ! Booo !");
+                }
+            }
+        }.execute();
+    }
 
 }

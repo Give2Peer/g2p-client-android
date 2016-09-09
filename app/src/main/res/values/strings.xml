@@ -51,6 +51,8 @@
     <string name="dialog_find_items_location_rationale">To find items around you, you need to allow Karma to access your location. Do so now ?</string>
     <string name="dialog_new_item_location_rationale">To locate the item you want to add, you need to allow Karma to access your location. Do so now ?</string>
     <string name="dialog_preregistration">Signing in…</string>
+    <string name="dialog_item_report_negative">Cancel</string>
+    <string name="dialog_item_report_positive">Report</string>
 
     <string name="toast_new_item_uploading">Uploading new item…</string>
     <string name="toast_new_item_uploaded">Item %s was uploaded.\nWell done!</string>
@@ -71,6 +73,8 @@
     <string name="toast_willingly_uncaught_error">Something went wrong with your device and we let the app crash so you can report a bug.</string>
     <string name="toast_authentication_failure">You are not authenticated, or your credentials don\'t check out.</string>
     <string name="toast_authorization_failure">You are not authorized to do that.</string>
+    <string name="toast_level_too_low">Your karmic level is too low for this action.</string>
+    <string name="toast_already_done">You already did that.</string>
     <string name="toast_permission_read_denied">Permission to read the pictures denied.\nTry again when you feel less paranoid.</string>
 
     <string name="title_current_location">Current location</string>

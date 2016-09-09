@@ -25,22 +25,23 @@ class Error
 
 /**
  * Populated by the responses sent back when the HTTP status code is >= 400.
- *
- * /!\
- *     Documentation server-side about this is non-existent.
  */
 public class ErrorResponse
 {
 
-    static int UNAVAILABLE_USERNAME = 1; // we use this
-    static int BANNED_FOR_ABUSE     = 2;
-    static int UNSUPPORTED_FILE     = 3;
-    static int NOT_AUTHORIZED       = 4; // we catch the 401 HTTP status code so this is never used
-    static int SYSTEM_ERROR         = 5;
-    static int BAD_LOCATION         = 6;
-    static int UNAVAILABLE_EMAIL    = 7; // use use this
-    static int EXCEEDED_QUOTA       = 8; // we catch the 429 HTTP status code so this is never used
-    static int BAD_USERNAME         = 9; // we use this
+    static int UNAVAILABLE_USERNAME =  1; // we use this
+    static int BANNED_FOR_ABUSE     =  2;
+    static int UNSUPPORTED_FILE     =  3;
+    static int NOT_AUTHORIZED       =  4; // we catch the 401 HTTP status code so this is never used
+    static int SYSTEM_ERROR         =  5;
+    static int BAD_LOCATION         =  6;
+    static int UNAVAILABLE_EMAIL    =  7; // use use this
+    static int EXCEEDED_QUOTA       =  8; // we catch the 429 HTTP status code so this is never used
+    static int BAD_USERNAME         =  9; // we use this
+    static int BAD_USER_ID          = 10;
+    static int BAD_ITEM_TYPE        = 11;
+    static int LEVEL_TOO_LOW        = 12;
+    static int ALREADY_DONE         = 13;
 
     Error error;
 
@@ -80,5 +81,14 @@ public class ErrorResponse
     public boolean isBadEmail() {
         return hasError() && getErrorCode() == UNAVAILABLE_EMAIL;
     }
+
+    public boolean isLevelTooLow() {
+        return hasError() && getErrorCode() == LEVEL_TOO_LOW;
+    }
+
+    public boolean isAlreadyDone() {
+        return hasError() && getErrorCode() == ALREADY_DONE;
+    }
+
 
 }
