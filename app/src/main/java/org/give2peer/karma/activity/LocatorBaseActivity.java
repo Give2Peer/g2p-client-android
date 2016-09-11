@@ -60,7 +60,6 @@ abstract public class LocatorBaseActivity extends LocationBaseActivity
     public LocationConfiguration getLocationConfiguration() {
         LocationConfiguration lc = new LocationConfiguration()
                 .keepTracking(false)
-                .askForGooglePlayServices(false) // 'true' is flaky on API 10, surprise surprise !
                 .setMinAccuracy(50.0f)
                 .setWaitPeriod(ProviderType.GOOGLE_PLAY_SERVICES, 5 * 1000)
                 .setWaitPeriod(ProviderType.GPS, 10 * 1000)
@@ -68,8 +67,14 @@ abstract public class LocatorBaseActivity extends LocationBaseActivity
                 .setGPSMessage(getString(R.string.dialog_gps_disabled_msg))
                 .setRationalMessage(getString(getLocationRationale()));
 
-        // There is a bug with Google Play Services on API 10 phones that make it crash when
+        // Asking is flaky on older versions, on API 10 for sure.
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            lc.askForGooglePlayServices(true);
+        }
+
+        // There is a bug with Google Play Services on API 10 phones that makes it crash when
         // Internet is not available. We cannot catch other applications crashes, so we skip it.
+        // That bug will never ever get fixed upstream, so this piece of monkey poop will dry.
         if (! isOnline() && Build.VERSION.SDK_INT <= Build.VERSION_CODES.GINGERBREAD_MR1) {
             lc.doNotUseGooglePlayServices(true);
         }

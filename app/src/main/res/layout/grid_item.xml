@@ -6,6 +6,7 @@
     android:background="@drawable/abc_list_selector_holo_dark"
     >
 
+    <!-- @Deprecated -->
     <!-- THIS IS NOT USED ANYMORE -->
 
     <pl.polidea.webimageview.WebImageView

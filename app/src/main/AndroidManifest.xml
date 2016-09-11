@@ -53,7 +53,10 @@
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
 
+
+        <!-- IMPORTANT NOTE -->
         <!-- Activities are suffixed by _ for AndroidAnnotations, as it generates subclasses. -->
+
 
         <!-- Map : the launcher immediately shows the items around the user's location. -->
         <activity
@@ -92,6 +95,12 @@
         <!-- Profile -->
         <activity
             android:name="org.give2peer.karma.activity.ProfileActivity_"
+            >
+        </activity>
+
+        <!-- About -->
+        <activity
+            android:name="org.give2peer.karma.activity.AboutActivity_"
             >
         </activity>
 

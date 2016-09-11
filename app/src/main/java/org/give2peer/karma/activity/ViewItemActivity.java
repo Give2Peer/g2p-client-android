@@ -281,12 +281,11 @@ public class ViewItemActivity
     }
 
     /**
-     * Note that this is faillible.
+     * Note that this is not 100% reliable.
      * Sometimes, it's true, but layout has not yet occurred for the map and its dimensions or
      * zooming methods are unavailable and will raise errors. This is because the map starts with
      * no visibility and we display it only when the user presses the map button.
      * Therefore, we complement this with `isMapLoaded()`.
-     * @return
      */
     protected boolean isMapReady() {
         return null != googleMap;
@@ -401,6 +400,11 @@ public class ViewItemActivity
                         item.getLatitude(), item.getLongitude()
                 )));
         startActivity(intent);
+    }
+
+    @Click
+    public void viewItemThankButtonClicked() {
+        app.toasty("You will be able to thank the author of that item in the future.");
     }
 
     @Click

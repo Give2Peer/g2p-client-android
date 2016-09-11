@@ -75,6 +75,9 @@ In no particular order, these ideas have no release milestone set yet. Some may 
 - [ ] Feature: add my facebook to my user account.
 - [ ] Feature: add my google+ to my user account.
 - [ ] Feature: add my twitter to my user account.
+- [ ] Feature: share added item on facebook.
+- [ ] Feature: share added item on twitter.
+- [ ] Feature: share added item on google+.
 - [ ] Feature: show items around as a list from closest to furthest.
 - [ ] Feature: communities.
 - [ ] Feature: a logging utility that we can more easily disable for production.
@@ -103,7 +106,6 @@ A version for the open beta community.
 - [ ] Feature: all-time world leaderboard.
 - [ ] Feature: I18N (Interplanetarization) for left-to-right languages.
 - [ ] L10N:    français.
-- [ ] BugHunt: google play services crashes when internet is unavailable.
 - [ ] BugHunt: issue #2: item images are mishandled.
 
 
@@ -111,7 +113,8 @@ A version for the open beta community.
 -----
 
 - [ ] Feature: delete items I authored.
-- [ ] Feature: report an abusive item, since level 1.
+- [x] BugHunt: google play services crashes when internet is unavailable on API 10.
+- [x] Feature: report an abusive item, since level 1.
 
 
 CHANGELOG

@@ -2,6 +2,7 @@ package org.give2peer.karma;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -15,7 +16,6 @@ import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
-import android.os.Parcelable;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
@@ -24,7 +24,6 @@ import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.PopupWindow;
@@ -45,15 +44,16 @@ import com.shamanland.fab.FloatingActionButton;
 
 import net.danlew.android.joda.JodaTimeAndroid;
 
+import org.give2peer.karma.activity.AboutActivity_;
 import org.give2peer.karma.activity.LoginActivity_;
 import org.give2peer.karma.activity.MapItemsActivity_;
 import org.give2peer.karma.activity.NewItemActivity_;
 import org.give2peer.karma.activity.ProfileActivity_;
 import org.give2peer.karma.activity.SettingsActivity;
 import org.give2peer.karma.activity.ViewItemActivity_;
+import org.give2peer.karma.entity.Item;
 import org.give2peer.karma.entity.Location;
 import org.give2peer.karma.entity.Server;
-import org.give2peer.karma.entity.Item;
 import org.give2peer.karma.event.AuthenticationEvent;
 import org.give2peer.karma.exception.GeocodingException;
 import org.give2peer.karma.exception.NoInternetException;
@@ -288,6 +288,11 @@ public class Application extends SugarApp
     public void launchSettings(Activity activity)
     {
         launchActivity(activity, SettingsActivity.class);
+    }
+
+    public void launchAbout(Activity activity)
+    {
+        launchActivity(activity, AboutActivity_.class);
     }
 
     /**
@@ -794,10 +799,13 @@ public class Application extends SugarApp
 
     // NAVIGATION DRAWER ///////////////////////////////////////////////////////////////////////////
 
-    public static long NAVIGATION_DRAWER_ITEM_MAP = 2;
+    public static long NAVIGATION_DRAWER_ITEM_MAP     = 2;
     public static long NAVIGATION_DRAWER_ITEM_PROFILE = 3;
+    public static long NAVIGATION_DRAWER_ITEM_ABOUT   = 4;
 
     /**
+     * Set up the navigation drawer. It's a complex setup that we don't want to repeat in each and
+     * every activity, hence its presence in the Application.
      *
      * @param activity
      * @param toolbar the Toolbar to replace the default Appbar
@@ -863,6 +871,20 @@ public class Application extends SugarApp
                 })
                 ;
 
+        PrimaryDrawerItem aboutDrawerItem = new PrimaryDrawerItem()
+                .withName(R.string.menu_action_about)
+                .withIcon(R.drawable.ic_karma_black_36dp)
+                .withIconTintingEnabled(true)
+                .withIdentifier(NAVIGATION_DRAWER_ITEM_ABOUT)
+                .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
+                    @Override
+                    public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
+                        launchAbout(activity);
+                        return true;
+                    }
+                })
+                ;
+
         DrawerBuilder drawerBuilder = new DrawerBuilder().withActivity(activity)
                 .withToolbar(toolbar)
                 .addDrawerItems(
@@ -870,7 +892,8 @@ public class Application extends SugarApp
                         profileDrawerItem,
                         addDrawerItem,
                         new DividerDrawerItem(),
-                        settingsDrawerItem
+                        settingsDrawerItem,
+                        aboutDrawerItem
                 )
                 .withSelectedItem(selectedDrawerItem)
                 ;
@@ -887,6 +910,22 @@ public class Application extends SugarApp
 //            navigationDrawer.setSelection(selectedDrawerItem);
 //        }
 //    }
+
+
+    // INTENTS /////////////////////////////////////////////////////////////////////////////////////
+
+    /**
+     * Open the provided url in the user's preferred web browser.
+     */
+    public void openBrowser(final Activity activity, String url) {
+        try {
+            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+            activity.startActivity(browserIntent);
+        } catch (ActivityNotFoundException e) {
+            toasty("No application can handle this request. Please install a web browser.");
+            e.printStackTrace();
+        }
+    }
 
 
     /**
