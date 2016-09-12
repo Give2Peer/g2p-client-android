@@ -173,6 +173,18 @@ public class Application extends SugarApp
         return null != server && server.isComplete();
     }
 
+    /**
+     * @return the username of the current user, or an empty string.
+     */
+    public String getUsername()
+    {
+        Server server = getCurrentServer();
+        if (null != server) {
+            return server.getUsername();
+        } else {
+            return "";
+        }
+    }
 
     public void requireAuthentication(final Activity activity)
     {

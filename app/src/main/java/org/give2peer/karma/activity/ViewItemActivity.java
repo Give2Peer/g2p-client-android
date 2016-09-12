@@ -35,6 +35,8 @@ import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.ViewById;
+import org.androidannotations.annotations.rest.Get;
+import org.androidannotations.annotations.rest.Rest;
 import org.give2peer.karma.Application;
 import org.give2peer.karma.LatLngUtils;
 import org.give2peer.karma.R;
@@ -93,6 +95,12 @@ public class ViewItemActivity
     TextView viewItemAuthorshipTextView;
     @ViewById
     Button   viewItemReportButton;
+    @ViewById
+    Button   viewItemThankButton;
+    @ViewById
+    Button   viewItemDeleteButton;
+    @ViewById
+    Button   viewItemEditButton;
 
     @ViewById
     NestedScrollView viewItemFormScrollView;
@@ -180,6 +188,18 @@ public class ViewItemActivity
         viewItemAuthorshipTextView.setText(getString(R.string.time_ago_by_someone,
                 item.getHumanUpdatedAt(), item.getAuthor().getPrettyUsername()
         ));
+    }
+
+
+    @AfterViews
+    public void enableOrDisableActionButtons() {
+        if (app.getUsername().equals(item.getAuthor().getUsername())) {
+            viewItemDeleteButton.setVisibility(View.VISIBLE);
+            //viewItemEditButton.setVisibility(View.VISIBLE);
+
+            viewItemReportButton.setVisibility(View.GONE);
+            viewItemThankButton.setVisibility(View.GONE);
+        }
     }
 
 
