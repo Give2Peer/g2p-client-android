@@ -10,11 +10,16 @@ import android.support.v7.widget.Toolbar;
 import com.mikepenz.materialdrawer.Drawer;
 
 import org.androidannotations.annotations.AfterViews;
+import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EActivity;
+import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
+import org.androidannotations.annotations.rest.RestService;
 import org.give2peer.karma.Application;
 import org.give2peer.karma.R;
+import org.give2peer.karma.response.Stats;
+import org.give2peer.karma.service.RestClient;
 
 
 /**
@@ -43,6 +48,23 @@ public class AboutActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         app = (Application) getApplication();
+    }
+
+    // STATS ///////////////////////////////////////////////////////////////////////////////////////
+
+    @RestService
+    RestClient restClient;
+
+    @Background
+    @AfterViews
+    void fetchStats() {
+        Stats stats = restClient.getStats();
+        updateInterfaceWithStats(stats);
+    }
+
+    @UiThread
+    void updateInterfaceWithStats(Stats stats) {
+        app.toasty(String.format("%d", stats.getItemsCount()));
     }
 
     // NAVIGATION DRAWER ///////////////////////////////////////////////////////////////////////////

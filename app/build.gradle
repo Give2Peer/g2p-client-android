@@ -47,8 +47,10 @@ android {
         exclude 'META-INF/DEPENDENCIES'
         exclude 'META-INF/NOTICE'
         exclude 'META-INF/NOTICE.txt'
+        exclude 'META-INF/notice.txt'
         exclude 'META-INF/LICENSE'
         exclude 'META-INF/LICENSE.txt'
+        exclude 'META-INF/license.txt'
         exclude 'LICENSE.txt'
     }
 }
@@ -79,8 +81,11 @@ dependencies {
     compile 'com.github.machinarius:preferencefragment:0.1.1' // we'll probably remove this
 
     // ANDROID ANNOTATIONS (unsure why we have both apt and compile directives)
+    // Do not update this to 4.x yet.
     apt 'org.androidannotations:androidannotations:3.3.2'
     compile 'org.androidannotations:androidannotations-api:3.3.2'
+    // AA depends on Spring, and weirdly asks us to add the dep ourselves ?
+    compile 'org.springframework.android:spring-android-rest-template:1.0.1.RELEASE'
 
     // GOOGLE - MAPS API
     compile 'com.google.android.gms:play-services-maps:8.4.0'
