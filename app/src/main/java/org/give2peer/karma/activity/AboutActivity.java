@@ -64,6 +64,7 @@ public class AboutActivity extends AppCompatActivity
 
     @UiThread
     void updateInterfaceWithStats(Stats stats) {
+        // fixme: fill the page instead of toasting
         app.toasty(String.format("%d", stats.getItemsCount()));
     }
 

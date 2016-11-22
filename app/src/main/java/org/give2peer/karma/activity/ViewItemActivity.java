@@ -315,7 +315,7 @@ public class ViewItemActivity
 
     /**
      * If we don't check this, `CameraUpdateFactory.newLatLngBounds` will fail.
-     * This becomes true when our `GoogleMap.OnMapLoadedCallback` has been called.
+     * This only returns true when our `GoogleMap.OnMapLoadedCallback` has been called.
      */
     protected boolean isMapLoaded() {
         return mapLoaded;
