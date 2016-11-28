@@ -44,6 +44,7 @@ import org.give2peer.karma.entity.Item;
 import org.give2peer.karma.event.LocationUpdateEvent;
 import org.give2peer.karma.exception.CriticalException;
 import org.give2peer.karma.exception.QuotaException;
+import org.give2peer.karma.response.DeleteItemResponse;
 import org.give2peer.karma.response.ReportItemResponse;
 import org.give2peer.karma.service.ExceptionHandler;
 import org.greenrobot.eventbus.EventBus;
@@ -391,6 +392,7 @@ public class ViewItemActivity
         viewItemImageWrapper.setVisibility(View.VISIBLE);
         canDragYet(true);
     }
+
     /**
      * Shows the map in the collapsing app bar instead of the picture.
      * Does nothing if the map is already shown.
@@ -426,6 +428,80 @@ public class ViewItemActivity
     public void viewItemThankButtonClicked() {
         app.toasty("You will be able to thank the author of that item in the future.");
     }
+
+
+    @Click
+    public void viewItemDeleteButtonClicked() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage("Are you sure this item is not available anymore ?")
+                .setPositiveButton(R.string.dialog_positive, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        deleteItem();
+                    }
+                })
+                .setNegativeButton(R.string.dialog_negative, null);
+        builder.create().show();
+    }
+
+    // AAAAAARGH, we could refactor this into a just few lines with AA's RestCient !
+    protected void deleteItem() {
+        final Application app = this.app;
+        final Activity activity = this;
+
+        viewItemDeleteButton.setEnabled(false);
+
+        new AsyncTask<Void, Void, Void>()
+        {
+            DeleteItemResponse report;
+            Exception e;
+
+            @Override
+            protected Void doInBackground(Void... nope)
+            {
+                try {
+                    report = app.getRestService().deleteItem(item);
+                } catch (Exception oops) {
+                    e = oops;
+                }
+
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Void nope)
+            {
+                super.onPostExecute(nope);
+
+                if (null != report) {
+
+                    app.toast("Item was deleted.");
+                    finish();
+
+                } else if (null != e) {
+
+                    // Log
+                    String loggedMsg = e.getMessage();
+                    if ( ! (null == loggedMsg || loggedMsg.isEmpty())) {
+                        Log.e("G2P", e.getMessage());
+                    }
+                    e.printStackTrace();
+
+                    // Handle the exception
+                    ExceptionHandler handler = new ExceptionHandler(activity);
+                    handler.handleExceptionOrFail(e); // brutality, until beta ends
+
+                    // Restore the UI
+                    viewItemDeleteButton.setEnabled(true);
+
+                } else {
+                    throw new CriticalException("You broke the code ! Booo !");
+                }
+            }
+        }.execute();
+    }
+
+
+    //// REPORTING FOR ABUSE ///////////////////////////////////////////////////////////////////////
 
     @Click
     public void viewItemReportButtonClicked() {
@@ -470,39 +546,34 @@ public class ViewItemActivity
             {
                 super.onPostExecute(nope);
 
-                //profileLoadingProgressBar.setVisibility(View.GONE);
-
                 if (null != report) {
 
                     if (report.wasItemDeleted()) {
-                        app.toasty("Item successfully reported as abusive, and subsequently deleted.");
+                        // fixme l10n
+                        app.toasty("Item reported as abusive,\nand subsequently deleted.");
+                        finish();
                     } else {
                         app.toasty("Item successfully reported as abusive !");
                     }
-
 
                 } else if (null != e) {
 
                     // Log
                     String loggedMsg = e.getMessage();
-                    if ( ! (null == loggedMsg || loggedMsg.isEmpty()))  {
+                    if ( ! (null == loggedMsg || loggedMsg.isEmpty())) {
                         Log.e("G2P", e.getMessage());
                     }
                     e.printStackTrace();
 
                     // Handle the exception
                     ExceptionHandler handler = new ExceptionHandler(activity);
-                    boolean handled = handler.handleException(e);
-                    if (! handled) {
-                         app.toasty(e.getMessage());
-                    }
+                    handler.handleExceptionOrFail(e); // brutality, until beta ends
 
                     // Restore the UI
                     viewItemReportButton.setEnabled(true);
 
                 } else {
-                    Log.e("G2P", "You broke the matrix. Happy?");
-                    //throw new CriticalException("You broke the code ! Booo !");
+                    throw new CriticalException("You broke the code ! Booo !");
                 }
             }
         }.execute();

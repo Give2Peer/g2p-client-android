@@ -3,10 +3,6 @@ Karma
 
 This is the source of the Android client application [Karma](http://give2peer.org).
 
-It is made to be a client to the [Give2Peer REST API](http://g2p.give2peer.org/),
-run by another FLOSS [server](https://github.com/Give2Peer/g2p-server-symfony) written in PHP,
-and [heavily featured](https://github.com/Give2Peer/g2p-server-symfony/tree/master/features#what).
-
 
 Goal
 ----
@@ -53,6 +49,13 @@ It's easier said than done, of course.
 Then again, Google should make a lost&found/ownership app altogether. Any big player should.
 
 
+Server
+------
+
+This is made to be a client to the [Give2Peer REST API](http://g2p.give2peer.org/),
+run by another FLOSS [server](https://github.com/Give2Peer/g2p-server-symfony) written in PHP,
+and [heavily featured](https://github.com/Give2Peer/g2p-server-symfony/tree/master/features#what).
+
 
 Roadmap
 =======
@@ -96,7 +99,6 @@ A version for the open beta community.
 - [ ] Feature: add my email to my user account.
 - [ ] Feature: log in with an existing user account.
 - [ ] Feature: request new credentials by email.
-- [ ] Feature: an _About_ activity.
 - [ ] Feature: a _Licences_ activity.
 
 
@@ -112,7 +114,8 @@ A version for the open beta community.
 1.6.0
 -----
 
-- [ ] Feature: delete items I authored.
+- [ ] Feature: an _About_ activity.
+- [x] Feature: delete items I authored.
 - [x] BugHunt: google play services crashes when internet is unavailable on API 10.
 - [x] Feature: report an abusive item, since level 1.
 

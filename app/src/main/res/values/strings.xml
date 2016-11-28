@@ -53,6 +53,8 @@
     <string name="about_button_report">Report Bug</string>
     <string name="about_button_email">Email Authors</string>
 
+    <string name="dialog_negative">No</string>
+    <string name="dialog_positive">Yes</string>
     <string name="dialog_gps_disabled_msg">Karma works best with GPS.\nEnable the GPS now ?</string>
     <string name="dialog_default_location_rationale">Karma is about geolocating items. You need to allow it to access your location. Do so now ?</string>
     <string name="dialog_find_items_location_rationale">To find items around you, you need to allow Karma to access your location. Do so now ?</string>

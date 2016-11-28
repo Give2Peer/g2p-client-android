@@ -73,7 +73,7 @@ repositories {
 }
 
 dependencies {
-    // We actually shouldn't have any of those, feels like bad practice
+    // We actually shouldn't have any of those, it feels like bad practice
     compile fileTree(dir: 'libs', include: ['*.jar'])
 
     // BACKWARDS COMPATIBILITY (http://developer.android.com/tools/support-library/features.html)

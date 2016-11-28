@@ -50,6 +50,7 @@ import org.give2peer.karma.exception.CriticalException;
 import org.give2peer.karma.exception.LevelTooLowException;
 import org.give2peer.karma.exception.NoInternetException;
 import org.give2peer.karma.response.CreateItemResponse;
+import org.give2peer.karma.response.DeleteItemResponse;
 import org.give2peer.karma.response.ErrorResponse;
 import org.give2peer.karma.response.FindItemsResponse;
 import org.give2peer.karma.response.PictureItemResponse;
@@ -107,6 +108,7 @@ public class RestService
     static String ROUTE_USER         = "/user";
     static String ROUTE_ITEM         = "/item";
     static String ROUTE_ITEM_REPORT  = "/item/{id}/report";
+    static String ROUTE_ITEM_DELETE  = "/item/{id}/delete";
     static String ROUTE_ITEM_PICTURE = "/item/{id}/picture";
     static String ROUTE_ITEMS_AROUND = "/items/around/{latitude}/{longitude}";
 
@@ -398,7 +400,6 @@ public class RestService
             NoInternetException, ErrorResponseException, BadConfigException, CriticalException, AlreadyDoneException, LevelTooLowException {
         String route = ROUTE_ITEM_REPORT.replaceAll("\\{id\\}", item.getId().toString());
         String json = postJson(route);
-        Log.d("G2P", "REPORT ITEM json reponse :\n"+json);
 
         ReportItemResponse reportItemResponse = new ReportItemResponse();
 
@@ -411,6 +412,31 @@ public class RestService
         }
 
         return reportItemResponse;
+    }
+
+    /**
+     * fixme
+     */
+    public DeleteItemResponse deleteItem(Item item)
+            throws
+            AuthorizationException, AuthenticationException, QuotaException, MaintenanceException,
+            NoInternetException, ErrorResponseException, BadConfigException, CriticalException,
+            AlreadyDoneException, LevelTooLowException {
+        String route = ROUTE_ITEM_DELETE.replaceAll("\\{id\\}", item.getId().toString());
+        String json = postJson(route);
+        Log.d("G2P", "Delete Item json reponse :\n"+json);
+
+        DeleteItemResponse response = new DeleteItemResponse();
+
+        try {
+            Gson gson = createGson();
+            response = gson.fromJson(json, DeleteItemResponse.class);
+        } catch (JsonSyntaxException e) {
+            String msg = "Failed to parse delete item response :\n%s";
+            throw new CriticalException(String.format(msg, json), e);
+        }
+
+        return response;
     }
 
     // HTTP QUERIES : TESTS ////////////////////////////////////////////////////////////////////////
