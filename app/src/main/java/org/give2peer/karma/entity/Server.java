@@ -4,11 +4,15 @@ package org.give2peer.karma.entity;
 /**
  * This is a persistable entity.
  *
+ * Important note : 10.0.2.2 is always the IP of the computer running the emulator.
+ *                  Pretty useful for development, as the server is easily run locally.
+ *
  * Possible names :
  * - ServerConfiguration (bit long)
  */
 public class Server extends BaseEntity
 {
+//    public static String DEFAULT_URL = "http://10.0.2.2:7676/v1";
     public static String DEFAULT_URL = "http://g2p.give2peer.org/v1";
     public static String DEFAULT_NAME = "Give2Peer";
     public static String DEFAULT_USERNAME = ""; // the emptiness is detected in the app onCreate
@@ -20,7 +24,7 @@ public class Server extends BaseEntity
     String password = "";
 
     /**
-     * We use this in the registration activity to either try to register a new account (if this is
+     * We use this in the registratiogouttonio@gmail.comn activity to either try to register a new account (if this is
      * true) or try to edit an existing account (if this is false) because we only pre-registered.
      */
     boolean isEditedByUser = false;

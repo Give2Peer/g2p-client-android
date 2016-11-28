@@ -1,5 +1,6 @@
 package org.give2peer.karma.activity;
 
+import android.app.Activity;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
@@ -33,8 +34,10 @@ import org.give2peer.karma.event.AuthoredItemsUpdateEvent;
 import org.give2peer.karma.event.UserUpdateEvent;
 import org.give2peer.karma.exception.CriticalException;
 import org.give2peer.karma.exception.NoInternetException;
+import org.give2peer.karma.exception.QuotaException;
 import org.give2peer.karma.response.PrivateProfileResponse;
 import org.give2peer.karma.entity.User;
+import org.give2peer.karma.service.ExceptionHandler;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
@@ -191,7 +194,7 @@ public class ProfileActivity extends AppCompatActivity
                 ,"Or maybe you do like it ?"
                 ,"You will be able to change it later."
                 ,"As well as securing your account with an email."
-                ,"This is an early alpha version, be patient."
+                ,"This is an early beta version, be patient."
                 ,"And, of course, thank you for your support !"
                 ,"Now, go gain some karma instead of reading these inane messages !"
                 ,"..."
@@ -409,9 +412,10 @@ public class ProfileActivity extends AppCompatActivity
      */
     protected void synchronize()
     {
-        final Application app = this.app;
-
         profileLoadingProgressBar.setVisibility(View.VISIBLE);
+
+        final Application app      = this.app;
+        final Activity    activity = this;
 
         new AsyncTask<Void, Void, Void>()
         {
@@ -445,16 +449,23 @@ public class ProfileActivity extends AppCompatActivity
 //                    refreshUI(profile);
 
                 } else if (null != e) {
-                    String msg = e.toString();
-                    // fixme: this is barbaric, use an exception handler !
-                    if (e instanceof HttpHostConnectException ||
-                            e instanceof UnknownHostException ||
-                            e instanceof NoInternetException) {
-                        msg = getString(R.string.toast_no_internet_available);
-                    } else {
-                        app.toasty(msg);
+
+                    // Log
+                    String loggedMsg = e.getMessage();
+                    if ( ! (null == loggedMsg || loggedMsg.isEmpty()))  {
+                        Log.e("G2P", e.getMessage());
                     }
-                    Log.e("G2P", "Unable to update profile : " + msg);
+                    e.printStackTrace();
+
+                    // Handle the exception
+                    ExceptionHandler handler = new ExceptionHandler(activity){
+//                        @Override
+//                        protected void on(QuotaException exception) {
+//                            toast(R.string.toast_new_item_error_quota_reached);
+//                        }
+                    };
+                    handler.handleExceptionOrFail(e);
+
                     hideContent();
 
                 } else {

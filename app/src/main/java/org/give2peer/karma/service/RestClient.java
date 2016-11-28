@@ -17,9 +17,12 @@ import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.http.converter.json.GsonHttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 
-import java.io.IOException;
 
-
+/**
+ * This is a WIP. It still needs :
+ *   - proper error handling.
+ *   - "dynamic" rootUrl from Server configuration.
+ */
 @Rest(
         rootUrl = "http://g2p.give2peer.org/v1", // todo: make this dynamic
         interceptors = AuthInterceptor.class,

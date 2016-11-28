@@ -16,6 +16,10 @@ import org.springframework.http.client.ClientHttpResponse;
 
 import java.io.IOException;
 
+/**
+ * An authentication interceptor that allows us to authenticate using basic HTTPAuth,
+ * as the server expects, with the correct user credentials that the Application provides.
+ */
 @EBean(scope = EBean.Scope.Singleton)
 public class AuthInterceptor implements ClientHttpRequestInterceptor {
 

@@ -553,7 +553,7 @@ public class RestService
      * This is the heart of darkness.
      * Pretty much every HTTP request to the API goes through here.
      *
-     * => Retrofit, please !
+     * => Retrofit, please ! See the wip in RestClient.
      *
      * @param method
      * @param route
@@ -653,6 +653,7 @@ public class RestService
             response = client.execute(request);
 
             // Get the response as a UTF-8 string
+            // Not sure why it's deprecated.
             json = EntityUtils.toString(response.getEntity(), "UTF-8");
 
             // Inspect the response and throw accordingly
@@ -700,22 +701,25 @@ public class RestService
                     // This can happen only if you change the code above, which might happen out of
                     // annoyance because the critical above may happen a lot until the server is OK.
                     throw new CriticalException("NEIN ! ... NEIN !");
-                } else {
-                    if (errorResponse.isBadEmail()) {
-                        throw new UnavailableEmailException(errorResponse);
-                    }
-                    if (errorResponse.isBadUsername()) {
-                        throw new UnavailableUsernameException(errorResponse);
-                    }
-                    if (errorResponse.isAlreadyDone()) {
-                        throw new AlreadyDoneException();
-                    }
-                    if (errorResponse.isLevelTooLow()) {
-                        throw new LevelTooLowException();
-                    }
                 }
+//                else {
+//
+//                    if (errorResponse.isBadEmail()) {
+//                        throw new UnavailableEmailException(errorResponse);
+//                    }
+//                    if (errorResponse.isBadUsername()) {
+//                        throw new UnavailableUsernameException(errorResponse);
+//                    }
+//                    if (errorResponse.isAlreadyDone()) {
+//                        throw new AlreadyDoneException();
+//                    }
+//                    if (errorResponse.isLevelTooLow()) {
+//                        throw new LevelTooLowException();
+//                    }
+//
+//                }
 
-                // The default, for what we don't yet explicitely support
+                // The default, we'll toast or snackbar the error message with it I guess.
                 throw new ErrorResponseException(errorResponse);
             }
 
