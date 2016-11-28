@@ -99,7 +99,6 @@ A version for the open beta community.
 - [ ] Feature: add my email to my user account.
 - [ ] Feature: log in with an existing user account.
 - [ ] Feature: request new credentials by email.
-- [ ] Feature: a _Licences_ activity.
 
 
 1.7.0
@@ -114,7 +113,9 @@ A version for the open beta community.
 1.6.0
 -----
 
-- [ ] Feature: an _About_ activity.
+- [ ] Feature: a proper Settings activity
+- [ ] Config:  move servers configuration out of harm's way
+- [x] Feature: an About activity.
 - [x] Feature: delete items I authored.
 - [x] BugHunt: google play services crashes when internet is unavailable on API 10.
 - [x] Feature: report an abusive item, since level 1.

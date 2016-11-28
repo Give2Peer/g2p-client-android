@@ -18,6 +18,10 @@
 
     <!-- CONTENT ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
 
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
     <LinearLayout
         android:id="@+id/aboutContentLayout"
         android:orientation="vertical"
@@ -26,18 +30,37 @@
         android:padding="@dimen/activity_padding"
         >
 
+
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceMedium"
-            android:text="Karma is libre, not-for-profit software licenced under the public domain."
+            android:text="@string/about_evangelism_1"
+            />
+
+
+        <!-- an HR tag -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:background="#8e8e8e"
+            android:layout_marginTop="11dp"
+            android:layout_marginBottom="13dp"
+            />
+
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="@string/about_copyright_disclaimer"
             />
 
         <ImageView
             android:layout_width="match_parent"
             android:layout_height="100dp"
             android:src="@drawable/about_badges"
-            android:contentDescription="No Copyright, Open-Source, Not for Profit"
+            android:contentDescription="@string/about_copyright_logos_description"
             />
 
 
@@ -92,6 +115,7 @@
         </LinearLayout>
 
 
+        <!-- an HR tag -->
         <View
             android:layout_width="match_parent"
             android:layout_height="2dp"
@@ -100,30 +124,26 @@
             android:layout_marginBottom="13dp"
             />
 
-        <ScrollView
+
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:orientation="vertical"
             >
 
-            <LinearLayout
+            <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                >
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="@string/activity_about_libraries_header"
+                />
 
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceMedium"
-                    android:text="Karma is built atop libre and awesome libraries listed below."
-                    />
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:layout_marginTop="10dp"
-                    android:text="
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:layout_marginTop="10dp"
+                android:text="
 Apache Software License, Version 2.0 :\n
 - Annotations (org.androidannotations)\n
 - Location (com.yayandroid:LocationManager)\n
@@ -135,22 +155,23 @@ Apache Software License, Version 2.0 :\n
 - JodaTime (net.danlew:android.joda)\n
 - Image View (com.github.rooseve:WebImageView)\n
 - Onboarding (com.github.rubengees:introduction)"
-                    />
+                />
 
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:layout_marginTop="10dp"
-                    android:autoLink="web"
-                    android:text="The full text of the Apache 2.0 Licence is available at\nhttps://www.apache.org/licenses/LICENSE-2.0"
-                    />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:layout_marginTop="10dp"
+                android:autoLink="web"
+                android:text="The full text of the Apache 2.0 Licence is available at\nhttps://www.apache.org/licenses/LICENSE-2.0"
+                />
 
-            </LinearLayout>
+        </LinearLayout>
 
-        </ScrollView>
 
 
     </LinearLayout>
+
+    </ScrollView>
 
 </LinearLayout>

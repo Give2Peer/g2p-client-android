@@ -136,6 +136,10 @@
     <string name="toast_new_item_upload_failed">Failed to upload the item.</string>
     <string name="dialog_gps_disabled_oui">Yes</string><!-- unused -->
     <string name="dialog_gps_disabled_non">No</string>
+    <string name="activity_about_libraries_header">Karma is built atop the libre and awesome libraries listed below.</string>
+    <string name="about_copyright_logos_description">No Copyright, Open-Source, Not for Profit</string>
+    <string name="about_copyright_disclaimer">Karma is libre, not-for-profit software licenced under the public domain.</string>
+    <string name="about_evangelism_1"><![CDATA[This app\'s purpose is to help find items in public places, items that belong to no-one and everyone. Those include lost&found, street art, white umbrellas in Tokyo, things people wanna give away, or already gave away by often illegaly dumping them on the street. Most of it is MOOP, Matter Out Of Place. We aim to help move that matter in the right hands... Yours.]]></string>
     <!-- unused -->
 
 
