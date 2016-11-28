@@ -58,8 +58,8 @@ public class AboutActivity extends AppCompatActivity
     @Background
     @AfterViews
     void fetchStats() {
-        Stats stats = restClient.getStats();
-        updateInterfaceWithStats(stats);
+        //Stats stats = restClient.getStats();
+        //updateInterfaceWithStats(stats);
     }
 
     @UiThread
