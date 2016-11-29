@@ -106,15 +106,17 @@ A version for the open beta community.
 
 - [ ] Feature: all-time world leaderboard.
 - [ ] Feature: I18N (Interplanetarization) for left-to-right languages.
-- [ ] L10N:    français.
-- [ ] BugHunt: issue #2: item images are mishandled.
+- [ ] Feature: L10N en français.
 
 
 1.6.0
 -----
 
-- [ ] Feature: a proper Settings activity
-- [ ] Config:  move servers configuration out of harm's way
+- [ ] BugHunt: issue #2: item images are mishandled.
+- [ ] Refacto: clear up a bunch of internal things left to do
+- [x] Feature: configure the drop animation of the map pins
+- [x] Feature: a proper Settings activity
+- [x] Config:  move servers configuration out of harm's way
 - [x] Feature: an About activity.
 - [x] Feature: delete items I authored.
 - [x] BugHunt: google play services crashes when internet is unavailable on API 10.

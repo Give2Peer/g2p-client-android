@@ -620,8 +620,6 @@ public  class      NewItemActivity
         } else {
             item.setType(Item.TYPE_MOOP);
         }
-        // fixme:
-          // or not : http://stackoverflow.com/questions/29411752/custom-icon-for-a-radio-button
 
         // In the future we'll have more than one image...
         List<Integer> pictureRotations = new ArrayList<Integer>();
