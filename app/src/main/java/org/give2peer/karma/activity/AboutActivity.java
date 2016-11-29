@@ -13,6 +13,7 @@ import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EActivity;
+import org.androidannotations.annotations.LongClick;
 import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
 import org.androidannotations.annotations.rest.RestService;
@@ -24,6 +25,8 @@ import org.give2peer.karma.service.RestClient;
 
 /**
  * The about activity.
+ *
+ * Spouts rubbish about the purpose of the app.
  *
  * Displays licences of vendor libraries, thanks, and various links to related content, such as :
  * - the portal website
@@ -51,6 +54,8 @@ public class AboutActivity extends AppCompatActivity
     }
 
     // STATS ///////////////////////////////////////////////////////////////////////////////////////
+
+    // This is a WIP, we're using this activity for testing the new RestClient.
 
     @RestService
     RestClient restClient;
@@ -112,9 +117,21 @@ public class AboutActivity extends AppCompatActivity
         try {
             startActivity(emailIntent);
         } catch (ActivityNotFoundException e) {
-            app.toasty("No application can handle this request. Please install an email client.");
+            app.toasty(R.string.error_no_email_client);
             e.printStackTrace();
         }
+    }
+
+    // SECRETS (shhhh, don't tell!) ////////////////////////////////////////////////////////////////
+
+    @Click(R.id.aboutCopyrightLogos)
+    public void aboutCopyrightLogosClick() {
+        app.toast(R.string.about_copyright_logos_description);
+    }
+
+    @LongClick(R.id.aboutCopyrightLogos)
+    public void aboutCopyrightLogosLongClick() {
+        app.launchServerConfig(this);
     }
 
 }

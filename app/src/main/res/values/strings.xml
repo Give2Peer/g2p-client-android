@@ -140,6 +140,7 @@
     <string name="about_copyright_logos_description">No Copyright, Open-Source, Not for Profit</string>
     <string name="about_copyright_disclaimer">Karma is libre, not-for-profit software licenced under the public domain.</string>
     <string name="about_evangelism_1"><![CDATA[This app\'s purpose is to help find items in public places, items that belong to no-one and everyone. Those include lost&found, street art, white umbrellas in Tokyo, things people wanna give away, or already gave away by often illegaly dumping them on the street. Most of it is MOOP, Matter Out Of Place. We aim to help move that matter in the right hands... Yours.]]></string>
+    <string name="error_no_email_client">No application can handle this request. Please install an email client.</string>
     <!-- unused -->
 
 

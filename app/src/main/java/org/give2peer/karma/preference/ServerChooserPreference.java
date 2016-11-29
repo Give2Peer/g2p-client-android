@@ -14,7 +14,7 @@ import java.util.List;
 
 /**
  * As we're using the server chooser in multiple places, we've moved the logic to this class.
- * It is used in the SettingsFragment and ServerChooserFragment
+ * It is used in the ServerSettingsFragment and ServerChooserFragment
  */
 public class ServerChooserPreference
 {

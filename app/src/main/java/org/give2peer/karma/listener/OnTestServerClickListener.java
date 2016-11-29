@@ -8,18 +8,18 @@ import android.util.Log;
 import org.give2peer.karma.Application;
 import org.give2peer.karma.exception.AuthorizationException;
 import org.give2peer.karma.exception.MaintenanceException;
+import org.give2peer.karma.fragment.ServerSettingsFragment;
 import org.give2peer.karma.service.RestService;
 import org.give2peer.karma.entity.Server;
-import org.give2peer.karma.fragment.SettingsFragment;
 
 public class OnTestServerClickListener implements Preference.OnPreferenceClickListener
 {
-    SettingsFragment fragment;
+    ServerSettingsFragment fragment;
     Server server;
 
     static int NUMBER_OF_ATTEMPTS = 3;
 
-    public OnTestServerClickListener(SettingsFragment fragment, Server server)
+    public OnTestServerClickListener(ServerSettingsFragment fragment, Server server)
     {
         this.fragment = fragment;
         this.server = server;

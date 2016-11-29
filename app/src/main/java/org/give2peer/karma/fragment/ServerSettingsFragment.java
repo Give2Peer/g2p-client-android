@@ -35,11 +35,18 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * THIS FILE IS BAD. BAD, BAD, BAD. Dirty hacks, inefficient code, bloat, it's got it all.
+ * THIS FILE IS BAD. BAD, BAD, BAD. Dirty hacks, inefficient learner's code, bloat, it's got it all.
  * We are procedurally generating most of the settings, from our SQLite-persisted servers and
  * locations.
  * This is probably not the best way to do this, but it gives the app a nice feel.
  * Besides, subsonic does it, and as a (blissfully ignorant) user, I really liked it.
+ *
+ * ---
+ *
+ * Forgive me, it was like the very first thing I wrote when I first started android. Eurgh.
+ *
+ * What we're doing before release is to hide the activity showing this fragment.
+ * To see it, long press on the copyright logos in the About activity.
  *
  * Servers
  *   [choice] Choose a server
@@ -47,14 +54,9 @@ import java.util.List;
  *   [edit] Server Foo
  *   [edit] Server Bar
  *   [add]
- * Addresses
- *   [edit] Home
- *   [edit] Office
- *   [edit] Somewhere else
- *   [add]
  *
  */
-public class SettingsFragment extends PreferenceFragment
+public class ServerSettingsFragment extends PreferenceFragment
 {
     // These list holders are simply to ensure that the garbage collector will not eat our listeners
     protected List<OnPreferenceChangeListener> notGarbageChangeListeners = new ArrayList<>();
@@ -62,7 +64,7 @@ public class SettingsFragment extends PreferenceFragment
 
     protected List<PreferenceScreen> serversEditScreens = new ArrayList<>();
 
-    // Probably makes sure that it is not garbage-collected either, because it too has listeners
+    // To make sure that it is not garbage-collected either, because it too has listeners.
     protected ServerChooserPreference scp;
 
     /**
@@ -83,9 +85,9 @@ public class SettingsFragment extends PreferenceFragment
     {
         super.onCreate(savedInstanceState);
 
-        // Load the preferences from an XML resource
-        // We'll need that later when we'll have static preferences (if we ever do)
-        // Android actually needs it now too, it seems, to instantiate stuff internally
+        // Load the preferences from an XML resource.
+        // Android actually requires this, it seems, to instantiate stuff internally, even if
+        // it is empty and useless because we're procedurally generating everything.
         addPreferencesFromResource(R.xml.preferences);
     }
 
@@ -129,6 +131,21 @@ public class SettingsFragment extends PreferenceFragment
         //servers.clear();
         //locations.clear();
         serversEditScreens.clear();
+
+
+        /// DISCLAIMER /////////////////////////////////////////////////////////////////////////////
+
+        Preference disclaimer = new Preference(context);
+        disclaimer.setTitle("You found the secret backoffice !");
+        disclaimer.setSummary("From here you can change the remote server credentials, which is useful for development !");
+        disclaimer.setOnPreferenceClickListener(new OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                app.toasty("With great power comes\ngreat responsibility.");
+                return true;
+            }
+        });
+        getPreferenceScreen().addPreference(disclaimer);
 
 
         /// THE SERVERS ////////////////////////////////////////////////////////////////////////////

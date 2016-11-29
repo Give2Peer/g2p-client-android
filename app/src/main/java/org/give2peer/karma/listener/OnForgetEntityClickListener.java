@@ -7,12 +7,12 @@ import android.preference.Preference;
 
 import org.give2peer.karma.activity.SettingsActivity;
 import org.give2peer.karma.entity.BaseEntity;
-import org.give2peer.karma.fragment.SettingsFragment;
+import org.give2peer.karma.fragment.ServerSettingsFragment;
 
 public class OnForgetEntityClickListener implements Preference.OnPreferenceClickListener {
-    SettingsFragment fragment;
+    ServerSettingsFragment fragment;
     BaseEntity entity;
-    public OnForgetEntityClickListener(SettingsFragment fragment, BaseEntity entity)
+    public OnForgetEntityClickListener(ServerSettingsFragment fragment, BaseEntity entity)
     {
         this.fragment = fragment;
         this.entity = entity;

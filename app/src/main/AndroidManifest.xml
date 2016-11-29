@@ -124,6 +124,14 @@
             >
         </activity>
 
+        <!-- App settings -->
+        <!-- This is TOTAL GARBAGE, but it's useful and it's hidden from view. -->
+        <activity
+            android:name="org.give2peer.karma.activity.ServerConfigActivity"
+            android:theme="@style/Theme.AppCompat"
+            >
+        </activity>
+
         <!-- Displays a grid of items, from closest to furthest -->
         <!-- NOT USED anymore, might be a good Map fallback when OpenGL 2.0 is unavailable ? -->
         <!-- besides, we should use a list and not a grid, because API 10 grids are HELL -->

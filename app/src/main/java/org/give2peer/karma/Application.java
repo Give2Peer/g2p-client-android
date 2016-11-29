@@ -49,6 +49,7 @@ import org.give2peer.karma.activity.LoginActivity_;
 import org.give2peer.karma.activity.MapItemsActivity_;
 import org.give2peer.karma.activity.NewItemActivity_;
 import org.give2peer.karma.activity.ProfileActivity_;
+import org.give2peer.karma.activity.ServerConfigActivity;
 import org.give2peer.karma.activity.SettingsActivity;
 import org.give2peer.karma.activity.ViewItemActivity_;
 import org.give2peer.karma.entity.Item;
@@ -313,6 +314,11 @@ public class Application extends SugarApp
     public void launchSettings(Activity activity)
     {
         launchActivity(activity, SettingsActivity.class);
+    }
+
+    public void launchServerConfig(Activity activity)
+    {
+        launchActivity(activity, ServerConfigActivity.class);
     }
 
     public void launchAbout(Activity activity)
@@ -699,10 +705,12 @@ public class Application extends SugarApp
 
     // UI //////////////////////////////////////////////////////////////////////////////////////////
 
-    public void toast(String message) { toast(message, Toast.LENGTH_SHORT); }
-    public void toasty(String message) { toast(message, Toast.LENGTH_LONG); } // toastLong ?
-    public void toast(String message, int duration)
-    {
+    public void toast(int stringResId)  { toast(getString(stringResId), Toast.LENGTH_SHORT); }
+    public void toasty(int stringResId) { toast(getString(stringResId), Toast.LENGTH_LONG);  }
+    public void toast(String message)   { toast(message, Toast.LENGTH_SHORT);                }
+    public void toasty(String message)  { toast(message, Toast.LENGTH_LONG);                 }
+
+    public void toast(String message, int duration) {
         Context context = getApplicationContext();
         Toast toast = Toast.makeText(context, message, duration);
         toast.show();
