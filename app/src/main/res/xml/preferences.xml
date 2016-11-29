@@ -1,7 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <Preference android:title="Hello there!"
-        android:summary="There will be more settings in the future."></Preference>
+    <Preference
+        android:key="@string/settings_motd"
+        android:title="News #1 : Hello there!"
+        android:summary="There will be more settings in the future."
+        >
+    </Preference>
+
+    <SwitchPreference
+        android:key="@string/settings_pins_animated"
+        android:title="Animate pins dropping on the map."
+        android:summary="Only for powerful devices!"
+        android:defaultValue="false"
+        >
+    </SwitchPreference>
 
 </PreferenceScreen>

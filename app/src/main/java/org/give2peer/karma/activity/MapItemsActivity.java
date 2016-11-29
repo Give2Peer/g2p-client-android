@@ -470,6 +470,9 @@ public class      MapItemsActivity
                     // idea : Use a custom InfoWindowAdapter to add an image ?
                     //        but there are lots of caveats with this canvas drawing technique !
 
+                    boolean should_animate = app.getPrefs() // the user chooses, obviously
+                            .getBoolean(getString(R.string.settings_pins_animated), false);
+
                     // Add markers to the map
                     for (int i = 0; i < itemsCount; i++) {
                         Item item = items.get(i);
@@ -483,10 +486,11 @@ public class      MapItemsActivity
                                         .anchor(item.getMapMarkerU(), item.getMapMarkerV())
                         );
 
-                        // todo: make the drop pin effect an opt-out option
-                        dropPinEffect(m, Math.round(i * 222),
-                                item.getMapMarkerU(), item.getMapMarkerV()
-                        );
+                        if (should_animate) {
+                            dropPinEffect(m, Math.round(i * 222),
+                                    item.getMapMarkerU(), item.getMapMarkerV()
+                            );
+                        }
 
                         // We also map the markers to the items for the click callback
                         markerItemHashMap.put(m, item);

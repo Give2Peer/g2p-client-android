@@ -133,6 +133,9 @@ public class Application extends SugarApp
         // Figure out the configured (or default) server configuration, and load it.
         // This also loads the REST service with the found configuration.
         setServerConfiguration(guessServerConfiguration());
+
+        // FIXME: 29/11/16
+        //PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
     }
 
     /**
