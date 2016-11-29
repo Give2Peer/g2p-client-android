@@ -32,7 +32,7 @@ public class MarkerInfoPolideaWebImageListener implements WebImageListener {
 
     // onFailure
     public void onImageFetchedFailed(String url) {
-        // todo: decide what should happen here. Nothing feels fine for now, in both senses.
+        // What should happen here? Nothing feels fine for now, in both senses.
         Log.e("G2P", String.format("I fixed the code by adding this line. %s", marker.getTitle()));
     }
 }

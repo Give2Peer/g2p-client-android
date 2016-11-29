@@ -7,17 +7,22 @@ import com.google.android.gms.maps.model.Marker;
 import com.rsv.widget.WebImageView;
 
 /**
- * Super-easily leaked ~wrapper class to scope the marker into the image loader response, because
- * we need to "refresh" the whole marker info window once the image is loaded.
+ * Super-easily leaked ~wrapper class to scope the marker into the image loader response,
+ * because we need to "refresh" the whole marker info window once the image is loaded.
+ * We gotta ensure that this is not memory-leaked somehow !
  *
  * Picasso is for minSdkVersion = 14, and we're still supporting API 10.
  */
 public class MarkerInfoWebImageListener implements WebImageView.WebImageProgressListener {
 
-    Marker marker;
+    private Marker marker;
 
     public MarkerInfoWebImageListener(Marker marker) {
         this.marker = marker;
+    }
+
+    public Marker getMarker() {
+        return marker;
     }
 
     @Override
