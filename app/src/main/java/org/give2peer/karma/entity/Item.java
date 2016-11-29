@@ -129,7 +129,7 @@ public class Item extends SugarRecord implements Parcelable
     }
 
     /**
-     * fixme : decide whether or not the type is shown too much.
+     * Create a non-empty title, gathering information about the item to complete if needed.
      * This is very much a work in progress. I expect to come back on this.
      *
      * Order :
@@ -142,9 +142,8 @@ public class Item extends SugarRecord implements Parcelable
      *   - tags  t1
      * Only show subsequent parts if there's room for them in a TITLE_LENGTH long title.
      *
-     *
-     * @param context
-     * @return
+     * @param context we need a context for getString()
+     * @return something readable as the item's title
      */
     public String getHumanTitle(Context context)
     {
@@ -152,6 +151,7 @@ public class Item extends SugarRecord implements Parcelable
         String tags = "";
         List<String> tagsList = getTags();
         if ( ! tagsList.isEmpty()) {
+            // org.apache.commons.lang3.StringUtils? WTF I'm doing it wrong, or Java is.
             tags = org.apache.commons.lang3.StringUtils.join(tagsList, ' ');
         }
         String type;

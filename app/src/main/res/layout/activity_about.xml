@@ -136,7 +136,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceMedium"
-                android:text="@string/activity_about_libraries_header"
+                android:text="@string/about_libraries_header"
                 />
 
             <TextView

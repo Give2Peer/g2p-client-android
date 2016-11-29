@@ -508,7 +508,7 @@ public class ViewItemActivity
         final Application app = this.app;
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage("Are you sure you want to report this item as abusive ? This operation cannot be cancelled !")
+        builder.setMessage(getString(R.string.toast_view_item_report_confirm))
                 .setPositiveButton(R.string.dialog_item_report_positive, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         doItemReport();
@@ -549,11 +549,10 @@ public class ViewItemActivity
                 if (null != report) {
 
                     if (report.wasItemDeleted()) {
-                        // fixme l10n
-                        app.toasty("Item reported as abusive,\nand subsequently deleted.");
+                        app.toasty(getString(R.string.toast_view_item_reported_and_deleted));
                         finish();
                     } else {
-                        app.toasty("Item successfully reported as abusive !");
+                        app.toasty(getString(R.string.toast_view_item_reported));
                     }
 
                 } else if (null != e) {
