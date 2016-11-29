@@ -119,8 +119,7 @@
         <!-- App settings -->
         <!-- This is TOTAL GARBAGE, to be redone from scratch. -->
         <activity
-            android:name="org.give2peer.karma.activity.SettingsActivity"
-            android:theme="@style/Theme.AppCompat"
+            android:name="org.give2peer.karma.activity.SettingsActivity_"
             >
         </activity>
 

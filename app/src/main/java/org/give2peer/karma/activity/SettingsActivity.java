@@ -1,19 +1,23 @@
 package org.give2peer.karma.activity;
 
-import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
+import android.preference.PreferenceActivity;
 
-import org.give2peer.karma.fragment.ServerSettingsFragment;
+import org.androidannotations.annotations.EActivity;
+import org.androidannotations.annotations.PreferenceScreen;
+import org.give2peer.karma.R;
 
-public class SettingsActivity extends FragmentActivity
-{
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+@PreferenceScreen(R.xml.preferences)
+@EActivity
+public class SettingsActivity extends PreferenceActivity {
 
-        // Display the fragment as the main content.
-        getSupportFragmentManager().beginTransaction()
-                .replace(android.R.id.content, new ServerSettingsFragment())
-                .commit();
-    }
+//    @PreferenceByKey(R.string.myPref1)
+//    Preference myPreference1;
+//
+//    @PreferenceByKey(R.string.checkBoxPref)
+//    CheckBoxPreference checkBoxPref;
+//
+//    @AfterPreferences
+//    void initPrefs() {
+//        checkBoxPref.setChecked(false);
+//    }
 }

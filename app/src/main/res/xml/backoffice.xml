@@ -1,7 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-
-    <Preference android:title="Hello there!"
-        android:summary="There will be more settings in the future."></Preference>
-
+    <!-- All of it is generated procedurally -->
 </PreferenceScreen>

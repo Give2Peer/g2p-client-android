@@ -88,7 +88,7 @@ public class ServerSettingsFragment extends PreferenceFragment
         // Load the preferences from an XML resource.
         // Android actually requires this, it seems, to instantiate stuff internally, even if
         // it is empty and useless because we're procedurally generating everything.
-        addPreferencesFromResource(R.xml.preferences);
+        addPreferencesFromResource(R.xml.backoffice);
     }
 
     @Override

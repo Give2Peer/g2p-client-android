@@ -50,7 +50,7 @@ import org.give2peer.karma.activity.MapItemsActivity_;
 import org.give2peer.karma.activity.NewItemActivity_;
 import org.give2peer.karma.activity.ProfileActivity_;
 import org.give2peer.karma.activity.ServerConfigActivity;
-import org.give2peer.karma.activity.SettingsActivity;
+import org.give2peer.karma.activity.SettingsActivity_;
 import org.give2peer.karma.activity.ViewItemActivity_;
 import org.give2peer.karma.entity.Item;
 import org.give2peer.karma.entity.Location;
@@ -313,7 +313,7 @@ public class Application extends SugarApp
 
     public void launchSettings(Activity activity)
     {
-        launchActivity(activity, SettingsActivity.class);
+        launchActivity(activity, SettingsActivity_.class);
     }
 
     public void launchServerConfig(Activity activity)
