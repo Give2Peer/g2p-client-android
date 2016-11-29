@@ -15,6 +15,7 @@ import com.yayandroid.locationmanager.constants.FailType;
 import com.yayandroid.locationmanager.constants.LogType;
 import com.yayandroid.locationmanager.constants.ProviderType;
 
+import org.give2peer.karma.DeviceUtils;
 import org.give2peer.karma.R;
 import org.give2peer.karma.event.LocationFailureEvent;
 import org.give2peer.karma.event.LocationUpdateEvent;
@@ -41,7 +42,7 @@ abstract public class LocatorBaseActivity extends LocationBaseActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        LocationManager.setLogType(LogType.GENERAL); // fixme@prod: use LogType.NONE
+        LocationManager.setLogType(DeviceUtils.isEmulator() ? LogType.GENERAL : LogType.NONE);
     }
 
     // Not sure whether or not we'd have to do anything in the onResume anymore
