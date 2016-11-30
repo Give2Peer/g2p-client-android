@@ -64,10 +64,10 @@ public class FileUtils {
     private static final boolean DEBUG = false; // Set to true to enable logging
 
     public static final String MIME_TYPE_AUDIO = "audio/*";
-    public static final String MIME_TYPE_TEXT = "text/*";
+    public static final String MIME_TYPE_TEXT  = "text/*";
     public static final String MIME_TYPE_IMAGE = "image/*";
     public static final String MIME_TYPE_VIDEO = "video/*";
-    public static final String MIME_TYPE_APP = "application/*";
+    public static final String MIME_TYPE_APP   = "application/*";
 
     public static final String HIDDEN_PREFIX = ".";
 
@@ -95,7 +95,7 @@ public class FileUtils {
         FileOutputStream fOut;
         try {
             fOut = new FileOutputStream(path);
-            bmp.compress(Bitmap.CompressFormat.JPEG, 85, fOut);
+            bmp.compress(Bitmap.CompressFormat.JPEG, 88, fOut);
             fOut.flush();
             fOut.close();
 
@@ -107,12 +107,46 @@ public class FileUtils {
         }
     }
 
+
+    /**
+     * Convert the image at `pathIn` into JPG and store it at `pathOut`.
+     * The output file must already exist, and will be overwritten.
+     *
+     * @param pathIn  path of the input image file
+     * @param pathOut path of the output JPG image file
+     */
+    public static void convertToJpg(String pathIn, String pathOut)
+    {
+        Bitmap bmp = BitmapFactory.decodeFile(pathIn);
+
+        if (null == bmp) {
+            throw new CriticalException(String.format(
+                    "Could not decode the image file at `%s`.", pathIn
+            ));
+        }
+
+        FileOutputStream fOut;
+        try {
+            fOut = new FileOutputStream(pathOut);
+            bmp.compress(Bitmap.CompressFormat.JPEG, 88, fOut);
+            fOut.flush();
+            fOut.close();
+
+        } catch (FileNotFoundException e) {
+            throw new CriticalException(String.format("`%s` not found. Permissions ?", pathOut), e);
+
+        } catch (IOException e) {
+            throw new CriticalException("Disk is probably full or unwriteable.", e);
+        }
+    }
+
+
+
     /**
      * Gets the extension of a file name, like ".png" or ".jpg".
      *
      * @param uri
-     * @return Extension including the dot("."); "" if there is no extension;
-     *         null if uri was null.
+     * @return the extension including the dot, "" if there is no extension and null if uri was null
      */
     public static String getExtension(String uri) {
         if (uri == null) {

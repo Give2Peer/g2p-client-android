@@ -112,8 +112,8 @@ A version for the open beta community.
 1.6.0
 -----
 
-- [ ] BugHunt: issue #2: item images are mishandled.
 - [ ] Refacto: clear up a bunch of internal things left to do
+- [x] BugHunt: issue #2: item images are mishandled.
 - [x] Feature: configure the drop animation of the map pins
 - [x] Feature: a proper Settings activity
 - [x] Config:  move servers configuration out of harm's way
