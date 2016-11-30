@@ -410,8 +410,15 @@ public class      MapItemsActivity
             @Override
             protected ArrayList<Item> doInBackground(Void... params) {
                 FindItemsResponse itemsResponse = new FindItemsResponse();
+
+                double maxDistance = 1000 * 1000; // 1000km should be reasonable
+                // do not filter by distance if we have drawn a region
+                if (null != container) maxDistance = 0;
+
                 try {
-                    itemsResponse = app.getRestService().findAround(where.latitude, where.longitude);
+                    itemsResponse = app.getRestService().findAround(
+                            where.latitude, where.longitude, maxDistance
+                    );
                 } catch (Exception e) {
                     exception = e;
                 }
@@ -425,7 +432,7 @@ public class      MapItemsActivity
                 filteredItems.addAll(items);
 
                 // Remove items outside of container polygon (if specified)
-                if (container != null) {
+                if (null != container) {
                     items = filteredItems;
                     filteredItems = new ArrayList<Item>();
                     for (Item item : items) {

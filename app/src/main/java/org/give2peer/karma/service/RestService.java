@@ -20,6 +20,7 @@ import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpRequestBase;
+import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.conn.ClientConnectionManager;
 import org.apache.http.conn.scheme.PlainSocketFactory;
 import org.apache.http.conn.scheme.Scheme;
@@ -224,25 +225,27 @@ public class RestService
 
     // HTTP QUERIES : ITEMS ////////////////////////////////////////////////////////////////////////
 
-    public FindItemsResponse findAroundPaginated(double latitude, double longitude, int page)
+    public FindItemsResponse findAroundPaginated(double latitude, double longitude,
+                                                 double maxDistance, int page)
             throws AuthorizationException, MaintenanceException, AuthenticationException,
             QuotaException, BadConfigException, ErrorResponseException,
             CriticalException, NoInternetException, LevelTooLowException, AlreadyDoneException {
         return findAround(latitude, longitude, page * ITEMS_PER_PAGE);
     }
 
-    public FindItemsResponse findAround(double latitude, double longitude)
+    public FindItemsResponse findAround(double latitude, double longitude, double maxDistance)
             throws AuthorizationException, MaintenanceException, AuthenticationException,
             QuotaException, BadConfigException, ErrorResponseException,
             CriticalException, NoInternetException, LevelTooLowException, AlreadyDoneException {
-        return findAround(latitude, longitude, 0);
+        return findAround(latitude, longitude, maxDistance, 0);
     }
 
     /**
      * Returns a list of at most 64 items.
      * Pages start at 0, and hold `ITEMS_PER_PAGE` items per page.
      */
-    public FindItemsResponse findAround(double latitude, double longitude, int offset)
+    public FindItemsResponse findAround(double latitude, double longitude,
+                                        double maxDistance, int offset)
             throws AuthorizationException, MaintenanceException, AuthenticationException,
             QuotaException, BadConfigException, ErrorResponseException,
             CriticalException, NoInternetException, AlreadyDoneException, LevelTooLowException {
@@ -251,6 +254,7 @@ public class RestService
 
         HashMap<String, String> params = new HashMap<String, String>();
         params.put("skip", String.valueOf(offset));
+        params.put("maxDistance", String.valueOf(maxDistance));
 
         String json = getJson(route, params);
 
@@ -624,7 +628,7 @@ public class RestService
                 throw new CriticalException(String.format("Unsupported HTTP method `%s`.", method));
             }
 
-            request.setURI(new URI(url));
+            URIBuilder uriBuilder = new URIBuilder(url);
 
             if (method.equals(METHOD_POST)) {
 
@@ -661,17 +665,18 @@ public class RestService
             } else if (method.equals(METHOD_GET)) {
                 // Add the GET parameters to the request
                 if ( ! parameters.isEmpty()) {
-                    BasicHttpParams params = new BasicHttpParams();
+
                     for (String key : parameters.keySet()) {
                         String value = parameters.get(key);
-                        params.setParameter(key, value);
+                        uriBuilder.addParameter(key, value);
                     }
-                    request.setParams(params);
                 }
 
             } else {
                 throw new CriticalException(String.format("Unsupported HTTP method `%s`.", method));
             }
+
+            request.setURI(uriBuilder.build());
 
             if (authenticated) authenticate(request);
 
