@@ -5,9 +5,7 @@ import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.database.Cursor;
 import android.graphics.Bitmap;
-import android.location.Location;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -25,7 +23,6 @@ import android.support.v7.app.AlertDialog;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
-import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -63,43 +60,28 @@ import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
 
 /**
- * fixme : update doc
- * Handles :
- * - Receiving an image from another activity's share intent
- * - (deprecated, but yet enabled back) launching the camera otherwise
- *   I deprecated this because the code around this hack is REALLY smelly.
- *   I disabled it and it was just too confusing for my alpha testers.
- *   So I enabled it back, and we'll just have to carry on until we ditch API 10 support.
- *   This can be cleaned up and un-deprecated
- * - A form to add a new item, with a nice Floating Action Button to send.
- * - Rotating the received image before sending it
- *
  * This is where the user adds new items in the database.
- * It should handle the three main moop intents :
- * - garbage is
- *   - spotted
- *   - recycled
- *   - destroyed
- * - lost&found is
- *   - spotted
- * - donation is
- *   - made
- * Unless we make multiple Activities for each, and make multiple share options.
- * That would reduce the number of actions the app requires of the user.
+ *
+ * Handles :
+ * - Receiving an image from another activity's share intent.
+ * - Launching the camera otherwise.
+ * - Rotating the received image before sending it.
+ * - A form to add a new item, with a nice Floating Action Button.
+ *
  */
 @EActivity(R.layout.activity_new_item)
 public  class      NewItemActivity
         extends    LocatorBaseActivity
         implements OnMapReadyCallback, ActivityCompat.OnRequestPermissionsResultCallback
 {
-    static final int REQUEST_IMAGE_CAPTURE = 1;
+    static final int REQUEST_CODE_IMAGE_CAPTURE = 1;
+    static final int REQUEST_CODE_ASK_EXTERNAL_STORAGE_PERMISSION = 2;
 
     Application app;
 
@@ -129,13 +111,13 @@ public  class      NewItemActivity
     @ViewById
     ProgressBar newItemProgressBar;
     @ViewById
-    ImageView newItemImageView;
+    ImageView   newItemImageView;
     @ViewById
-    EditText newItemTitleEditText;
+    EditText    newItemTitleEditText;
     @ViewById
-    EditText newItemDescriptionEditText;
+    EditText    newItemDescriptionEditText;
     @ViewById
-    EditText newItemLocationEditText;
+    EditText    newItemLocationEditText;
     @ViewById
     RadioButton newItemGiftRadioButton;
     @ViewById
@@ -175,24 +157,12 @@ public  class      NewItemActivity
         // What happens when we have a savedinstancestate but the picture comes from the share ?
         if (null != savedInstanceState) {
             imagePaths = savedInstanceState.getStringArrayList(BUNDLE_IMAGE_PATHS);
-            if (imagePaths != null) {
-                Log.d("G2P", String.format(
-                        "Restored image paths %s from bundle.",
-                        Arrays.toString(imagePaths.toArray()))
-                );
-            }
         }
 
         // Only initialize the imagePaths if they have not been restored from bundle state.
         if (null == imagePaths) {
             imagePaths = new ArrayList<>();
         }
-
-        // If we created the image files ourselves by launching the camera, we'll want to delete
-        // them afterwards, once they're safely uploaded along with the item properties
-//        if (null != savedInstanceState) {
-//            deleteImages = savedInstanceState.getBoolean(BUNDLE_DELETE_IMAGES);
-//        }
     }
 
     @Override
@@ -207,7 +177,7 @@ public  class      NewItemActivity
         super.onStop();
     }
 
-    protected static final int REQUEST_CODE_ASK_EXTERNAL_STORAGE_PERMISSION = 1003;
+
 
     @Override
     protected void onResume() {
@@ -217,54 +187,7 @@ public  class      NewItemActivity
         // We never know, maybe the map and location are ready already ?
         updateMap();
 
-        // Let's ask for permissions if they're not already granted
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M &&
-                (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
-                != PackageManager.PERMISSION_GRANTED ||
-                ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                != PackageManager.PERMISSION_GRANTED)) {
-
-            Log.d("G2P", String.format("Not enough permissions ! %d %d", ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE), ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)));
-
-
-            // This is true when the user has denied the permissions once
-            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
-                    Manifest.permission.READ_EXTERNAL_STORAGE)
-                    || ActivityCompat.shouldShowRequestPermissionRationale(this,
-                    Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-
-                final Activity activity = this;
-                new AlertDialog.Builder(this)
-                        .setCancelable(false)
-                        .setTitle(getString(R.string.permissions_rw_title))
-                        .setMessage(getString(R.string.permissions_rw_message))
-                        .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                            @Override public void onClick(DialogInterface dialog, int which) {
-                                // beware, this is run on UI thread
-                                ActivityCompat.requestPermissions(
-                                    activity,
-                                    new String[] {
-                                            Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                                            Manifest.permission.READ_EXTERNAL_STORAGE
-                                    },
-                                    REQUEST_CODE_ASK_EXTERNAL_STORAGE_PERMISSION
-                                );
-                            }
-                        })
-                        .create()
-                        .show();
-
-            } else {
-                ActivityCompat.requestPermissions(
-                    this,
-                    new String[] {
-                            Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                            Manifest.permission.READ_EXTERNAL_STORAGE
-                    },
-                    REQUEST_CODE_ASK_EXTERNAL_STORAGE_PERMISSION
-                );
-            }
-        }
+        askForAccessPermissions();
     }
 
     @Override
@@ -291,8 +214,67 @@ public  class      NewItemActivity
         }
     }
 
+    /**
+     * This is only useful for Android Marshmallow and above, as permissions like these are given
+     * on-the-fly and not on app install like in older android flavors.
+     */
+    protected void askForAccessPermissions() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) return;
+
+        // Let's ask for permissions if they're not already granted
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
+                    != PackageManager.PERMISSION_GRANTED ||
+            ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                    != PackageManager.PERMISSION_GRANTED)
+        {
+            Log.i("G2P", String.format(
+                    "Not enough permissions ! read=%d / write=%d",
+                    ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE),
+                    ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+            ));
+
+            // This is true when the user has denied the permissions once
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+                    Manifest.permission.READ_EXTERNAL_STORAGE)
+                    || ActivityCompat.shouldShowRequestPermissionRationale(this,
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+
+                final Activity activity = this;
+                new AlertDialog.Builder(this)
+                        .setCancelable(false)
+                        .setTitle(getString(R.string.permissions_rw_title))
+                        .setMessage(getString(R.string.permissions_rw_message))
+                        .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                            @Override public void onClick(DialogInterface dialog, int which) {
+                                // beware, this is run on UI thread
+                                ActivityCompat.requestPermissions(
+                                        activity,
+                                        new String[] {
+                                                Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                                                Manifest.permission.READ_EXTERNAL_STORAGE
+                                        },
+                                        REQUEST_CODE_ASK_EXTERNAL_STORAGE_PERMISSION
+                                );
+                            }
+                        })
+                        .create()
+                        .show();
+
+            } else {
+                ActivityCompat.requestPermissions(
+                        this,
+                        new String[] {
+                                Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                                Manifest.permission.READ_EXTERNAL_STORAGE
+                        },
+                        REQUEST_CODE_ASK_EXTERNAL_STORAGE_PERMISSION
+                );
+            }
+        }
+    }
+
     protected void onAccessPermissionsDenied() {
-        Log.d("G2P", "Permission to access external storage denied... Why, you paranoid clod ?");
+        Log.i("G2P", "Permission to access external storage denied... Why, you paranoid clod ?");
         app.toasty(getString(R.string.toast_permission_read_denied));
         finish();
     }
@@ -304,10 +286,10 @@ public  class      NewItemActivity
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
         super.onActivityResult(requestCode, resultCode, intent);
-        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
+        if (requestCode == REQUEST_CODE_IMAGE_CAPTURE && resultCode == RESULT_OK) {
             // Put the bitmap in the View to show the user
             fillThumbnail();
-        } else if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_CANCELED) {
+        } else if (requestCode == REQUEST_CODE_IMAGE_CAPTURE && resultCode == RESULT_CANCELED) {
             // If the user cancelled the capture of a picture, we GTFO.
             // It may be nice to allow a user to add a picture from a gallery instead of taking one.
             // see http://stackoverflow.com/questions/20021431/android-how-to-take-a-picture-from-camera-or-gallery
@@ -591,7 +573,7 @@ public  class      NewItemActivity
         //deleteImages = true; // we don't want to clutter the local filesystem
 
         takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
-        startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+        startActivityForResult(takePictureIntent, REQUEST_CODE_IMAGE_CAPTURE);
     }
 
     /**
