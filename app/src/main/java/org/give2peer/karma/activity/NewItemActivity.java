@@ -78,7 +78,8 @@ import java.util.Locale;
 @EActivity(R.layout.activity_new_item)
 public  class      NewItemActivity
         extends    LocatorBaseActivity
-        implements OnMapReadyCallback, ActivityCompat.OnRequestPermissionsResultCallback
+        implements OnMapReadyCallback, GoogleMap.OnMapLongClickListener,
+                   ActivityCompat.OnRequestPermissionsResultCallback
 {
     static final int REQUEST_CODE_IMAGE_CAPTURE = 1;
     static final int REQUEST_CODE_ASK_EXTERNAL_STORAGE_PERMISSION = 2;
@@ -451,11 +452,23 @@ public  class      NewItemActivity
             }
         });
 
+        googleMap.setOnMapLongClickListener(this);
+
         googleMap.getUiSettings().setMapToolbarEnabled(false);
         googleMap.getUiSettings().setRotateGesturesEnabled(false);
         googleMap.getUiSettings().setCompassEnabled(false);
 
         updateMap();
+    }
+
+    @Override
+    public void onMapLongClick(LatLng latLng) {
+        if (null == itemLocationMarker) {
+            itemLocationMarker = googleMap.addMarker(new MarkerOptions()
+                    .position(latLng)
+                    .draggable(true)
+            );
+        }
     }
 
     protected boolean isMapReady() {
@@ -483,11 +496,13 @@ public  class      NewItemActivity
         googleMap.clear();
         googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(getLatLng(), 16));
 
-        // Let's put a marker on the map, so that the user may drag it around if they want
-        itemLocationMarker = googleMap.addMarker(new MarkerOptions()
-                .position(getLatLng())
-                .draggable(true)
-        );
+        // Let's put a marker on the map if needed, so that the user may drag it around if they want
+        if (null == itemLocationMarker) {
+            itemLocationMarker = googleMap.addMarker(new MarkerOptions()
+                    .position(getLatLng())
+                    .draggable(true)
+            );
+        }
 
         googleMap.setOnMarkerDragListener(new GoogleMap.OnMarkerDragListener() {
             @Override
