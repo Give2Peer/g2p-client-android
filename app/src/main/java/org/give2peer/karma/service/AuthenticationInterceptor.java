@@ -21,13 +21,10 @@ import java.io.IOException;
  * as the server expects, with the correct user credentials that the Application provides.
  */
 @EBean(scope = EBean.Scope.Singleton)
-public class AuthInterceptor implements ClientHttpRequestInterceptor {
-
-//    @Bean
-//    MyAuthStore authStore;
+public class AuthenticationInterceptor implements ClientHttpRequestInterceptor {
 
     @RootContext
-    Context context;
+    Context context; // must not be private, whatever the IDE says
 
     public ClientHttpResponse intercept(
             HttpRequest request,
@@ -41,6 +38,7 @@ public class AuthInterceptor implements ClientHttpRequestInterceptor {
                 app.getUsername(), app.getPassword()
         );
         headers.setAuthorization(auth);
+
         return execution.execute(request, body);
     }
 }

@@ -18,6 +18,7 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -44,6 +45,7 @@ import com.shamanland.fab.FloatingActionButton;
 
 import net.danlew.android.joda.JodaTimeAndroid;
 
+import org.androidannotations.annotations.EApplication;
 import org.give2peer.karma.activity.AboutActivity_;
 import org.give2peer.karma.activity.LoginActivity_;
 import org.give2peer.karma.activity.MapItemsActivity_;
@@ -90,13 +92,12 @@ import pl.polidea.webimageview.WebImageView;
  * * Application app;
  * ```
  */
+@EApplication
 public class Application extends SugarApp
 {
     public static String REPORT_BUG_URL = "https://github.com/Give2Peer/g2p-client-android/issues";
     public static int THUMB_MAX_WIDTH  = 512;
     public static int THUMB_MAX_HEIGHT = 512;
-
-    private static Application singleton;
 
     protected android.location.Location location;
 
@@ -106,9 +107,6 @@ public class Application extends SugarApp
 
     protected boolean isFirstTime = false;
 
-    // Unsure if this is even used somewhere...
-    public Application getInstance() { return singleton; }
-
     // FLOW ////////////////////////////////////////////////////////////////////////////////////////
 
     @Override
@@ -116,10 +114,8 @@ public class Application extends SugarApp
     {
         super.onCreate();
 
-        singleton = this;
-
         // A debug message helping me understand when the Application is created
-        Log.d("G2P", "G2P Application onCreate");
+        Log.d("G2P", "Application onCreate");
 
         // Otherwise, we get a `Resource not found: "org/joda/time/tz/data/ZoneInfoMap"`.
         JodaTimeAndroid.init(this);
@@ -134,7 +130,7 @@ public class Application extends SugarApp
         // This also loads the REST service with the found configuration.
         setServerConfiguration(guessServerConfiguration());
 
-        // FIXME: 29/11/16
+        // We don't even need this I guess ?
         //PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
     }
 
@@ -708,6 +704,8 @@ public class Application extends SugarApp
 
     // UI //////////////////////////////////////////////////////////////////////////////////////////
 
+    Toast toast;
+
     public void toast(int stringResId)  { toast(getString(stringResId), Toast.LENGTH_SHORT); }
     public void toasty(int stringResId) { toast(getString(stringResId), Toast.LENGTH_LONG);  }
     public void toast(String message)   { toast(message, Toast.LENGTH_SHORT);                }
@@ -715,8 +713,26 @@ public class Application extends SugarApp
 
     public void toast(String message, int duration) {
         Context context = getApplicationContext();
-        Toast toast = Toast.makeText(context, message, duration);
+        toast = Toast.makeText(context, message, duration);
         toast.show();
+    }
+
+    Snackbar snack;
+
+    /**
+     * Snackbars are better suited for errors messages than toasts.
+     * Falls back on a toast if the currently focused view cannot be found for any reason.
+     */
+    public void snack(Activity activity, String msg)
+    {
+        View view = activity.getCurrentFocus();
+        if (null == view) {
+            Log.e("G2P", "activity.getCurrentFocus() is null !");
+            toast(msg);
+        } else {
+            snack = Snackbar.make(activity.getCurrentFocus(), msg, Snackbar.LENGTH_INDEFINITE);
+            snack.show();
+        }
     }
 
     public void showItemPopup(Activity activity, final Item item)

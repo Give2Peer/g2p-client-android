@@ -1,35 +1,33 @@
 package org.give2peer.karma.service;
 
-import org.androidannotations.annotations.Bean;
-import org.androidannotations.annotations.EBean;
 import org.androidannotations.annotations.rest.Accept;
 import org.androidannotations.annotations.rest.Get;
 import org.androidannotations.annotations.rest.Rest;
 import org.androidannotations.api.rest.MediaType;
+import org.androidannotations.api.rest.RestClientErrorHandling;
+import org.androidannotations.api.rest.RestClientRootUrl;
 import org.give2peer.karma.response.Stats;
-import org.springframework.http.HttpAuthentication;
-import org.springframework.http.HttpBasicAuthentication;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpRequest;
-import org.springframework.http.client.ClientHttpRequestExecution;
-import org.springframework.http.client.ClientHttpRequestInterceptor;
-import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.http.converter.json.GsonHttpMessageConverter;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 
 
 /**
+ * This is an effortless REST client thanks to Android Annotations (v3).
+ * A documentation and sandbox are available at https://g2p.give2peer.org
+ *
+ * Note:
+ *   You have to call setRootUrl(app.getCurrentServer().getUrl()) at some point before using this,
+ *   in a method annotated with @AfterInject seems a good idea.
+ *
  * This is a WIP. It still needs :
  *   - proper error handling.
- *   - "dynamic" rootUrl from Server configuration.
  */
 @Rest(
-        rootUrl = "http://g2p.give2peer.org/v1", // todo: make this dynamic
-        interceptors = AuthInterceptor.class,
-        converters = { GsonHttpMessageConverter.class }
+        interceptors = { AuthenticationInterceptor.class },
+        converters   = { GsonHttpMessageConverter.class  }
 )
 @Accept(MediaType.APPLICATION_JSON)
-public interface RestClient {
+public interface RestClient extends RestClientRootUrl, RestClientErrorHandling
+{
     @Get("/stats")
     Stats getStats();
 }
