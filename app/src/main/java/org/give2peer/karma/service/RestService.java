@@ -93,8 +93,9 @@ import java.util.List;
  * Responsibilities :
  * - Fetch data from server's HTTP REST API.
  *
- * /!\ There are a lot of deprecated classes used in this service. Consider moving to retrofit !
+ * /!\ There are a lot of deprecated classes used in this service. Use RestClient instead !
  */
+@Deprecated
 public class RestService
 {
     /**

@@ -24,6 +24,7 @@ import org.give2peer.karma.exception.QuotaException;
  * Handles our different kinds of exceptions, from benign to critical.
  * Provides default behaviors you can override when you instantiate it.
  */
+@Deprecated
 public class ExceptionHandler
 {
 

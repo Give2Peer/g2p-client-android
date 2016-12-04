@@ -40,22 +40,31 @@
             />
 
 
-        <!-- an HR tag -->
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="2dp"
-            android:background="#8e8e8e"
-            android:layout_marginTop="11dp"
-            android:layout_marginBottom="13dp"
-            />
-
-
-        <TextView
-            android:id="@+id/aboutStats"
+        <LinearLayout
+            android:id="@+id/aboutStatsLayout"
+            android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text=""
-            />
+            android:visibility="gone"
+            >
+
+            <!-- an HR tag -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:background="#8e8e8e"
+                android:layout_marginTop="11dp"
+                android:layout_marginBottom="13dp"
+                />
+
+            <TextView
+                android:id="@+id/aboutStats"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text=""
+                />
+
+        </LinearLayout>
 
 
         <!-- an HR tag -->

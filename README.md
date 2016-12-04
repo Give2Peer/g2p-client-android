@@ -113,6 +113,8 @@ A version for the open beta community.
 -----
 
 - [ ] Refacto: clear up a bunch of internal things left to do
+- [ ] Feature: refactor to use Android Annotation's RestClient
+- [x] Feature: set an item location by longclick on the map when GPS is unavailable
 - [x] BugHunt: issue #2: item images are mishandled.
 - [x] Feature: configure the drop animation of the map pins
 - [x] Feature: a proper Settings activity

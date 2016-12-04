@@ -5,6 +5,8 @@ import android.content.Intent;
 import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.mikepenz.materialdrawer.Drawer;
@@ -13,19 +15,20 @@ import org.androidannotations.annotations.AfterInject;
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.App;
 import org.androidannotations.annotations.Background;
+import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.LongClick;
 import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
-import org.androidannotations.annotations.rest.RestService;
+import org.androidannotations.rest.spring.annotations.RestService;
+import org.androidannotations.rest.spring.api.RestErrorHandler;
 import org.give2peer.karma.Application;
 import org.give2peer.karma.R;
-import org.give2peer.karma.response.ErrorResponse;
 import org.give2peer.karma.response.Stats;
 import org.give2peer.karma.service.RestClient;
-import org.give2peer.karma.service.RestClientErrorHandler;
-import org.give2peer.karma.service.ErrorResponseHandler;
+import org.give2peer.karma.service.RestExceptionHandler;
+import org.springframework.core.NestedRuntimeException;
 
 
 /**
@@ -40,7 +43,7 @@ import org.give2peer.karma.service.ErrorResponseHandler;
  * - the authors email
  */
 @EActivity(R.layout.activity_about)
-public class AboutActivity extends AppCompatActivity implements ErrorResponseHandler
+public class AboutActivity extends AppCompatActivity implements RestErrorHandler
 {
     @App
     Application app;
@@ -54,6 +57,8 @@ public class AboutActivity extends AppCompatActivity implements ErrorResponseHan
     Toolbar aboutToolbar;
     @ViewById
     TextView aboutStats;
+    @ViewById
+    LinearLayout aboutStatsLayout;
 
     // STATS ///////////////////////////////////////////////////////////////////////////////////////
 
@@ -65,16 +70,17 @@ public class AboutActivity extends AppCompatActivity implements ErrorResponseHan
     @AfterInject
     void setupRestClient() {
         restClient.setRootUrl(app.getCurrentServer().getUrl());
-        restClient.setRestErrorHandler(new RestClientErrorHandler(this));
+        restClient.setRestErrorHandler(this);
     }
 
+    @Override
     @UiThread
-    public void handleErrorResponse(ErrorResponse errorResponse) {
-        app.snack(this, errorResponse.getMessage());
+    public void onRestClientExceptionThrown(NestedRuntimeException e) {
+        new RestExceptionHandler(app, this).handleException(e);
     }
 
-    @Background
     @AfterViews
+    @Background
     void fetchStats() {
         Stats stats = restClient.getStats();
         if (null != stats) updateInterfaceWithStats(stats);
@@ -82,6 +88,7 @@ public class AboutActivity extends AppCompatActivity implements ErrorResponseHan
 
     @UiThread
     void updateInterfaceWithStats(Stats stats) {
+        aboutStatsLayout.setVisibility(View.VISIBLE);
         String msg = getString(R.string.about_stats, stats.getItemsTotal(), stats.getUsersCount());
         aboutStats.setText(msg);
     }
@@ -147,5 +154,4 @@ public class AboutActivity extends AppCompatActivity implements ErrorResponseHan
     public void aboutCopyrightLogosLongClick() {
         app.launchServerConfig(this);
     }
-
 }

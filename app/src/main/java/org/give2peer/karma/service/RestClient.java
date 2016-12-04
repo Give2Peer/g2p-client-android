@@ -1,12 +1,13 @@
 package org.give2peer.karma.service;
 
-import org.androidannotations.annotations.rest.Accept;
-import org.androidannotations.annotations.rest.Get;
-import org.androidannotations.annotations.rest.Rest;
-import org.androidannotations.api.rest.MediaType;
-import org.androidannotations.api.rest.RestClientErrorHandling;
-import org.androidannotations.api.rest.RestClientRootUrl;
+import org.androidannotations.rest.spring.annotations.Accept;
+import org.androidannotations.rest.spring.annotations.Get;
+import org.androidannotations.rest.spring.annotations.Rest;
+import org.androidannotations.rest.spring.api.MediaType;
+import org.androidannotations.rest.spring.api.RestClientErrorHandling;
+import org.androidannotations.rest.spring.api.RestClientRootUrl;
 import org.give2peer.karma.response.Stats;
+
 import org.springframework.http.converter.json.GsonHttpMessageConverter;
 
 

@@ -974,7 +974,7 @@ public class Application extends SugarApp
             Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
             activity.startActivity(browserIntent);
         } catch (ActivityNotFoundException e) {
-            toasty("No application can handle this request. Please install a web browser.");
+            toasty(getString(R.string.toast_no_browser_available));
             e.printStackTrace();
         }
     }
