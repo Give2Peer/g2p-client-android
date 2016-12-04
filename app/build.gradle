@@ -81,10 +81,12 @@ dependencies {
     compile 'com.github.machinarius:preferencefragment:0.1.1' // we'll probably remove this
 
     // ANDROID ANNOTATIONS (unsure why we have both apt and compile directives)
-    // Do not update this to 4.x yet.
-    apt 'org.androidannotations:androidannotations:3.3.2'
-    compile 'org.androidannotations:androidannotations-api:3.3.2'
-    // AA depends on Spring, and weirdly asks us to add the dep ourselves ?
+    compile 'org.androidannotations:androidannotations-api:4.1.0'
+    apt     'org.androidannotations:androidannotations:4.1.0'
+    compile 'org.androidannotations:rest-spring-api:4.1.0'
+    apt     'org.androidannotations:rest-spring:4.1.0'
+
+    // This is for GsonHttpMessageConverter for AA's RestService, so far as I understand
     compile 'org.springframework.android:spring-android-rest-template:1.0.1.RELEASE'
 
     // GOOGLE - MAPS API
