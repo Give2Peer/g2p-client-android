@@ -77,8 +77,6 @@ public class AboutActivity extends AppCompatActivity implements RestErrorHandler
 
     // STATS ///////////////////////////////////////////////////////////////////////////////////////
 
-    // This is a WIP, we're using this activity for testing the new RestClient.
-
     @RestService
     RestClient restClient;
 

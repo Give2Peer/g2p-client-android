@@ -24,7 +24,7 @@ public class Server extends BaseEntity
     String password = "";
 
     /**
-     * We use this in the registratiogouttonio@gmail.comn activity to either try to register a new account (if this is
+     * We use this in the registration activity to either try to register a new account (if this is
      * true) or try to edit an existing account (if this is false) because we only pre-registered.
      */
     boolean isEditedByUser = false;
@@ -74,7 +74,6 @@ public class Server extends BaseEntity
 
     /**
      * This is false by default.
-     *
      *
      * @return whether or not this server configuration as been edited by the hand of the user.
      */

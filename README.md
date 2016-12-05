@@ -20,7 +20,7 @@ Karma aims to help in the following situations, for example :
 - _"I need wood scraps to fix that chair."_
 - _"I need worms to kickstart my compost."_
 - _"I lost my left glove last night !"_
-- _"Who wants the old computer taking up space in my office ?"_
+- _"Who wants the old chair/computer taking up space in my office ?"_
 
 
 ### Features
@@ -75,7 +75,7 @@ In no particular order, these ideas have no release milestone set yet. Some may 
 - [ ] Feature: some form of OAuth2 as fallback for Maps, as we are subjected to quotas.
 - [ ] Feature: edit items I authored in my profile.
 - [ ] Feature: change my username when level 1, against some (9?) karma points.
-- [ ] Feature: add my facebook to my user account.
+- [ ] Feature: add my facebook to my user account. (recommended by users)
 - [ ] Feature: add my google+ to my user account.
 - [ ] Feature: add my twitter to my user account.
 - [ ] Feature: share added item on facebook.
@@ -84,9 +84,10 @@ In no particular order, these ideas have no release milestone set yet. Some may 
 - [ ] Feature: show items around as a list from closest to furthest.
 - [ ] Feature: communities.
 - [ ] Feature: a logging utility that we can more easily disable for production.
-- [ ] BugHunt: fail gracefully when item image type or size is unsupported.
+- [ ] BugHunt: fail gracefully when item image type or size is unsupported. (may be already done)
 - [ ] L10N:    español.
 - [ ] Feature: list notifications in the profile.
+- [ ] Feature: thank someone for an item.
 
 
 2.0.0
@@ -94,7 +95,6 @@ In no particular order, these ideas have no release milestone set yet. Some may 
 
 A version for the open beta community.
 
-- [ ] Feature: thank someone for an item.
 - [ ] Cleanup: remove all deprecated code.
 - [ ] Feature: add my email to my user account.
 - [ ] Feature: log in with an existing user account.
