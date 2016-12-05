@@ -863,8 +863,9 @@ public class Application extends SugarApp
      * @param toolbar the Toolbar to replace the default Appbar
      * @param selectedDrawerItem One of NAVIGATION_DRAWER_ITEM_XXXXX, provide -1 to select nothing.
      */
-    public Drawer setUpNavigationDrawer(final AppCompatActivity activity, Toolbar toolbar,
-                                      long selectedDrawerItem) {
+    public Drawer setUpNavigationDrawer(
+            final AppCompatActivity activity, Toolbar toolbar, long selectedDrawerItem
+    ) {
 
         activity.setSupportActionBar(toolbar);
 

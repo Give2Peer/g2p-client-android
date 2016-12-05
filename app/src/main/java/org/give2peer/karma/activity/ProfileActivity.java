@@ -102,10 +102,8 @@ public class ProfileActivity extends AppCompatActivity
         // If the user is not authenticated, take care of it
         app.requireAuthentication(this);
 
-        // The navigation drawers selects the last item that was clicked on, and maybe this
-        // activity was not destroyed, so we need to select the MAP item back.
-        // We could use .withSelected(false) but we'd lose the color-change click responsiveness.
-        selectNavigationDrawerItem(Application.NAVIGATION_DRAWER_ITEM_PROFILE);
+        // Handle the navigation drawer in case the activity was not destroyed
+        setUpNavigationDrawer();
 
         // Request data and then fill up the profile views
         synchronize();
@@ -123,13 +121,6 @@ public class ProfileActivity extends AppCompatActivity
         super.onStop();
     }
 
-    @AfterViews
-    public void setUpNavigationDrawer() {
-        navigationDrawer = app.setUpNavigationDrawer(this, profileToolbar,
-                Application.NAVIGATION_DRAWER_ITEM_PROFILE
-        );
-    }
-
     // NAVIGATION DRAWER ///////////////////////////////////////////////////////////////////////////
 
     Drawer navigationDrawer;
@@ -138,15 +129,17 @@ public class ProfileActivity extends AppCompatActivity
         return navigationDrawer;
     }
 
-    /**
-     * Does nothing if the navigation drawer is not ready yet.
-     * @param selectedDrawerItem One of Application.NAVIGATION_DRAWER_ITEM_XXXXX
-     */
-    public void selectNavigationDrawerItem(long selectedDrawerItem) {
+    @AfterViews
+    public void setUpNavigationDrawer() {
+        long drawer = Application.NAVIGATION_DRAWER_ITEM_PROFILE;
         if (null != navigationDrawer) {
-            navigationDrawer.setSelection(selectedDrawerItem);
+            navigationDrawer.setSelection(drawer);
+            navigationDrawer.closeDrawer();
+        } else {
+            navigationDrawer = app.setUpNavigationDrawer(this, profileToolbar, drawer);
         }
     }
+
 
     // OPTIONS MENU ////////////////////////////////////////////////////////////////////////////////
 

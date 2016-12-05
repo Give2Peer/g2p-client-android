@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -15,7 +16,6 @@ import org.androidannotations.annotations.AfterInject;
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.App;
 import org.androidannotations.annotations.Background;
-import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.LongClick;
@@ -60,6 +60,21 @@ public class AboutActivity extends AppCompatActivity implements RestErrorHandler
     @ViewById
     LinearLayout aboutStatsLayout;
 
+    @Override
+    protected void onResume()
+    {
+        super.onResume();
+
+        Log.d("G2P", "Resuming about activity.");
+
+        // The navigation drawers selects the last item that was clicked on, and maybe this
+        // activity was not destroyed, so we need to select the appropriate item back.
+        // We could use .withSelected(false) but we'd lose the color-change click responsiveness.
+        // This is why this method is both in @AfterViews and here.
+        // Remember that AfterViews is run BEFORE onResume.
+        setUpNavigationDrawer();
+    }
+
     // STATS ///////////////////////////////////////////////////////////////////////////////////////
 
     // This is a WIP, we're using this activity for testing the new RestClient.
@@ -103,11 +118,15 @@ public class AboutActivity extends AppCompatActivity implements RestErrorHandler
 
     @AfterViews
     public void setUpNavigationDrawer() {
-        if (null != navigationDrawer) return;
-        navigationDrawer = app.setUpNavigationDrawer(this, aboutToolbar,
-                Application.NAVIGATION_DRAWER_ITEM_ABOUT
-        );
+        long drawer = Application.NAVIGATION_DRAWER_ITEM_ABOUT;
+        if (null != navigationDrawer) {
+            navigationDrawer.setSelection(drawer);
+            navigationDrawer.closeDrawer();
+        } else {
+            navigationDrawer = app.setUpNavigationDrawer(this, aboutToolbar, drawer);
+        }
     }
+
 
     // UI LISTENERS ////////////////////////////////////////////////////////////////////////////////
 

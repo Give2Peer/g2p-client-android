@@ -155,11 +155,8 @@ public class      MapItemsActivity
         // The chain of events starts here ; not very good design, this.
         app.requireAuthentication(this);
 
-        // The navigation drawers selects the last item that was clicked on, and maybe this
-        // activity was not destroyed, so we need to select the MAP item back.
-        // We could use .withSelected(false) but we'd lose the color-change click responsiveness.
-        selectNavigationDrawerItem(Application.NAVIGATION_DRAWER_ITEM_MAP);
-
+        // In case this activity was not destroyed
+        setUpNavigationDrawer();
     }
 
     /**
@@ -168,13 +165,6 @@ public class      MapItemsActivity
     @AfterViews
     public void readyLayout() {
         isLayoutReady = true;
-    }
-
-    @AfterViews
-    public void setUpNavigationDrawer() {
-        navigationDrawer = app.setUpNavigationDrawer(this, mapItemsToolbar,
-                Application.NAVIGATION_DRAWER_ITEM_MAP
-        );
     }
 
     @Subscribe
@@ -257,13 +247,14 @@ public class      MapItemsActivity
         return navigationDrawer;
     }
 
-    /**
-     * Does nothing if the navigation drawer is not ready yet.
-     * @param selectedDrawerItem One of Application.NAVIGATION_DRAWER_ITEM_XXXXX
-     */
-    public void selectNavigationDrawerItem(long selectedDrawerItem) {
+    @AfterViews
+    public void setUpNavigationDrawer() {
+        long drawer = Application.NAVIGATION_DRAWER_ITEM_MAP;
         if (null != navigationDrawer) {
-            navigationDrawer.setSelection(selectedDrawerItem);
+            navigationDrawer.setSelection(drawer);
+            navigationDrawer.closeDrawer();
+        } else {
+            navigationDrawer = app.setUpNavigationDrawer(this, mapItemsToolbar, drawer);
         }
     }
 
