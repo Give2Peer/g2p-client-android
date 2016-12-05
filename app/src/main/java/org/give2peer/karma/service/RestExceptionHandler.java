@@ -1,32 +1,16 @@
 package org.give2peer.karma.service;
 
-import android.app.Activity;
 import android.content.Context;
-import android.support.design.widget.Snackbar;
 import android.util.Log;
-import android.view.View;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
 
-import org.apache.http.auth.AuthenticationException;
 import org.give2peer.karma.Application;
 import org.give2peer.karma.R;
-import org.give2peer.karma.adapter.DateTimeTypeAdapter;
-import org.give2peer.karma.exception.AlreadyDoneException;
-import org.give2peer.karma.exception.AuthorizationException;
-import org.give2peer.karma.exception.BadConfigException;
 import org.give2peer.karma.exception.CriticalException;
-import org.give2peer.karma.exception.ErrorResponseException;
-import org.give2peer.karma.exception.GeocodingException;
-import org.give2peer.karma.exception.LevelTooLowException;
-import org.give2peer.karma.exception.MaintenanceException;
-import org.give2peer.karma.exception.NoInternetException;
-import org.give2peer.karma.exception.QuotaException;
 import org.give2peer.karma.response.ErrorResponse;
-import org.joda.time.DateTime;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
@@ -80,7 +64,6 @@ public class RestExceptionHandler
      * @return whether or not the exception was handled.
      */
     public boolean handleExceptionSafe(Exception exception) {
-        // The order below is important, as some Exceptions are children of others.
 
         if (exception instanceof HttpClientErrorException) {
             HttpClientErrorException hcee = (HttpClientErrorException) exception;
@@ -90,10 +73,10 @@ public class RestExceptionHandler
 
             ErrorResponse errorResponse = null;
             try {
-                Gson gson = createGson();
+                Gson gson = GsonHttpMessageConverter.createGson();
                 errorResponse = gson.fromJson(json, ErrorResponse.class);
             } catch (JsonSyntaxException jse) {
-                String m = "Not valid JSON on a %d :\n%s";
+                String m = "Invalid JSON on a %d :\n%s";
                 throw new CriticalException(String.format(m, code.value(), json), hcee);
             }
 
@@ -121,23 +104,10 @@ public class RestExceptionHandler
             return true;
         }
 
+        // Can be thrown too :
+        // HttpMessageNotReadableException (JSON is not parsable)
 
         return false;
-    }
-
-
-    // UTILS ///////////////////////////////////////////////////////////////////////////////////////
-
-    /**
-     * Our own very puny Gson factory, to attach our DateTime adapter.
-     */
-    private Gson createGson() {
-        GsonBuilder gsonBuilder = new GsonBuilder();
-        // Register a Joda time adapter for ISO8601 strings. Otherwise it expects an object.
-        gsonBuilder.registerTypeAdapter(DateTime.class, new DateTimeTypeAdapter());
-        // We don't need to specify the DateFormat, Joda time accepts ISO8601 in our converter.
-        // gsonBuilder.setDateFormat("yyyy-MM-dd'T'HH:mm:ssZ"); // ISO8601
-        return gsonBuilder.create();
     }
 
 
@@ -149,6 +119,13 @@ public class RestExceptionHandler
         exception.printStackTrace();
 
         app.toasty(R.string.toast_no_internet_available);
+    }
+
+    protected void onMaintenanceException(Exception exception) {
+        Log.e("G2P", "Maintenance?");
+        exception.printStackTrace();
+
+        app.toasty(R.string.toast_server_maintenance);
     }
 
     protected void onAuthenticationException(HttpClientErrorException exception, ErrorResponse er) {
@@ -166,15 +143,6 @@ public class RestExceptionHandler
             app.toasty(R.string.toast_authorization_failure);
         }
     }
-
-    protected void onMaintenanceException(Exception exception) {
-        Log.e("G2P", "Maintenance?");
-        exception.printStackTrace();
-
-        app.toasty(R.string.toast_server_maintenance);
-    }
-
-
 
     /**
      * Most errors in the request will go through this hook.

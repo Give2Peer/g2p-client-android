@@ -1,14 +1,9 @@
 package org.give2peer.karma.activity;
 
-import android.app.Activity;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
@@ -20,28 +15,30 @@ import android.widget.Toast;
 
 import com.mikepenz.materialdrawer.Drawer;
 
+import org.androidannotations.annotations.AfterInject;
 import org.androidannotations.annotations.AfterViews;
+import org.androidannotations.annotations.App;
+import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EActivity;
-import org.androidannotations.annotations.EApplication;
+import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
-import org.apache.http.conn.HttpHostConnectException;
+import org.androidannotations.rest.spring.annotations.RestService;
+import org.androidannotations.rest.spring.api.RestErrorHandler;
 import org.give2peer.karma.Application;
 import org.give2peer.karma.R;
 import org.give2peer.karma.adapter.ItemsListViewAdapter;
 import org.give2peer.karma.entity.Item;
 import org.give2peer.karma.event.AuthoredItemsUpdateEvent;
 import org.give2peer.karma.event.UserUpdateEvent;
-import org.give2peer.karma.exception.CriticalException;
-import org.give2peer.karma.exception.NoInternetException;
-import org.give2peer.karma.exception.QuotaException;
 import org.give2peer.karma.response.PrivateProfileResponse;
 import org.give2peer.karma.entity.User;
-import org.give2peer.karma.service.ExceptionHandler;
+import org.give2peer.karma.service.RestClient;
+import org.give2peer.karma.service.RestExceptionHandler;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
+import org.springframework.core.NestedRuntimeException;
 
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -54,8 +51,9 @@ import java.util.List;
  * - Items added by the user
  */
 @EActivity(R.layout.activity_profile)
-public class ProfileActivity extends AppCompatActivity
+public class ProfileActivity extends AppCompatActivity implements RestErrorHandler
 {
+    @App
     Application app;
 
     @ViewById
@@ -84,19 +82,14 @@ public class ProfileActivity extends AppCompatActivity
     Toolbar        profileToolbar;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState)
-    {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        app = (Application) getApplication();
-
         Log.d("G2P", "Starting profile activity.");
     }
 
     @Override
-    protected void onResume()
-    {
+    protected void onResume() {
         super.onResume();
-
         Log.d("G2P", "Resuming profile activity.");
 
         // If the user is not authenticated, take care of it
@@ -158,11 +151,30 @@ public class ProfileActivity extends AppCompatActivity
 //        return found || super.onOptionsItemSelected(item);
 //    }
 
+    // REST SERVICE ////////////////////////////////////////////////////////////////////////////////
+
+    @RestService
+    RestClient restClient;
+
+    @AfterInject
+    void setupRestClient() {
+        restClient.setRootUrl(app.getCurrentServer().getUrl());
+        restClient.setRestErrorHandler(this);
+    }
+
+    @Override
+    @UiThread
+    public void onRestClientExceptionThrown(NestedRuntimeException e) {
+        new RestExceptionHandler(app, this).handleException(e);
+    }
+
     // INTERFACE LISTENERS /////////////////////////////////////////////////////////////////////////
 
+    /**
+     * Gotta replace this by a snackbar, and make it more reusable. How?
+     */
     @Click
-    public void profileRetryButton()
-    {
+    public void profileRetryButton() {
         profileRetryButton.setVisibility(View.GONE);
         app.requireAuthentication(this);
         synchronize();
@@ -173,7 +185,7 @@ public class ProfileActivity extends AppCompatActivity
 
     /**
      * I don't know what we'll do here in the future, but it might be an entry point for
-     * manual login and/or registration.
+     * manual login and/or registration. Meanwhile, I flew over the cuckoo's nest.
      */
     @Click
     public void profileUsernameTextView()
@@ -341,21 +353,17 @@ public class ProfileActivity extends AppCompatActivity
     // GLOBAL  LISTENERS ///////////////////////////////////////////////////////////////////////////
 
     @Subscribe
-    public void onUpdateUser(UserUpdateEvent e) // it IS used, actually
-    {
+    public void onUpdateUser(UserUpdateEvent e) { // it IS used, actually
         refreshUI(e.getUser());
     }
 
     @Subscribe
-    public void onUpdateAuthoredItems(AuthoredItemsUpdateEvent e) // it IS used, actually
-    {
+    public void onUpdateAuthoredItems(AuthoredItemsUpdateEvent e) { // it IS used, actually
         refreshUI(e.getItems());
     }
 
 
     // ACTIONS /////////////////////////////////////////////////////////////////////////////////////
-
-
 
     protected void refreshUI (User user)
     {
@@ -384,16 +392,14 @@ public class ProfileActivity extends AppCompatActivity
 
     }
 
-    protected void showContent()
-    {
+    protected void showContent() {
         // Hide the RETRY button
         profileRetryButton.setVisibility(View.GONE);
         // Show the content
         profileContentLayout.setVisibility(View.VISIBLE);
     }
 
-    protected void hideContent()
-    {
+    protected void hideContent() {
         // Show the RETRY button
         profileRetryButton.setVisibility(View.VISIBLE);
         // Hide the content
@@ -403,70 +409,28 @@ public class ProfileActivity extends AppCompatActivity
     /**
      * Download the profile data from the server and trigger a refresh of the UI.
      */
-    protected void synchronize()
-    {
+    protected void synchronize() {
         profileLoadingProgressBar.setVisibility(View.VISIBLE);
+        downloadProfile();
+    }
 
-        final Application app      = this.app;
-        final Activity    activity = this;
+    @Background
+    protected void downloadProfile() {
+        PrivateProfileResponse profile = restClient.getPrivateProfile();
+        updateUiWithProfile(profile);
+    }
 
-        new AsyncTask<Void, Void, Void>()
-        {
-            PrivateProfileResponse profile;
-            Exception e;
+    @UiThread
+    protected void updateUiWithProfile(PrivateProfileResponse profile) {
+        profileLoadingProgressBar.setVisibility(View.GONE);
 
-            @Override
-            protected Void doInBackground(Void... nope)
-            {
-                try {
-                    profile = app.getRestService().getProfile();
-                } catch (Exception oops) {
-                    e = oops;
-                }
-
-                return null;
-            }
-
-            @Override
-            protected void onPostExecute(Void nope)
-            {
-                super.onPostExecute(nope);
-
-                profileLoadingProgressBar.setVisibility(View.GONE);
-
-                if (null != profile) {
-                    // It's a win, let's give that information to whoever wants it
-                    EventBus.getDefault().post(new UserUpdateEvent(profile.getUser()));
-                    EventBus.getDefault().post(new AuthoredItemsUpdateEvent(profile.getItems()));
-                    showContent();
-//                    refreshUI(profile);
-
-                } else if (null != e) {
-
-                    // Log
-                    String loggedMsg = e.getMessage();
-                    if ( ! (null == loggedMsg || loggedMsg.isEmpty()))  {
-                        Log.e("G2P", e.getMessage());
-                    }
-                    e.printStackTrace();
-
-                    // Handle the exception
-                    ExceptionHandler handler = new ExceptionHandler(activity){
-//                        @Override
-//                        protected void on(QuotaException exception) {
-//                            toast(R.string.toast_new_item_error_quota_reached);
-//                        }
-                    };
-                    handler.handleExceptionOrFail(e);
-
-                    hideContent();
-
-                } else {
-                    Log.e("G2P", "You broke the matrix. Happy?");
-                    //throw new CriticalException("You broke the code ! Booo !");
-                }
-            }
-        }.execute();
+        if (null != profile) {
+            EventBus.getDefault().post(new UserUpdateEvent(profile.getUser()));
+            EventBus.getDefault().post(new AuthoredItemsUpdateEvent(profile.getItems()));
+            showContent();
+        } else {
+            hideContent();
+        }
     }
 
 }
