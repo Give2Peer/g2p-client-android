@@ -62,7 +62,7 @@ buildscript {
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:2.2.2'
-        classpath 'com.neenbedankt.gradle.plugins:android-apt:1.4'
+        classpath 'com.neenbedankt.gradle.plugins:android-apt:1.8'
     }
 }
 
@@ -83,6 +83,7 @@ dependencies {
     // ANDROID ANNOTATIONS (unsure why we have both apt and compile directives)
     compile 'org.androidannotations:androidannotations-api:4.1.0'
     apt     'org.androidannotations:androidannotations:4.1.0'
+//    compile 'com.github.Goutte:androidannotations:4.1.1' // nope, not working :(
     compile 'org.androidannotations:rest-spring-api:4.1.0'
     apt     'org.androidannotations:rest-spring:4.1.0'
 
@@ -181,7 +182,9 @@ dependencies {
 
 apt {
     arguments {
-        androidManifestFile variant.outputs[0].processResources.manifestFile
+        resourcePackageName android.defaultConfig.applicationId
+        androidManifestFile variant.outputs[0]?.processResources?.manifestFile
+
         // if you have multiple outputs (when using splits), you may want to have other index than 0
 
         // you should set your package name here if you are using different application IDs
