@@ -17,7 +17,6 @@ import android.view.animation.Interpolator;
 import android.widget.FrameLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -40,11 +39,17 @@ import com.rubengees.introduction.IntroductionBuilder;
 import com.rubengees.introduction.entity.Slide;
 import com.shamanland.fab.FloatingActionButton;
 
+import org.androidannotations.annotations.AfterInject;
 import org.androidannotations.annotations.AfterViews;
+import org.androidannotations.annotations.App;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EActivity;
+import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
+import org.androidannotations.rest.spring.annotations.RestService;
+import org.androidannotations.rest.spring.api.RestErrorHandler;
 import org.give2peer.karma.Application;
+import org.give2peer.karma.GeometryUtils;
 import org.give2peer.karma.LatLngUtils;
 import org.give2peer.karma.adapter.ItemInfoWindowAdapter;
 import org.give2peer.karma.entity.Item;
@@ -53,8 +58,11 @@ import org.give2peer.karma.event.AuthenticationEvent;
 import org.give2peer.karma.event.LocationUpdateEvent;
 import org.give2peer.karma.exception.CriticalException;
 import org.give2peer.karma.response.FindItemsResponse;
+import org.give2peer.karma.service.RestClient;
+import org.give2peer.karma.service.RestExceptionHandler;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
+import org.springframework.core.NestedRuntimeException;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -74,8 +82,9 @@ import java.util.List;
 @EActivity(R.layout.activity_map_items)
 public class      MapItemsActivity
        extends    LocatorBaseActivity
-       implements OnMapReadyCallback
+       implements OnMapReadyCallback, RestErrorHandler
 {
+    @App
     Application app;
 
     GoogleMap googleMap;
@@ -129,7 +138,7 @@ public class      MapItemsActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        app = (Application) getApplication();
+        //app = (Application) getApplication();
         loadOnboardingIfNeeded();
     }
 
@@ -297,7 +306,32 @@ public class      MapItemsActivity
             hideRegion();
         }
 
-        updateDrawButton();
+        updateFab();
+    }
+
+    protected void updateFab() {
+        // 1. We are currently finding items, and this button is a CANCEL button.
+        if (isFinding()) {
+            mapItemsFloatingActionButton.setImageResource(R.drawable.ic_clear_white_24dp);
+        }
+        // 2. We are on the map, and we want to FIND
+        else if (!isDrawing) {
+            mapItemsFloatingActionButton.setImageResource(R.drawable.ic_search_white_24dp);
+        }
+        // 3. We just clicked on it and are drawing, show CANCEL
+        else {
+            mapItemsFloatingActionButton.setImageResource(R.drawable.ic_clear_white_24dp);
+        }
+    }
+
+    protected void updateFabDelayed() {
+        final Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                updateFab();
+            }
+        }, 300);
     }
 
 
@@ -351,33 +385,26 @@ public class      MapItemsActivity
         return slides;
     }
 
-    //// ACTIONS ///////////////////////////////////////////////////////////////////////////////////
 
-    protected void updateDrawButton() {
-        // 1. We are currently finding items, and this button is a CANCEL button.
-        if (isFinding()) {
-            mapItemsFloatingActionButton.setImageResource(R.drawable.ic_clear_white_24dp);
-        }
-        // 2. We are on the map, and we want to FIND
-        else if (!isDrawing) {
-            mapItemsFloatingActionButton.setImageResource(R.drawable.ic_search_white_24dp);
-        }
-        // 3. We just clicked on it and are drawing, show CANCEL
-        else {
-            mapItemsFloatingActionButton.setImageResource(R.drawable.ic_clear_white_24dp);
-        }
+    // REST SERVICE ////////////////////////////////////////////////////////////////////////////////
+
+    @RestService
+    RestClient restClient;
+
+    @AfterInject
+    void setupRestClient() {
+        restClient.setRootUrl(app.getCurrentServer().getUrl());
+        restClient.setRestErrorHandler(this);
     }
 
-    protected void updateDrawButtonDelayed() {
-        final Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                updateDrawButton();
-            }
-        }, 300);
+    @Override
+    @UiThread
+    public void onRestClientExceptionThrown(NestedRuntimeException e) {
+        new RestExceptionHandler(app, this).handleException(e);
     }
 
+
+    //// ITEMS FINDER //////////////////////////////////////////////////////////////////////////////
 
 //    protected boolean isReadyToFindItems() {
 //        return isAuthenticated() && isLocationReady() && isMapReady();
@@ -390,84 +417,74 @@ public class      MapItemsActivity
     }
 
     public AsyncTask executeFinderTask(final LatLng where, final List<LatLng> container) {
+        // We only want one finder task to be run at a time.
+        // We can either cancel the new task or the running one. We arbitrarily chose the latter.
         cancelFinderTask();
-        showLoader();
 
-        final Activity activity = this;
+        showLoader(); // We'll hide the loader in the onPostExecute listener
+
+        final Activity activity = this; // Scope shenanigans...
 
         finder = new AsyncTask<Void, Void, ArrayList<Item>>() {
-            Exception exception;
+
+            FindItemsResponse itemsResponse;
 
             @Override
             protected ArrayList<Item> doInBackground(Void... params) {
-                FindItemsResponse itemsResponse = new FindItemsResponse();
 
                 double maxDistance = 1000 * 1000; // 1000km should be reasonable
                 // do not filter by distance if we have drawn a region
                 if (null != container) maxDistance = 0;
 
-                try {
-                    itemsResponse = app.getRestService().findAround(
-                            where.latitude, where.longitude, maxDistance
-                    );
-                } catch (Exception e) {
-                    exception = e;
-                }
+                int skip = 0; // for pagination, as the server returns at most 64 items
 
-                ArrayList<Item> items = new ArrayList<Item>();
-                if (null != itemsResponse.getItems()) {
-                    Collections.addAll(items, itemsResponse.getItems());
-                }
+                itemsResponse = restClient.findItemsAround(
+                        String.valueOf(where.latitude), String.valueOf(where.longitude),
+                        String.valueOf(skip), String.valueOf(maxDistance)
+                );
 
-                ArrayList<Item> filteredItems = new ArrayList<Item>();
-                filteredItems.addAll(items);
-
-                // Remove items outside of container polygon (if specified)
-                if (null != container) {
-                    items = filteredItems;
-                    filteredItems = new ArrayList<Item>();
-                    for (Item item : items) {
-                        if (pointInPolygon(item.getLatLng(), container)) {
-                            filteredItems.add(item);
+                // Let's filter the items in the background task, for responsiveness
+                ArrayList<Item> items = new ArrayList<>();
+                if (null != itemsResponse && null != itemsResponse.getItems()) {
+                    // Remove items outside of container polygon if specified
+                    if (null != container) {
+                        for (Item item : itemsResponse.getItems()) {
+                            if (GeometryUtils.pointInPolygon(item.getLatLng(), container)) {
+                                items.add(item);
+                            } // else ignore the item
                         }
+                    }
+                    // ... or add them all indiscriminately
+                    else {
+                        Collections.addAll(items, itemsResponse.getItems());
                     }
                 }
 
                 // Add to the cache
                 displayedItems.clear();
-                displayedItems.addAll(filteredItems);
+                displayedItems.addAll(items);
 
-                return filteredItems;
+                return items;
             }
 
             @Override
             protected void onPostExecute(ArrayList<Item> items) {
                 super.onPostExecute(items);
 
-                // Hide the loader, whether there was an exception or not.
-                hideLoader();
+                hideLoader(); // whether there was an error or not
 
-                // Something went wrong with the request: probably no internet.
-                if (null != exception) {
-                    Log.e("G2P", "Something went wrong while finding items !");
-                    exception.printStackTrace();
-                    noInternetTextView.setVisibility(View.VISIBLE);
-                    updateDrawButtonDelayed();
+                // Maybe the request failed for any number of reasons
+                if (null == itemsResponse) {
+                    hideRegion();
+                    updateFabDelayed();
                     return;
-                } else {
-                    noInternetTextView.setVisibility(View.GONE);
                 }
 
-                // Now, either we found items or we didn't (TQ: maybe the app crashed :3)
+                // Now, either we found items or we didn't
                 int itemsCount = items.size();
                 if (itemsCount == 0) {
-                    // There were no items found
-                    app.toast("No items were found in this area.", Toast.LENGTH_LONG);
+                    app.toasty(getString(R.string.toast_no_items_found_in_area));
                 } else {
-
-                    // idea : Use a custom InfoWindowAdapter to add an image ?
-                    //        but there are lots of caveats with this canvas drawing technique !
-
                     boolean should_animate = app.getPrefs() // the user chooses, obviously
                             .getBoolean(getString(R.string.settings_pins_animated), false);
 
@@ -494,8 +511,7 @@ public class      MapItemsActivity
                         markerItemHashMap.put(m, item);
                     }
 
-                    // Zoom on items
-                    zoomOnItems(googleMap, items);
+                    zoomOnItems(googleMap, items); // smooth
 
                     /////////////
                     // Anything that needs an up-to-date markerItemHashMap needs to be set AGAIN
@@ -510,7 +526,9 @@ public class      MapItemsActivity
                         }
                     });
 
-                    googleMap.setInfoWindowAdapter(new ItemInfoWindowAdapter(activity, markerItemHashMap));
+                    googleMap.setInfoWindowAdapter(
+                            new ItemInfoWindowAdapter(activity, markerItemHashMap)
+                    );
 
                     /////////////
 
@@ -527,12 +545,12 @@ public class      MapItemsActivity
                 // We could remove this hack by using a isFinished bool that we update ourselves
                 // but this solution also has non-trivial issues when running concurrent tasks.
                 // We can only implement it if we make sure that only one task may run at a time.
-                updateDrawButtonDelayed();
+                updateFabDelayed();
             }
 
         }.execute();
 
-        updateDrawButton();
+        updateFab();
 
         return finder;
     }
@@ -546,12 +564,26 @@ public class      MapItemsActivity
             finder = null;
         }
         hideLoader();
-        updateDrawButton();
+        updateFab();
     }
 
     protected boolean isFinding() {
         return finder != null && finder.getStatus() != AsyncTask.Status.FINISHED;
     }
+
+
+    // LOADER //////////////////////////////////////////////////////////////////////////////////////
+
+    private void showLoader() {
+        mapItemsProgressBar.setVisibility(View.VISIBLE);
+    }
+
+    private void hideLoader() {
+        mapItemsProgressBar.setVisibility(View.GONE);
+    }
+
+
+    // MAP /////////////////////////////////////////////////////////////////////////////////////////
 
     protected boolean isMapReady() {
         return googleMap != null && isLayoutReady;
@@ -676,18 +708,9 @@ public class      MapItemsActivity
         googleMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bc.build(), 111));
     }
 
-
-    private void showLoader() {
-        mapItemsProgressBar.setVisibility(View.VISIBLE);
-    }
-
-    private void hideLoader() {
-        mapItemsProgressBar.setVisibility(View.GONE);
-    }
-
     /**
      * BUGGY WITH CUSTOM ANCHORS
-     *
+     * (is it, still ? Not sure about that.)
      *
      * @param marker
      * @param delay
@@ -701,7 +724,7 @@ public class      MapItemsActivity
 
         final Interpolator interpolator = new BounceInterpolator();
 
-        marker.setAnchor(42, 42);
+        marker.setAnchor(42, 42); // effectively hides the marker
 
         handler.postDelayed(new Runnable()
         {
@@ -772,68 +795,4 @@ public class      MapItemsActivity
         drawnCircle = googleMap.addCircle(options);
     }
 
-    //// MATH UTILS (SHOULD BE MOVED ELSEWHERE) ////////////////////////////////////////////////////
-
-    /**
-     * Ray casting algorithm, see http://rosettacode.org/wiki/Ray-casting_algorithm
-     *
-     * @param point
-     * @param polygon The list of the vertices of the polygon, sequential and looping.
-     * @return whether the point is inside the polygon
-     */
-    public boolean pointInPolygon(LatLng point, List<LatLng> polygon) {
-        int crossings = 0;
-        int verticesCount = polygon.size();
-
-        // For each edge
-        for (int i = 0; i < verticesCount; i++) {
-            int j = (i + 1) % verticesCount;
-            LatLng a = polygon.get(i);
-            LatLng b = polygon.get(j);
-            if (rayCrossesSegment(point, a, b)) crossings++;
-        }
-
-        // Odd number of crossings?
-        return crossings % 2 == 1;
-    }
-
-    /**
-     * Ray Casting algorithm checks, for each segment AB,
-     * Returns true if the point is
-     * 1) to the left of the segment and
-     * 2) not above nor below the segment.
-     *
-     * @param point
-     * @param a
-     * @param b
-     */
-    public boolean rayCrossesSegment(LatLng point, LatLng a, LatLng b) {
-        double px = point.longitude,
-               py = point.latitude,
-               ax = a.longitude,
-               ay = a.latitude,
-               bx = b.longitude,
-               by = b.latitude;
-        if (ay > by) {
-            ax = b.longitude;
-            ay = b.latitude;
-            bx = a.longitude;
-            by = a.latitude;
-        }
-        // Alter longitude to cater for 180 degree crossings
-        if (px < 0 || ax < 0 || bx < 0) { px += 360; ax += 360; bx += 360; }
-        // If the point has the same latitude as a or b, increase slightly py
-        if (py == ay || py == by) py += 0.00000001;
-        // If the point is above, below or to the right of the segment, it returns false
-        if ((py > by || py < ay) || (px > Math.max(ax, bx))) { return false; }
-        // If the point is not above, below or to the right and is to the left, return true
-        else if (px < Math.min(ax, bx))                      { return true;  }
-        // When the two above conditions are not met, compare the slopes of segment AB and AP
-        // to see if the point P is to the left of segment AB or not.
-        else {
-            double slopeAB = (ax != bx) ? ((by - ay) / (bx - ax)) : Double.POSITIVE_INFINITY;
-            double slopeAP = (ax != px) ? ((py - ay) / (px - ax)) : Double.POSITIVE_INFINITY;
-            return slopeAP >= slopeAB;
-        }
-    }
 }

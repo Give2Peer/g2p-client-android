@@ -72,8 +72,9 @@
     <string name="toast_no_mapping_activity">Could not find any mapping activity to go to.</string>
     <string name="toast_no_internet_available">Internet is unavailable.\nPlease connect and try again.</string>
     <string name="toast_no_location_available">You must provide a location.</string>
-    <string name="toast_invalid_location">Provided location is invalid.\nPlease set up a postal address.</string>
+    <string name="toast_no_items_found_in_area">No items were found in this area.</string>
     <string name="toast_no_image_paths">No image paths were provided.</string>
+    <string name="toast_invalid_location">Provided location is invalid.\nPlease set up a postal address.</string>
     <string name="toast_draw_on_map">Draw the approximate region where you want to find items.</string>
     <string name="toast_error_wtf">How did you even manage to do that?\nReport a bug!</string>
     <string name="toast_preregistration_welcome">Welcome, %s.</string>
@@ -149,6 +150,5 @@
 
     <string name="permissions_rw_title">Permissions required</string>
     <string name="permissions_rw_message">Pictures are usually stored on the external storage, so we need your permission to access them.</string>
-
 
 </resources>
