@@ -2,10 +2,12 @@ package org.give2peer.karma.service;
 
 import org.androidannotations.rest.spring.annotations.Accept;
 import org.androidannotations.rest.spring.annotations.Get;
+import org.androidannotations.rest.spring.annotations.Path;
 import org.androidannotations.rest.spring.annotations.Rest;
 import org.androidannotations.rest.spring.api.MediaType;
 import org.androidannotations.rest.spring.api.RestClientErrorHandling;
 import org.androidannotations.rest.spring.api.RestClientRootUrl;
+import org.give2peer.karma.response.FindItemsResponse;
 import org.give2peer.karma.response.PrivateProfileResponse;
 import org.give2peer.karma.response.Stats;
 
@@ -30,4 +32,10 @@ public interface RestClient extends RestClientRootUrl, RestClientErrorHandling
 
     @Get("/user")
     PrivateProfileResponse getPrivateProfile();
+
+    @Get("/items/around/{latitude}/{longitude}?skip={skip}&maxDistance={maxDistance}")
+    FindItemsResponse findItemsAround(
+            @Path String latitude, @Path String longitude,
+            @Path String skip,     @Path String maxDistance
+    );
 }
