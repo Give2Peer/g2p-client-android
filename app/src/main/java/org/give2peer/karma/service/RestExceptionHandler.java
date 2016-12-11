@@ -16,13 +16,33 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.ResourceAccessException;
 
+import java.util.Locale;
+
 
 /**
  * Handles the different kinds of exceptions raised by our AA-powered RestClient.
  * Provides default behaviors you can override when you instantiate it.
  *
- * The reason we use this with a try-catch block and not RestService.setRestErrorHandler is because
+ * The reason we use this as a POJO class and not an implementation of RestErrorHandler is that
  * we were unable to work out how to get back to the UiThread from inside the handler.
+ *
+ * Here's an example usage, in an Activity that implements RestErrorHandler :
+ *
+ * @RestService
+ * RestClient restClient;
+ *
+ * @AfterInject
+ * void setupRestClient() {
+ *     restClient.setRootUrl(app.getCurrentServer().getUrl());
+ *     restClient.setRestErrorHandler(this);
+ * }
+ *
+ * @Override
+ * @UiThread
+ * public void onRestClientExceptionThrown(NestedRuntimeException e) {
+ *     new RestExceptionHandler(app, this).handleException(e);
+ * }
+ *
  */
 public class RestExceptionHandler
 {
@@ -41,7 +61,7 @@ public class RestExceptionHandler
      *
      * If no handler can handle the Exception for any reason, we let it crash so that users can
      * report the crash. So long as this app is in Beta, this should stay like this.
-     * Once we published a production release, we need to be more ... quiet.
+     * Once we published a production release, we probably need to be more ... quiet.
      *
      * @param exception to handle
      */
@@ -60,6 +80,9 @@ public class RestExceptionHandler
     }
 
     /**
+     * Handle the provided exception without raising an exception if it cannot be handled.
+     * In the provided exception cannot be handled, return false. Otherwise, return true.
+     *
      * @param exception to handle
      * @return whether or not the exception was handled.
      */
@@ -77,7 +100,9 @@ public class RestExceptionHandler
                 errorResponse = gson.fromJson(json, ErrorResponse.class);
             } catch (JsonSyntaxException jse) {
                 String m = "Invalid JSON on a %d :\n%s";
-                throw new CriticalException(String.format(m, code.value(), json), hcee);
+                throw new CriticalException(String.format(
+                        Locale.ENGLISH, m, code.value(), json
+                ), hcee);
             }
 
             if (code.value() == 401) {
