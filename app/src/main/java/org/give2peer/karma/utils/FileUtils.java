@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.give2peer.karma;
+package org.give2peer.karma.utils;
 
 import android.content.ContentResolver;
 import android.content.ContentUris;

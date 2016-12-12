@@ -5,7 +5,6 @@ import android.content.Context;
 import android.graphics.Point;
 import android.location.Location;
 import android.os.AsyncTask;
-import android.os.Bundle;
 import android.os.Handler;
 import android.os.SystemClock;
 import android.support.v7.widget.Toolbar;
@@ -49,8 +48,8 @@ import org.androidannotations.annotations.ViewById;
 import org.androidannotations.rest.spring.annotations.RestService;
 import org.androidannotations.rest.spring.api.RestErrorHandler;
 import org.give2peer.karma.Application;
-import org.give2peer.karma.GeometryUtils;
-import org.give2peer.karma.LatLngUtils;
+import org.give2peer.karma.utils.GeometryUtils;
+import org.give2peer.karma.utils.LatLngUtils;
 import org.give2peer.karma.adapter.ItemInfoWindowAdapter;
 import org.give2peer.karma.entity.Item;
 import org.give2peer.karma.R;
@@ -135,12 +134,10 @@ public class      MapItemsActivity
 
     //// LIFECYCLE /////////////////////////////////////////////////////////////////////////////////
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        //app = (Application) getApplication();
-        loadOnboardingIfNeeded();
-    }
+//    @Override
+//    protected void onCreate(Bundle savedInstanceState) {
+//        super.onCreate(savedInstanceState);
+//    }
 
     @Override
     public void onStart() {
@@ -164,16 +161,13 @@ public class      MapItemsActivity
         // The chain of events starts here ; not very good design, this.
         app.requireAuthentication(this);
 
-        // In case this activity was not destroyed
+        // In case this activity was not destroyed, set up the currently selected navigation item
         setUpNavigationDrawer();
     }
 
-    /**
-     * todo: ensure this is necessary (it might very well not be)
-     */
     @AfterViews
     public void readyLayout() {
-        isLayoutReady = true;
+        isLayoutReady = true; // to make sure, before we inject the map into our views
     }
 
     @Subscribe
@@ -337,6 +331,7 @@ public class      MapItemsActivity
 
     //// ONBOARDING ////////////////////////////////////////////////////////////////////////////////
 
+    @AfterViews
     public void loadOnboardingIfNeeded() {
         //app.isUserOnBoard(false);
         if (!app.isUserOnBoard()) {
@@ -482,11 +477,13 @@ public class      MapItemsActivity
 
                 // Now, either we found items or we didn't
                 int itemsCount = items.size();
-                if (itemsCount == 0) {
+                if (0 == itemsCount) {
                     app.toasty(getString(R.string.toast_no_items_found_in_area));
                 } else {
                     boolean should_animate = app.getPrefs() // the user chooses, obviously
                             .getBoolean(getString(R.string.settings_pins_animated), false);
+
+                    Marker firstMarker = null;
 
                     // Add markers to the map
                     for (int i = 0; i < itemsCount; i++) {
@@ -509,6 +506,11 @@ public class      MapItemsActivity
 
                         // We also map the markers to the items for the click callback
                         markerItemHashMap.put(m, item);
+
+                        // Store the first marker added for later usage (showing its info window)
+                        if (0 == i) {
+                            firstMarker = m;
+                        }
                     }
 
                     zoomOnItems(googleMap, items); // smooth
@@ -531,6 +533,12 @@ public class      MapItemsActivity
                     );
 
                     /////////////
+
+                    // Show the info window of the marker when it's alone
+                    // We need to do this _after_ we've set our custom info window adapter.
+                    // We don't show the info window when there are multiple markers because we have
+                    // no way of ensuring that the info window is not truncated by the screen's edge
+                    if (null != firstMarker && 1 == itemsCount) firstMarker.showInfoWindow();
 
                     // Hide the drawn region, and draw a circle instead
                     // This is a cheap solution to the problem of performance, as users may draw BIG regions
@@ -670,6 +678,7 @@ public class      MapItemsActivity
 
     /**
      * Zooms and pans the `googleMap` to encompass all the `items`.
+     * Note: this method will have artifacts around poles, but WHO CARES ?!
      *
      * @param googleMap to zoom.
      * @param items     that should be visible on the map.
@@ -682,7 +691,6 @@ public class      MapItemsActivity
         // exact same position (usually when there is only one item), we also
         // include in the builder coordinates around the item, to ensure a minimal
         // level of zoom higher than the vendor's minimal level of zoom.
-        // Note: our method will have artifacts around poles, but WHO CARES ?!
         // This is because multiple items can have the exact same coordinates so
         // we cannot rely on their numbers alone, which would yield clearer code.
         double latPad = 180. / 30000;
@@ -709,11 +717,11 @@ public class      MapItemsActivity
     }
 
     /**
-     * BUGGY WITH CUSTOM ANCHORS
-     * (is it, still ? Not sure about that.)
+     * Animate the placement of the markers on the map with a bouncing drop effect.
+     * The duration of the drop is hardcoded to 1.5s.
      *
-     * @param marker
-     * @param delay
+     * @param marker to animate
+     * @param delay in milliseconds of the effect (not the duration!)
      * @param u Anchor U (between 0 and 1, origin is top left)
      * @param v Anchor V (between 0 and 1, origin is top left)
      */
@@ -726,8 +734,7 @@ public class      MapItemsActivity
 
         marker.setAnchor(42, 42); // effectively hides the marker
 
-        handler.postDelayed(new Runnable()
-        {
+        handler.postDelayed(new Runnable() {
             @Override
             public void run()
             {
@@ -746,8 +753,7 @@ public class      MapItemsActivity
                     //marker.showInfoWindow();
                 }
             }
-        }
-        ,delay);
+        } ,delay);
     }
 
     Polygon  drawnPolygon;

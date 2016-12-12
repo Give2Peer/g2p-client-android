@@ -1,4 +1,4 @@
-package org.give2peer.karma;
+package org.give2peer.karma.utils;
 
 import android.location.Location;
 

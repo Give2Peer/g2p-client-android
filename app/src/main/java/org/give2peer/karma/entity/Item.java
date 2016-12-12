@@ -7,16 +7,14 @@ import android.os.Parcelable;
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
 import com.orm.SugarRecord;
 
 import org.give2peer.karma.Application;
 import org.give2peer.karma.R;
-import org.give2peer.karma.StringUtils;
+import org.give2peer.karma.utils.StringUtils;
 import org.give2peer.karma.exception.CriticalException;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.joda.time.tz.DateTimeZoneBuilder;
 import org.ocpsoft.prettytime.PrettyTime;
 
 import java.util.List;

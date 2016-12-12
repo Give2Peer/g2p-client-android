@@ -36,7 +36,7 @@ import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.ViewById;
 import org.give2peer.karma.Application;
-import org.give2peer.karma.LatLngUtils;
+import org.give2peer.karma.utils.LatLngUtils;
 import org.give2peer.karma.R;
 import org.give2peer.karma.entity.Item;
 import org.give2peer.karma.event.LocationUpdateEvent;
