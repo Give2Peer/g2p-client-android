@@ -74,7 +74,7 @@ In no particular order, these ideas have no release milestone set yet. Some may 
 - [ ] Feature: warn the user that the app is unavailable during server maintenance. (to be tested)
 - [ ] Feature: some form of OAuth2 as fallback for Maps, as we are subjected to quotas.
 - [ ] Feature: edit items I authored in my profile.
-- [ ] Feature: change my username when level 1, against some (9?) karma points.
+- [ ] Feature: change my username when level N, against some (9?) karma points.
 - [ ] Feature: add my facebook to my user account. (recommended by users)
 - [ ] Feature: add my google+ to my user account.
 - [ ] Feature: add my twitter to my user account.
@@ -85,9 +85,11 @@ In no particular order, these ideas have no release milestone set yet. Some may 
 - [ ] Feature: communities.
 - [ ] Feature: a logging utility that we can more easily disable for production.
 - [ ] BugHunt: fail gracefully when item image type or size is unsupported. (may be already done)
-- [ ] L10N:    español.
+- [ ] Feature: L10N español.
 - [ ] Feature: list notifications in the profile.
 - [ ] Feature: thank someone for an item.
+- [ ] Feature: I18N (Interplanetarization) for left-to-right languages.
+- [ ] Feature: L10N français.
 
 
 2.0.0
@@ -105,8 +107,6 @@ A version for the open beta community.
 -----
 
 - [ ] Feature: all-time world leaderboard.
-- [ ] Feature: I18N (Interplanetarization) for left-to-right languages.
-- [ ] Feature: L10N en français.
 
 
 1.6.0

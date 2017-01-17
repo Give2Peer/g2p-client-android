@@ -26,7 +26,9 @@ public class Server extends BaseEntity
     /**
      * We use this in the registration activity to either try to register a new account (if this is
      * true) or try to edit an existing account (if this is false) because we only pre-registered.
+     * This is not the best design pattern, so this is deprecated.
      */
+    @Deprecated
     boolean isEditedByUser = false;
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -77,11 +79,13 @@ public class Server extends BaseEntity
      *
      * @return whether or not this server configuration as been edited by the hand of the user.
      */
+    @Deprecated
     public boolean isEditedByUser() { return isEditedByUser; }
 
     /**
      * Set this to true when the user edits "by hand" the configuration (ie: registers manually).
      */
+    @Deprecated
     public void setEditedByUser() { this.isEditedByUser = true; }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////

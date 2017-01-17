@@ -8,7 +8,7 @@ android {
 //    signingConfigs {
 //    }
 
-    compileSdkVersion 23
+    compileSdkVersion 25
     buildToolsVersion "21.1.2"
 
     defaultConfig {
@@ -17,7 +17,7 @@ android {
         // Yes, we are supporting API 10. It is the root of most of our trouble and bad code.
         // We'll dump support for it eventually, say when it drops below 0.01% of all users.
         minSdkVersion 10
-        targetSdkVersion 23
+        targetSdkVersion 25
 
         versionCode 10
         versionName "1.5.0"
@@ -77,19 +77,19 @@ dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
 
     // BACKWARDS COMPATIBILITY (http://developer.android.com/tools/support-library/features.html)
-    compile 'com.android.support:appcompat-v7:23.4.0'
+    compile 'com.android.support:appcompat-v7:25.0.1'
     compile 'com.github.machinarius:preferencefragment:0.1.1' // we'll probably remove this
 
     // ANDROID ANNOTATIONS (unsure why we have both apt and compile directives)
     compile 'org.androidannotations:androidannotations-api:4.1.0'
     apt     'org.androidannotations:androidannotations:4.1.0'
-//    compile 'com.github.Goutte:androidannotations:4.1.1' // nope, not working :(
     compile 'org.androidannotations:rest-spring-api:4.1.0'
     apt     'org.androidannotations:rest-spring:4.1.0'
 
     // This is for GsonHttpMessageConverter for AA's RestService, so far as I understand
     compile 'org.springframework.android:spring-android-rest-template:1.0.1.RELEASE'
 
+    // If we update those, we need to also update Google Play Services in the emulator (no joy)
     // GOOGLE - MAPS API
     compile 'com.google.android.gms:play-services-maps:8.4.0'
     // GOOGLE - LOCATION API
@@ -100,7 +100,7 @@ dependencies {
     compile 'com.github.Give2Peer:LocationManager:1.1.1-api10'
 
     // MATERIAL DESIGN
-    compile 'com.android.support:design:23.4.0'
+    compile 'com.android.support:design:25.0.1'
 
     // FAB (Floating Action Button)
     compile 'com.shamanland:fab:0.0.8'
@@ -108,7 +108,7 @@ dependencies {
     // NAVIGATION DRAWER
     compile('com.mikepenz:materialdrawer:5.3.0@aar') { transitive = true }
 
-    // HTTP /!\ deprecated
+    // HTTP /!\ deprecated, remove them once we've refactored to the new RestClient
     compile 'org.apache.httpcomponents:httpmime:4.3'
     compile 'org.apache.httpcomponents:httpclient-android:4.3.5'
 
@@ -170,8 +170,8 @@ dependencies {
     testCompile 'junit:junit:4.12'
     androidTestCompile 'junit:junit:4.12' // ahem. o.O
 
-    androidTestCompile 'com.android.support:support-annotations:23.4.0'
-    androidTestCompile 'com.android.support.test:runner:0.4.1'
+    androidTestCompile 'com.android.support:support-annotations:25.0.1'
+    androidTestCompile 'com.android.support.test:runner:0.5'
 
     // Not sure why we'd use testng over junit4 ?
     //testCompile 'org.testng:testng:6.9.6'
@@ -180,6 +180,7 @@ dependencies {
     //androidTestCompile 'com.google.truth:truth:0.26'
 }
 
+// APT configuration is mostly for Android Annotations
 apt {
     arguments {
         resourcePackageName android.defaultConfig.applicationId

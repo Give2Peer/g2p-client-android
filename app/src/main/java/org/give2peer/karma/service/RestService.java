@@ -69,12 +69,14 @@ import java.util.List;
 
 /**
  * This is our REST client service.
- * It fetches data synchronously, so there's also a bunch of AsyncTasks that use these methods.
+ * It fetches data synchronously, so you need to wrap it in an AsyncTask.
  *
  * Responsibilities :
  * - Fetch data from server's HTTP REST API.
  *
- * /!\ There are a lot of deprecated classes used in this service. Use RestClient instead !
+ * /!\ DEPRECATION NOTICE
+ *     There are a lot of deprecated classes used in this service, such as apache HTTP components.
+ *     Use the RestClient instead. We're working to migrate existing routes. @Goutte
  */
 @Deprecated
 public class RestService
@@ -93,7 +95,6 @@ public class RestService
     static String ROUTE_ITEM_REPORT  = "/item/{id}/report";
     static String ROUTE_ITEM_DELETE  = "/item/{id}/delete";
     static String ROUTE_ITEM_PICTURE = "/item/{id}/picture";
-    static String ROUTE_ITEMS_AROUND = "/items/around/{latitude}/{longitude}";
 
     static String METHOD_GET  = "GET";
     static String METHOD_POST = "POST";
@@ -207,51 +208,51 @@ public class RestService
 
     // HTTP QUERIES : ITEMS ////////////////////////////////////////////////////////////////////////
 
-    public FindItemsResponse findAroundPaginated(double latitude, double longitude,
-                                                 double maxDistance, int page)
-            throws AuthorizationException, MaintenanceException, AuthenticationException,
-            QuotaException, BadConfigException, ErrorResponseException,
-            CriticalException, NoInternetException, LevelTooLowException, AlreadyDoneException {
-        return findAround(latitude, longitude, page * ITEMS_PER_PAGE);
-    }
-
-    public FindItemsResponse findAround(double latitude, double longitude, double maxDistance)
-            throws AuthorizationException, MaintenanceException, AuthenticationException,
-            QuotaException, BadConfigException, ErrorResponseException,
-            CriticalException, NoInternetException, LevelTooLowException, AlreadyDoneException {
-        return findAround(latitude, longitude, maxDistance, 0);
-    }
-
-    /**
-     * Returns a list of at most 64 items.
-     * Pages start at 0, and hold `ITEMS_PER_PAGE` items per page.
-     */
-    public FindItemsResponse findAround(double latitude, double longitude,
-                                        double maxDistance, int offset)
-            throws AuthorizationException, MaintenanceException, AuthenticationException,
-            QuotaException, BadConfigException, ErrorResponseException,
-            CriticalException, NoInternetException, AlreadyDoneException, LevelTooLowException {
-        String route = ROUTE_ITEMS_AROUND.replaceAll("\\{latitude\\}",  String.valueOf(latitude))
-                                         .replaceAll("\\{longitude\\}", String.valueOf(longitude));
-
-        HashMap<String, String> params = new HashMap<String, String>();
-        params.put("skip", String.valueOf(offset));
-        params.put("maxDistance", String.valueOf(maxDistance));
-
-        String json = getJson(route, params);
-
-        FindItemsResponse findItemsResponse = new FindItemsResponse();
-
-        try {
-            Gson gson = createGson();
-            findItemsResponse = gson.fromJson(json, FindItemsResponse.class);
-        } catch (JsonSyntaxException e) {
-            String msg = "Failed to parse finding items `%s` response :\n%s";
-            throw new CriticalException(String.format(msg, route, json), e);
-        }
-
-        return findItemsResponse;
-    }
+//    public FindItemsResponse findAroundPaginated(double latitude, double longitude,
+//                                                 double maxDistance, int page)
+//            throws AuthorizationException, MaintenanceException, AuthenticationException,
+//            QuotaException, BadConfigException, ErrorResponseException,
+//            CriticalException, NoInternetException, LevelTooLowException, AlreadyDoneException {
+//        return findAround(latitude, longitude, page * ITEMS_PER_PAGE);
+//    }
+//
+//    public FindItemsResponse findAround(double latitude, double longitude, double maxDistance)
+//            throws AuthorizationException, MaintenanceException, AuthenticationException,
+//            QuotaException, BadConfigException, ErrorResponseException,
+//            CriticalException, NoInternetException, LevelTooLowException, AlreadyDoneException {
+//        return findAround(latitude, longitude, maxDistance, 0);
+//    }
+//
+//    /**
+//     * Returns a list of at most 64 items.
+//     * Pages start at 0, and hold `ITEMS_PER_PAGE` items per page.
+//     */
+//    public FindItemsResponse findAround(double latitude, double longitude,
+//                                        double maxDistance, int offset)
+//            throws AuthorizationException, MaintenanceException, AuthenticationException,
+//            QuotaException, BadConfigException, ErrorResponseException,
+//            CriticalException, NoInternetException, AlreadyDoneException, LevelTooLowException {
+//        String route = ROUTE_ITEMS_AROUND.replaceAll("\\{latitude\\}",  String.valueOf(latitude))
+//                                         .replaceAll("\\{longitude\\}", String.valueOf(longitude));
+//
+//        HashMap<String, String> params = new HashMap<String, String>();
+//        params.put("skip", String.valueOf(offset));
+//        params.put("maxDistance", String.valueOf(maxDistance));
+//
+//        String json = getJson(route, params);
+//
+//        FindItemsResponse findItemsResponse = new FindItemsResponse();
+//
+//        try {
+//            Gson gson = createGson();
+//            findItemsResponse = gson.fromJson(json, FindItemsResponse.class);
+//        } catch (JsonSyntaxException e) {
+//            String msg = "Failed to parse finding items `%s` response :\n%s";
+//            throw new CriticalException(String.format(msg, route, json), e);
+//        }
+//
+//        return findItemsResponse;
+//    }
 
 
     public CreateItemResponse createItem(Item item)

@@ -1,3 +1,17 @@
+DEVELOP
+=======
+
+Clone [the PHP server](https://github.com/Give2Peer/g2p-server-symfony). Set it up.
+
+Run the server locally with :
+
+    php -S localhost:7676 -t web web/route.php
+
+Launch the app in the emulator, and set the server to `http://10.0.2.2:7676/v1`.
+`10.0.2.2` is always the IP of the computer running the emulator.
+
+
+
 CAVEATS
 =======
 
