@@ -12,10 +12,10 @@ public class PictureItemResponse
 
     public PictureItemResponse() {} // maybe needed, maybe not
 
-    /** @return the item that was added, as it is now in the server's database.                  (*///)
+    /** @return the item that was added, as it is now in the server's database. */
     public Item getItem() { return item;                                                           }
-                                                                                                 /**/
-    /** @return the amount of karma gained by the action of authoring this item               °**///({
-    public int getKarma() { return karma;                                                         }
+
+    /** @return the amount of karma gained by the action of authoring this item */
+    public int getKarma() { return karma;                                                          }
 
 }

@@ -177,7 +177,7 @@ public class ViewItemActivity
 
     @AfterViews
     public void fillLayoutWithItem() {
-        viewItemImageView.setWebImageUrl(item.getThumbnailNoSsl());
+        viewItemImageView.setWebImageUrl(item.getPictureNoSsl());
         viewItemTitleTextView.setText(item.getHumanTitle(this));
         if (item.hasDescription()) {
             viewItemDescriptionTextView.setText(item.getDescription());

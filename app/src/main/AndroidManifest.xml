@@ -34,7 +34,7 @@
             android:value="give2peer.db" />
         <meta-data
             android:name="VERSION"
-            android:value="10" /> <!-- Every time the database structure changes, increment this -->
+            android:value="11" /> <!-- Every time the database structure changes, increment this -->
         <meta-data
             android:name="QUERY_LOG"
             android:value="false" />

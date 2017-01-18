@@ -1,7 +1,7 @@
 package org.give2peer.karma.utils;
 
 /**
- *
+ * String utilities, because Java.
  */
 public class StringUtils
 {
@@ -24,8 +24,7 @@ public class StringUtils
         return new String(hexChars);
     }
 
-    public static String httpsToHttp(String url)
-    {
+    public static String httpsToHttp(String url) {
         return url.replaceFirst("^https", "http");
     }
 }

@@ -38,13 +38,12 @@ public class Item extends SugarRecord implements Parcelable
     Float    distance; // in meters, not always provided by the server
     DateTime created_at;
     DateTime updated_at;
-    String   thumbnail;
 
+    List<ItemPicture> pictures;
     List<String> tags;
 
     User author;
 
-    // It would be best for these to be constants.
     static public String TYPE_MOOP = "moop";
     static public String TYPE_GIFT = "gift";
     static public String TYPE_LOST = "lost";
@@ -69,8 +68,8 @@ public class Item extends SugarRecord implements Parcelable
         longitude = in.readFloat();
         created_at = new DateTime(in.readLong(), DateTimeZone.forID(in.readString()));
         updated_at = new DateTime(in.readLong(), DateTimeZone.forID(in.readString()));
-        thumbnail = in.readString();
         author = in.readParcelable(User.class.getClassLoader());
+        pictures = in.createTypedArrayList(ItemPicture.CREATOR);
         tags = in.createStringArrayList();
     }
 
@@ -87,8 +86,8 @@ public class Item extends SugarRecord implements Parcelable
         parcel.writeString(created_at.getZone().getID());
         parcel.writeLong(updated_at.getMillis());
         parcel.writeString(updated_at.getZone().getID());
-        parcel.writeString(thumbnail);
         parcel.writeParcelable(author, flags);
+        parcel.writeTypedList(pictures);
         parcel.writeStringList(tags);
     }
 
@@ -109,6 +108,45 @@ public class Item extends SugarRecord implements Parcelable
         return 0;
     }
 
+
+    //// PICTURES //////////////////////////////////////////////////////////////////////////////////
+
+    /**
+     * @return the URL of the first picture, or an empty string.
+     */
+    public String getPicture() {
+        if (0 == getPictures().size()) return "";
+        return getPictures().get(0).getUrl();
+    }
+
+    /**
+     * @return the URL of the first picture in http, not https, or an empty string.
+     */
+    public String getPictureNoSsl() {
+        return StringUtils.httpsToHttp(getPicture());
+    }
+
+    public String getThumbnail() {
+        return getThumbnail(240, 240);
+    }
+
+    /**
+     * See https://github.com/Polidea/AndroidImageCache/issues/6
+     * Note: the other image cache lib we're using is choking on our dirty https too.
+     * @return the thumbnail URL of the first picture, in `http`, not `https`.
+     */
+    public String getThumbnailNoSsl() {
+        return StringUtils.httpsToHttp(getThumbnail());
+    }
+
+    public String getThumbnail(int width, int height) {
+        if (0 == getPictures().size()) return "";
+        return getPictures().get(0).getThumbnail(width, height);
+    }
+
+    public String getThumbnailNoSsl(int width, int height) {
+        return StringUtils.httpsToHttp(getThumbnail(width, height));
+    }
 
     //// DESCRIPTION ///////////////////////////////////////////////////////////////////////////////
 
@@ -235,16 +273,6 @@ public class Item extends SugarRecord implements Parcelable
      */
     public LatLng getLatLng() { return new LatLng(getLatitude(), getLongitude()); }
 
-    /**
-     * See https://github.com/Polidea/AndroidImageCache/issues/6
-     * Note: the other image cache lib we're using is choking on our dirty https too.
-     * @return the thumbnail URL in `http`, not `https`.
-     */
-    public String getThumbnailNoSsl()
-    {
-        return StringUtils.httpsToHttp(getThumbnail());
-    }
-
 
     //// MAP MARKERS ///////////////////////////////////////////////////////////////////////////////
 
@@ -319,11 +347,13 @@ public class Item extends SugarRecord implements Parcelable
 
     public void setUpdatedAt(DateTime updatedAt)     { this.updated_at = updatedAt;                }
 
-    public boolean hasThumbnail()                    { return ! thumbnail.isEmpty();               }
+//    public boolean hasThumbnail()                    { return ! thumbnail.isEmpty();               }
 
-    public String getThumbnail()                     { return thumbnail;                           }
+//    public String getThumbnail()                     { return thumbnail;                           }
 
-    public void setThumbnail(String thumbnail)       { this.thumbnail = thumbnail;                 }
+//    public void setThumbnail(String thumbnail)       { this.thumbnail = thumbnail;                 }
+
+    public List<ItemPicture> getPictures()           { return pictures;                            }
 
     public List<String> getTags()                    { return tags;                                }
 

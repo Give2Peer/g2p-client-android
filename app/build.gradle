@@ -29,6 +29,7 @@ android {
     }
 
     // Because we're using Apache legacy, removed from SDK 23
+    // We'll remove usage of this when we've updated to the new RestClient
     useLibrary 'org.apache.http.legacy'
 
     // What is this ?

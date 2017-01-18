@@ -3,6 +3,7 @@ Karma
 
 This is the source of the Android client application [Karma](http://give2peer.org).
 
+[![Karma](https://raw.githubusercontent.com/Give2Peer/g2p-server-symfony/master/assets/logo_karma.png)](https://play.google.com/store/apps/details?id=org.give2peer.karma)
 
 Goal
 ----
@@ -114,6 +115,7 @@ A version for the open beta community.
 
 - [ ] Refacto: clear up a bunch of internal things left to do
 - [ ] Feature: refactor to use Android Annotation's RestClient
+- [x] Feature: use better quality pictures in the item details view
 - [x] Feature: set an item location by longclick on the map when GPS is unavailable
 - [x] BugHunt: issue #2: item images are mishandled.
 - [x] Feature: configure the drop animation of the map pins
