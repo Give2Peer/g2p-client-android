@@ -350,7 +350,7 @@ public class ProfileActivity extends AppCompatActivity implements RestErrorHandl
 
     }
 
-    // GLOBAL  LISTENERS ///////////////////////////////////////////////////////////////////////////
+    // GLOBAL LISTENERS ////////////////////////////////////////////////////////////////////////////
 
     @Subscribe
     public void onUpdateUser(UserUpdateEvent e) { // it IS used, actually

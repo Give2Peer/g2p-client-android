@@ -255,6 +255,7 @@ public class RestService
 //    }
 
 
+    @Deprecated
     public CreateItemResponse createItem(Item item)
             throws
             AuthorizationException, QuotaException, MaintenanceException,
@@ -354,31 +355,6 @@ public class RestService
     }
 
     /**
-     * @throws AuthorizationException
-     * @throws QuotaException
-     * @throws MaintenanceException
-     */
-    public PrivateProfileResponse getProfile()
-            throws
-            AuthorizationException, AuthenticationException, QuotaException, MaintenanceException,
-            NoInternetException, ErrorResponseException, BadConfigException, CriticalException, AlreadyDoneException, LevelTooLowException {
-        String json = getJson(ROUTE_USER);
-        // Log.d("G2P", "Profile json reponse :\n"+json);
-
-        PrivateProfileResponse privateProfileResponse = new PrivateProfileResponse();
-
-        try {
-            Gson gson = createGson();
-            privateProfileResponse = gson.fromJson(json, PrivateProfileResponse.class);
-        } catch (JsonSyntaxException e) {
-            String msg = "Failed to parse private profile response :\n%s";
-            throw new CriticalException(String.format(msg, json), e);
-        }
-
-        return privateProfileResponse;
-    }
-
-    /**
      * fixme
      */
     public ReportItemResponse reportItem(Item item)
@@ -442,13 +418,13 @@ public class RestService
      * @throws BadConfigException
      * @throws CriticalException
      */
-    public boolean checkServer()
-            throws
-            AuthorizationException, AuthenticationException, MaintenanceException, QuotaException,
-            NoInternetException, ErrorResponseException, BadConfigException, CriticalException, LevelTooLowException, AlreadyDoneException {
-        String json = getJson(ROUTE_HELLO, new HashMap<String, String>(), false);
-        return json.equals("\"pong\"");
-    }
+//    public boolean checkServer()
+//            throws
+//            AuthorizationException, AuthenticationException, MaintenanceException, QuotaException,
+//            NoInternetException, ErrorResponseException, BadConfigException, CriticalException, LevelTooLowException, AlreadyDoneException {
+//        String json = getJson(ROUTE_HELLO, new HashMap<String, String>(), false);
+//        return json.equals("\"pong\"");
+//    }
 
     /**
      * Checks connection to server to a route behind the authentication firewall.

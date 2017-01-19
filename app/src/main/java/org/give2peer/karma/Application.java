@@ -680,6 +680,7 @@ public class Application extends SugarApp
     /**
      * The REST service handles all the HTTP nitty-gritty, and provides named methods for each API.
      */
+    @Deprecated
     public RestService getRestService() { return restService; }
 
 

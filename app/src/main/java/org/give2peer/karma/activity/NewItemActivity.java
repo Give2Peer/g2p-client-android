@@ -39,12 +39,18 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.shamanland.fab.FloatingActionButton;
 
+import org.androidannotations.annotations.AfterInject;
 import org.androidannotations.annotations.AfterViews;
+import org.androidannotations.annotations.App;
 import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.ViewById;
+import org.androidannotations.rest.spring.annotations.RestService;
+import org.androidannotations.rest.spring.api.RestErrorHandler;
 import org.give2peer.karma.Application;
+import org.give2peer.karma.service.RestClient;
+import org.give2peer.karma.service.RestExceptionHandler;
 import org.give2peer.karma.utils.FileUtils;
 import org.give2peer.karma.entity.Item;
 import org.give2peer.karma.R;
@@ -55,6 +61,7 @@ import org.give2peer.karma.factory.BitmapFactory;
 import org.give2peer.karma.service.ExceptionHandler;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
+import org.springframework.core.NestedRuntimeException;
 
 import java.io.File;
 import java.io.IOException;
@@ -79,12 +86,10 @@ import java.util.Locale;
 public  class      NewItemActivity
         extends    LocatorBaseActivity
         implements OnMapReadyCallback, GoogleMap.OnMapLongClickListener,
-                   ActivityCompat.OnRequestPermissionsResultCallback
+                   ActivityCompat.OnRequestPermissionsResultCallback, RestErrorHandler
 {
     static final int REQUEST_CODE_IMAGE_CAPTURE = 1;
     static final int REQUEST_CODE_ASK_EXTERNAL_STORAGE_PERMISSION = 2;
-
-    Application app;
 
     /**
      * Stores the image files paths, and is bundled so that it survives the Camera activity.
@@ -105,7 +110,11 @@ public  class      NewItemActivity
      */
     protected int imageRotation = 0;
 
+
     //// VIEWS /////////////////////////////////////////////////////////////////////////////////////
+
+    @App
+    Application app;
 
     @ViewById
     FloatingActionButton newItemSendButton;
@@ -150,7 +159,6 @@ public  class      NewItemActivity
         super.onCreate(savedInstanceState);
 
         Log.d("G2P", "Starting new item activity.");
-        app = (Application) getApplication();
 
         // For when we launched the Camera Activity FROM Karma (and are not using the share...),
         // on some devices, the Camera activity destroys this activity, so we need to restore the
@@ -177,8 +185,6 @@ public  class      NewItemActivity
         if (EventBus.getDefault().isRegistered(this))  EventBus.getDefault().unregister(this);
         super.onStop();
     }
-
-
 
     @Override
     protected void onResume() {
@@ -406,6 +412,23 @@ public  class      NewItemActivity
     }
 
 
+    //// REST SERVICE //////////////////////////////////////////////////////////////////////////////
+
+    @RestService
+    RestClient restClient;
+
+    @AfterInject
+    void setupRestClient() {
+        restClient.setRootUrl(app.getCurrentServer().getUrl());
+        restClient.setRestErrorHandler(this);
+    }
+
+    @Override
+    @org.androidannotations.annotations.UiThread
+    public void onRestClientExceptionThrown(NestedRuntimeException e) {
+        new RestExceptionHandler(app, this).handleException(e);
+    }
+
 
     //// ITEM LOCATION ON MAP //////////////////////////////////////////////////////////////////////
 
@@ -423,7 +446,6 @@ public  class      NewItemActivity
     public void resizeCollapsingMapSection() {
         // We want the collapsing section to fit the whole screen height minus a fixed height.
         // We want it to work on all devices, on both orientations. hence, we set it that way.
-
         DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
         newItemMapWrapper.getLayoutParams().height = displayMetrics.heightPixels - app.dpi2pix(108);
     }
@@ -514,7 +536,7 @@ public  class      NewItemActivity
                 LatLng c = marker.getPosition();
                 googleMap.animateCamera(CameraUpdateFactory.newLatLng(c));
                 newItemLocationEditText.setText(String.format(
-                        Locale.US, "%.8f / %.8f", c.latitude, c.longitude
+                        Locale.FRENCH, "%.8f / %.8f", c.latitude, c.longitude
                 ));
             }
         });
@@ -643,12 +665,19 @@ public  class      NewItemActivity
             Exception exception;
 
             @Override
-            protected Item doInBackground(Item... itemToCreate) {
+            protected Item doInBackground(Item... itemsToCreate) {
                 Item itemCreated;
+                Item itemToCreate = itemsToCreate[0]; // bouerk
 
                 // Upload the item properties (at least try to)
                 try {
-                    itemCreated = app.getRestService().createItem(itemToCreate[0]).getItem();
+//                    itemCreated = restClient.createItem(
+//                            itemToCreate.getLocation(),
+//                            itemToCreate.getTitle(),
+//                            itemToCreate.getDescription(),
+//                            itemToCreate.getType()
+//                    ).getItem();
+                    itemCreated = app.getRestService().createItem(itemToCreate).getItem();
                 } catch (Exception e) {
                     exception = e;
                     return null;
@@ -763,10 +792,7 @@ public  class      NewItemActivity
         showMap();
     }
 
-    public void onSend(View view)
-    {
-        send();
-    }
+    public void onSend(View view) { send(); }
 
     protected void enableSending()
     {

@@ -15,7 +15,7 @@ import java.util.Map;
 
 
 /**
- *
+ * An item picture and its thumbnails.
  */
 public class ItemPicture extends SugarRecord implements Parcelable
 {
@@ -96,16 +96,6 @@ public class ItemPicture extends SugarRecord implements Parcelable
         if (null == thumb) thumb = "";
         return thumb;
     }
-
-    /**
-     * See https://github.com/Polidea/AndroidImageCache/issues/6
-     * Note: the other image cache lib we're using is choking on our dirty https too.
-     * @return the thumbnail URL in `http`, not `https`.
-     */
-//    public String getThumbnailNoSsl()
-//    {
-//        return StringUtils.httpsToHttp(getThumbnail());
-//    }
 
 
     //// VANILLA ACCESSORS AND MUTATORS ////////////////////////////////////////////////////////////
