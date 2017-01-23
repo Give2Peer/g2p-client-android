@@ -48,7 +48,6 @@ import org.androidannotations.annotations.ViewById;
 import org.androidannotations.rest.spring.annotations.RestService;
 import org.androidannotations.rest.spring.api.RestErrorHandler;
 import org.give2peer.karma.Application;
-import org.give2peer.karma.event.ItemDeletionEvent;
 import org.give2peer.karma.utils.GeometryUtils;
 import org.give2peer.karma.utils.LatLngUtils;
 import org.give2peer.karma.adapter.ItemInfoWindowAdapter;

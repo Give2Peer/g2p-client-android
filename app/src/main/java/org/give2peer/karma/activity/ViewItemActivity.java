@@ -40,7 +40,6 @@ import org.androidannotations.annotations.ViewById;
 import org.androidannotations.rest.spring.annotations.RestService;
 import org.androidannotations.rest.spring.api.RestErrorHandler;
 import org.give2peer.karma.Application;
-import org.give2peer.karma.event.ItemDeletionEvent;
 import org.give2peer.karma.response.DeleteItemResponse;
 import org.give2peer.karma.service.RestClient;
 import org.give2peer.karma.service.RestExceptionHandler;
@@ -484,8 +483,6 @@ public class ViewItemActivity
 
     @Click
     public void viewItemReportButtonClicked() {
-        final Application app = this.app;
-
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage(getString(R.string.view_item_report_confirm))
                 .setPositiveButton(R.string.dialog_item_report_positive, new DialogInterface.OnClickListener() {

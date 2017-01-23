@@ -412,7 +412,6 @@ public  class      NewItemActivity
         FileUtils.convertToJpg(imagePathOfUser, imagePathTmp);
         imagePaths.add(imagePathTmp);
         fillThumbnail();
-        //sendItemImage();
     }
 
 
@@ -494,6 +493,9 @@ public  class      NewItemActivity
                     .position(latLng)
                     .draggable(true)
             );
+
+            // We NEED to set the drag listener here too, oddly
+            googleMap.setOnMarkerDragListener(makeMapMarkerDragListener());
         }
     }
 
@@ -530,20 +532,7 @@ public  class      NewItemActivity
             );
         }
 
-        googleMap.setOnMarkerDragListener(new GoogleMap.OnMarkerDragListener() {
-            @Override
-            public void onMarkerDragStart(Marker marker) {}
-            @Override
-            public void onMarkerDrag(Marker marker) {}
-            @Override
-            public void onMarkerDragEnd(Marker marker) {
-                LatLng c = marker.getPosition();
-                googleMap.animateCamera(CameraUpdateFactory.newLatLng(c));
-                newItemLocationEditText.setText(String.format(
-                        Locale.FRENCH, "%.8f / %.8f", c.latitude, c.longitude
-                ));
-            }
-        });
+        googleMap.setOnMarkerDragListener(makeMapMarkerDragListener());
 
         // We don't need to ask for permission again, we already did while creating the activity.
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
@@ -558,6 +547,23 @@ public  class      NewItemActivity
                 }
             });
         }
+    }
+
+    GoogleMap.OnMarkerDragListener makeMapMarkerDragListener() {
+        return new GoogleMap.OnMarkerDragListener() {
+            @Override
+            public void onMarkerDragStart(Marker marker) {}
+            @Override
+            public void onMarkerDrag(Marker marker) {}
+            @Override
+            public void onMarkerDragEnd(Marker marker) {
+                LatLng c = marker.getPosition();
+                googleMap.animateCamera(CameraUpdateFactory.newLatLng(c));
+                newItemLocationEditText.setText(String.format(
+                        Locale.FRENCH, "%.8f / %.8f", c.latitude, c.longitude
+                ));
+            }
+        };
     }
 
 
@@ -611,7 +617,6 @@ public  class      NewItemActivity
         Log.d("G2P", "Starting Camera, EXTRA_OUTPUT="+imageUri+" ("+imageUri.getPath()+")");
 
         imagePaths.add(imageFile.getPath());
-        //deleteImages = true; // we don't want to clutter the local filesystem
 
         takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
         startActivityForResult(takePictureIntent, REQUEST_CODE_IMAGE_CAPTURE);
@@ -657,102 +662,7 @@ public  class      NewItemActivity
             item.setType(Item.TYPE_MOOP);
         }
 
-        // In the future we'll have more than one image...
-        final List<Integer> pictureRotations = new ArrayList<Integer>();
-        // ... but we only support one for now.
-        pictureRotations.add(imageRotation);
-
-        sendItemImage();
-        sendItemData(item);
-
-
-
-
-//        final Activity activity = this;
-//
-//        new AsyncTask<Item, Void, Item>() {
-//            Exception exception;
-//
-//            @Override
-//            protected Item doInBackground(Item... itemsToCreate) {
-//                Item itemCreated;
-//                Item itemToCreate = itemsToCreate[0]; // bouerk
-//
-//                // Upload the item properties (at least try to)
-//                try {
-////                    itemCreated = restClient.createItem(
-////                            itemToCreate.getLocation(),
-////                            itemToCreate.getTitle(),
-////                            itemToCreate.getDescription(),
-////                            itemToCreate.getType()
-////                    ).getItem();
-//                    itemCreated = app.getRestService().createItem(itemToCreate).getItem();
-//                } catch (Exception e) {
-//                    exception = e;
-//                    return null;
-//                }
-//
-//                // Open the image files
-//                List<File> imageFiles = new ArrayList<>();
-//                try {
-//                    for (String path : imagePaths) {
-//                        imageFiles.add(new File(path));
-//                    }
-//                } catch (Exception e) {
-//                    exception = e;
-//                    return itemCreated;
-//                }
-//
-//                // And if successful then rotate and upload the picture
-//                // We only upload the first one for now, but ideally we should try to upload all of them
-//                try {
-//                    if ( ! imageFiles.isEmpty()) {
-//                        // grab only the last picture
-//                        File picture = imageFiles.get(imageFiles.size() - 1);
-//                        // rotate
-//                        Integer rotationInDegrees = pictureRotations.get(0);
-//                        FileUtils.rotateImageFile(picture.getPath(), rotationInDegrees);
-//                        // and upload
-//                        itemCreated = app.getRestService().pictureItem(itemCreated, picture).getItem();
-//                    }
-//                } catch (Exception e) {
-//                    exception = e;
-//                    return itemCreated;
-//                }
-//
-//                // If all went smoothly we want to delete the local files
-//                for (File file : imageFiles) {
-//                    if ( ! file.delete()) {
-//                        Log.e("G2P", String.format("Failed to delete item image file '%s'.", file.getPath()));
-//                    } else {
-//                        Log.d("G2P", String.format("Deleted item image file '%s'.", file.getPath()));
-//                    }
-//                }
-//
-//                return itemCreated;
-//            }
-//
-//            @Override
-//            protected void onPostExecute(Item item) {
-//                if (null == exception) {
-//                    //
-//                    app.toasty(getString(R.string.toast_new_item_uploaded, item.getTitle()));
-//
-//                    // Continue to the profile
-//                    Intent intent = new Intent(activity, ProfileActivity_.class);
-//                    activity.startActivity(intent);
-//                    // ... but close this activity, we don't want it in the history stack.
-//                    finish();
-//                } else {
-//                    Exception e = exception;
-//
-//                    // Log
-//                    String loggedMsg = exception.getMessage();
-//                    if ( ! (null == loggedMsg || loggedMsg.isEmpty()))  {
-//                        Log.e("G2P", exception.getMessage());
-//                    }
-//                    exception.printStackTrace();
-//
+        // todo Handle the quota Exception
 //                    // Handle the exception
 //                    ExceptionHandler handler = new ExceptionHandler(activity){
 //                        @Override
@@ -760,14 +670,9 @@ public  class      NewItemActivity
 //                            app.toast(R.string.toast_new_item_error_quota_reached);
 //                        }
 //                    };
-//                    handler.handleExceptionOrFail(e);
-//
-//                    // And enable sending again
-//                    enableSending();
-//                }
-//            }
-//        }.execute(item);
 
+        sendItemImage();
+        sendItemData(item);
     }
 
 
