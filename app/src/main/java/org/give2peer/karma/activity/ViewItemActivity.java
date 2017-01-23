@@ -512,6 +512,7 @@ public class ViewItemActivity
     @UiThread
     protected void afterReportItem(ReportItemResponse report) {
         if (report.wasItemDeleted()) {
+            app.setStale("items");
             app.toasty(getString(R.string.toast_view_item_reported_and_deleted));
             finish();
         } else {
