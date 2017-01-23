@@ -176,7 +176,7 @@ public class RestExceptionHandler
      * @param er        The ErrorResponse object, containing an already localized message.
      */
     protected void onErrorResponseException(HttpClientErrorException exception, ErrorResponse er) {
-        app.toast(exception.getMessage());
+        app.toasty(er.getMessage());
     }
 
 }

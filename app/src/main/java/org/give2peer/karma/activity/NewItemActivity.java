@@ -694,7 +694,6 @@ public  class      NewItemActivity
         if (arePicturesSent) return;
 
         arePicturesSent = true;
-        pictures = new String[MAX_PICTURES_COUNT];
         PictureItemBeforehandResponse pibr;
         try {
             int i = 0;
@@ -743,7 +742,7 @@ public  class      NewItemActivity
         if (null != cir) {
             doneSending(cir.getItem());
         } else {
-            failSending("FAILED sendItemData");
+            failSending();
         }
     }
 
@@ -761,6 +760,11 @@ public  class      NewItemActivity
     @UiThread
     protected void failSending(String why) {
         app.toasty(why);
+        failSending();
+    }
+
+    @UiThread
+    protected void failSending() {
         enableSending();
     }
 
