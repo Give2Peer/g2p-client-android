@@ -88,13 +88,13 @@ public class RestService
     static int ITEMS_PER_PAGE = 64;
 
     // See the routes at http://g2p.give2peer.org
-    static String ROUTE_HELLO        = "/hello";
+//    static String ROUTE_HELLO        = "/hello";
     static String ROUTE_CHECK        = "/check";
     static String ROUTE_USER         = "/user";
-    static String ROUTE_ITEM         = "/item";
+//    static String ROUTE_ITEM         = "/item";
     static String ROUTE_ITEM_REPORT  = "/item/{id}/report";
     static String ROUTE_ITEM_DELETE  = "/item/{id}/delete";
-    static String ROUTE_ITEM_PICTURE = "/item/{id}/picture";
+//    static String ROUTE_ITEM_PICTURE = "/item/{id}/picture";
 
     static String METHOD_GET  = "GET";
     static String METHOD_POST = "POST";
@@ -255,61 +255,59 @@ public class RestService
 //    }
 
 
-    @Deprecated
-    public CreateItemResponse createItem(Item item)
-            throws
-            AuthorizationException, QuotaException, MaintenanceException,
-            ErrorResponseException, NoInternetException, BadConfigException,
-            CriticalException, AuthenticationException, AlreadyDoneException, LevelTooLowException {
-        HashMap<String, String> params = new HashMap<String, String>();
-        params.put("location", item.getLocation());
-        params.put("title", item.getTitle());
-        params.put("description", item.getDescription());
-        params.put("type", item.getType());
+//    @Deprecated
+//    public CreateItemResponse createItem(Item item)
+//            throws
+//            AuthorizationException, QuotaException, MaintenanceException,
+//            ErrorResponseException, NoInternetException, BadConfigException,
+//            CriticalException, AuthenticationException, AlreadyDoneException, LevelTooLowException {
+//        HashMap<String, String> params = new HashMap<String, String>();
+//        params.put("location", item.getLocation());
+//        params.put("title", item.getTitle());
+//        params.put("description", item.getDescription());
+//        params.put("type", item.getType());
+//
+//        String jsonResponse = postJson(ROUTE_ITEM, params);
+//
+//        CreateItemResponse createItemResponse = new CreateItemResponse();
+//
+//        try {
+//            Gson gson = createGson();
+//            createItemResponse = gson.fromJson(jsonResponse, CreateItemResponse.class);
+//        } catch (JsonSyntaxException e) {
+//            String msg = "Failed to parse item creation response :\n%s";
+//            throw new CriticalException(String.format(msg, jsonResponse), e);
+//        }
+//
+//        return createItemResponse;
+//    }
 
-        String jsonResponse = postJson(ROUTE_ITEM, params);
-
-        CreateItemResponse createItemResponse = new CreateItemResponse();
-
-        try {
-            Gson gson = createGson();
-            createItemResponse = gson.fromJson(jsonResponse, CreateItemResponse.class);
-        } catch (JsonSyntaxException e) {
-            String msg = "Failed to parse item creation response :\n%s";
-            throw new CriticalException(String.format(msg, jsonResponse), e);
-        }
-
-        return createItemResponse;
-    }
-
-    /**
-     * TODO: make a temp file with a capped-size picture, upload it, and delete it afterwards ?
-     *
-     * @param item to add the picture to.
-     * @param picture to add to the item.
-     */
-    public PictureItemResponse pictureItem(Item item, File picture)
-            throws
-            CriticalException, AuthorizationException, QuotaException, MaintenanceException,
-            NoInternetException, BadConfigException, ErrorResponseException, AuthenticationException, AlreadyDoneException, LevelTooLowException {
-        String route = ROUTE_ITEM_PICTURE.replaceAll("\\{id\\}", item.getId().toString());
-
-        HashMap<String, String> params = new HashMap<String, String>();
-
-        String json = requestJson(METHOD_POST, route, params, true, picture);
-
-        PictureItemResponse pictureItemResponse = new PictureItemResponse();
-
-        try {
-            Gson gson = createGson();
-            pictureItemResponse = gson.fromJson(json, PictureItemResponse.class);
-        } catch (JsonSyntaxException e) {
-            String msg = "Failed to parse picture item response :\n%s";
-            throw new CriticalException(String.format(msg, json), e);
-        }
-
-        return pictureItemResponse;
-    }
+//    /**
+//     * @param item to add the picture to.
+//     * @param picture to add to the item.
+//     */
+//    public PictureItemResponse pictureItem(Item item, File picture)
+//            throws
+//            CriticalException, AuthorizationException, QuotaException, MaintenanceException,
+//            NoInternetException, BadConfigException, ErrorResponseException, AuthenticationException, AlreadyDoneException, LevelTooLowException {
+//        String route = ROUTE_ITEM_PICTURE.replaceAll("\\{id\\}", item.getId().toString());
+//
+//        HashMap<String, String> params = new HashMap<String, String>();
+//
+//        String json = requestJson(METHOD_POST, route, params, true, picture);
+//
+//        PictureItemResponse pictureItemResponse = new PictureItemResponse();
+//
+//        try {
+//            Gson gson = createGson();
+//            pictureItemResponse = gson.fromJson(json, PictureItemResponse.class);
+//        } catch (JsonSyntaxException e) {
+//            String msg = "Failed to parse picture item response :\n%s";
+//            throw new CriticalException(String.format(msg, json), e);
+//        }
+//
+//        return pictureItemResponse;
+//    }
 
     // HTTP QUERIES : USERS ////////////////////////////////////////////////////////////////////////
 

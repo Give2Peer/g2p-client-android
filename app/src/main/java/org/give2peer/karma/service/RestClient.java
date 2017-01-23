@@ -4,6 +4,7 @@ import org.androidannotations.rest.spring.annotations.Accept;
 import org.androidannotations.rest.spring.annotations.Body;
 import org.androidannotations.rest.spring.annotations.Field;
 import org.androidannotations.rest.spring.annotations.Get;
+import org.androidannotations.rest.spring.annotations.Part;
 import org.androidannotations.rest.spring.annotations.Path;
 import org.androidannotations.rest.spring.annotations.Post;
 import org.androidannotations.rest.spring.annotations.Rest;
@@ -12,8 +13,10 @@ import org.androidannotations.rest.spring.api.RestClientErrorHandling;
 import org.androidannotations.rest.spring.api.RestClientRootUrl;
 import org.give2peer.karma.response.CreateItemResponse;
 import org.give2peer.karma.response.FindItemsResponse;
+import org.give2peer.karma.response.PictureItemBeforehandResponse;
 import org.give2peer.karma.response.PrivateProfileResponse;
 import org.give2peer.karma.response.Stats;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.converter.FormHttpMessageConverter;
 
 
@@ -52,6 +55,11 @@ public interface RestClient extends RestClientRootUrl, RestClientErrorHandling
             @Field String location,
             @Field String title,
             @Field String description,
-            @Field String type
+            @Field String type,
+            @Field("pictures[]") String picture  // such a HAX, won't work with tags :(
     );
+
+    @Post("/item/picture")
+    PictureItemBeforehandResponse pictureItemBeforehand(@Part FileSystemResource picture);
+
 }

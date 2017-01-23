@@ -13,7 +13,6 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
-import android.support.annotation.UiThread;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.app.ActivityCompat;
@@ -45,10 +44,14 @@ import org.androidannotations.annotations.App;
 import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EActivity;
+import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
 import org.androidannotations.rest.spring.annotations.RestService;
 import org.androidannotations.rest.spring.api.RestErrorHandler;
 import org.give2peer.karma.Application;
+import org.give2peer.karma.response.CreateItemResponse;
+import org.give2peer.karma.response.PictureItemBeforehandResponse;
+import org.give2peer.karma.response.PictureItemResponse;
 import org.give2peer.karma.service.RestClient;
 import org.give2peer.karma.service.RestExceptionHandler;
 import org.give2peer.karma.utils.FileUtils;
@@ -62,6 +65,7 @@ import org.give2peer.karma.service.ExceptionHandler;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.springframework.core.NestedRuntimeException;
+import org.springframework.core.io.FileSystemResource;
 
 import java.io.File;
 import java.io.IOException;
@@ -109,6 +113,11 @@ public  class      NewItemActivity
      * Right now the user can set the rotation by clicking on the image.
      */
     protected int imageRotation = 0;
+
+    /**
+     * Ids of the pictures we pre-uploaded before submitting.
+     */
+    protected List<String> pictureIds = new ArrayList<>();
 
 
     //// VIEWS /////////////////////////////////////////////////////////////////////////////////////
@@ -161,9 +170,8 @@ public  class      NewItemActivity
         Log.d("G2P", "Starting new item activity.");
 
         // For when we launched the Camera Activity FROM Karma (and are not using the share...),
-        // on some devices, the Camera activity destroys this activity, so we need to restore the
-        // paths of the files we created before launching the Camera.
-        // What happens when we have a savedinstancestate but the picture comes from the share ?
+        // and the Camera activity has destroyed this activity, so we need to restore the
+        // paths of the files we created before we launched the Camera.
         if (null != savedInstanceState) {
             imagePaths = savedInstanceState.getStringArrayList(BUNDLE_IMAGE_PATHS);
         }
@@ -193,32 +201,8 @@ public  class      NewItemActivity
         app.requireAuthentication(this);
         // We never know, maybe the map and location are ready already ?
         updateMap();
-
+        // For Android M and above, as we want to read and write pictures to the external storage
         askForAccessPermissions();
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
-                                           @NonNull int[] grantResults)
-    {
-        if (grantResults.length == 0) {
-            // In some rare cases, this might happen ; consider permissions denied
-            Log.d("G2P", "onRequestPermissionsResult with no permissions.");
-            onAccessPermissionsDenied();
-            return;
-        }
-        switch (requestCode) {
-            case REQUEST_CODE_ASK_EXTERNAL_STORAGE_PERMISSION:
-                Log.d("G2P", String.format("Grants: %d %d", grantResults[0], grantResults[1]));
-                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    fillThumbnail();
-                } else {
-                    onAccessPermissionsDenied();
-                }
-                break;
-            default:
-                super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        }
     }
 
     /**
@@ -280,6 +264,31 @@ public  class      NewItemActivity
         }
     }
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+                                           @NonNull int[] grantResults)
+    {
+        if (grantResults.length == 0) {
+            // In some rare cases, this might happen ; consider permissions denied
+            Log.d("G2P", "onRequestPermissionsResult with no permissions.");
+            onAccessPermissionsDenied();
+            return;
+        }
+        switch (requestCode) {
+            case REQUEST_CODE_ASK_EXTERNAL_STORAGE_PERMISSION:
+                Log.d("G2P", String.format("Grants: %d %d", grantResults[0], grantResults[1]));
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    fillThumbnail();
+                    //sendItemImage();
+                } else {
+                    onAccessPermissionsDenied();
+                }
+                break;
+            default:
+                super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        }
+    }
+
     protected void onAccessPermissionsDenied() {
         Log.i("G2P", "Permission to access external storage denied... Why, you paranoid clod ?");
         app.toasty(getString(R.string.toast_permission_read_denied));
@@ -296,6 +305,7 @@ public  class      NewItemActivity
         if (requestCode == REQUEST_CODE_IMAGE_CAPTURE && resultCode == RESULT_OK) {
             // Put the bitmap in the View to show the user
             fillThumbnail();
+            //sendItemImage();
         } else if (requestCode == REQUEST_CODE_IMAGE_CAPTURE && resultCode == RESULT_CANCELED) {
             // If the user cancelled the capture of a picture, we GTFO.
             // It may be nice to allow a user to add a picture from a gallery instead of taking one.
@@ -309,7 +319,7 @@ public  class      NewItemActivity
     public void updateMapWhenLocated(LocationUpdateEvent locationUpdateEvent) {
         //Location location = locationUpdateEvent.getLocation();
         // Successfully located device : we hint to the user that the Location field is optional.
-        // Note that this field is not shown anymore, but still used in the "form".
+        // Note that this field is not shown anymore, but is still used in the "form".
         newItemLocationEditText.setHint(R.string.new_item_label_location_optional);
         // Now, we update the map (it will fetch itself the relevant location)
         updateMap();
@@ -329,21 +339,13 @@ public  class      NewItemActivity
     /**
      * This is to recover the image from the Intent, or launch the Camera to pick one if we
      * arrived on this activity by other means (ie: the Intent is empty).
-     * We shouldn't use the second use case, it's not very stable and I'd like to remove it
-     * to de-clutter the code. Right now we disabled any way to go there but users may inspect and
-     * launch activities of their choice from the OS, if they so choose to, I believe.
-     * Instead, we could warn the user and suggest to either launch the camera or return to the map.
-     * Not sure when happens in the "back" history in that case.
-     * I'd love a tool to inspect in real-time that information. There's probably one already.
-     *
-     * Note that this is in AfterViews because we're using Android Annotations.
      */
     @AfterViews
     public void recoverImage() {
-        // This activity may have been destroyed by the Camera activity ; if it's the case,
-        // the imagePaths is not null, as we saved it.
+        // This activity may have been destroyed by the Camera activity.
+        // If it's the case, the imagePaths is not null, as we saved it.
+        // Only initialize it if it has not been restored from bundle state.
         if (null == imagePaths) {
-            // Only initialize if it has not been restored from bundle state.
             imagePaths = new ArrayList<>();
         }
 
@@ -374,6 +376,7 @@ public  class      NewItemActivity
             // Otherwise, it means that `onActivityResult` will be called..
             if (imagePaths.size() > 0) {
                 fillThumbnail();
+                //sendItemImage();
             } else {
                 try {
                     // Check if there's a camera available
@@ -402,13 +405,14 @@ public  class      NewItemActivity
      *
      * @param imagePathOfUser path to an image provided by the user that we should not alter
      */
-    @Background
+    @Background(serial="send")
     void processUserSharedImage(String imagePathOfUser) {
         File imageFileTmp = createImageFile();
         String imagePathTmp = imageFileTmp.getAbsolutePath();
         FileUtils.convertToJpg(imagePathOfUser, imagePathTmp);
         imagePaths.add(imagePathTmp);
         fillThumbnail();
+        //sendItemImage();
     }
 
 
@@ -424,7 +428,7 @@ public  class      NewItemActivity
     }
 
     @Override
-    @org.androidannotations.annotations.UiThread
+    @UiThread
     public void onRestClientExceptionThrown(NestedRuntimeException e) {
         new RestExceptionHandler(app, this).handleException(e);
     }
@@ -645,7 +649,6 @@ public  class      NewItemActivity
         item.setLocation(locationInputValue);
         item.setTitle(newItemTitleEditText.getText().toString());
         item.setDescription(newItemDescriptionEditText.getText().toString());
-
         if (newItemGiftRadioButton.isChecked()) {
             item.setType(Item.TYPE_GIFT);
         } else if (newItemLostRadioButton.isChecked()) {
@@ -659,106 +662,201 @@ public  class      NewItemActivity
         // ... but we only support one for now.
         pictureRotations.add(imageRotation);
 
-        final Activity activity = this;
+        sendItemImage();
+        sendItemData(item);
 
-        new AsyncTask<Item, Void, Item>() {
-            Exception exception;
 
-            @Override
-            protected Item doInBackground(Item... itemsToCreate) {
-                Item itemCreated;
-                Item itemToCreate = itemsToCreate[0]; // bouerk
 
-                // Upload the item properties (at least try to)
-                try {
-//                    itemCreated = restClient.createItem(
-//                            itemToCreate.getLocation(),
-//                            itemToCreate.getTitle(),
-//                            itemToCreate.getDescription(),
-//                            itemToCreate.getType()
-//                    ).getItem();
-                    itemCreated = app.getRestService().createItem(itemToCreate).getItem();
-                } catch (Exception e) {
-                    exception = e;
-                    return null;
+
+//        final Activity activity = this;
+//
+//        new AsyncTask<Item, Void, Item>() {
+//            Exception exception;
+//
+//            @Override
+//            protected Item doInBackground(Item... itemsToCreate) {
+//                Item itemCreated;
+//                Item itemToCreate = itemsToCreate[0]; // bouerk
+//
+//                // Upload the item properties (at least try to)
+//                try {
+////                    itemCreated = restClient.createItem(
+////                            itemToCreate.getLocation(),
+////                            itemToCreate.getTitle(),
+////                            itemToCreate.getDescription(),
+////                            itemToCreate.getType()
+////                    ).getItem();
+//                    itemCreated = app.getRestService().createItem(itemToCreate).getItem();
+//                } catch (Exception e) {
+//                    exception = e;
+//                    return null;
+//                }
+//
+//                // Open the image files
+//                List<File> imageFiles = new ArrayList<>();
+//                try {
+//                    for (String path : imagePaths) {
+//                        imageFiles.add(new File(path));
+//                    }
+//                } catch (Exception e) {
+//                    exception = e;
+//                    return itemCreated;
+//                }
+//
+//                // And if successful then rotate and upload the picture
+//                // We only upload the first one for now, but ideally we should try to upload all of them
+//                try {
+//                    if ( ! imageFiles.isEmpty()) {
+//                        // grab only the last picture
+//                        File picture = imageFiles.get(imageFiles.size() - 1);
+//                        // rotate
+//                        Integer rotationInDegrees = pictureRotations.get(0);
+//                        FileUtils.rotateImageFile(picture.getPath(), rotationInDegrees);
+//                        // and upload
+//                        itemCreated = app.getRestService().pictureItem(itemCreated, picture).getItem();
+//                    }
+//                } catch (Exception e) {
+//                    exception = e;
+//                    return itemCreated;
+//                }
+//
+//                // If all went smoothly we want to delete the local files
+//                for (File file : imageFiles) {
+//                    if ( ! file.delete()) {
+//                        Log.e("G2P", String.format("Failed to delete item image file '%s'.", file.getPath()));
+//                    } else {
+//                        Log.d("G2P", String.format("Deleted item image file '%s'.", file.getPath()));
+//                    }
+//                }
+//
+//                return itemCreated;
+//            }
+//
+//            @Override
+//            protected void onPostExecute(Item item) {
+//                if (null == exception) {
+//                    //
+//                    app.toasty(getString(R.string.toast_new_item_uploaded, item.getTitle()));
+//
+//                    // Continue to the profile
+//                    Intent intent = new Intent(activity, ProfileActivity_.class);
+//                    activity.startActivity(intent);
+//                    // ... but close this activity, we don't want it in the history stack.
+//                    finish();
+//                } else {
+//                    Exception e = exception;
+//
+//                    // Log
+//                    String loggedMsg = exception.getMessage();
+//                    if ( ! (null == loggedMsg || loggedMsg.isEmpty()))  {
+//                        Log.e("G2P", exception.getMessage());
+//                    }
+//                    exception.printStackTrace();
+//
+//                    // Handle the exception
+//                    ExceptionHandler handler = new ExceptionHandler(activity){
+//                        @Override
+//                        protected void on(QuotaException exception) {
+//                            app.toast(R.string.toast_new_item_error_quota_reached);
+//                        }
+//                    };
+//                    handler.handleExceptionOrFail(e);
+//
+//                    // And enable sending again
+//                    enableSending();
+//                }
+//            }
+//        }.execute(item);
+
+    }
+
+
+    //// NETWORK ///////////////////////////////////////////////////////////////////////////////////
+
+    static int MAX_PICTURES_COUNT = 4;
+    String[] pictures = new String[MAX_PICTURES_COUNT]; // use List instead ?
+
+    boolean arePicturesSent = false;
+
+    /**
+     * We cannot send the picture right at the beginning of the activity, we need to wait for the
+     * user to press the "send" FAB because of the picture rotation we want to apply.
+     * Also, we need the picture to keep existing as the user may recreate the activity by rotating
+     * the screen. I'm sad. We need a background Service or something to keep the UI snappy.
+     */
+    @Background(serial="send")
+    protected void sendItemImage() {
+        if (arePicturesSent) return;
+
+        arePicturesSent = true;
+        pictures = new String[MAX_PICTURES_COUNT];
+        PictureItemBeforehandResponse pibr;
+        try {
+            int i = 0;
+            for (String path : imagePaths) {
+
+                FileSystemResource fsr = new FileSystemResource(path);
+                File file = new File(path);
+
+                // Rotate
+                FileUtils.rotateImageFile(file.getPath(), imageRotation);
+
+                // Send (this takes a LONG time on poor networks)
+                pibr = restClient.pictureItemBeforehand(fsr);
+                if (null != pibr) {
+                    pictures[i] = pibr.getPicture().getId().toString();
                 }
 
-                // Open the image files
-                List<File> imageFiles = new ArrayList<>();
-                try {
-                    for (String path : imagePaths) {
-                        imageFiles.add(new File(path));
-                    }
-                } catch (Exception e) {
-                    exception = e;
-                    return itemCreated;
-                }
-
-                // And if successful then rotate and upload the picture
-                // We only upload the first one for now, but ideally we should try to upload all of them
-                try {
-                    if ( ! imageFiles.isEmpty()) {
-                        // grab only the last picture
-                        File picture = imageFiles.get(imageFiles.size() - 1);
-                        // rotate
-                        Integer rotationInDegrees = pictureRotations.get(0);
-                        FileUtils.rotateImageFile(picture.getPath(), rotationInDegrees);
-                        // and upload
-                        itemCreated = app.getRestService().pictureItem(itemCreated, picture).getItem();
-                    }
-                } catch (Exception e) {
-                    exception = e;
-                    return itemCreated;
-                }
-
-                // If all went smoothly we want to delete the local files
-                for (File file : imageFiles) {
-                    if ( ! file.delete()) {
-                        Log.e("G2P", String.format("Failed to delete item image file '%s'.", file.getPath()));
-                    } else {
-                        Log.d("G2P", String.format("Deleted item image file '%s'.", file.getPath()));
-                    }
-                }
-
-                return itemCreated;
-            }
-
-            @Override
-            protected void onPostExecute(Item item) {
-                if (null == exception) {
-                    //
-                    app.toasty(getString(R.string.toast_new_item_uploaded, item.getTitle()));
-
-                    // Continue to the profile
-                    Intent intent = new Intent(activity, ProfileActivity_.class);
-                    activity.startActivity(intent);
-                    // ... but close this activity, we don't want it in the history stack.
-                    finish();
+                // Delete
+                if ( ! file.delete()) {
+                    Log.e("G2P", String.format("Failed to delete item image file '%s'.", file.getPath()));
                 } else {
-                    Exception e = exception;
-
-                    // Log
-                    String loggedMsg = exception.getMessage();
-                    if ( ! (null == loggedMsg || loggedMsg.isEmpty()))  {
-                        Log.e("G2P", exception.getMessage());
-                    }
-                    exception.printStackTrace();
-
-                    // Handle the exception
-                    ExceptionHandler handler = new ExceptionHandler(activity){
-                        @Override
-                        protected void on(QuotaException exception) {
-                            app.toast(R.string.toast_new_item_error_quota_reached);
-                        }
-                    };
-                    handler.handleExceptionOrFail(e);
-
-                    // And enable sending again
-                    enableSending();
+                    Log.d("G2P", String.format("Deleted item image file '%s'.", file.getPath()));
                 }
-            }
-        }.execute(item);
 
+                i++;
+            }
+        } catch (Exception e) {
+            arePicturesSent = false;
+            Log.e("G2P", "Failed to send image.");
+            e.printStackTrace();
+            failSending(e.getMessage()); // todo: L18N
+        }
+    }
+
+    @Background(serial="send")
+    protected void sendItemData(Item item) {
+        String picture = "";
+        if (pictures.length > 0) picture = pictures[0];
+        CreateItemResponse cir = restClient.createItem(
+                item.getLocation(),
+                item.getTitle(),
+                item.getDescription(),
+                item.getType(),
+                picture
+        );
+        if (null != cir) {
+            doneSending(cir.getItem());
+        } else {
+            failSending("FAILED sendItemData");
+        }
+    }
+
+    @UiThread
+    protected void doneSending(Item item) {
+        // Congratulate the user
+        app.toasty(getString(R.string.toast_new_item_uploaded, item.getTitle()));
+        // Continue to the profile
+        Intent intent = new Intent(this, ProfileActivity_.class);
+        this.startActivity(intent);
+        // Close this activity, we don't want it in the history stack.
+        finish();
+    }
+
+    @UiThread
+    protected void failSending(String why) {
+        app.toasty(why);
+        enableSending();
     }
 
 
@@ -768,17 +866,16 @@ public  class      NewItemActivity
      * Shows the picture in the collapsing app bar instead of the map.
      * Does nothing if the picture is already shown.
      */
-    protected void showPicture()
-    {
+    protected void showPicture() {
         newItemMapWrapper.setVisibility(View.GONE);
         newItemImageWrapper.setVisibility(View.VISIBLE);
     }
+
     /**
      * Shows the map in the collapsing app bar instead of the picture.
      * Does nothing if the map is already shown.
      */
-    protected void showMap()
-    {
+    protected void showMap() {
         newItemImageWrapper.setVisibility(View.GONE);
         newItemMapWrapper.setVisibility(View.VISIBLE);
     }
@@ -792,33 +889,30 @@ public  class      NewItemActivity
         showMap();
     }
 
-    public void onSend(View view) { send(); }
-
-    protected void enableSending()
-    {
-        newItemSendButton.setEnabled(true);
-        newItemProgressBar.setVisibility(View.GONE);
-    }
-
-    protected void disableSending()
-    {
-        newItemSendButton.setEnabled(false);
-        newItemProgressBar.setVisibility(View.VISIBLE);
-    }
-
     /**
      * Rotate the image clockwise per steps of 90° when clicked.
      * It's only since API 11, so the feature will not be available to API 10 and lower.
      */
     @Click
-    public void newItemImageViewClicked()
-    {
+    public void newItemImageViewClicked() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
             imageRotation = (imageRotation + 90) % 360;
             newItemImageView.setPivotX(newItemImageView.getWidth()/2);
             newItemImageView.setPivotY(newItemImageView.getHeight()/2);
             newItemImageView.setRotation(imageRotation);
         }
+    }
+
+    public void onSend(View view) { send(); }
+
+    protected void enableSending() {
+        newItemSendButton.setEnabled(true);
+        newItemProgressBar.setVisibility(View.GONE);
+    }
+
+    protected void disableSending() {
+        newItemSendButton.setEnabled(false);
+        newItemProgressBar.setVisibility(View.VISIBLE);
     }
 
 
@@ -829,8 +923,7 @@ public  class      NewItemActivity
      * @param contentUri of the image we want the path from
      * @return the system path of the file described by the Uri.
      */
-    public String getPathFromImageURI(Uri contentUri)
-    {
+    public String getPathFromImageURI(Uri contentUri) {
         String path = null;
 
         // Support for Urls of type content://com.android.providers.downloads.documents/document/4
@@ -849,8 +942,7 @@ public  class      NewItemActivity
      * @return the File that was created.
      * @throws CriticalException
      */
-    private File createImageFile() throws CriticalException
-    {
+    private File createImageFile() throws CriticalException {
         File imageFile = null;
         try {
             String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(new Date());
