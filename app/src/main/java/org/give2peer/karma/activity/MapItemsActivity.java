@@ -48,6 +48,7 @@ import org.androidannotations.annotations.ViewById;
 import org.androidannotations.rest.spring.annotations.RestService;
 import org.androidannotations.rest.spring.api.RestErrorHandler;
 import org.give2peer.karma.Application;
+import org.give2peer.karma.event.ItemDeletionEvent;
 import org.give2peer.karma.utils.GeometryUtils;
 import org.give2peer.karma.utils.LatLngUtils;
 import org.give2peer.karma.adapter.ItemInfoWindowAdapter;
@@ -135,11 +136,6 @@ public class      MapItemsActivity
 
     //// LIFECYCLE /////////////////////////////////////////////////////////////////////////////////
 
-//    @Override
-//    protected void onCreate(Bundle savedInstanceState) {
-//        super.onCreate(savedInstanceState);
-//    }
-
     @Override
     public void onStart() {
         super.onStart();
@@ -164,6 +160,16 @@ public class      MapItemsActivity
 
         // In case this activity was not destroyed, set up the currently selected navigation item
         setUpNavigationDrawer();
+
+        if (isMapReady() && app.isStale("items")) {
+            if (drawingCoordinates.size() > 0) {
+                finishDrawingArea(googleMap, drawingCoordinates);
+            } else {
+                googleMap.clear();
+                googleMap.moveCamera(CameraUpdateFactory.zoomTo(1));
+                getLocation();
+            }
+        }
     }
 
     @AfterViews
@@ -200,6 +206,7 @@ public class      MapItemsActivity
             Log.d("G2P", "Map is ready AGAIN !? When does this ever happen ?");
             return;
         }
+        Log.d("G2P", "Google map is ready.");
 
         googleMap = _googleMap;
 
@@ -478,6 +485,7 @@ public class      MapItemsActivity
                 }
 
                 // Now, either we found items or we didn't
+                app.setFresh("items");
                 int itemsCount = items.size();
                 if (0 == itemsCount) {
                     app.toasty(getString(R.string.toast_no_items_found_in_area));
@@ -649,25 +657,7 @@ public class      MapItemsActivity
                                 break;
 
                             case MotionEvent.ACTION_UP:   // the finger leaves the screen
-                                googleMap.clear();
-                                drawPolygonOnMap(googleMap, drawingCoordinates);
-
-                                isDrawing = false;
-
-                                LatLng centroid = LatLngUtils.getLatLngCentroid(drawingCoordinates);
-                                if (centroid != null) {
-                                    // We need to make a copy of our drawn path, as we may clear it
-                                    // at any time.
-                                    List<LatLng> container = new ArrayList<LatLng>();
-                                    container.addAll(drawingCoordinates);
-                                    executeFinderTask(centroid, container);
-                                }
-
-                                // Zoom and pan the camera ideally around the drawn area
-                                googleMap.animateCamera(CameraUpdateFactory.newLatLngBounds(
-                                        LatLngUtils.getLatLngBounds(drawingCoordinates), 55
-                                ));
-
+                                finishDrawingArea(googleMap, drawingCoordinates);
                                 break;
                         }
 
@@ -676,6 +666,26 @@ public class      MapItemsActivity
                 }
         );
 
+    }
+
+    protected void finishDrawingArea(GoogleMap googleMap, List<LatLng> drawingCoordinates) {
+        googleMap.clear();
+        drawPolygonOnMap(googleMap, drawingCoordinates);
+
+        isDrawing = false;
+
+        LatLng centroid = LatLngUtils.getLatLngCentroid(drawingCoordinates);
+        if (centroid != null) {
+            // Make a copy of our drawn path for the finder, as we may clear it at any time.
+            List<LatLng> container = new ArrayList<LatLng>();
+            container.addAll(drawingCoordinates);
+            executeFinderTask(centroid, container);
+        }
+
+        // Zoom and pan the camera ideally around the drawn area
+        googleMap.animateCamera(CameraUpdateFactory.newLatLngBounds(
+                LatLngUtils.getLatLngBounds(drawingCoordinates), 55
+        ));
     }
 
     /**

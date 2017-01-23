@@ -1,12 +1,10 @@
 package org.give2peer.karma.activity;
 
 import android.Manifest;
-import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.AppBarLayout;
@@ -31,21 +29,30 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.rsv.widget.WebImageView;
 
+import org.androidannotations.annotations.AfterInject;
 import org.androidannotations.annotations.AfterViews;
+import org.androidannotations.annotations.App;
+import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EActivity;
+import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
+import org.androidannotations.rest.spring.annotations.RestService;
+import org.androidannotations.rest.spring.api.RestErrorHandler;
 import org.give2peer.karma.Application;
+import org.give2peer.karma.event.ItemDeletionEvent;
+import org.give2peer.karma.response.DeleteItemResponse;
+import org.give2peer.karma.service.RestClient;
+import org.give2peer.karma.service.RestExceptionHandler;
 import org.give2peer.karma.utils.LatLngUtils;
 import org.give2peer.karma.R;
 import org.give2peer.karma.entity.Item;
 import org.give2peer.karma.event.LocationUpdateEvent;
 import org.give2peer.karma.exception.CriticalException;
-import org.give2peer.karma.response.DeleteItemResponse;
 import org.give2peer.karma.response.ReportItemResponse;
-import org.give2peer.karma.service.ExceptionHandler;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
+import org.springframework.core.NestedRuntimeException;
 
 import java.util.ArrayList;
 import java.util.Locale;
@@ -66,8 +73,9 @@ import java.util.Locale;
 @EActivity(R.layout.activity_view_item)
 public class ViewItemActivity
      extends LocatorBaseActivity
-  implements OnMapReadyCallback
+  implements OnMapReadyCallback, RestErrorHandler
 {
+    @App
     Application app;
 
     /**
@@ -114,17 +122,19 @@ public class ViewItemActivity
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        Log.d("G2P", "Starting new item activity.");
-        app = (Application) getApplication();
+        Log.d("G2P", "Starting view item activity.");
 
         try {
             item = (Item) savedInstanceState.get("item");
         } catch (Exception e) {
-            Log.d("G2P", "No item was passed in the saved instance bundle.");
+            Log.d("G2P", "No item was passed in the saved instance bundle, trying Parcelable...");
         }
 
         if (null == item) {
             item = getIntent().getParcelableExtra("item");
+            if (null != item) {
+                Log.d("G2P", "Found a parceled item.");
+            }
         }
 
         if (null == item) {
@@ -231,6 +241,25 @@ public class ViewItemActivity
 
 
 
+    //// REST SERVICE //////////////////////////////////////////////////////////////////////////////
+
+    @RestService
+    RestClient restClient;
+
+    @AfterInject
+    void setupRestClient() {
+        restClient.setRootUrl(app.getCurrentServer().getUrl());
+        restClient.setRestErrorHandler(this);
+    }
+
+    @Override
+    @UiThread
+    public void onRestClientExceptionThrown(NestedRuntimeException e) {
+        new RestExceptionHandler(app, this).handleException(e);
+    }
+
+
+
     //// ITEM LOCATION ON MAP //////////////////////////////////////////////////////////////////////
 
     GoogleMap googleMap;
@@ -324,18 +353,14 @@ public class ViewItemActivity
     }
 
     protected void updateMap() {
-
-        if ( ! isMapReady() || ! isMapLoaded()) {
-            return;
-        }
+        if ( ! isMapReady() || ! isMapLoaded()) { return; }
 
         // Even with the check above, the following must be safe to run multiple times,
-        // because I think it happens in some lifecycle cases. I suck at android :|
+        // because I think it may happen in some lifecycle cases. I suck at Android :|
         Log.d("G2P", "Updating the view item location map..."); // let's see !
 
         // Let's clear the map
         googleMap.clear();
-
 
         // Zoom and pan the camera ideally around the item alone.
         if ( ! isLocationReady()) {
@@ -372,19 +397,13 @@ public class ViewItemActivity
     }
 
 
-    //// ACTIONS ///////////////////////////////////////////////////////////////////////////////////
-
-
-
-
     //// UI ////////////////////////////////////////////////////////////////////////////////////////
 
     /**
      * Shows the picture in the collapsing app bar instead of the map.
      * Does nothing if the picture is already shown.
      */
-    protected void showPicture()
-    {
+    protected void showPicture() {
         viewItemMapWrapper.setVisibility(View.GONE);
         viewItemImageWrapper.setVisibility(View.VISIBLE);
         canDragYet(true);
@@ -394,8 +413,7 @@ public class ViewItemActivity
      * Shows the map in the collapsing app bar instead of the picture.
      * Does nothing if the map is already shown.
      */
-    protected void showMap()
-    {
+    protected void showMap() {
         viewItemImageWrapper.setVisibility(View.GONE);
         viewItemMapWrapper.setVisibility(View.VISIBLE);
         canDragYet(false);
@@ -415,7 +433,7 @@ public class ViewItemActivity
         Intent intent = new Intent(android.content.Intent.ACTION_VIEW,
                 Uri.parse(String.format(
                         Locale.US,
-                        "http://maps.google.com/maps?daddr=%.6f,%.6f",
+                        "http://maps.google.com/maps?daddr=%.8f,%.8f",
                         item.getLatitude(), item.getLongitude()
                 )));
         startActivity(intent);
@@ -427,10 +445,12 @@ public class ViewItemActivity
     }
 
 
+    //// DELETING AN ITEM //////////////////////////////////////////////////////////////////////////
+
     @Click
     public void viewItemDeleteButtonClicked() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage("Are you sure this item is not available anymore ?")
+        builder.setMessage(getString(R.string.view_item_delete_confirm))
                 .setPositiveButton(R.string.dialog_positive, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         deleteItem();
@@ -440,61 +460,23 @@ public class ViewItemActivity
         builder.create().show();
     }
 
-    // AAAAAARGH, we could refactor this into a just few lines with AA's RestCient !
+    @Background
     protected void deleteItem() {
-        final Application app = this.app;
-        final Activity activity = this;
-
+        beforeDeleteItem();
+        DeleteItemResponse response = restClient.deleteItem(item.getId().toString());
+        if (null != response) { afterDeleteItem(); }
+    }
+    
+    @UiThread
+    protected void beforeDeleteItem() {
         viewItemDeleteButton.setEnabled(false);
-
-        new AsyncTask<Void, Void, Void>()
-        {
-            DeleteItemResponse report;
-            Exception e;
-
-            @Override
-            protected Void doInBackground(Void... nope)
-            {
-                try {
-                    report = app.getRestService().deleteItem(item);
-                } catch (Exception oops) {
-                    e = oops;
-                }
-
-                return null;
-            }
-
-            @Override
-            protected void onPostExecute(Void nope)
-            {
-                super.onPostExecute(nope);
-
-                if (null != report) {
-
-                    app.toast("Item was deleted.");
-                    finish();
-
-                } else if (null != e) {
-
-                    // Log
-                    String loggedMsg = e.getMessage();
-                    if ( ! (null == loggedMsg || loggedMsg.isEmpty())) {
-                        Log.e("G2P", e.getMessage());
-                    }
-                    e.printStackTrace();
-
-                    // Handle the exception
-                    ExceptionHandler handler = new ExceptionHandler(activity);
-                    handler.handleExceptionOrFail(e); // brutality, until beta ends
-
-                    // Restore the UI
-                    viewItemDeleteButton.setEnabled(true);
-
-                } else {
-                    throw new CriticalException("You broke the code ! Booo !");
-                }
-            }
-        }.execute();
+    }
+    
+    @UiThread
+    protected void afterDeleteItem() {
+        app.setStale("items");
+        app.toast(getString(R.string.toast_view_item_deleted));
+        finish();
     }
 
 
@@ -505,74 +487,36 @@ public class ViewItemActivity
         final Application app = this.app;
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage(getString(R.string.toast_view_item_report_confirm))
+        builder.setMessage(getString(R.string.view_item_report_confirm))
                 .setPositiveButton(R.string.dialog_item_report_positive, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                        doItemReport();
+                        reportItem();
                     }
                 })
                 .setNegativeButton(R.string.dialog_item_report_negative, null);
         builder.create().show();
     }
 
-    protected void doItemReport() {
-        final Application app = this.app;
-        final Activity activity = this;
+    @Background
+    protected void reportItem() {
+        beforeReportItem();
+        ReportItemResponse response = restClient.reportItem(item.getId().toString());
+        if (null != response) { afterReportItem(response); }
+    }
 
+    @UiThread
+    protected void beforeReportItem() {
         viewItemReportButton.setEnabled(false);
+    }
 
-        new AsyncTask<Void, Void, Void>()
-        {
-            ReportItemResponse report;
-            Exception e;
-
-            @Override
-            protected Void doInBackground(Void... nope)
-            {
-                try {
-                    report = app.getRestService().reportItem(item);
-                } catch (Exception oops) {
-                    e = oops;
-                }
-
-                return null;
-            }
-
-            @Override
-            protected void onPostExecute(Void nope)
-            {
-                super.onPostExecute(nope);
-
-                if (null != report) {
-
-                    if (report.wasItemDeleted()) {
-                        app.toasty(getString(R.string.toast_view_item_reported_and_deleted));
-                        finish();
-                    } else {
-                        app.toasty(getString(R.string.toast_view_item_reported));
-                    }
-
-                } else if (null != e) {
-
-                    // Log
-                    String loggedMsg = e.getMessage();
-                    if ( ! (null == loggedMsg || loggedMsg.isEmpty())) {
-                        Log.e("G2P", e.getMessage());
-                    }
-                    e.printStackTrace();
-
-                    // Handle the exception
-                    ExceptionHandler handler = new ExceptionHandler(activity);
-                    handler.handleExceptionOrFail(e); // brutality, until beta ends
-
-                    // Restore the UI
-                    viewItemReportButton.setEnabled(true);
-
-                } else {
-                    throw new CriticalException("You broke the code ! Booo !");
-                }
-            }
-        }.execute();
+    @UiThread
+    protected void afterReportItem(ReportItemResponse report) {
+        if (report.wasItemDeleted()) {
+            app.toasty(getString(R.string.toast_view_item_reported_and_deleted));
+            finish();
+        } else {
+            app.toasty(getString(R.string.toast_view_item_reported));
+        }
     }
 
 }

@@ -68,8 +68,10 @@ import org.ocpsoft.prettytime.PrettyTime;
 
 import java.io.IOException;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import pl.polidea.webimageview.WebImageView;
 
@@ -272,30 +274,27 @@ public class Application extends SugarApp
         }
     }
 
-    //// ACTIONS ///////////////////////////////////////////////////////////////////////////////////
 
-    public void launchBugReport(Activity activity)
-    {
+    // ACTIONS /////////////////////////////////////////////////////////////////////////////////////
+
+    public void launchBugReport(Activity activity) {
         Intent i = new Intent(Intent.ACTION_VIEW);
         i.setData(Uri.parse(Application.REPORT_BUG_URL));
         activity.startActivity(i);
     }
 
-    public void launchNewItem(Activity activity)
-    {
+    public void launchNewItem(Activity activity) {
         Intent intent = new Intent(this, NewItemActivity_.class);
         activity.startActivity(intent);
     }
 
-    public void launchViewItem(Activity activity, Item item)
-    {
+    public void launchViewItem(Activity activity, Item item) {
         Intent intent = new Intent(this, ViewItemActivity_.class);
         intent.putExtra("item", item);
         activity.startActivity(intent);
     }
 
-    public void launchLogin(Activity activity)
-    {
+    public void launchLogin(Activity activity) {
         Intent intent = new Intent(this, LoginActivity_.class);
         activity.startActivity(intent);
     }
@@ -305,18 +304,15 @@ public class Application extends SugarApp
         launchActivity(activity, MapItemsActivity_.class);
     }
 
-    public void launchProfile(Activity activity)
-    {
+    public void launchProfile(Activity activity) {
         launchActivity(activity, ProfileActivity_.class);
     }
 
-    public void launchSettings(Activity activity)
-    {
+    public void launchSettings(Activity activity) {
         launchActivity(activity, SettingsActivity_.class);
     }
 
-    public void launchServerConfig(Activity activity)
-    {
+    public void launchServerConfig(Activity activity) {
         launchActivity(activity, ServerConfigActivity.class);
     }
 
@@ -332,11 +328,23 @@ public class Application extends SugarApp
      * @param activity Our current activity, mostly used as Context
      * @param activityClass The activity we want to launch.
      */
-    public void launchActivity(Activity activity, Class<?> activityClass )
-    {
+    public void launchActivity(Activity activity, Class<?> activityClass ) {
         Intent intent = new Intent(activity, activityClass);
         intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
         activity.startActivity(intent);
+    }
+
+    /**
+     * Open the provided url in the user's preferred web browser.
+     */
+    public void openBrowser(final Activity activity, String url) {
+        try {
+            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+            activity.startActivity(browserIntent);
+        } catch (ActivityNotFoundException e) {
+            toasty(getString(R.string.toast_no_browser_available));
+            e.printStackTrace();
+        }
     }
 
 
@@ -347,22 +355,19 @@ public class Application extends SugarApp
      * Ideally, run this in an async task as there may be SQL requests made.
      * @return the currently used Server configuration
      */
-    public Server getCurrentServer()
-    {
+    public Server getCurrentServer() {
         if (null == currentServer) {
             currentServer = guessServerConfiguration();
         }
         return currentServer;
     }
 
-    public void setServerConfiguration(Server config)
-    {
+    public void setServerConfiguration(Server config) {
         currentServer = config;
         restService = new RestService(currentServer);
     }
 
-    public boolean hasServerConfiguration()
-    {
+    public boolean hasServerConfiguration() {
         // Grab the locally-stored servers in our yummy SQLite database
         List<Server> servers = Server.listAll(Server.class);
 
@@ -382,8 +387,7 @@ public class Application extends SugarApp
     }
 
 
-    public Server guessServerConfiguration()
-    {
+    public Server guessServerConfiguration() {
         Server serverConfiguration = null;
 
         // Grab the locally-stored servers in our yummy SQLite database
@@ -454,15 +458,34 @@ public class Application extends SugarApp
 //    }
 
 
+    // STALENESS MARKERS ///////////////////////////////////////////////////////////////////////////
+
+    protected Map<String, Boolean> stalenessMarkers = new HashMap<>();
+
+    public boolean isStale(String what) {
+        if (stalenessMarkers.containsKey(what)) {
+            return stalenessMarkers.get(what);
+        } else {
+            return false;
+        }
+    }
+
+    public void setStale(String what) {
+        stalenessMarkers.put(what, true);
+    }
+
+    public void setFresh(String what) {
+        stalenessMarkers.remove(what);
+    }
+
+
     // ONBOARDING //////////////////////////////////////////////////////////////////////////////////
 
-    public boolean isUserOnBoard()
-    {
+    public boolean isUserOnBoard() {
         return getPrefs().getBoolean("is_on_board", false);
     }
 
-    public void isUserOnBoard(boolean onBoard)
-    {
+    public void isUserOnBoard(boolean onBoard) {
         getPrefs().edit().putBoolean("is_on_board", onBoard).apply();
     }
 
@@ -553,13 +576,11 @@ public class Application extends SugarApp
 
     // LOCATION ////////////////////////////////////////////////////////////////////////////////////
 
-    public boolean hasLocation()
-    {
+    public boolean hasLocation() {
         return null != getLocation();
     }
 
-    public Location getLocation()
-    {
+    public Location getLocation() {
         Long id = Long.valueOf(getPrefs().getString("current_location_id", "0"));
         if (0 == id) {
             if (hasGeoLocation()) {
@@ -968,18 +989,7 @@ public class Application extends SugarApp
 
     // INTENTS /////////////////////////////////////////////////////////////////////////////////////
 
-    /**
-     * Open the provided url in the user's preferred web browser.
-     */
-    public void openBrowser(final Activity activity, String url) {
-        try {
-            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-            activity.startActivity(browserIntent);
-        } catch (ActivityNotFoundException e) {
-            toasty(getString(R.string.toast_no_browser_available));
-            e.printStackTrace();
-        }
-    }
+
 
 
     /**

@@ -12,9 +12,11 @@ import org.androidannotations.rest.spring.api.MediaType;
 import org.androidannotations.rest.spring.api.RestClientErrorHandling;
 import org.androidannotations.rest.spring.api.RestClientRootUrl;
 import org.give2peer.karma.response.CreateItemResponse;
+import org.give2peer.karma.response.DeleteItemResponse;
 import org.give2peer.karma.response.FindItemsResponse;
 import org.give2peer.karma.response.PictureItemBeforehandResponse;
 import org.give2peer.karma.response.PrivateProfileResponse;
+import org.give2peer.karma.response.ReportItemResponse;
 import org.give2peer.karma.response.Stats;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.converter.FormHttpMessageConverter;
@@ -56,10 +58,15 @@ public interface RestClient extends RestClientRootUrl, RestClientErrorHandling
             @Field String title,
             @Field String description,
             @Field String type,
-            @Field("pictures[]") String picture  // such a HAX, won't work with tags :(
+            @Field("pictures[]") String picture  // such a HAX for PHP, won't work with tags :(
     );
 
     @Post("/item/picture")
     PictureItemBeforehandResponse pictureItemBeforehand(@Part FileSystemResource picture);
 
+    @Post("/item/{id}/report")
+    ReportItemResponse reportItem(@Path String id);
+
+    @Post("/item/{id}/delete")
+    DeleteItemResponse deleteItem(@Path String id);
 }

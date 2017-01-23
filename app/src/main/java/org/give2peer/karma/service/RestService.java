@@ -92,8 +92,8 @@ public class RestService
     static String ROUTE_CHECK        = "/check";
     static String ROUTE_USER         = "/user";
 //    static String ROUTE_ITEM         = "/item";
-    static String ROUTE_ITEM_REPORT  = "/item/{id}/report";
-    static String ROUTE_ITEM_DELETE  = "/item/{id}/delete";
+//    static String ROUTE_ITEM_REPORT  = "/item/{id}/report";
+//    static String ROUTE_ITEM_DELETE  = "/item/{id}/delete";
 //    static String ROUTE_ITEM_PICTURE = "/item/{id}/picture";
 
     static String METHOD_GET  = "GET";
@@ -352,53 +352,53 @@ public class RestService
         return registrationResponse;
     }
 
-    /**
-     * fixme
-     */
-    public ReportItemResponse reportItem(Item item)
-            throws
-            AuthorizationException, AuthenticationException, QuotaException, MaintenanceException,
-            NoInternetException, ErrorResponseException, BadConfigException, CriticalException, AlreadyDoneException, LevelTooLowException {
-        String route = ROUTE_ITEM_REPORT.replaceAll("\\{id\\}", item.getId().toString());
-        String json = postJson(route);
-
-        ReportItemResponse reportItemResponse = new ReportItemResponse();
-
-        try {
-            Gson gson = createGson();
-            reportItemResponse = gson.fromJson(json, ReportItemResponse.class);
-        } catch (JsonSyntaxException e) {
-            String msg = "Failed to parse report item response :\n%s";
-            throw new CriticalException(String.format(msg, json), e);
-        }
-
-        return reportItemResponse;
-    }
-
-    /**
-     * fixme
-     */
-    public DeleteItemResponse deleteItem(Item item)
-            throws
-            AuthorizationException, AuthenticationException, QuotaException, MaintenanceException,
-            NoInternetException, ErrorResponseException, BadConfigException, CriticalException,
-            AlreadyDoneException, LevelTooLowException {
-        String route = ROUTE_ITEM_DELETE.replaceAll("\\{id\\}", item.getId().toString());
-        String json = postJson(route);
-        Log.d("G2P", "Delete Item json reponse :\n"+json);
-
-        DeleteItemResponse response = new DeleteItemResponse();
-
-        try {
-            Gson gson = createGson();
-            response = gson.fromJson(json, DeleteItemResponse.class);
-        } catch (JsonSyntaxException e) {
-            String msg = "Failed to parse delete item response :\n%s";
-            throw new CriticalException(String.format(msg, json), e);
-        }
-
-        return response;
-    }
+//    /**
+//     * fixme
+//     */
+//    public ReportItemResponse reportItem(Item item)
+//            throws
+//            AuthorizationException, AuthenticationException, QuotaException, MaintenanceException,
+//            NoInternetException, ErrorResponseException, BadConfigException, CriticalException, AlreadyDoneException, LevelTooLowException {
+//        String route = ROUTE_ITEM_REPORT.replaceAll("\\{id\\}", item.getId().toString());
+//        String json = postJson(route);
+//
+//        ReportItemResponse reportItemResponse = new ReportItemResponse();
+//
+//        try {
+//            Gson gson = createGson();
+//            reportItemResponse = gson.fromJson(json, ReportItemResponse.class);
+//        } catch (JsonSyntaxException e) {
+//            String msg = "Failed to parse report item response :\n%s";
+//            throw new CriticalException(String.format(msg, json), e);
+//        }
+//
+//        return reportItemResponse;
+//    }
+//
+//    /**
+//     * fixme
+//     */
+//    public DeleteItemResponse deleteItem(Item item)
+//            throws
+//            AuthorizationException, AuthenticationException, QuotaException, MaintenanceException,
+//            NoInternetException, ErrorResponseException, BadConfigException, CriticalException,
+//            AlreadyDoneException, LevelTooLowException {
+//        String route = ROUTE_ITEM_DELETE.replaceAll("\\{id\\}", item.getId().toString());
+//        String json = postJson(route);
+//        Log.d("G2P", "Delete Item json reponse :\n"+json);
+//
+//        DeleteItemResponse response = new DeleteItemResponse();
+//
+//        try {
+//            Gson gson = createGson();
+//            response = gson.fromJson(json, DeleteItemResponse.class);
+//        } catch (JsonSyntaxException e) {
+//            String msg = "Failed to parse delete item response :\n%s";
+//            throw new CriticalException(String.format(msg, json), e);
+//        }
+//
+//        return response;
+//    }
 
     // HTTP QUERIES : TESTS ////////////////////////////////////////////////////////////////////////
 

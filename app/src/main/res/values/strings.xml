@@ -35,6 +35,9 @@
     <string name="new_item_send_button">Send</string><!-- deprecated: we use an icon FAB now -->
     <!---->
 
+    <string name="view_item_report_confirm">Are you sure you want to report this item as abusive ? This operation cannot be cancelled !</string>
+    <string name="view_item_delete_confirm">Are you sure this item is not available anymore ?</string>
+
     <string name="registration_label_username">Username</string>
     <string name="registration_label_password">Password</string>
     <string name="registration_label_password2">Password confirmation</string>
@@ -89,7 +92,8 @@
     <string name="toast_permission_read_denied">Permission to read the pictures denied.\nTry again when you feel less paranoid.</string>
     <string name="toast_view_item_reported_and_deleted">Item reported as abusive,\nand subsequently deleted.</string>
     <string name="toast_view_item_reported">Item successfully reported as abusive !</string>
-    <string name="toast_view_item_report_confirm">Are you sure you want to report this item as abusive ? This operation cannot be cancelled !</string>
+    <string name="toast_view_item_deleted">Item was deleted.</string>
+
 
     <string name="title_current_location">Current location</string>
     <string name="title_set_up_location">Set up a location</string>
