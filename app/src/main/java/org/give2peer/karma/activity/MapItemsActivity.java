@@ -67,6 +67,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 
 
 /**
@@ -230,9 +231,8 @@ public class      MapItemsActivity
     @Subscribe
     public void findItemsAroundWhenLocatedForTheFirstTime(LocationUpdateEvent locationUpdateEvent) {
         Location location = locationUpdateEvent.getLocation();
-        // I've got to refactor all these logs...
         Log.d("G2P", String.format(
-                "Location found : latitude=%f, longitude=%f",
+                "Location found : latitude=%.8f, longitude=%.8f",
                 location.getLatitude(), location.getLongitude()
         ));
         // The map should be ready but it costs almost nothing to check again.
@@ -433,8 +433,10 @@ public class      MapItemsActivity
 
                 int skip = 0; // for pagination, as the server returns at most 64 items
 
+                // WARNING : String.valueOf(double) may return scientific notation like 1.5E-3
                 itemsResponse = restClient.findItemsAround(
-                        String.valueOf(where.latitude), String.valueOf(where.longitude),
+                        String.format(Locale.FRENCH, "%.8f", where.latitude),
+                        String.format(Locale.FRENCH, "%.8f", where.longitude),
                         String.valueOf(skip), String.valueOf(maxDistance)
                 );
 
