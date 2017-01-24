@@ -6,20 +6,17 @@ package org.give2peer.karma.event;
  */
 public class AuthenticationEvent
 {
-    boolean success;
+    private boolean success;
 
-    public AuthenticationEvent(boolean success)
-    {
+    public AuthenticationEvent(boolean success) {
         this.success = success;
     }
 
-    public boolean isSuccess()
-    {
+    public boolean isSuccess() {
         return success;
     }
 
-    public boolean isFailure()
-    {
+    public boolean isFailure() {
         return ! success;
     }
 }
