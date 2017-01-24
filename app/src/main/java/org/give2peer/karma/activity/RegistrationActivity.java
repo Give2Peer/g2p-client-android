@@ -20,6 +20,7 @@ import org.give2peer.karma.entity.Server;
 import org.give2peer.karma.exception.ErrorResponseException;
 import org.give2peer.karma.exception.UnavailableEmailException;
 import org.give2peer.karma.exception.UnavailableUsernameException;
+import org.give2peer.karma.response.RegistrationResponse;
 
 //import android.support.v7.internal.widget.AdapterViewCompat;
 //import org.give2peer.karma.entity.Location;
@@ -27,7 +28,7 @@ import org.give2peer.karma.exception.UnavailableUsernameException;
 //import im.delight.android.keyvaluespinner.KeyValueSpinner;
 
 /**
- *
+ * This activity is never used.
  */
 public class RegistrationActivity extends ActionBarActivity
 {
@@ -134,44 +135,38 @@ public class RegistrationActivity extends ActionBarActivity
         }
 
         // Wrap the HTTP query in an async task
-        new AsyncTask<Void, Void, Void>() {
+        new AsyncTask<Void, Void, RegistrationResponse>() {
             Exception exception;
 
             @Override
-            protected Void doInBackground(Void... nope)
+            protected RegistrationResponse doInBackground(Void... nope)
             {
-                try {
-                    app.getOldRestService().register(username, password, email);
-                } catch (Exception e) {
-                    exception = e;
-                }
-
-                return null;
+                return app.getRestClient().register(email, username, password);
             }
 
             @Override
-            protected void onPostExecute(Void nope)
+            protected void onPostExecute(RegistrationResponse nope)
             {
                 super.onPostExecute(nope);
 
-                if (exception != null) {
+                if (null == nope) {
                     enableSending();
-                    if (exception instanceof UnavailableUsernameException) {
-                        app.toast("That username is already taken.");
-                        usrInput.setTextColor(COLOR_ERROR);
-                    }
-                    else if (exception instanceof UnavailableEmailException) {
-                        app.toast("That email is already taken or invalid.");
-                        emlInput.setTextColor(COLOR_ERROR);
-                    }
-                    else if (exception instanceof ErrorResponseException) {
-                        app.toast("The server denied the registration.");
-                        exception.printStackTrace();
-                    }
-                    else {
-                        app.toast("An error occurred.\nCheck your internet connection.");
-                        exception.printStackTrace();
-                    }
+//                    if (exception instanceof UnavailableUsernameException) {
+//                        app.toast("That username is already taken.");
+//                        usrInput.setTextColor(COLOR_ERROR);
+//                    }
+//                    else if (exception instanceof UnavailableEmailException) {
+//                        app.toast("That email is already taken or invalid.");
+//                        emlInput.setTextColor(COLOR_ERROR);
+//                    }
+//                    else if (exception instanceof ErrorResponseException) {
+//                        app.toast("The server denied the registration.");
+//                        exception.printStackTrace();
+//                    }
+//                    else {
+//                        app.toast("An error occurred.\nCheck your internet connection.");
+//                        exception.printStackTrace();
+//                    }
                 } else {
                     // Everything went smoothly, let's save the username and password
                     Server server = app.getCurrentServer();
@@ -180,9 +175,6 @@ public class RegistrationActivity extends ActionBarActivity
                     server.save();
                     // Update the REST service
                     app.setServerConfiguration(server);
-                    // we could also do
-                    //app.getOldRestService().setCredentials(username, password);
-                    // .. not sure which is best.
                     // In the prefs, too. Yeah, technical debt...
                     SharedPreferences prefs = app.getPrefs();
                     String usrKey = String.format("server_%d_username", server.getId());

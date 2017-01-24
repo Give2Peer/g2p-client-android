@@ -110,7 +110,7 @@ abstract public class LocatorBaseActivity extends LocationBaseActivity
     public void onLocationFailed(int failType) {
         switch (failType) {
             case FailType.PERMISSION_DENIED: {
-                Log.d("G2P", "Couldn't get location, because user didn't give permission!");
+                Log.d("G2P", "Couldn't get location, because the user did not give permission!");
                 break;
             }
             case FailType.GP_SERVICES_NOT_AVAILABLE:

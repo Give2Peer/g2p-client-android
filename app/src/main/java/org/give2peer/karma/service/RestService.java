@@ -37,6 +37,7 @@ import org.give2peer.karma.exception.BadConfigException;
 import org.give2peer.karma.exception.CriticalException;
 import org.give2peer.karma.exception.LevelTooLowException;
 import org.give2peer.karma.exception.NoInternetException;
+import org.give2peer.karma.response.CheckResponse;
 import org.give2peer.karma.response.CreateItemResponse;
 import org.give2peer.karma.response.DeleteItemResponse;
 import org.give2peer.karma.response.ErrorResponse;
@@ -81,20 +82,8 @@ import java.util.List;
 @Deprecated
 public class RestService
 {
-    /**
-     * The server limits the number of items sent in the response.
-     * This constant is defined by the server.
-     */
-    static int ITEMS_PER_PAGE = 64;
-
     // See the routes at http://g2p.give2peer.org
-//    static String ROUTE_HELLO        = "/hello";
     static String ROUTE_CHECK        = "/check";
-    static String ROUTE_USER         = "/user";
-//    static String ROUTE_ITEM         = "/item";
-//    static String ROUTE_ITEM_REPORT  = "/item/{id}/report";
-//    static String ROUTE_ITEM_DELETE  = "/item/{id}/delete";
-//    static String ROUTE_ITEM_PICTURE = "/item/{id}/picture";
 
     static String METHOD_GET  = "GET";
     static String METHOD_POST = "POST";
@@ -186,246 +175,18 @@ public class RestService
 
         client = HttpClients.custom().setSSLSocketFactory(sslSF).build();
 
-//        HttpParams httpParameters = new BasicHttpParams();
-//        HttpConnectionParams.setConnectionTimeout(httpParameters, TIMEOUT_CONNECTION);
-//        HttpConnectionParams.setSoTimeout(httpParameters, TIMEOUT_SOCKET);
-//        HttpProtocolParams.setVersion(httpParameters, HttpVersion.HTTP_1_1);
-
-        // Thread safe in case various AsyncTasks try to access it concurrently
-//        SchemeRegistry schemeRegistry = new SchemeRegistry();
-//        schemeRegistry.register(new Scheme("http", PlainSocketFactory.getSocketFactory(), 80));
-//        schemeRegistry.register(new Scheme("https", SSLSocketFactory.getSocketFactory(), 443));
-//        ClientConnectionManager cm = new ThreadSafeClientConnManager(httpParameters, schemeRegistry);
-
-//        client = new DefaultHttpClient(cm, httpParameters);
-
-//        CookieStore cookieStore = client.getCookieStore();
-//        HttpContext localContext = new BasicHttpContext();
-//        localContext.setAttribute(ClientContext.COOKIE_STORE, cookieStore);
-
         return client;
     }
 
-    // HTTP QUERIES : ITEMS ////////////////////////////////////////////////////////////////////////
-
-//    public FindItemsResponse findAroundPaginated(double latitude, double longitude,
-//                                                 double maxDistance, int page)
-//            throws AuthorizationException, MaintenanceException, AuthenticationException,
-//            QuotaException, BadConfigException, ErrorResponseException,
-//            CriticalException, NoInternetException, LevelTooLowException, AlreadyDoneException {
-//        return findAround(latitude, longitude, page * ITEMS_PER_PAGE);
-//    }
-//
-//    public FindItemsResponse findAround(double latitude, double longitude, double maxDistance)
-//            throws AuthorizationException, MaintenanceException, AuthenticationException,
-//            QuotaException, BadConfigException, ErrorResponseException,
-//            CriticalException, NoInternetException, LevelTooLowException, AlreadyDoneException {
-//        return findAround(latitude, longitude, maxDistance, 0);
-//    }
-//
-//    /**
-//     * Returns a list of at most 64 items.
-//     * Pages start at 0, and hold `ITEMS_PER_PAGE` items per page.
-//     */
-//    public FindItemsResponse findAround(double latitude, double longitude,
-//                                        double maxDistance, int offset)
-//            throws AuthorizationException, MaintenanceException, AuthenticationException,
-//            QuotaException, BadConfigException, ErrorResponseException,
-//            CriticalException, NoInternetException, AlreadyDoneException, LevelTooLowException {
-//        String route = ROUTE_ITEMS_AROUND.replaceAll("\\{latitude\\}",  String.valueOf(latitude))
-//                                         .replaceAll("\\{longitude\\}", String.valueOf(longitude));
-//
-//        HashMap<String, String> params = new HashMap<String, String>();
-//        params.put("skip", String.valueOf(offset));
-//        params.put("maxDistance", String.valueOf(maxDistance));
-//
-//        String json = getJson(route, params);
-//
-//        FindItemsResponse findItemsResponse = new FindItemsResponse();
-//
-//        try {
-//            Gson gson = createGson();
-//            findItemsResponse = gson.fromJson(json, FindItemsResponse.class);
-//        } catch (JsonSyntaxException e) {
-//            String msg = "Failed to parse finding items `%s` response :\n%s";
-//            throw new CriticalException(String.format(msg, route, json), e);
-//        }
-//
-//        return findItemsResponse;
-//    }
 
 
-//    @Deprecated
-//    public CreateItemResponse createItem(Item item)
-//            throws
-//            AuthorizationException, QuotaException, MaintenanceException,
-//            ErrorResponseException, NoInternetException, BadConfigException,
-//            CriticalException, AuthenticationException, AlreadyDoneException, LevelTooLowException {
-//        HashMap<String, String> params = new HashMap<String, String>();
-//        params.put("location", item.getLocation());
-//        params.put("title", item.getTitle());
-//        params.put("description", item.getDescription());
-//        params.put("type", item.getType());
-//
-//        String jsonResponse = postJson(ROUTE_ITEM, params);
-//
-//        CreateItemResponse createItemResponse = new CreateItemResponse();
-//
-//        try {
-//            Gson gson = createGson();
-//            createItemResponse = gson.fromJson(jsonResponse, CreateItemResponse.class);
-//        } catch (JsonSyntaxException e) {
-//            String msg = "Failed to parse item creation response :\n%s";
-//            throw new CriticalException(String.format(msg, jsonResponse), e);
-//        }
-//
-//        return createItemResponse;
-//    }
 
-//    /**
-//     * @param item to add the picture to.
-//     * @param picture to add to the item.
-//     */
-//    public PictureItemResponse pictureItem(Item item, File picture)
-//            throws
-//            CriticalException, AuthorizationException, QuotaException, MaintenanceException,
-//            NoInternetException, BadConfigException, ErrorResponseException, AuthenticationException, AlreadyDoneException, LevelTooLowException {
-//        String route = ROUTE_ITEM_PICTURE.replaceAll("\\{id\\}", item.getId().toString());
-//
-//        HashMap<String, String> params = new HashMap<String, String>();
-//
-//        String json = requestJson(METHOD_POST, route, params, true, picture);
-//
-//        PictureItemResponse pictureItemResponse = new PictureItemResponse();
-//
-//        try {
-//            Gson gson = createGson();
-//            pictureItemResponse = gson.fromJson(json, PictureItemResponse.class);
-//        } catch (JsonSyntaxException e) {
-//            String msg = "Failed to parse picture item response :\n%s";
-//            throw new CriticalException(String.format(msg, json), e);
-//        }
-//
-//        return pictureItemResponse;
-//    }
-
-    // HTTP QUERIES : USERS ////////////////////////////////////////////////////////////////////////
-
-    public RegistrationResponse preregister()
-            throws
-            // see method below for more details
-            ErrorResponseException, UnavailableUsernameException, UnavailableEmailException,
-            AuthorizationException, MaintenanceException, QuotaException, CriticalException,
-            BadConfigException, NoInternetException, AuthenticationException, AlreadyDoneException, LevelTooLowException {
-        return register("", "", "");
-    }
-
-    public RegistrationResponse register(String username, String password, String email)
-            throws
-            UnavailableUsernameException, UnavailableEmailException // obvious
-            , ErrorResponseException  // never if we implement everything the server responds
-            , AuthorizationException  // user is not allowed to so that
-            , AuthenticationException // server credentials don't check out
-            , MaintenanceException    // such pro, very maintain wow
-            , CriticalException       // we want to know when they happen
-            , QuotaException
-            , BadConfigException      // something is badly configured ! User's fault, 99.99%
-            , NoInternetException, LevelTooLowException, AlreadyDoneException
-
-    {
-        HashMap<String, String> params = new HashMap<String, String>();
-        params.put("username", username);
-        params.put("password", password);
-        params.put("email", email);
-        String json = postJson(ROUTE_USER, params, false);
-
-        RegistrationResponse registrationResponse = new RegistrationResponse();
-
-        try {
-            Gson gson = createGson();
-            registrationResponse = gson.fromJson(json, RegistrationResponse.class);
-        } catch (JsonSyntaxException e) {
-            String msg = "Failed to parse registration response :\n%s";
-            throw new CriticalException(String.format(msg, json), e);
-        }
-
-        return registrationResponse;
-    }
-
-//    /**
-//     * fixme
-//     */
-//    public ReportItemResponse reportItem(Item item)
-//            throws
-//            AuthorizationException, AuthenticationException, QuotaException, MaintenanceException,
-//            NoInternetException, ErrorResponseException, BadConfigException, CriticalException, AlreadyDoneException, LevelTooLowException {
-//        String route = ROUTE_ITEM_REPORT.replaceAll("\\{id\\}", item.getId().toString());
-//        String json = postJson(route);
-//
-//        ReportItemResponse reportItemResponse = new ReportItemResponse();
-//
-//        try {
-//            Gson gson = createGson();
-//            reportItemResponse = gson.fromJson(json, ReportItemResponse.class);
-//        } catch (JsonSyntaxException e) {
-//            String msg = "Failed to parse report item response :\n%s";
-//            throw new CriticalException(String.format(msg, json), e);
-//        }
-//
-//        return reportItemResponse;
-//    }
-//
-//    /**
-//     * fixme
-//     */
-//    public DeleteItemResponse deleteItem(Item item)
-//            throws
-//            AuthorizationException, AuthenticationException, QuotaException, MaintenanceException,
-//            NoInternetException, ErrorResponseException, BadConfigException, CriticalException,
-//            AlreadyDoneException, LevelTooLowException {
-//        String route = ROUTE_ITEM_DELETE.replaceAll("\\{id\\}", item.getId().toString());
-//        String json = postJson(route);
-//        Log.d("G2P", "Delete Item json reponse :\n"+json);
-//
-//        DeleteItemResponse response = new DeleteItemResponse();
-//
-//        try {
-//            Gson gson = createGson();
-//            response = gson.fromJson(json, DeleteItemResponse.class);
-//        } catch (JsonSyntaxException e) {
-//            String msg = "Failed to parse delete item response :\n%s";
-//            throw new CriticalException(String.format(msg, json), e);
-//        }
-//
-//        return response;
-//    }
-
-    // HTTP QUERIES : TESTS ////////////////////////////////////////////////////////////////////////
-
-    /**
-     * Does not check credentials. Mostly tells us that the server URL is correct.
-     * Tells us :
-     * - if the server URL is correct (failed or suceeded)
-     * - additional info on the server, and we might make the app say hello on create ?
-     *
-     * @throws AuthorizationException
-     * @throws MaintenanceException
-     * @throws QuotaException
-     * @throws NoInternetException
-     * @throws ErrorResponseException
-     * @throws BadConfigException
-     * @throws CriticalException
-     */
-//    public boolean checkServer()
-//            throws
-//            AuthorizationException, AuthenticationException, MaintenanceException, QuotaException,
-//            NoInternetException, ErrorResponseException, BadConfigException, CriticalException, LevelTooLowException, AlreadyDoneException {
-//        String json = getJson(ROUTE_HELLO, new HashMap<String, String>(), false);
-//        return json.equals("\"pong\"");
-//    }
 
     /**
      * Checks connection to server to a route behind the authentication firewall.
+     *
+     * This is the only method we're still using in deprecated activities, like the
+     * server configuration.
      *
      * @throws AuthorizationException
      * @throws MaintenanceException
@@ -439,9 +200,14 @@ public class RestService
             throws
             AuthorizationException, AuthenticationException, MaintenanceException, QuotaException,
             NoInternetException, ErrorResponseException, BadConfigException, CriticalException, AlreadyDoneException, LevelTooLowException {
-        String json = getJson(ROUTE_CHECK);
-        return json.equals("\"pong\"");
+        Gson gson = createGson();
+        CheckResponse cr = gson.fromJson(getJson(ROUTE_CHECK), CheckResponse.class);
+        return cr.isOk();
     }
+
+
+
+
 
     // UTILS ///////////////////////////////////////////////////////////////////////////////////////
 

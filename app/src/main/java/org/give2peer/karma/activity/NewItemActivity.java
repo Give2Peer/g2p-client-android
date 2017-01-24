@@ -587,8 +587,7 @@ public  class      NewItemActivity
      * means to share them. How about some karma points as incentive to report bugs ? ;)
      */
     @UiThread
-    protected void fillThumbnail()
-    {
+    protected void fillThumbnail() {
         if (imagePaths.size() > 0) {
             String imagePath = imagePaths.get(imagePaths.size() - 1);
             try { // imagePaths may be set but the files may not exist yet
@@ -609,8 +608,7 @@ public  class      NewItemActivity
     /**
      * Launch the Camera activity to grab a picture, which will get back to `onActivityResult`.
      */
-    protected void requestNewPicture() throws CriticalException
-    {
+    protected void requestNewPicture() throws CriticalException {
         // Create an new image capture intent
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 
@@ -636,8 +634,7 @@ public  class      NewItemActivity
     /**
      * Send the new item data to the server, in an async task.
      */
-    public void send()
-    {
+    public void send() {
         disableSending();
 
         // Grab the Location, from input or GPS. It is MANDATORY.

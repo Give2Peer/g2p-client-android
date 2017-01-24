@@ -11,6 +11,7 @@ import org.androidannotations.rest.spring.annotations.Rest;
 import org.androidannotations.rest.spring.api.MediaType;
 import org.androidannotations.rest.spring.api.RestClientErrorHandling;
 import org.androidannotations.rest.spring.api.RestClientRootUrl;
+import org.give2peer.karma.response.CheckResponse;
 import org.give2peer.karma.response.CreateItemResponse;
 import org.give2peer.karma.response.DeleteItemResponse;
 import org.give2peer.karma.response.FindItemsResponse;
@@ -41,6 +42,9 @@ import org.springframework.http.converter.FormHttpMessageConverter;
 @Accept(MediaType.APPLICATION_JSON)
 public interface RestClient extends RestClientRootUrl, RestClientErrorHandling
 {
+    @Get("/check")
+    CheckResponse check();
+
     @Get("/stats")
     Stats getStats();
 
