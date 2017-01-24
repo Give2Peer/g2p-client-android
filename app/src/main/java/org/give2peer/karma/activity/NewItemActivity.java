@@ -7,7 +7,6 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
@@ -46,25 +45,18 @@ import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
-import org.androidannotations.rest.spring.annotations.RestService;
-import org.androidannotations.rest.spring.api.RestErrorHandler;
 import org.give2peer.karma.Application;
 import org.give2peer.karma.response.CreateItemResponse;
 import org.give2peer.karma.response.PictureItemBeforehandResponse;
 import org.give2peer.karma.response.PictureItemResponse;
-import org.give2peer.karma.service.RestClient;
-import org.give2peer.karma.service.RestExceptionHandler;
 import org.give2peer.karma.utils.FileUtils;
 import org.give2peer.karma.entity.Item;
 import org.give2peer.karma.R;
 import org.give2peer.karma.event.LocationUpdateEvent;
 import org.give2peer.karma.exception.CriticalException;
-import org.give2peer.karma.exception.QuotaException;
 import org.give2peer.karma.factory.BitmapFactory;
-import org.give2peer.karma.service.ExceptionHandler;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
-import org.springframework.core.NestedRuntimeException;
 import org.springframework.core.io.FileSystemResource;
 
 import java.io.File;
@@ -90,7 +82,7 @@ import java.util.Locale;
 public  class      NewItemActivity
         extends    LocatorBaseActivity
         implements OnMapReadyCallback, GoogleMap.OnMapLongClickListener,
-                   ActivityCompat.OnRequestPermissionsResultCallback, RestErrorHandler
+                   ActivityCompat.OnRequestPermissionsResultCallback
 {
     static final int REQUEST_CODE_IMAGE_CAPTURE = 1;
     static final int REQUEST_CODE_ASK_EXTERNAL_STORAGE_PERMISSION = 2;
@@ -199,10 +191,10 @@ public  class      NewItemActivity
         super.onResume();
         // If the user is not preregistered, let's do this dudeez !
         app.requireAuthentication(this);
-        // We never know, maybe the map and location are ready already ?
-        updateMap();
         // For Android M and above, as we want to read and write pictures to the external storage
         askForAccessPermissions();
+        // We never know, maybe the map and location are ready already ?
+        updateMap();
     }
 
     /**
@@ -279,7 +271,6 @@ public  class      NewItemActivity
                 Log.d("G2P", String.format("Grants: %d %d", grantResults[0], grantResults[1]));
                 if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     fillThumbnail();
-                    //sendItemImage();
                 } else {
                     onAccessPermissionsDenied();
                 }
@@ -325,6 +316,7 @@ public  class      NewItemActivity
         updateMap();
     }
 
+
     //// AFTER VIEWS ///////////////////////////////////////////////////////////////////////////////
 
     /**
@@ -342,6 +334,9 @@ public  class      NewItemActivity
      */
     @AfterViews
     public void recoverImage() {
+        // We need to do that as this is run before onResume
+        askForAccessPermissions();
+
         // This activity may have been destroyed by the Camera activity.
         // If it's the case, the imagePaths is not null, as we saved it.
         // Only initialize it if it has not been restored from bundle state.
@@ -412,24 +407,6 @@ public  class      NewItemActivity
         FileUtils.convertToJpg(imagePathOfUser, imagePathTmp);
         imagePaths.add(imagePathTmp);
         fillThumbnail();
-    }
-
-
-    //// REST SERVICE //////////////////////////////////////////////////////////////////////////////
-
-    @RestService
-    RestClient restClient;
-
-    @AfterInject
-    void setupRestClient() {
-        restClient.setRootUrl(app.getCurrentServer().getUrl());
-        restClient.setRestErrorHandler(this);
-    }
-
-    @Override
-    @UiThread
-    public void onRestClientExceptionThrown(NestedRuntimeException e) {
-        new RestExceptionHandler(app, this).handleException(e);
     }
 
 
@@ -520,11 +497,11 @@ public  class      NewItemActivity
         // because I think it happens in some lifecycle cases. I suck at android :|
         Log.d("G2P", "Updating the new item location map..."); // let's see !
 
-        // Let's clear the map and zoom on the user position
+        // Clear the map and zoom on the user position
         googleMap.clear();
         googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(getLatLng(), 16));
 
-        // Let's put a marker on the map if needed, so that the user may drag it around if they want
+        // Put a marker on the map, if any, so that the user may drag it around if they want
         if (null == itemLocationMarker) {
             itemLocationMarker = googleMap.addMarker(new MarkerOptions()
                     .position(getLatLng())
@@ -706,7 +683,7 @@ public  class      NewItemActivity
                 FileUtils.rotateImageFile(file.getPath(), imageRotation);
 
                 // Send (this takes a LONG time on poor networks)
-                pibr = restClient.pictureItemBeforehand(fsr);
+                pibr = app.getRestClient().pictureItemBeforehand(fsr);
                 if (null != pibr) {
                     pictures[i] = pibr.getPicture().getId().toString();
                 }
@@ -732,7 +709,7 @@ public  class      NewItemActivity
     protected void sendItemData(Item item) {
         String picture = "";
         if (pictures.length > 0) picture = pictures[0];
-        CreateItemResponse cir = restClient.createItem(
+        CreateItemResponse cir = app.getRestClient().createItem(
                 item.getLocation(),
                 item.getTitle(),
                 item.getDescription(),

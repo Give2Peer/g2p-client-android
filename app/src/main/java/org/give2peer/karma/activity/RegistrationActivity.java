@@ -141,7 +141,7 @@ public class RegistrationActivity extends ActionBarActivity
             protected Void doInBackground(Void... nope)
             {
                 try {
-                    app.getRestService().register(username, password, email);
+                    app.getOldRestService().register(username, password, email);
                 } catch (Exception e) {
                     exception = e;
                 }
@@ -181,7 +181,7 @@ public class RegistrationActivity extends ActionBarActivity
                     // Update the REST service
                     app.setServerConfiguration(server);
                     // we could also do
-                    //app.getRestService().setCredentials(username, password);
+                    //app.getOldRestService().setCredentials(username, password);
                     // .. not sure which is best.
                     // In the prefs, too. Yeah, technical debt...
                     SharedPreferences prefs = app.getPrefs();

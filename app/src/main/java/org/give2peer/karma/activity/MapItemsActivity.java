@@ -45,8 +45,6 @@ import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
-import org.androidannotations.rest.spring.annotations.RestService;
-import org.androidannotations.rest.spring.api.RestErrorHandler;
 import org.give2peer.karma.Application;
 import org.give2peer.karma.utils.GeometryUtils;
 import org.give2peer.karma.utils.LatLngUtils;
@@ -57,11 +55,8 @@ import org.give2peer.karma.event.AuthenticationEvent;
 import org.give2peer.karma.event.LocationUpdateEvent;
 import org.give2peer.karma.exception.CriticalException;
 import org.give2peer.karma.response.FindItemsResponse;
-import org.give2peer.karma.service.RestClient;
-import org.give2peer.karma.service.RestExceptionHandler;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
-import org.springframework.core.NestedRuntimeException;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -82,7 +77,7 @@ import java.util.Locale;
 @EActivity(R.layout.activity_map_items)
 public class      MapItemsActivity
        extends    LocatorBaseActivity
-       implements OnMapReadyCallback, RestErrorHandler
+       implements OnMapReadyCallback
 {
     @App
     Application app;
@@ -248,7 +243,7 @@ public class      MapItemsActivity
     }
 
 
-    // NAVIGATION DRAWER ///////////////////////////////////////////////////////////////////////////
+    //// NAVIGATION DRAWER /////////////////////////////////////////////////////////////////////////
 
     Drawer navigationDrawer;
 
@@ -267,7 +262,8 @@ public class      MapItemsActivity
         }
     }
 
-    // OPTIONS MENU ////////////////////////////////////////////////////////////////////////////////
+
+    //// OPTIONS MENU //////////////////////////////////////////////////////////////////////////////
 
     // We'll have map filters over here.
 
@@ -387,24 +383,6 @@ public class      MapItemsActivity
     }
 
 
-    // REST SERVICE ////////////////////////////////////////////////////////////////////////////////
-
-    @RestService
-    RestClient restClient;
-
-    @AfterInject
-    void setupRestClient() {
-        restClient.setRootUrl(app.getCurrentServer().getUrl());
-        restClient.setRestErrorHandler(this);
-    }
-
-    @Override
-    @UiThread
-    public void onRestClientExceptionThrown(NestedRuntimeException e) {
-        new RestExceptionHandler(app, this).handleException(e);
-    }
-
-
     //// ITEMS FINDER //////////////////////////////////////////////////////////////////////////////
 
 //    protected boolean isReadyToFindItems() {
@@ -440,7 +418,7 @@ public class      MapItemsActivity
                 int skip = 0; // for pagination, as the server returns at most 64 items
 
                 // WARNING : String.valueOf(double) may return scientific notation like 1.5E-3
-                itemsResponse = restClient.findItemsAround(
+                itemsResponse = app.getRestClient().findItemsAround(
                         String.format(Locale.FRENCH, "%.8f", where.latitude),
                         String.format(Locale.FRENCH, "%.8f", where.longitude),
                         String.valueOf(skip), String.valueOf(maxDistance)

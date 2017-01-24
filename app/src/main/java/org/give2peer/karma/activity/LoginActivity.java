@@ -28,6 +28,8 @@ import java.net.URISyntaxException;
 
 
 /**
+ * We do not use this right now.
+ *
  * Allows a user to set up his username and password for the current server.
  * This can also be done ine the preferences, but :
  * - this is prettier, and might pave the way for other login means.
@@ -86,7 +88,7 @@ public class LoginActivity extends ActionBarActivity
         final String password = loginPasswordEditText.getText().toString();
 
         // Grab the REST service and save its initial credentials
-        final RestService rs = app.getRestService();
+        final RestService rs = app.getOldRestService();
         final UsernamePasswordCredentials credentials = rs.getCredentials();
 
         // Wrap the HTTP query in an async task

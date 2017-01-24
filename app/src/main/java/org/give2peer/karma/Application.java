@@ -45,7 +45,11 @@ import com.shamanland.fab.FloatingActionButton;
 
 import net.danlew.android.joda.JodaTimeAndroid;
 
+import org.androidannotations.annotations.AfterInject;
+import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.EApplication;
+import org.androidannotations.annotations.UiThread;
+import org.androidannotations.rest.spring.api.RestErrorHandler;
 import org.give2peer.karma.activity.AboutActivity_;
 import org.give2peer.karma.activity.LoginActivity_;
 import org.give2peer.karma.activity.MapItemsActivity_;
@@ -58,13 +62,18 @@ import org.give2peer.karma.entity.Item;
 import org.give2peer.karma.entity.Location;
 import org.give2peer.karma.entity.Server;
 import org.give2peer.karma.event.AuthenticationEvent;
+import org.give2peer.karma.exception.CriticalException;
 import org.give2peer.karma.exception.GeocodingException;
 import org.give2peer.karma.exception.NoInternetException;
 import org.give2peer.karma.listener.GoogleApiClientListener;
 import org.give2peer.karma.response.RegistrationResponse;
+import org.give2peer.karma.response.Stats;
+import org.give2peer.karma.service.RestClient;
+import org.give2peer.karma.service.RestExceptionHandler;
 import org.give2peer.karma.service.RestService;
 import org.greenrobot.eventbus.EventBus;
 import org.ocpsoft.prettytime.PrettyTime;
+import org.springframework.core.NestedRuntimeException;
 
 import java.io.IOException;
 import java.util.Date;
@@ -95,8 +104,7 @@ import pl.polidea.webimageview.WebImageView;
  * ```
  */
 @EApplication
-public class Application extends SugarApp
-{
+public class Application extends SugarApp implements RestErrorHandler {
     public static String REPORT_BUG_URL = "https://github.com/Give2Peer/g2p-client-android/issues";
     public static int THUMB_MAX_WIDTH  = 512;
     public static int THUMB_MAX_HEIGHT = 512;
@@ -134,6 +142,8 @@ public class Application extends SugarApp
 
         // We don't even need this I guess ?
         //PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
+
+        setupRestClient();
     }
 
     /**
@@ -169,8 +179,7 @@ public class Application extends SugarApp
      *                 that case obviously returns false.
      * @return whether the current user is (pre)registered or not at all. (no username or password)
      */
-    public boolean isUserRegistered()
-    {
+    public boolean isUserRegistered() {
         Server server = getCurrentServer();
         return null != server && server.isComplete();
     }
@@ -178,8 +187,7 @@ public class Application extends SugarApp
     /**
      * @return the username of the current user, or an empty string.
      */
-    public String getUsername()
-    {
+    public String getUsername() {
         Server server = getCurrentServer();
         if (null != server) {
             return server.getUsername();
@@ -191,8 +199,7 @@ public class Application extends SugarApp
     /**
      * @return the username of the current user, or an empty string.
      */
-    public String getPassword()
-    {
+    public String getPassword() {
         Server server = getCurrentServer();
         if (null != server) {
             return server.getPassword();
@@ -201,16 +208,16 @@ public class Application extends SugarApp
         }
     }
 
-    public void requireAuthentication(final Activity activity)
-    {
-        requireAuthentication(activity, null);
-    }
+//    @Background
+//    protected void doRegistration() {
+//
+//        getRestClient().preregister();
+//    }
 
-    public void requireAuthentication(final Activity activity, @Nullable String message)
-    {
-        if ( ! isUserRegistered()) {
-
-            // Launch an async !
+    public void requireAuthentication(final Activity activity) {
+        if (isUserRegistered()) {
+            EventBus.getDefault().post(new AuthenticationEvent(true));
+        } else {
 
             final Server config = getCurrentServer();
 
@@ -218,13 +225,11 @@ public class Application extends SugarApp
                 private final ProgressDialog dialog = new ProgressDialog(activity);
                 Exception exception;
 
-
                 @Override
-                protected RegistrationResponse doInBackground(Void... voids) {
-                    RegistrationResponse response = null;
+                protected RegistrationResponse doInBackground(Void... nope) {
+                    RegistrationResponse response = getRestClient().preregister();
 
                     try {
-                        response = restService.preregister(); // <-- async is for this line
                         config.setUsername(response.getUser().getUsername());
                         if ( ! response.getPassword().isEmpty()) {
                             config.setPassword(response.getPassword());
@@ -250,28 +255,45 @@ public class Application extends SugarApp
                     }
                     if (null != response) {
                         Log.d("G2P", "Pre-registered successfully.");
-                        toasty(String.format(getString(R.string.toast_preregistration_welcome), response.getUser().getPrettyUsername()));
+                        toasty(String.format(
+                                getString(R.string.toast_preregistration_welcome),
+                                response.getUser().getPrettyUsername()
+                        ));
                         EventBus.getDefault().post(new AuthenticationEvent(true));
                     } else if (null != exception) {
-                        // fixme : ExceptionHandler OOOOOPS what to do here ?
-                        if (exception instanceof NoInternetException) {
-                            toasty(getString(R.string.toast_no_internet_available));
-                        } else {
-                            Log.d("G2P", "Failed to pre-register.");
-                            exception.printStackTrace();
-                        }
+                        Log.d("G2P", "Failed to pre-register.");
+                        exception.printStackTrace();
                         EventBus.getDefault().post(new AuthenticationEvent(false));
-
+                        throw new CriticalException(exception); // while in beta...
                     } else {
-                        // Should never EVER happen, right ?
-                        Log.e("G2P", "I should never happen.");
+                        // An error happened but the error handler probably handled it.
+                        EventBus.getDefault().post(new AuthenticationEvent(false));
                     }
                 }
             }.execute();
 
-        } else {
-            EventBus.getDefault().post(new AuthenticationEvent(true));
         }
+    }
+
+
+    // REST CLIENT /////////////////////////////////////////////////////////////////////////////////
+
+    @org.androidannotations.rest.spring.annotations.RestService
+    RestClient restClient;
+
+    public RestClient getRestClient() {
+        return restClient;
+    }
+
+    void setupRestClient() {
+        restClient.setRootUrl(getCurrentServer().getUrl());
+        restClient.setRestErrorHandler(this);
+    }
+
+    @Override
+    @UiThread
+    public void onRestClientExceptionThrown(NestedRuntimeException e) {
+        new RestExceptionHandler(this, this.getApplicationContext()).handleException(e);
     }
 
 
@@ -702,7 +724,7 @@ public class Application extends SugarApp
      * The REST service handles all the HTTP nitty-gritty, and provides named methods for each API.
      */
     @Deprecated
-    public RestService getRestService() { return restService; }
+    public RestService getOldRestService() { return restService; }
 
 
     // STATS ///////////////////////////////////////////////////////////////////////////////////////

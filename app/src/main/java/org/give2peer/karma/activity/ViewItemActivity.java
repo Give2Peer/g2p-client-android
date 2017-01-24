@@ -72,7 +72,7 @@ import java.util.Locale;
 @EActivity(R.layout.activity_view_item)
 public class ViewItemActivity
      extends LocatorBaseActivity
-  implements OnMapReadyCallback, RestErrorHandler
+  implements OnMapReadyCallback
 {
     @App
     Application app;
@@ -242,20 +242,20 @@ public class ViewItemActivity
 
     //// REST SERVICE //////////////////////////////////////////////////////////////////////////////
 
-    @RestService
-    RestClient restClient;
-
-    @AfterInject
-    void setupRestClient() {
-        restClient.setRootUrl(app.getCurrentServer().getUrl());
-        restClient.setRestErrorHandler(this);
-    }
-
-    @Override
-    @UiThread
-    public void onRestClientExceptionThrown(NestedRuntimeException e) {
-        new RestExceptionHandler(app, this).handleException(e);
-    }
+//    @RestService
+//    RestClient restClient;
+//
+//    @AfterInject
+//    void setupRestClient() {
+//        restClient.setRootUrl(app.getCurrentServer().getUrl());
+//        restClient.setRestErrorHandler(this);
+//    }
+//
+//    @Override
+//    @UiThread
+//    public void onRestClientExceptionThrown(NestedRuntimeException e) {
+//        new RestExceptionHandler(app, this).handleException(e);
+//    }
 
 
 
@@ -462,7 +462,7 @@ public class ViewItemActivity
     @Background
     protected void deleteItem() {
         beforeDeleteItem();
-        DeleteItemResponse response = restClient.deleteItem(item.getId().toString());
+        DeleteItemResponse response = app.getRestClient().deleteItem(item.getId().toString());
         if (null != response) { afterDeleteItem(); }
     }
     
@@ -497,7 +497,7 @@ public class ViewItemActivity
     @Background
     protected void reportItem() {
         beforeReportItem();
-        ReportItemResponse response = restClient.reportItem(item.getId().toString());
+        ReportItemResponse response = app.getRestClient().reportItem(item.getId().toString());
         if (null != response) { afterReportItem(response); }
     }
 

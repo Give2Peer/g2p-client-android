@@ -9,6 +9,7 @@ package org.give2peer.karma.entity;
  *
  * Possible names :
  * - ServerConfiguration (bit long)
+ * - ApiConfiguration? Credentials?
  */
 public class Server extends BaseEntity
 {

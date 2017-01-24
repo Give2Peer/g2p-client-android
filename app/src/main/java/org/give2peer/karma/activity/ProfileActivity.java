@@ -51,7 +51,7 @@ import java.util.List;
  * - Items added by the user
  */
 @EActivity(R.layout.activity_profile)
-public class ProfileActivity extends AppCompatActivity implements RestErrorHandler
+public class ProfileActivity extends AppCompatActivity
 {
     @App
     Application app;
@@ -114,7 +114,7 @@ public class ProfileActivity extends AppCompatActivity implements RestErrorHandl
         super.onStop();
     }
 
-    // NAVIGATION DRAWER ///////////////////////////////////////////////////////////////////////////
+    //// NAVIGATION DRAWER /////////////////////////////////////////////////////////////////////////
 
     Drawer navigationDrawer;
 
@@ -134,7 +134,7 @@ public class ProfileActivity extends AppCompatActivity implements RestErrorHandl
     }
 
 
-    // OPTIONS MENU ////////////////////////////////////////////////////////////////////////////////
+    //// OPTIONS MENU //////////////////////////////////////////////////////////////////////////////
 
 //    @Override
 //    public boolean onCreateOptionsMenu(Menu menu)
@@ -151,24 +151,7 @@ public class ProfileActivity extends AppCompatActivity implements RestErrorHandl
 //        return found || super.onOptionsItemSelected(item);
 //    }
 
-    // REST SERVICE ////////////////////////////////////////////////////////////////////////////////
-
-    @RestService
-    RestClient restClient;
-
-    @AfterInject
-    void setupRestClient() {
-        restClient.setRootUrl(app.getCurrentServer().getUrl());
-        restClient.setRestErrorHandler(this);
-    }
-
-    @Override
-    @UiThread
-    public void onRestClientExceptionThrown(NestedRuntimeException e) {
-        new RestExceptionHandler(app, this).handleException(e);
-    }
-
-    // INTERFACE LISTENERS /////////////////////////////////////////////////////////////////////////
+    //// INTERFACE LISTENERS ///////////////////////////////////////////////////////////////////////
 
     /**
      * Gotta replace this by a snackbar, and make it more reusable. How?
@@ -350,7 +333,8 @@ public class ProfileActivity extends AppCompatActivity implements RestErrorHandl
 
     }
 
-    // GLOBAL LISTENERS ////////////////////////////////////////////////////////////////////////////
+
+    //// GLOBAL LISTENERS //////////////////////////////////////////////////////////////////////////
 
     @Subscribe
     public void onUpdateUser(UserUpdateEvent e) { // it IS used, actually
@@ -363,7 +347,7 @@ public class ProfileActivity extends AppCompatActivity implements RestErrorHandl
     }
 
 
-    // ACTIONS /////////////////////////////////////////////////////////////////////////////////////
+    //// ACTIONS ///////////////////////////////////////////////////////////////////////////////////
 
     protected void refreshUI (User user)
     {
@@ -416,7 +400,7 @@ public class ProfileActivity extends AppCompatActivity implements RestErrorHandl
 
     @Background
     protected void downloadProfile() {
-        PrivateProfileResponse profile = restClient.getPrivateProfile();
+        PrivateProfileResponse profile = app.getRestClient().getPrivateProfile();
         updateUiWithProfile(profile);
     }
 

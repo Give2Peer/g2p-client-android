@@ -16,6 +16,7 @@ import org.give2peer.karma.response.DeleteItemResponse;
 import org.give2peer.karma.response.FindItemsResponse;
 import org.give2peer.karma.response.PictureItemBeforehandResponse;
 import org.give2peer.karma.response.PrivateProfileResponse;
+import org.give2peer.karma.response.RegistrationResponse;
 import org.give2peer.karma.response.ReportItemResponse;
 import org.give2peer.karma.response.Stats;
 import org.springframework.core.io.FileSystemResource;
@@ -45,6 +46,16 @@ public interface RestClient extends RestClientRootUrl, RestClientErrorHandling
 
     @Get("/user")
     PrivateProfileResponse getPrivateProfile();
+
+    @Post("/user")
+    RegistrationResponse register(
+            @Field String email,
+            @Field String username,
+            @Field String password
+    );
+
+    @Post("/user")
+    RegistrationResponse preregister();
 
     @Get("/items/around/{latitude}/{longitude}?skip={skip}&maxDistance={maxDistance}")
     FindItemsResponse findItemsAround(

@@ -26,7 +26,7 @@ import java.util.Locale;
  * The reason we use this as a POJO class and not an implementation of RestErrorHandler is that
  * we were unable to work out how to get back to the UiThread from inside the handler.
  *
- * Here's an example usage, in an Activity that implements RestErrorHandler :
+ * Here's an example usage, in an Activity or Application that implements RestErrorHandler :
  *
  * @RestService
  * RestClient restClient;
@@ -46,9 +46,8 @@ import java.util.Locale;
  */
 public class RestExceptionHandler
 {
-
-    Application app;
-    Context context;
+    private Application app;
+    private Context context;
 
     public RestExceptionHandler(Application app, Context context) {
         this.app = app;

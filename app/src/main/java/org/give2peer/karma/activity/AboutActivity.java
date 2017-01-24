@@ -43,7 +43,7 @@ import org.springframework.core.NestedRuntimeException;
  * - the authors email
  */
 @EActivity(R.layout.activity_about)
-public class AboutActivity extends AppCompatActivity implements RestErrorHandler
+public class AboutActivity extends AppCompatActivity
 {
     @App
     Application app;
@@ -77,25 +77,10 @@ public class AboutActivity extends AppCompatActivity implements RestErrorHandler
 
     // STATS ///////////////////////////////////////////////////////////////////////////////////////
 
-    @RestService
-    RestClient restClient;
-
-    @AfterInject
-    void setupRestClient() {
-        restClient.setRootUrl(app.getCurrentServer().getUrl());
-        restClient.setRestErrorHandler(this);
-    }
-
-    @Override
-    @UiThread
-    public void onRestClientExceptionThrown(NestedRuntimeException e) {
-        new RestExceptionHandler(app, this).handleException(e);
-    }
-
     @AfterViews
     @Background
     void fetchStats() {
-        Stats stats = restClient.getStats();
+        Stats stats = app.getRestClient().getStats();
         if (null != stats) updateInterfaceWithStats(stats);
     }
 
