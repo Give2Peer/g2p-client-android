@@ -191,18 +191,32 @@ public  class      NewItemActivity
         super.onResume();
         // If the user is not preregistered, let's do this dudeez !
         app.requireAuthentication(this);
-        // For Android M and above, as we want to read and write pictures to the external storage
-        askForAccessPermissions();
         // We never know, maybe the map and location are ready already ?
         updateMap();
     }
+
+    private class OnAccessPermissionsCallback {
+        void onGranted() {}
+        void onDenied() {
+            Log.i("G2P", "Permission to access external storage denied… Why, you paranoid clod?");
+            app.toasty(getString(R.string.toast_permission_read_denied));
+            finish();
+        }
+    }
+
+    protected OnAccessPermissionsCallback accessPermissionsCallback;
 
     /**
      * This is only useful for Android Marshmallow and above, as permissions like these are given
      * on-the-fly and not on app install like in older android flavors.
      */
-    protected void askForAccessPermissions() {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) return;
+    protected void askForAccessPermissions(OnAccessPermissionsCallback callback) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+            callback.onGranted();
+            return;
+        }
+
+        accessPermissionsCallback = callback;
 
         // Let's ask for permissions if they're not already granted
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
@@ -263,16 +277,23 @@ public  class      NewItemActivity
         if (grantResults.length == 0) {
             // In some rare cases, this might happen ; consider permissions denied
             Log.d("G2P", "onRequestPermissionsResult with no permissions.");
-            onAccessPermissionsDenied();
+            if (null != accessPermissionsCallback) {
+                accessPermissionsCallback.onDenied();
+            }
             return;
         }
         switch (requestCode) {
             case REQUEST_CODE_ASK_EXTERNAL_STORAGE_PERMISSION:
                 Log.d("G2P", String.format("Grants: %d %d", grantResults[0], grantResults[1]));
                 if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    fillThumbnail();
+                    if (null != accessPermissionsCallback) {
+                        accessPermissionsCallback.onGranted();
+                    }
+                    fillThumbnail(); // todo: ensure we still need this
                 } else {
-                    onAccessPermissionsDenied();
+                    if (null != accessPermissionsCallback) {
+                        accessPermissionsCallback.onDenied();
+                    }
                 }
                 break;
             default:
@@ -280,11 +301,11 @@ public  class      NewItemActivity
         }
     }
 
-    protected void onAccessPermissionsDenied() {
-        Log.i("G2P", "Permission to access external storage denied... Why, you paranoid clod ?");
-        app.toasty(getString(R.string.toast_permission_read_denied));
-        finish();
-    }
+//    protected void onAccessPermissionsDenied() {
+//        Log.i("G2P", "Permission to access external storage denied... Why, you paranoid clod ?");
+//        app.toasty(getString(R.string.toast_permission_read_denied));
+//        finish();
+//    }
 
     /**
      * The Camera and Gallery activities will provide the images to this activity in this method,
@@ -329,14 +350,27 @@ public  class      NewItemActivity
     }
 
     /**
-     * This is to recover the image from the Intent, or launch the Camera to pick one if we
-     * arrived on this activity by other means (ie: the Intent is empty).
+     * Recover the image from the share or the camera, but ask for permissions first !
      */
     @AfterViews
     public void recoverImage() {
         // We need to do that as this is run before onResume
-        askForAccessPermissions();
+        askForAccessPermissions(new OnAccessPermissionsCallback() {
+            @Override
+            void onGranted() {
+                doRecoverImage();
+            }
+        });
+    }
 
+
+    //// IMAGE RECOVERY ////////////////////////////////////////////////////////////////////////////
+
+    /**
+     * This is to recover the image from the Intent, or launch the Camera to pick one if we
+     * arrived on this activity by other means (ie: the Intent is empty).
+     */
+    public void doRecoverImage() {
         // This activity may have been destroyed by the Camera activity.
         // If it's the case, the imagePaths is not null, as we saved it.
         // Only initialize it if it has not been restored from bundle state.

@@ -115,6 +115,7 @@ A version for the open beta community.
 
 - [ ] Refacto: clear up a bunch of internal things left to do
 - [ ] Feature: refactor to use Android Annotation's RestClient
+- [x] BugHunt: fix a critical bug with external storage permissions
 - [x] Feature: use better quality pictures in the item details view
 - [x] Feature: set an item location by longclick on the map when GPS is unavailable
 - [x] BugHunt: issue #2: item images are mishandled.
