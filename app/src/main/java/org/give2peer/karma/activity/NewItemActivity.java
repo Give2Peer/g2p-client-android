@@ -267,6 +267,8 @@ public  class      NewItemActivity
                         REQUEST_CODE_ASK_EXTERNAL_STORAGE_PERMISSION
                 );
             }
+        } else {
+            callback.onGranted();
         }
     }
 
@@ -317,7 +319,6 @@ public  class      NewItemActivity
         if (requestCode == REQUEST_CODE_IMAGE_CAPTURE && resultCode == RESULT_OK) {
             // Put the bitmap in the View to show the user
             fillThumbnail();
-            //sendItemImage();
         } else if (requestCode == REQUEST_CODE_IMAGE_CAPTURE && resultCode == RESULT_CANCELED) {
             // If the user cancelled the capture of a picture, we GTFO.
             // It may be nice to allow a user to add a picture from a gallery instead of taking one.
@@ -405,7 +406,6 @@ public  class      NewItemActivity
             // Otherwise, it means that `onActivityResult` will be called..
             if (imagePaths.size() > 0) {
                 fillThumbnail();
-                //sendItemImage();
             } else {
                 try {
                     // Check if there's a camera available
