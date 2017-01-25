@@ -69,8 +69,11 @@ import java.util.HashMap;
 import java.util.List;
 
 /**
- * This is our REST client service.
+ * This WAS our REST client service.
  * It fetches data synchronously, so you need to wrap it in an AsyncTask.
+ *
+ * It is now unused but in a hidden activity to configure servers ; too complex to refactor now.
+ * Never mind this class, see the RestClient instead.
  *
  * Responsibilities :
  * - Fetch data from server's HTTP REST API.

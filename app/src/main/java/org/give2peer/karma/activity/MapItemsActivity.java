@@ -335,7 +335,7 @@ public class      MapItemsActivity
 
     @AfterViews
     public void loadOnboardingIfNeeded() {
-        //app.isUserOnBoard(false);
+        app.isUserOnBoard(false);
         if (!app.isUserOnBoard()) {
             app.isUserOnBoard(true);
             loadOnboarding();
@@ -377,6 +377,13 @@ public class      MapItemsActivity
                 .withDescription(R.string.tutorial_slide_4_description)
                 .withColorResource(R.color.tutorial_slide_4_background)
                 .withImage(R.drawable.tutorial_slide_4)
+        );
+
+        slides.add(new Slide()
+                .withTitle(R.string.tutorial_slide_5_title)
+                .withDescription(R.string.tutorial_slide_5_description)
+                .withColorResource(R.color.tutorial_slide_5_background)
+                .withImage(R.drawable.tutorial_slide_5)
         );
 
         return slides;

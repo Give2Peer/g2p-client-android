@@ -135,12 +135,14 @@
     <!-- TUTORIAL -->
     <string name="tutorial_slide_1_title">Welcome !</string>
     <string name="tutorial_slide_1_description">Take your first steps\ninto our karmic community,\nwhere money is irrelevant.</string>
-    <string name="tutorial_slide_2_title">Lost something ?</string>
+    <string name="tutorial_slide_2_title">Lost something ?\nNeed something ?</string>
     <string name="tutorial_slide_2_description">Search for it on the map !</string>
-    <string name="tutorial_slide_3_title">Found something ?</string>
-    <string name="tutorial_slide_3_description">Snap a picture with your camera\nand share it to Karma !</string>
+    <string name="tutorial_slide_3_title">Found something ?\nGiving something ?</string>
+    <string name="tutorial_slide_3_description">Snap a picture with your camera,\nshare it to Karma,\nand give it a second life !</string>
     <string name="tutorial_slide_4_title">Level up !</string>
     <string name="tutorial_slide_4_description">By contributing, you\'ll win karma,\nprivileges, and boasting rights !</string>
+    <string name="tutorial_slide_5_title">Free, Transparent,\nLibre, Respectful</string>
+    <string name="tutorial_slide_5_description">Karma is the first and only\nopen-source recycling app.\nNeed a feature ?\nYou\'re welcome to contribute !</string>
 
     <string name="dialog_gps_disabled_oui">Yes</string><!-- deprecated -->
     <string name="dialog_gps_disabled_non">No</string><!-- deprecated -->
